@@ -1,23 +1,26 @@
-# Nextra Docs Template 
+# MillionScope.com
 
-This is a template for creating documentation with [Nextra](https://nextra.site).
+<div style={{width:"32px"}}>
+![image](assets/images/Hi.gif)
+</div>
 
-[**Live Demo →**](https://MillionScope.vercel.app)
+{/* <img src='https://qpluspicture.oss-cn-beijing.aliyuncs.com/6LjjQA/Hi.gif' alt='Hi' width="42"/> */}
+{/* <Image src="assets/images/Hi.gif" width="42" height="42" alt='Hi'/> */}
 
-[![](.github/screenshot.png)](https://MillionScope.vercel.app)
+### Repos:
 
-## Quick Start
+- [OpenHuman/Awesome Gesture Generation](https://github.com/OpenHuman-ai/awesome-gesture_generation)
 
-Click the button to clone this repository and deploy it on Vercel:
+### Pet projects:
 
-[![](https://vercel.com/button)](https://vercel.com/new/clone?s=https%3A%2F%2Fgithub.com%2Fmillionscope%2FMillionScope&showOptionalTeamCreation=false)
+- Loading animation with sound: [https://hmthanh.github.io/collection_loading_animation/](https://hmthanh.github.io/collection_loading_animation/)
+- Three.JS 3D human: [https://hmthanh.github.io/3d-human-model/](https://hmthanh.github.io/3d-human-model/)
+- Pucca Runner: [https://hmthanh.github.io/pucca_runner/](https://hmthanh.github.io/pucca_runner/)
+- RSA: [https://hmthanh.github.io/rsa/](https://hmthanh.github.io/rsa/)
 
-## Local Development
+### Contact with me:
 
-First, run `pnpm i` to install the dependencies.
-
-Then, run `pnpm dev` to start the development server and visit localhost:3000.
-
-## License
-
-This project is licensed under the MIT License.
+- Profile: https://hmthanh.github.io
+- Github: https://github.com/hmthanh
+- Twitter: https://twitter.com/hmthanh
+- LinkedIn: https://www.linkedin.com/in/hmthanh
