@@ -1,7 +1,5 @@
 {
   "index": "Introduction",
-  "another": "Blogs",
-  "quotes": "Quotes",
   "about": {
     "title": "About",
     "type": "page"
@@ -11,5 +9,6 @@
     "type": "page",
     "href": "https://hmthanh.github.io",
     "newWindow": true
-  }
+  },
+  "quotes": "Quotes"
 }

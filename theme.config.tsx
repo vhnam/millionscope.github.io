@@ -1,16 +1,25 @@
 import React from "react";
 // import { DocsThemeConfig } from "nextra-theme-docs";
 import { DocsThemeConfig } from "nextra-theme-docs";
+import { useRouter } from "next/router";
 
 const config: DocsThemeConfig = {
   logo: <span>MillionScope</span>,
   banner: {
-    key: "2.0-release",
+    key: "is comming",
     text: (
       <a href="https://openhuman.ai" target="_blank">
         🎉 OpenHuman.AI is comming. Read more →
       </a>
     ),
+  },
+  useNextSeoProps() {
+    const { asPath } = useRouter();
+    if (asPath !== "/") {
+      return {
+        titleTemplate: "%s - MillionScope",
+      };
+    }
   },
   faviconGlyph: "📚",
   project: {
@@ -37,6 +46,10 @@ const config: DocsThemeConfig = {
   docsRepositoryBase: "https://github.com/MillionScope/millionscope.github.io",
   footer: {
     text: "Thanh Minh-Hoang's blog",
+  },
+  navigation: {
+    prev: true,
+    next: true,
   },
 };
 
