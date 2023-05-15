@@ -1,15 +1,15 @@
 {
   "index": "Introduction",
-  "another": "Another Page",
-  "advanced": "Advanced (A Folder)",
+  "another": "Blogs",
+  "quotes": "Quotes",
   "about": {
     "title": "About",
     "type": "page"
   },
   "contact": {
-    "title": "Twitter ↗",
+    "title": "My Profile ↗",
     "type": "page",
-    "href": "https://twitter.com/millionscope",
+    "href": "https://hmthanh.github.io",
     "newWindow": true
   }
 }
