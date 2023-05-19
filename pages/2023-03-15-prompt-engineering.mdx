@@ -88,8 +88,8 @@ Many studies looked into how to construct in-context examples to maximize the pe
         - (1) First, construct a directed graph $G=(V, E)$ based on the embedding (e.g. by [SBERT](https://arxiv.org/abs/1908.10084) or [other](https://arxiv.org/abs/2201.10005) [embedding](https://platform.openai.com/docs/guides/embeddings) [models](https://openai.com/blog/new-and-improved-embedding-model)) cosine similarity between samples, where each node points to its $k$ nearest neighbors;
 
         - (2) Start with a set of selected samples $\mathcal{L}=\emptyset$ and a set of remaining samples $\mathcal{U}$.
-        Each sample $u \in \mathcal{U}$ is scored by 
-        
+        Each sample $u \in \mathcal{U}$ is scored by
+
         $$\text{score}(u) = \sum_{v \in \{v \mid (u, v) \in E, v\in \mathcal{U}\}} s(v)\quad\text{where }s(v)=\rho^{- \vert \{\ell \in \mathcal{L} \vert (v, \ell)\in E \}\vert},\quad\rho > 1 $$
 
         such that $s(v)$ is low if many of $v$'s neighbors are selected and thus the scoring encourages to pick diverse samples.
@@ -146,3 +146,52 @@ _In-context instruction learning_ ([Ye et al. 2023](https://arxiv.org/abs/2302.1
 # Chain-of-Thought (CoT)[#](#chain-of-thought-cot)
 
 **Chain-of-thought (CoT) prompting** ([Wei et al. 2022](https://arxiv.org/abs/2201.11903)) generates a sequence of short sentences to describe reasoning logics step by step, known as _reasoning chains_ or _rationales_, to eventually lead to the final answer. The benefit of CoT is more pronounced for **complicated reasoning tasks**, while using **large models** (e.g. with more than 50B parameters). Simple tasks only benefit slightly from CoT prompting.
+
+## Types of CoT prompts[#](#types-of-cot-prompts)
+
+Two main types of CoT prompting:
+
+- **Few-shot CoT**. It is to prompt the model with a few demonstrations, each containing manually written (or model-generated) high-quality reasoning chains.
+
+(All the math reasoning examples are from [GSM8k](https://github.com/openai/grade-school-math))
+
+```
+    Question: Tom and Elizabeth have a competition to climb a hill. Elizabeth takes 30 minutes to climb the hill. Tom takes four times as long as Elizabeth does to climb the hill. How many hours does it take Tom to climb up the hill?
+    Answer: It takes Tom 30*4 = <<30*4=120>>120 minutes to climb the hill.
+    It takes Tom 120/60 = <<120/60=2>>2 hours to climb the hill.
+    So the answer is 2.
+    ===
+    Question: Jack is a soccer player. He needs to buy two pairs of socks and a pair of soccer shoes. Each pair of socks cost $9.50, and the shoes cost $92. Jack has $40. How much more money does Jack need?
+    Answer: The total cost of two pairs of socks is $9.50 x 2 = $<<9.5*2=19>>19.
+    The total cost of the socks and the shoes is $19 + $92 = $<<19+92=111>>111.
+    Jack need $111 - $40 = $<<111-40=71>>71 more.
+    So the answer is 71.
+    ===
+    Question: Marty has 100 centimeters of ribbon that he must cut into 4 equal parts. Each of the cut parts must be divided into 5 equal parts. How long will each final cut be?
+    Answer:
+```
+
+- **Zero-shot CoT**. Use natural language statement like `Let's think step by step` to explicitly encourage the model to first generate reasoning chains and then to prompt with `Therefore, the answer is` to produce answers ([Kojima et al. 2022](https://arxiv.org/abs/2205.11916) ). Or a similar statement `Let's work this out it a step by step to be sure we have the right answer` ([Zhou et al. 2022](https://arxiv.org/abs/2211.01910)).
+
+```
+  Question: Marty has 100 centimeters of ribbon that he must cut into 4 equal parts. Each of the cut parts must be divided into 5 equal parts. How long will each final cut be?
+  Answer: Let's think step by step.
+```
+
+## Tips and Extensions[#](#tips-and-extensions)
+
+- [Self-consistency sampling](#self-consistency-sampling) can improve reasoning accuracy by sampling a number of diverse answers and then taking the majority vote. ([Wang et al. 2022a](https://arxiv.org/abs/2203.11171))
+- Another approach for ensemble learning is to alter the example order or use model generated rationales to replace human-written ones to introduce randomness during multiple sample trials. Then aggregate model outputs with a majority vote to get final answer. ([Wang et al. 2022b](https://arxiv.org/abs/2207.00747))
+- If training examples are only associated with true answers (easy to verify!) but no rationales, we can follow the _STaR_ (Self-Taught Reasoner; [Zelikman et al. 2022](https://arxiv.org/abs/2203.14465)) method : (1) Ask LLM to generate reasoning chains and only keep those leading to correct answers; (2) Then fine-tune the model with generated rationales and repeat the process until convergence. Note that higher temperature is more likely to generate incorrect rationales with correct answers. If training examples do not have ground truth answers, maybe consider using majority votes as the “correct” answers.
+- Prompts with demonstrations of higher reasoning complexity can achieve better performance, where complexity is measured by the number of reasoning steps in the chains. When separating reasoning steps, newline `\n` symbol works better than `step i`, period `.` or semicolon `;`. ([Fu et al. 2023](https://arxiv.org/abs/2210.00720))
+
+- _Complexity-based consistency_ is to explicitly prefer complex chains among all the generations by taking majority vote among only top $k$ complex chains. ([Fu et al. 2023](https://arxiv.org/abs/2210.00720))
+- Later, [Shum et al. (2023)](https://arxiv.org/abs/2302.12822) found that in their experiments CoT prompts with only complex examples can improve the accuracy of complex questions, but perform poorly in simple questions; evidence shown on GSM8k.
+- Changing `Q:` to `Question:` is found to be helpful. ([Fu et al. 2023](https://arxiv.org/abs/2210.00720))
+- [Ye & Durrett (2022)](https://arxiv.org/abs/2205.03401) found that the benefit of including explanations in the prompt is small to moderate for NLP tasks that involve reasoning over text (i.e. QA and NLI) and the effects vary by models. They observed that explanations are more likely to be nonfactual than be inconsistent (i.e. whether explanation entails prediction). Nonfactual explanations most likely lead to incorrect predictions.
+- _Self-Ask_ ([Press et al. 2022](https://arxiv.org/abs/2210.03350)) is a method to repeatedly prompt the model to _ask following-up questions_ to construct the thought process iteratively. Follow-up questions can be answered by search engine results. Similarly, _IRCoT_ (Interleaving Retrieval CoT; [Trivedi et al. 2022](https://arxiv.org/abs/2212.10509)) and _ReAct_ (Reason + Act; [Yao et al. 2023](https://arxiv.org/abs/2210.03629)) combines iterative CoT prompting with queries to Wikipedia APIs to search for relevant entities and content and then add it back into the context.
+
+![](assets/images/2023-03-15-prompt-engineering/SelfAsk-search.png)
+
+Fig. 1. How Self-Ask works with external search queries.  
+(Image source: [Press et al. 2022](https://arxiv.org/abs/2210.03350)).
