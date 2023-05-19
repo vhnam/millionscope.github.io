@@ -67,43 +67,43 @@ $N$
 
 The total number of attention layers in the model; not considering MoE.
 
-$\\mathbf{X} \\in \\mathbb{R}^{L \\times d}$
+$\\mathbf{X} \in \\mathbb{R}^{L \\times d}$
 
 The input sequence where each element has been mapped into an embedding vector of shape $d$, same as the model size.
 
-$\\mathbf{W}^k \\in \\mathbb{R}^{d \\times d\_k}$
+$\\mathbf{W}^k \in \\mathbb{R}^{d \\times d\_k}$
 
 The key weight matrix.
 
-$\\mathbf{W}^q \\in \\mathbb{R}^{d \\times d\_k}$
+$\\mathbf{W}^q \in \\mathbb{R}^{d \\times d\_k}$
 
 The query weight matrix.
 
-$\\mathbf{W}^v \\in \\mathbb{R}^{d \\times d\_v}$
+$\\mathbf{W}^v \in \\mathbb{R}^{d \\times d\_v}$
 
 The value weight matrix. Often we have $d\_k = d\_v = d$.
 
-$\\mathbf{W}^k\_i, \\mathbf{W}^q\_i \\in \\mathbb{R}^{d \\times d\_k/h}; \\mathbf{W}^v\_i \\in \\mathbb{R}^{d \\times d\_v/h}$
+$\\mathbf{W}^k\_i, \\mathbf{W}^q\_i \in \\mathbb{R}^{d \\times d\_k/h}; \\mathbf{W}^v\_i \in \\mathbb{R}^{d \\times d\_v/h}$
 
 The weight matrices per head.
 
-$\\mathbf{W}^o \\in \\mathbb{R}^{d\_v \\times d}$
+$\\mathbf{W}^o \in \\mathbb{R}^{d\_v \\times d}$
 
 The output weight matrix.
 
-$\\mathbf{Q} = \\mathbf{X}\\mathbf{W}^q \\in \\mathbb{R}^{L \\times d\_k}$
+$\\mathbf{Q} = \\mathbf{X}\\mathbf{W}^q \in \\mathbb{R}^{L \\times d\_k}$
 
 The query embedding inputs.
 
-$\\mathbf{K} = \\mathbf{X}\\mathbf{W}^k \\in \\mathbb{R}^{L \\times d\_k}$
+$\\mathbf{K} = \\mathbf{X}\\mathbf{W}^k \in \\mathbb{R}^{L \\times d\_k}$
 
 The key embedding inputs.
 
-$\\mathbf{V} = \\mathbf{X}\\mathbf{W}^v \\in \\mathbb{R}^{L \\times d\_v}$
+$\\mathbf{V} = \\mathbf{X}\\mathbf{W}^v \in \\mathbb{R}^{L \\times d\_v}$
 
 The value embedding inputs.
 
-$\\mathbf{q}\_i, \\mathbf{k}\_i \\in \\mathbb{R}^{d\_k}, \\mathbf{v}\_i \\in \\mathbb{R}^{d\_v}$
+$\\mathbf{q}\_i, \\mathbf{k}\_i \in \\mathbb{R}^{d\_k}, \\mathbf{v}\_i \in \\mathbb{R}^{d\_v}$
 
 Row vectors in query, key, value matrices, $\\mathbf{Q}$, $\\mathbf{K}$ and $\\mathbf{V}$.
 
@@ -111,15 +111,15 @@ $S\_i$
 
 A collection of key positions for the $i$-th query $\\mathbf{q}\_i$ to attend to.
 
-$\\mathbf{A} \\in \\mathbb{R}^{L \\times L}$
+$\\mathbf{A} \in \\mathbb{R}^{L \\times L}$
 
-The self-attention matrix between a input sequence of lenght $L$ and itself. $\\mathbf{A} = \\text{softmax}(\\mathbf{Q}\\mathbf{K}^\\top / \\sqrt{d\_k})$.
+The self-attention matrix between a input sequence of lenght $L$ and itself. $\\mathbf{A} = \text{softmax}(\\mathbf{Q}\\mathbf{K}^\\top / \\sqrt{d\_k})$.
 
-$a\_{ij} \\in \\mathbf{A}$
+$a\_{ij} \in \\mathbf{A}$
 
 The scalar attention score between query $\\mathbf{q}\_i$ and key $\\mathbf{k}\_j$.
 
-$\\mathbf{P} \\in \\mathbb{R}^{L \\times d}$
+$\\mathbf{P} \in \\mathbb{R}^{L \\times d}$
 
 position encoding matrix, where the $i$-th row $\\mathbf{p}\_i$ is the positional encoding for input $\\mathbf{x}\_i$.
 
@@ -135,13 +135,13 @@ The **Transformer** (which will be referred to as “vanilla Transformer” to d
 
 There are various forms of attention / self-attention, Transformer ([Vaswani et al., 2017](https://arxiv.org/abs/1706.03762)) relies on the _scaled dot-product attention_: given a query matrix $\\mathbf{Q}$, a key matrix $\\mathbf{K}$ and a value matrix $\\mathbf{V}$, the output is a weighted sum of the value vectors, where the weight assigned to each value slot is determined by the dot-product of the query with the corresponding key:
 
-$$ \\text{attn}(\\mathbf{Q}, \\mathbf{K}, \\mathbf{V}) = \\text{softmax}(\\frac{\\mathbf{Q} {\\mathbf{K}}^\\top}{\\sqrt{d_k}})\\mathbf{V} $$
+$$ \text{attn}(\\mathbf{Q}, \\mathbf{K}, \\mathbf{V}) = \text{softmax}(\\frac{\\mathbf{Q} {\\mathbf{K}}^\\top}{\\sqrt{d_k}})\\mathbf{V} $$
 
-And for a query and a key vector $\\mathbf{q}\_i, \\mathbf{k}\_j \\in \\mathbb{R}^d$ (row vectors in query and key matrices), we have a scalar score:
+And for a query and a key vector $\\mathbf{q}\_i, \\mathbf{k}\_j \in \\mathbb{R}^d$ (row vectors in query and key matrices), we have a scalar score:
 
-$$ a\_{ij} = \\text{softmax}(\\frac{\\mathbf{q}\_i {\\mathbf{k}\_j}^\\top}{\\sqrt{d_k}}) = \\frac{\\exp(\\mathbf{q}\_i {\\mathbf{k}\_j}^\\top)}{ \\sqrt{d_k} \\sum\_{r \\in \\mathcal{S}\_i} \\exp(\\mathbf{q}\_i {\\mathbf{k}\_r}^\\top) } $$
+$$ a\_{ij} = \text{softmax}(\\frac{\\mathbf{q}\_i {\\mathbf{k}\_j}^\\top}{\\sqrt{d_k}}) = \\frac{\\exp(\\mathbf{q}\_i {\\mathbf{k}\_j}^\\top)}{ \\sqrt{d_k} \sum\_{r \in \mathcal{S}\_i} \\exp(\\mathbf{q}\_i {\\mathbf{k}\_r}^\\top) } $$
 
-where $\\mathcal{S}\_i$ is a collection of key positions for the $i$-th query to attend to.
+where $\mathcal{S}\_i$ is a collection of key positions for the $i$-th query to attend to.
 
 See my old [post for other types of attention](https://lilianweng.github.io/posts/2018-06-24-attention/#a-family-of-attention-mechanisms) if interested.
 
@@ -149,9 +149,9 @@ See my old [post for other types of attention](https://lilianweng.github.io/post
 
 The **multi-head self-attention** module is a key component in Transformer. Rather than only computing the attention once, the multi-head mechanism splits the inputs into smaller chunks and then computes the scaled dot-product attention over each subspace in parallel. The independent attention outputs are simply concatenated and linearly transformed into expected dimensions.
 
-$$ \\begin{aligned} \\text{MultiHeadAttn}(\\mathbf{X}\_q, \\mathbf{X}\_k, \\mathbf{X}\_v) &= \[\\text{head}\_1; \\dots; \\text{head}\_h\] \\mathbf{W}^o \\\\ \\text{where head}\_i &= \\text{Attention}(\\mathbf{X}\_q\\mathbf{W}^q_i, \\mathbf{X}\_k\\mathbf{W}^k_i, \\mathbf{X}\_v\\mathbf{W}^v_i) \\end{aligned} $$
+$$ \\begin{aligned} \text{MultiHeadAttn}(\\mathbf{X}\_q, \\mathbf{X}\_k, \\mathbf{X}\_v) &= \[\text{head}\_1; \\dots; \text{head}\_h\] \\mathbf{W}^o \\\\ \text{where head}\_i &= \text{Attention}(\\mathbf{X}\_q\\mathbf{W}^q_i, \\mathbf{X}\_k\\mathbf{W}^k_i, \\mathbf{X}\_v\\mathbf{W}^v_i) \\end{aligned} $$
 
-where $\[.;.\]$ is a concatenation operation. $\\mathbf{W}^q\_i, \\mathbf{W}^k\_i \\in \\mathbb{R}^{d \\times d\_k/h}, \\mathbf{W}^v\_i \\in \\mathbb{R}^{d \\times d\_v/h}$ are weight matrices to map input embeddings of size $L \\times d$ into query, key and value matrices. And $\\mathbf{W}^o \\in \\mathbb{R}^{d\_v \\times d}$ is the output linear transformation. All the weights should be learned during training.
+where $\[.;.\]$ is a concatenation operation. $\\mathbf{W}^q\_i, \\mathbf{W}^k\_i \in \\mathbb{R}^{d \\times d\_k/h}, \\mathbf{W}^v\_i \in \\mathbb{R}^{d \\times d\_v/h}$ are weight matrices to map input embeddings of size $L \\times d$ into query, key and value matrices. And $\\mathbf{W}^o \in \\mathbb{R}^{d\_v \\times d}$ is the output linear transformation. All the weights should be learned during training.
 
 ![](multi-head-attention.png)
 
@@ -169,13 +169,13 @@ Fig. 2. The architecture of the vanilla Transformer model. (Image source: [Figur
 
 ## Positional Encoding[#](#positional-encoding)
 
-Because self-attention operation is permutation invariant, it is important to use proper **positional encoding** to provide _order information_ to the model. The positional encoding $\\mathbf{P} \\in \\mathbb{R}^{L \\times d}$ has the same dimension as the input embedding, so it can be added on the input directly. The vanilla Transformer considered two types of encodings:
+Because self-attention operation is permutation invariant, it is important to use proper **positional encoding** to provide _order information_ to the model. The positional encoding $\\mathbf{P} \in \\mathbb{R}^{L \\times d}$ has the same dimension as the input embedding, so it can be added on the input directly. The vanilla Transformer considered two types of encodings:
 
 ### Sinusoidal Positional Encoding[#](#sinusoidal-positional-encoding)
 
 Sinusoidal positional encoding is defined as follows, given the token position $i=1,\\dots,L$ and the dimension $\\delta=1,\\dots,d$:
 
-$$ \\text{PE}(i,\\delta) = \\begin{cases} \\sin(\\frac{i}{10000^{2\\delta'/d}}) & \\text{if } \\delta = 2\\delta'\\\\ \\cos(\\frac{i}{10000^{2\\delta'/d}}) & \\text{if } \\delta = 2\\delta' + 1\\\\ \\end{cases} $$
+$$ \text{PE}(i,\\delta) = \\begin{cases} \\sin(\\frac{i}{10000^{2\\delta'/d}}) & \text{if } \\delta = 2\\delta'\\\\ \\cos(\\frac{i}{10000^{2\\delta'/d}}) & \text{if } \\delta = 2\\delta' + 1\\\\ \\end{cases} $$
 
 In this way each dimension of the positional encoding corresponds to a sinusoid of different wavelengths in different dimensions, from $2\\pi$ to $10000 \\cdot 2\\pi$.
 
@@ -189,9 +189,9 @@ Learned positional encoding assigns each element with a _learned_ column vector 
 
 ### Relative Position Encoding[#](#relative-position-encoding)
 
-[Shaw et al. (2018)](https://arxiv.org/abs/1803.02155)) incorporated relative positional information into $\\mathbf{W}^k$ and $\\mathbf{W}^v$. Maximum relative position is clipped to a maximum absolute value of $k$ and this clipping operation enables the model to generalize to unseen sequence lengths. Therefore, $2k + 1$ unique edge labels are considered and let us denote $\\mathbf{P}^k, \\mathbf{P}^v \\in \\mathbb{R}^{2k+1}$ as learnable relative position representations.
+[Shaw et al. (2018)](https://arxiv.org/abs/1803.02155)) incorporated relative positional information into $\\mathbf{W}^k$ and $\\mathbf{W}^v$. Maximum relative position is clipped to a maximum absolute value of $k$ and this clipping operation enables the model to generalize to unseen sequence lengths. Therefore, $2k + 1$ unique edge labels are considered and let us denote $\\mathbf{P}^k, \\mathbf{P}^v \in \\mathbb{R}^{2k+1}$ as learnable relative position representations.
 
-$$ A\_{ij}^k = P^k\_{\\text{clip}(j - i, k)} \\quad A\_{ij}^v = P^v\_{\\text{clip}(j - i, k)} \\quad \\text{where }\\text{clip}(x, k) = \\text{clip}(x, -k, k) $$
+$$ A\_{ij}^k = P^k\_{\text{clip}(j - i, k)} \quad A\_{ij}^v = P^v\_{\text{clip}(j - i, k)} \quad \text{where }\text{clip}(x, k) = \text{clip}(x, -k, k) $$
 
 [Transformer-XL](#transformer-xl) ([Dai et al., 2019](https://arxiv.org/abs/1901.02860)) proposed a type of relative positional encoding based on reparametrization of dot-product of keys and queries. To keep the positional information flow coherently across segments, Transformer-XL encodes the _relative_ position instead, as it could be sufficient enough to know the position offset for making good predictions, i.e. $i-j$, between one key vector $\\mathbf{k}\_{\\tau, j}$ and its query $\\mathbf{q}\_{\\tau, i}$.
 
@@ -201,9 +201,9 @@ $$ \\begin{aligned} a\_{ij} &= \\mathbf{q}\_i {\\mathbf{k}\_j}^\\top = (\\mathbf
 
 Transformer-XL reparameterizes the above four terms as follows:
 
-$$ a\_{ij}^\\text{rel} = \\underbrace{ \\mathbf{x}\_i\\mathbf{W}^q \\color{blue}{ {\\mathbf{W}\_E^k}^\\top } \\mathbf{x}\_j^\\top }\_\\text{content-based addressing} + \\underbrace{ \\mathbf{x}\_i\\mathbf{W}^q \\color{blue}{ {\\mathbf{W}\_R^k}^\\top } \\color{green}{\\mathbf{r}\_{i-j}^\\top} }\_\\text{content-dependent positional bias} + \\underbrace{ \\color{red}{\\mathbf{u}} \\color{blue}{ {\\mathbf{W}\_E^k}^\\top } \\mathbf{x}\_j^\\top }\_\\text{global content bias} + \\underbrace{ \\color{red}{\\mathbf{v}} \\color{blue}{ {\\mathbf{W}\_R^k}^\\top } \\color{green}{\\mathbf{r}\_{i-j}^\\top} }\_\\text{global positional bias} $$
+$$ a\_{ij}^\text{rel} = \\underbrace{ \\mathbf{x}\_i\\mathbf{W}^q \\color{blue}{ {\\mathbf{W}\_E^k}^\\top } \\mathbf{x}\_j^\\top }\_\text{content-based addressing} + \\underbrace{ \\mathbf{x}\_i\\mathbf{W}^q \\color{blue}{ {\\mathbf{W}\_R^k}^\\top } \\color{green}{\\mathbf{r}\_{i-j}^\\top} }\_\text{content-dependent positional bias} + \\underbrace{ \\color{red}{\\mathbf{u}} \\color{blue}{ {\\mathbf{W}\_E^k}^\\top } \\mathbf{x}\_j^\\top }\_\text{global content bias} + \\underbrace{ \\color{red}{\\mathbf{v}} \\color{blue}{ {\\mathbf{W}\_R^k}^\\top } \\color{green}{\\mathbf{r}\_{i-j}^\\top} }\_\text{global positional bias} $$
 
-- Replace $\\mathbf{p}\_j$ with relative positional encoding $\\mathbf{r}\_{i-j} \\in \\mathbf{R}^{d}$;
+- Replace $\\mathbf{p}\_j$ with relative positional encoding $\\mathbf{r}\_{i-j} \in \\mathbf{R}^{d}$;
 - Replace $\\mathbf{p}\_i\\mathbf{W}^q$ with two trainable parameters $\\mathbf{u}$ (for content) and $\\mathbf{v}$ (for location) in two different terms;
 - Split $\\mathbf{W}^k$ into two matrices, $\\mathbf{W}^k\_E$ for content information and $\\mathbf{W}^k\_R$ for location information.
 
@@ -221,11 +221,11 @@ When generalizing to higher dimensional space, RoPE divide the $d$-dimensional s
 
 $$ R^d\_{\\Theta, i} = \\begin{bmatrix} \\cos i\\theta_1 & -\\sin i\\theta_1 & 0 & 0 & \\dots & 0 & 0 \\\\ \\sin i\\theta_1 & \\cos i\\theta_1 & 0 & 0 & \\dots & 0 & 0 \\\\ 0 & 0 & \\cos i\\theta_2 & -\\sin i\\theta_2 & \\dots & 0 & 0 \\\\ 0 & 0 & \\sin i\\theta_1 & \\cos i\\theta_1 & \\dots & 0 & 0 \\\\ \\vdots & \\vdots & \\vdots & \\vdots & \\ddots & \\vdots & \\vdots \\\\ 0 & 0 & 0 & 0 & \\dots & \\cos i\\theta\_{d/2} & -\\sin i\\theta\_{d/2} \\\\ 0 & 0 & 0 & 0 & \\dots & \\sin i\\theta\_{d/2} & \\cos i\\theta\_{d/2} \\\\ \\end{bmatrix} $$
 
-where in the paper we have $\\Theta = {\\theta\_i = 10000^{-2(i−1)/d}, i \\in \[1, 2, …, d/2\]}$. Note that this is essentially equivalent to sinusoidal positional encoding but formulated as a rotation matrix.
+where in the paper we have $\\Theta = {\\theta\_i = 10000^{-2(i−1)/d}, i \in \[1, 2, …, d/2\]}$. Note that this is essentially equivalent to sinusoidal positional encoding but formulated as a rotation matrix.
 
 Then both key and query matrices incorporates the positional information by multiplying with this rotation matrix:
 
-$$ \\begin{aligned} & \\mathbf{q}\_i^\\top \\mathbf{k}\_j = (R^d\_{\\Theta, i} \\mathbf{W}^q\\mathbf{x}\_i)^\\top (R^d\_{\\Theta, j} \\mathbf{W}^k\\mathbf{x}\_j) = \\mathbf{x}\_i^\\top\\mathbf{W}^q R^d\_{\\Theta, j-i}\\mathbf{W}^k\\mathbf{x}\_j \\\\ & \\text{ where } R^d\_{\\Theta, j-i} = (R^d\_{\\Theta, i})^\\top R^d\_{\\Theta, j} \\end{aligned} $$
+$$ \\begin{aligned} & \\mathbf{q}\_i^\\top \\mathbf{k}\_j = (R^d\_{\\Theta, i} \\mathbf{W}^q\\mathbf{x}\_i)^\\top (R^d\_{\\Theta, j} \\mathbf{W}^k\\mathbf{x}\_j) = \\mathbf{x}\_i^\\top\\mathbf{W}^q R^d\_{\\Theta, j-i}\\mathbf{W}^k\\mathbf{x}\_j \\\\ & \text{ where } R^d\_{\\Theta, j-i} = (R^d\_{\\Theta, i})^\\top R^d\_{\\Theta, j} \\end{aligned} $$
 
 ![](RoPE.png)
 
@@ -233,7 +233,7 @@ Fig. 4. Visual illustration of how rotary position embedding is implemented.(Ima
 
 # Longer Context[#](#longer-context)
 
-The length of an input sequence for transformer models at inference time is upper-bounded by the context length used for training. Naively increasing context length leads to high consumption in both time ($\\mathcal{O}(L^2d)$) and memory ($\\mathcal{O}(L^2)$) and may not be supported due to hardware constraints.
+The length of an input sequence for transformer models at inference time is upper-bounded by the context length used for training. Naively increasing context length leads to high consumption in both time ($\mathcal{O}(L^2d)$) and memory ($\mathcal{O}(L^2)$) and may not be supported due to hardware constraints.
 
 This section introduces several improvements in transformer architecture to better support long context at inference; E.g. using additional memory, design for better context extrapolation, or recurrency mechanism.
 
@@ -251,9 +251,9 @@ The vanilla Transformer has a fixed and limited attention span. The model can on
 
 Fig. 5. A comparison between the training phrase of vanilla Transformer & Transformer-XL with a segment length 4. (Image source: left part of Figure 2 in [Dai et al., 2019](https://arxiv.org/abs/1901.02860)).
 
-Let’s label the hidden state of the $n$-th layer for the $(\\tau + 1)$-th segment in the model as $\\mathbf{h}\_{\\tau+1}^{(n)} \\in \\mathbb{R}^{L \\times d}$. In addition to the hidden state of the last layer for the same segment $\\mathbf{h}\_{\\tau+1}^{(n-1)}$, it also depends on the hidden state of the same layer for the previous segment $\\mathbf{h}\_{\\tau}^{(n)}$. By incorporating information from the previous hidden states, the model extends the attention span much longer in the past, over multiple segments.
+Let's label the hidden state of the $n$-th layer for the $(\\tau + 1)$-th segment in the model as $\\mathbf{h}\_{\\tau+1}^{(n)} \in \\mathbb{R}^{L \\times d}$. In addition to the hidden state of the last layer for the same segment $\\mathbf{h}\_{\\tau+1}^{(n-1)}$, it also depends on the hidden state of the same layer for the previous segment $\\mathbf{h}\_{\\tau}^{(n)}$. By incorporating information from the previous hidden states, the model extends the attention span much longer in the past, over multiple segments.
 
-$$ \\begin{aligned} \\color{red}{\\widetilde{\\mathbf{h}}\_{\\tau+1}^{(n-1)}} &= \[\\text{stop-gradient}(\\mathbf{h}\_{\\tau}^{(n-1)}) \\circ \\mathbf{h}\_{\\tau+1}^{(n-1)}\] \\\\ \\mathbf{Q}\_{\\tau+1}^{(n)} &= \\mathbf{h}\_{\\tau+1}^{(n-1)}\\mathbf{W}^q \\\\ \\mathbf{K}\_{\\tau+1}^{(n)} &= \\color{red}{\\widetilde{\\mathbf{h}}\_{\\tau+1}^{(n-1)}} \\mathbf{W}^k \\\\ \\mathbf{V}\_{\\tau+1}^{(n)} &= \\color{red}{\\widetilde{\\mathbf{h}}\_{\\tau+1}^{(n-1)}} \\mathbf{W}^v \\\\ \\mathbf{h}\_{\\tau+1}^{(n)} &= \\text{transformer-layer}(\\mathbf{Q}\_{\\tau+1}^{(n)}, \\mathbf{K}\_{\\tau+1}^{(n)}, \\mathbf{V}\_{\\tau+1}^{(n)}) \\end{aligned} $$
+$$ \\begin{aligned} \\color{red}{\\widetilde{\\mathbf{h}}\_{\\tau+1}^{(n-1)}} &= \[\text{stop-gradient}(\\mathbf{h}\_{\\tau}^{(n-1)}) \\circ \\mathbf{h}\_{\\tau+1}^{(n-1)}\] \\\\ \\mathbf{Q}\_{\\tau+1}^{(n)} &= \\mathbf{h}\_{\\tau+1}^{(n-1)}\\mathbf{W}^q \\\\ \\mathbf{K}\_{\\tau+1}^{(n)} &= \\color{red}{\\widetilde{\\mathbf{h}}\_{\\tau+1}^{(n-1)}} \\mathbf{W}^k \\\\ \\mathbf{V}\_{\\tau+1}^{(n)} &= \\color{red}{\\widetilde{\\mathbf{h}}\_{\\tau+1}^{(n-1)}} \\mathbf{W}^v \\\\ \\mathbf{h}\_{\\tau+1}^{(n)} &= \text{transformer-layer}(\\mathbf{Q}\_{\\tau+1}^{(n)}, \\mathbf{K}\_{\\tau+1}^{(n)}, \\mathbf{V}\_{\\tau+1}^{(n)}) \\end{aligned} $$
 
 Note that both keys and values rely on extended hidden states, while queries only consume hidden states at the current step. The concatenation operation $\[. \\circ .\]$ is along the sequence length dimension. And Transformer-XL needs to use [relative positional encoding](#transformer-xl-encoding) because previous and current segments would be assigned with the same encoding if we encode absolute positions, which is undesired.
 
@@ -274,15 +274,15 @@ Compressive transformer has two additional training losses:
 
 1.  **Auto-encoding loss** (lossless compression objective) measures how well we can reconstruct the original memories from compressed memories
 
-    $$ \\mathcal{L}\_{ac} = \\| \\textbf{old_mem}^{(i)} - g(\\textbf{new_cm}^{(i)}) \\|\_2 $$
+    $$ \mathcal{L}\_{ac} = \\| \textbf{old_mem}^{(i)} - g(\textbf{new_cm}^{(i)}) \\|\_2 $$
 
     where $g: \\mathbb{R}^{\[\\frac{L}{c}\] \\times d} \\to \\mathbb{R}^{L \\times d}$ reverses the compression function $f$.
 
 2.  **Attention-reconstruction loss** (lossy objective) reconstructs content-based attention over memory vs compressed memory and minimize the difference:
 
-    $$ \\mathcal{L}\_{ar} = \\|\\text{attn}(\\mathbf{h}^{(i)}, \\textbf{old_mem}^{(i)}) − \\text{attn}(\\mathbf{h}^{(i)}, \\textbf{new_cm}^{(i)})\\|\_2 $$
+    $$ \mathcal{L}\_{ar} = \\|\text{attn}(\\mathbf{h}^{(i)}, \textbf{old_mem}^{(i)}) − \text{attn}(\\mathbf{h}^{(i)}, \textbf{new_cm}^{(i)})\\|\_2 $$
 
-Transformer-XL with a memory of size $m$ has a maximum temporal range of $m \\times N$, where $N$ is the number of layers in the model, and attention cost $\\mathcal{O}(L^2 + Lm)$. In comparison, compressed transformer has a temporal range of $(m\_m + c \\cdot m\_{cm}) \\times N$ and attention cost $\\mathcal{O}(L^2 + L(m\_m + m\_{cm}))$. A larger compression rate $c$ gives better tradeoff between temporal range length and attention cost.
+Transformer-XL with a memory of size $m$ has a maximum temporal range of $m \\times N$, where $N$ is the number of layers in the model, and attention cost $\mathcal{O}(L^2 + Lm)$. In comparison, compressed transformer has a temporal range of $(m\_m + c \\cdot m\_{cm}) \\times N$ and attention cost $\mathcal{O}(L^2 + L(m\_m + m\_{cm}))$. A larger compression rate $c$ gives better tradeoff between temporal range length and attention cost.
 
 Attention weights, from oldest to newest, are stored in three locations: compressed memory → memory → causally masked sequence. In the experiments, they observed an increase in attention weights from oldest activations stored in the regular memory, to activations stored in the compressed memory, implying that the network is learning to preserve salient information.
 
@@ -296,9 +296,9 @@ Fig. 7. Attention weights with one standard deviation as error bars versus memor
 
 At inference time, the next token probability is a weighted sum of two predictions:
 
-$$ \\begin{aligned} p(y \\vert \\mathbf{x}) &= \\lambda \\; p\_\\text{kNN}(y \\vert \\mathbf{x}) + (1- \\lambda) \\; p\_\\text{LM}(y \\vert \\mathbf{x}) \\\\ p\_\\text{kNN}(y \\vert \\mathbf{x}) &\\propto \\sum\_{(k_i, w_i) \\in \\mathcal{N}} \\mathbb{1}\[y = w_i\] \\exp(-d(k_i, f(\\mathbf{x}))) \\end{aligned} $$
+$$ \\begin{aligned} p(y \vert \\mathbf{x}) &= \\lambda \\; p\_\text{kNN}(y \vert \\mathbf{x}) + (1- \\lambda) \\; p\_\text{LM}(y \vert \\mathbf{x}) \\\\ p\_\text{kNN}(y \vert \\mathbf{x}) &\\propto \sum\_{(k_i, w_i) \in \mathcal{N}} \\mathbb{1}\[y = w_i\] \\exp(-d(k_i, f(\\mathbf{x}))) \\end{aligned} $$
 
-where $\\mathcal{N}$ contains a set of nearest neighbor data points retrieved by $k$NN; $d(., .)$ is a distance function such as L2 distance.
+where $\mathcal{N}$ contains a set of nearest neighbor data points retrieved by $k$NN; $d(., .)$ is a distance function such as L2 distance.
 
 According to the experiments, larger datastore size or larger $k$ is correlated with better perplexity. The weighting scalar $\\lambda$ should be tuned, but in general it is expected to be larger for out-of-domain data compared to in-domain data and larger datastore can afford a larger $\\lambda$.
 
@@ -308,11 +308,11 @@ According to the experiments, larger datastore size or larger $k$ is correlated 
 
 Fig. 8. Illustration of how SPALM combines context memory of past hidden states (short term memory) with an external key-value datastore (long term memory) to support longer context. (Image source: [Yogatama et al. 2021](https://arxiv.org/abs/2102.02557)).
 
-SPALM runs $k$NN search to fetch $k$ tokens with most relevant context. For each token we can get the same embedding representation provided by a pretrained LM, denoted as $\\{\\mathbf{y}\_i\\}\_{i=1}^k$. The gating mechanism first aggregates the retrieved token embeddings with a simple attention layer using $\\mathbf{h}^R\_t$ (the hidden state for token $x\_t$ at layer $R$) as a query and then learns a gating parameter $\\mathbf{g}\_t$ to balance between local information $\\mathbf{h}^R\_t$ and long-term information $\\mathbf{m}\_t$.
+SPALM runs $k$NN search to fetch $k$ tokens with most relevant context. For each token we can get the same embedding representation provided by a pretrained LM, denoted as $\{\\mathbf{y}\_i\}\_{i=1}^k$. The gating mechanism first aggregates the retrieved token embeddings with a simple attention layer using $\\mathbf{h}^R\_t$ (the hidden state for token $x\_t$ at layer $R$) as a query and then learns a gating parameter $\\mathbf{g}\_t$ to balance between local information $\\mathbf{h}^R\_t$ and long-term information $\\mathbf{m}\_t$.
 
-$$ \\begin{aligned} \\mathbf{m}\_t &= \\sum\_{i=1}^k \\frac{\\exp(\\mathbf{y}\_i^\\top \\mathbf{h}^R_t)}{\\sum\_{j=1}^k \\exp(\\mathbf{y}\_j^\\top \\mathbf{h}^R_t)} \\cdot \\mathbf{y}\_i \\\\ \\mathbf{g}\_t &= \\sigma(\\mathbf{w}\_g^\\top \\mathbf{h}\_t^R) \\\\ \\mathbf{z}\_t &= (1 - \\mathbf{g}\_t) \\odot \\mathbf{m}\_t + \\mathbf{g}\_t \\odot \\mathbf{h}^R_t \\\\ p(x\_{t+1}\\mid \\mathbf{x}\_{\\leq t}) &= \\text{softmax}(\\mathbf{z}\_t; \\mathbf{W}) \\end{aligned} $$
+$$ \\begin{aligned} \\mathbf{m}\_t &= \sum\_{i=1}^k \\frac{\\exp(\\mathbf{y}\_i^\\top \\mathbf{h}^R_t)}{\sum\_{j=1}^k \\exp(\\mathbf{y}\_j^\\top \\mathbf{h}^R_t)} \\cdot \\mathbf{y}\_i \\\\ \\mathbf{g}\_t &= \\sigma(\\mathbf{w}\_g^\\top \\mathbf{h}\_t^R) \\\\ \\mathbf{z}\_t &= (1 - \\mathbf{g}\_t) \\odot \\mathbf{m}\_t + \\mathbf{g}\_t \\odot \\mathbf{h}^R_t \\\\ p(x\_{t+1}\mid \\mathbf{x}\_{\\leq t}) &= \text{softmax}(\\mathbf{z}\_t; \\mathbf{W}) \\end{aligned} $$
 
-where $\\mathbf{w}\_g$ is a parameter vector to learn; $\\sigma(.)$ is sigmoid; $\\mathbf{W}$ is the word embedding matrix shared between both input and output tokens. Different from $k$NN-LM, they didn’t find the nearest neighbor distance to be helpful in the aggregation of retrieved tokens.
+where $\\mathbf{w}\_g$ is a parameter vector to learn; $\\sigma(.)$ is sigmoid; $\\mathbf{W}$ is the word embedding matrix shared between both input and output tokens. Different from $k$NN-LM, they didn't find the nearest neighbor distance to be helpful in the aggregation of retrieved tokens.
 
 During training, the key representations in the long-term memory stay constant, produced by a pretrained LM, but the value encoder, aka the word embedding matrix, gets updated.
 
@@ -339,11 +339,11 @@ Note that the default positional encoding in vanilla Transformer only adds posit
 
 _DA-Transformer_ ([Wu, et al. 2021](https://aclanthology.org/2021.naacl-main.166)) multiplies attention scores at each layer by a learnable bias that is formulated as a function of the distance between key and query. Different attention heads use different parameters to distinguish diverse preferences to short-term vs long-term context. Given two positions, $i, j$, DA-Transformer uses the following weighting function to alter the self-attention score:
 
-$$ \\begin{aligned} \\mathbf{R}^{(i)} &= \\alpha_i \\mathbf{R} \\quad \\text{where }R\_{ij} = \\vert i-j \\vert\\\\ f(\\mathbf{R}^{(i)}; \\beta_i) &= \\frac{1 + \\exp(\\beta_i)}{1 + \\exp(\\beta_i - \\mathbf{R}^{(i)})} \\\\ \\text{attn}(\\mathbf{Q}^{(i)}, \\mathbf{K}^{(i)}, \\mathbf{V}^{(i)}) &= \\text{row-softmax}\\Big(\\frac{\\text{ReLU}(\\mathbf{Q}^{(i)}\\mathbf{K}^{(i)\\top})f(\\mathbf{R}^{(i)})}{\\sqrt{d}}\\Big) \\mathbf{V}^{(i)} \\end{aligned} $$
+$$ \\begin{aligned} \\mathbf{R}^{(i)} &= \\alpha_i \\mathbf{R} \quad \text{where }R\_{ij} = \vert i-j \vert\\\\ f(\\mathbf{R}^{(i)}; \\beta_i) &= \\frac{1 + \\exp(\\beta_i)}{1 + \\exp(\\beta_i - \\mathbf{R}^{(i)})} \\\\ \text{attn}(\\mathbf{Q}^{(i)}, \\mathbf{K}^{(i)}, \\mathbf{V}^{(i)}) &= \text{row-softmax}\\Big(\\frac{\text{ReLU}(\\mathbf{Q}^{(i)}\\mathbf{K}^{(i)\\top})f(\\mathbf{R}^{(i)})}{\\sqrt{d}}\\Big) \\mathbf{V}^{(i)} \\end{aligned} $$
 
-where $\\alpha\_i$ is a learnable parameters to weight relative distance differently per head where the head is indexed by superscript $^{(i)}$; $\\beta\_i$ is a learnable parameter to control the upper bound and ascending slope wrt the distance for the $i$-th attention head. The weighting function $f(.)$ is designed in a way that: (1) $f(0)=1$; (2) $f(\\mathbf{R}^{(i)}) = 0$ when $\\mathbf{R}^{(i)} \\to -\\infty$; (3) $f(\\mathbf{R}^{(i)})$ is bounded when $\\mathbf{R}^{(i)} \\to +\\infty$; (4) the scale is tunable; (5) and the function is monotonic. The extra time complexity brought by $f(\\mathbf{R}^{(i)})$ is $\\mathcal{O}(L^2)$ and it is small relative to the self attention time complexity $\\mathcal{O}(L^2 d)$. The extra memory consumption is minimal, ~$\\mathcal{O}(2h)$.
+where $\\alpha\_i$ is a learnable parameters to weight relative distance differently per head where the head is indexed by superscript $^{(i)}$; $\\beta\_i$ is a learnable parameter to control the upper bound and ascending slope wrt the distance for the $i$-th attention head. The weighting function $f(.)$ is designed in a way that: (1) $f(0)=1$; (2) $f(\\mathbf{R}^{(i)}) = 0$ when $\\mathbf{R}^{(i)} \\to -\infty$; (3) $f(\\mathbf{R}^{(i)})$ is bounded when $\\mathbf{R}^{(i)} \\to +\infty$; (4) the scale is tunable; (5) and the function is monotonic. The extra time complexity brought by $f(\\mathbf{R}^{(i)})$ is $\mathcal{O}(L^2)$ and it is small relative to the self attention time complexity $\mathcal{O}(L^2 d)$. The extra memory consumption is minimal, ~$\mathcal{O}(2h)$.
 
-Instead of multipliers, _ALiBi_ ([Press et al. 2022](https://arxiv.org/abs/2108.12409)) adds a constant bias term on query-key attention scores, proportional to pairwise distances. The bias introduces a strong recency preference and penalizes keys that are too far away. The penalties are increased at different rates within different heads. $$ \\text{softmax}(\\mathbf{q}\_i \\mathbf{K}^\\top + \\alpha_i \\cdot \[0, -1, -2, \\dots, -(i-1)\]) $$ where $\\alpha\_i$ is a head-specific weighting scalar. Different from DA-transformer, $\\alpha\_i$ is not learned but fixed as a geometric sequence; for example, for 8 heads, ${\\alpha\_i} = {\\frac{1}{2}, \\frac{1}{2^2}, \\dots, \\frac{1}{2^8}}$. The overall idea is very much similar to what relative positional encoding aims to solve.
+Instead of multipliers, _ALiBi_ ([Press et al. 2022](https://arxiv.org/abs/2108.12409)) adds a constant bias term on query-key attention scores, proportional to pairwise distances. The bias introduces a strong recency preference and penalizes keys that are too far away. The penalties are increased at different rates within different heads. $$ \text{softmax}(\\mathbf{q}\_i \\mathbf{K}^\\top + \\alpha_i \\cdot \[0, -1, -2, \\dots, -(i-1)\]) $$ where $\\alpha\_i$ is a head-specific weighting scalar. Different from DA-transformer, $\\alpha\_i$ is not learned but fixed as a geometric sequence; for example, for 8 heads, ${\\alpha\_i} = {\\frac{1}{2}, \\frac{1}{2^2}, \\dots, \\frac{1}{2^8}}$. The overall idea is very much similar to what relative positional encoding aims to solve.
 
 ![](ALiBi-bias.png)
 
@@ -365,15 +365,15 @@ On a high level, the universal transformer can be viewed as a recurrent function
 
 Fig. 12. How the Universal Transformer refines a set of hidden state representations repeatedly for every position in parallel. (Image source: Figure 1 in [Dehghani, et al. 2019](https://arxiv.org/abs/1807.03819)).
 
-Given an input sequence of length $L$, Universal Transformer iteratively updates the representation $\\mathbf{h}^t \\in \\mathbb{R}^{L \\times d}$ at step $t$ for an adjustable number of steps. At step 0, $\\mathbf{h}^0$ is initialized to be same as the input embedding matrix. All the positions are processed in parallel in the multi-head self-attention mechanism and then go through a recurrent transition function.
+Given an input sequence of length $L$, Universal Transformer iteratively updates the representation $\\mathbf{h}^t \in \\mathbb{R}^{L \\times d}$ at step $t$ for an adjustable number of steps. At step 0, $\\mathbf{h}^0$ is initialized to be same as the input embedding matrix. All the positions are processed in parallel in the multi-head self-attention mechanism and then go through a recurrent transition function.
 
-$$ \\begin{aligned} \\mathbf{A}^t &= \\text{LayerNorm}(\\mathbf{h}^{t-1} + \\text{MultiHeadAttention}(\\mathbf{h}^{t-1} + \\mathbf{P}^t) \\\\ \\mathbf{h}^t &= \\text{LayerNorm}(\\mathbf{A}^{t-1} + \\text{Transition}(\\mathbf{A}^t)) \\end{aligned} $$
+$$ \\begin{aligned} \\mathbf{A}^t &= \text{LayerNorm}(\\mathbf{h}^{t-1} + \text{MultiHeadAttention}(\\mathbf{h}^{t-1} + \\mathbf{P}^t) \\\\ \\mathbf{h}^t &= \text{LayerNorm}(\\mathbf{A}^{t-1} + \text{Transition}(\\mathbf{A}^t)) \\end{aligned} $$
 
-where $\\text{Transition}(.)$ is either a [separable convolution](https://arxiv.org/abs/1610.02357) or a fully-connected neural network that consists of two position-wise (i.e. applied to each row of $\\mathbf{A}^t$ individually) affine transformation + one ReLU.
+where $\text{Transition}(.)$ is either a [separable convolution](https://arxiv.org/abs/1610.02357) or a fully-connected neural network that consists of two position-wise (i.e. applied to each row of $\\mathbf{A}^t$ individually) affine transformation + one ReLU.
 
 The positional encoding $\\mathbf{P}^t$ uses [sinusoidal position signal](#sinusoidal-positional-encoding) but with an additional time dimension:
 
-$$ \\text{PE}(i, t, \\delta) = \\begin{cases} \\sin(\\frac{i}{10000^{2\\delta'/d}}) \\oplus \\sin(\\frac{t}{10000^{2\\delta'/d}}) & \\text{if } \\delta = 2\\delta'\\\\ \\cos(\\frac{i}{10000^{2\\delta'/d}}) \\oplus \\cos(\\frac{t}{10000^{2\\delta'/d}}) & \\text{if } \\delta = 2\\delta' + 1\\\\ \\end{cases} $$
+$$ \text{PE}(i, t, \\delta) = \\begin{cases} \\sin(\\frac{i}{10000^{2\\delta'/d}}) \\oplus \\sin(\\frac{t}{10000^{2\\delta'/d}}) & \text{if } \\delta = 2\\delta'\\\\ \\cos(\\frac{i}{10000^{2\\delta'/d}}) \\oplus \\cos(\\frac{t}{10000^{2\\delta'/d}}) & \text{if } \\delta = 2\\delta' + 1\\\\ \\end{cases} $$
 
 ![](universal-transformer.png)
 
@@ -397,11 +397,11 @@ Fig. 14. Two attention heads in the same model, A & B, assign attention differen
 
 Given the $i$-th token, we need to compute the attention weights between this token and other keys within its attention span of size $s$:
 
-$$ \\begin{aligned} e\_{ij} &= \\mathbf{q}\_i {\\mathbf{k}\_j}^\\top \\\\ a\_{ij} &= \\text{softmax}(e\_{ij}) = \\frac{\\exp(e\_{ij})}{\\sum\_{r=i-s}^{i-1} \\exp(e\_{ir})} \\\\ \\mathbf{y}\_i &= \\sum\_{r=i-s}^{i-1}a\_{ir}\\mathbf{v}\_r = \\sum\_{r=i-s}^{i-1}a\_{ir}\\mathbf{x}\_r\\mathbf{W}^v \\end{aligned} $$
+$$ \\begin{aligned} e\_{ij} &= \\mathbf{q}\_i {\\mathbf{k}\_j}^\\top \\\\ a\_{ij} &= \text{softmax}(e\_{ij}) = \\frac{\\exp(e\_{ij})}{\sum\_{r=i-s}^{i-1} \\exp(e\_{ir})} \\\\ \\mathbf{y}\_i &= \sum\_{r=i-s}^{i-1}a\_{ir}\\mathbf{v}\_r = \sum\_{r=i-s}^{i-1}a\_{ir}\\mathbf{x}\_r\\mathbf{W}^v \\end{aligned} $$
 
-A _soft mask function_ $m\_z$ is added to control for an effective adjustable attention span, which maps the distance between query and key into a \[0, 1\] value. $m\_z$ is parameterized by $z \\in \[0, s\]$ and $z$ is to be learned:
+A _soft mask function_ $m\_z$ is added to control for an effective adjustable attention span, which maps the distance between query and key into a \[0, 1\] value. $m\_z$ is parameterized by $z \in \[0, s\]$ and $z$ is to be learned:
 
-$$ m_z(x) = \\text{clip}(\\frac{1}{R}(R+z-x), 0, 1) $$
+$$ m_z(x) = \text{clip}(\\frac{1}{R}(R+z-x), 0, 1) $$
 
 where $R$ is a hyper-parameter which defines the softness of $m\_z$.
 
@@ -411,9 +411,9 @@ Fig. 15. The soft masking function used in the adaptive attention span. (Image s
 
 The soft mask function is applied to the softmax elements in the attention weights:
 
-$$ a\_{ij} = \\frac{m_z(i-j)\\exp(s\_{ij})}{\\sum\_{r=i-s}^{i-1}m_z(i-r) \\exp(s\_{ir})} $$
+$$ a\_{ij} = \\frac{m_z(i-j)\\exp(s\_{ij})}{\sum\_{r=i-s}^{i-1}m_z(i-r) \\exp(s\_{ir})} $$
 
-In the above equation, $z$ is differentiable so it is trained jointly with other parts of the model. Parameters $z^{(i)}, i=1, \\dots, h$ are learned _separately per head_. Moreover, the loss function has an extra L1 penalty on $\\sum\_{i=1}^h z^{(i)}$.
+In the above equation, $z$ is differentiable so it is trained jointly with other parts of the model. Parameters $z^{(i)}, i=1, \\dots, h$ are learned _separately per head_. Moreover, the loss function has an extra L1 penalty on $\sum\_{i=1}^h z^{(i)}$.
 
 Using [Adaptive Computation Time](https://lilianweng.github.io/posts/2020-04-07-the-transformer-family/#adaptive-computation-time-act), the approach can be further enhanced to have flexible attention span length, adaptive to the current input dynamically. The span parameter $z\_t$ of an attention head at time $t$ is a sigmoidal function, $z\_t = S \\sigma(\\mathbf{v} \\cdot \\mathbf{x}\_t +b)$, where the vector $\\mathbf{v}$ and the bias scalar $b$ are learned jointly with other parameters.
 
@@ -427,7 +427,7 @@ Both **Depth-Adaptive Transformer** ([Elabyad et al. 2020](https://arxiv.org/abs
 
 _Depth-adaptive transformer_ ([Elabyad et al. 2020](https://arxiv.org/abs/1910.10073)) attaches an output classifier to every layer to produce exit predictions based on activations of that layer. The classifier weight matrices can be different per layer or shared across layers. During training, the model sample different sequences of exits such that the model is optimized with hidden states of different layers. The learning objective incorporates likelihood probabilities predicted at different layers, $n=1, \\dots, N$:
 
-$$ \\text{LL}^n_t = \\log p(y_t \\vert \\mathbf{h}^n\_{t-1}) \\quad \\text{LL}^n = \\sum\_{t=1}^{\\vert\\mathbf{y}\\vert} LL^n_t $$
+$$ \text{LL}^n_t = \\log p(y_t \vert \\mathbf{h}^n\_{t-1}) \quad \text{LL}^n = \sum\_{t=1}^{\vert\\mathbf{y}\vert} LL^n_t $$
 
 Adaptive depth classifiers outputs a parametric distribution $q\_t$. It is trained with cross entropy loss against an oracle distribution $q^\*\_t$. The paper explored three confiurations for how to learn such a classifier $q\_t$.
 
@@ -436,19 +436,19 @@ Adaptive depth classifiers outputs a parametric distribution $q\_t$. It is train
 Fig. 16. Illustration of three types of adaptive depth classifiers.  
 (Image source: [Elabyad et al. 2020](https://arxiv.org/abs/1910.10073)).
 
-1.  _Sequence-specific depth classifier_: All tokens of the same sequence share the same exit block. It depends on the average of the encoder representation of the sequence. Given an input sequence $\\mathbf{x}$ of length $L$, the classifier takes $\\bar{\\mathbf{x}} = \\frac{1}{L} \\sum\_{t=1}^L \\mathbf{x}\_t$ as input and outputs a multinomial distribution of $N$ dimensions, corresponding to $N$ layers.
+1.  _Sequence-specific depth classifier_: All tokens of the same sequence share the same exit block. It depends on the average of the encoder representation of the sequence. Given an input sequence $\\mathbf{x}$ of length $L$, the classifier takes $\\bar{\\mathbf{x}} = \\frac{1}{L} \sum\_{t=1}^L \\mathbf{x}\_t$ as input and outputs a multinomial distribution of $N$ dimensions, corresponding to $N$ layers.
 
-    $$ \\begin{aligned} q(n \\vert \\mathbf{x}) &=\\text{softmax}(\\mathbf{W}\_n \\bar{\\mathbf{x}} + b_n) \\in \\mathbb{R}^N \\\\ q\_\\text{lik}^\*(\\mathbf{x}, \\mathbf{y}) &= \\delta(\\arg\\max_n \\text{LL}^n - \\lambda n) \\\\ \\text{or }q\_\\text{corr}^\*(\\mathbf{x}, \\mathbf{y}) &= \\delta(\\arg\\max_n C^n - \\lambda n) \\text{ where }C^n = \\vert\\{t \\vert y_t = \\arg\\max_y p(y \\vert \\mathbf{h}^n\_{t-1})\\}\\vert \\\\ \\end{aligned} $$
+    $$ \\begin{aligned} q(n \vert \\mathbf{x}) &=\text{softmax}(\\mathbf{W}\_n \\bar{\\mathbf{x}} + b_n) \in \\mathbb{R}^N \\\\ q\_\text{lik}^\*(\\mathbf{x}, \\mathbf{y}) &= \\delta(\\arg\\max_n \text{LL}^n - \\lambda n) \\\\ \text{or }q\_\text{corr}^\*(\\mathbf{x}, \\mathbf{y}) &= \\delta(\\arg\\max_n C^n - \\lambda n) \text{ where }C^n = \vert\{t \vert y_t = \\arg\\max_y p(y \vert \\mathbf{h}^n\_{t-1})\}\vert \\\\ \\end{aligned} $$
 
-    where $\\delta$ is [dirac delta](https://en.wikipedia.org/wiki/Dirac_delta_function) (unit impulse) function and $-\\lambda n$ is a regularization term to encourage lower layer exits. The ground truth $q^\*$ can be prepared in two way, based on maximum likelihood $q\_\\text{lik}^\*$ or correctness $q\_\\text{corr}^\*$.
+    where $\\delta$ is [dirac delta](https://en.wikipedia.org/wiki/Dirac_delta_function) (unit impulse) function and $-\\lambda n$ is a regularization term to encourage lower layer exits. The ground truth $q^\*$ can be prepared in two way, based on maximum likelihood $q\_\text{lik}^\*$ or correctness $q\_\text{corr}^\*$.
 
 2.  _Token-specific depth classifier (multinomial)_: Each token is decoded with different exit block, predicted conditioned on the first decoder hidden state $\\mathbf{h}^1\_t$:
 
-    $$ q_t(n \\vert \\mathbf{x}, \\mathbf{y}\_{< t}) = \\text{softmax}(\\mathbf{W}\_n \\mathbf{h}^1_t + b_n) $$
+    $$ q_t(n \vert \\mathbf{x}, \\mathbf{y}\_{< t}) = \text{softmax}(\\mathbf{W}\_n \\mathbf{h}^1_t + b_n) $$
 
-3.  _Token-specific depth classifier (geometric-like)_: A binary exit prediction distribution is made per layer per token, $\\mathcal{X}^n\_t$. The RBF kernel $\\kappa(t, t’) = \\exp(\\frac{\\vert t - t’ \\vert^2}{\\sigma})$ is used to smooth the predictions to incorporate the impact of current decision on future time steps.
+3.  _Token-specific depth classifier (geometric-like)_: A binary exit prediction distribution is made per layer per token, $\mathcal{X}^n\_t$. The RBF kernel $\\kappa(t, t') = \\exp(\\frac{\vert t - t' \vert^2}{\\sigma})$ is used to smooth the predictions to incorporate the impact of current decision on future time steps.
 
-    $$ \\begin{aligned} \\mathcal{X}^n_t &= \\text{sigmoid}(\\mathbf{w}\_n^\\top \\mathbf{h}^n_t + b_n)\\quad \\forall n \\in \[1, \\dots, N-1\] \\\\ q_t(n \\vert \\mathbf{x}, \\mathbf{y}\_{< t}) &= \\begin{cases} \\mathcal{X}^n_t \\prod\_{n' < n} (1 - \\mathcal{X}^{n'}\_t) & \\text{if } n < N\\\\ \\prod\_{n' < N} (1 - \\mathcal{X}^{n'}\_t) & \\text{otherwise} \\end{cases} \\\\ q\_\\text{lik}^\*(\\mathbf{x}, \\mathbf{y}) &= \\delta(\\arg\\max_n \\widetilde{\\text{LL}}^n_t - \\lambda n) \\text{ where } \\widetilde{\\text{LL}}^n_t = \\sum\_{t'=1}^{\\vert\\mathbf{y}\\vert}\\kappa(t, t') LL^n\_{t'} \\\\ \\text{or }q\_\\text{cor}^\*(\\mathbf{x}, \\mathbf{y}) &= \\delta(\\arg\\max_n \\tilde{C}\_t^n - \\lambda n) \\text{ where }C_t^n = \\mathbb{1}\[y_t = \\arg\\max_y p(y \\vert \\mathbf{h}^n\_{t-1})\],\\; \\tilde{C}^n_t = \\sum\_{t'=1}^{\\vert\\mathbf{y}\\vert}\\kappa(t, t') C^n\_{t'} \\\\ \\end{aligned} $$
+    $$ \\begin{aligned} \mathcal{X}^n_t &= \text{sigmoid}(\\mathbf{w}\_n^\\top \\mathbf{h}^n_t + b_n)\quad \\forall n \in \[1, \\dots, N-1\] \\\\ q_t(n \vert \\mathbf{x}, \\mathbf{y}\_{< t}) &= \\begin{cases} \mathcal{X}^n_t \\prod\_{n' < n} (1 - \mathcal{X}^{n'}\_t) & \text{if } n < N\\\\ \\prod\_{n' < N} (1 - \mathcal{X}^{n'}\_t) & \text{otherwise} \\end{cases} \\\\ q\_\text{lik}^\*(\\mathbf{x}, \\mathbf{y}) &= \\delta(\\arg\\max_n \\widetilde{\text{LL}}^n_t - \\lambda n) \text{ where } \\widetilde{\text{LL}}^n_t = \sum\_{t'=1}^{\vert\\mathbf{y}\vert}\\kappa(t, t') LL^n\_{t'} \\\\ \text{or }q\_\text{cor}^\*(\\mathbf{x}, \\mathbf{y}) &= \\delta(\\arg\\max_n \\tilde{C}\_t^n - \\lambda n) \text{ where }C_t^n = \\mathbb{1}\[y_t = \\arg\\max_y p(y \vert \\mathbf{h}^n\_{t-1})\],\\; \\tilde{C}^n_t = \sum\_{t'=1}^{\vert\\mathbf{y}\vert}\\kappa(t, t') C^n\_{t'} \\\\ \\end{aligned} $$
 
 At inference time, the confidence threshold for making an exit decision needs to be calibrated. Depth-adaptive transformer finds such a threshold on a validation set via grid search. _CALM_ ([Schuster et al. 2022](https://arxiv.org/abs/2207.07061)) applied the Learn then Test (LTT) framework ([Angelopoulos et al. 2021](https://arxiv.org/abs/2110.01052)) to identify a subset of valid thresholds and chose the minimum value as the threshold for inference. Except for training per-layer exit classifier, CALM also explored other methods for adaptive depth prediction, including the softmax responses (i.e. difference between top two softmax outputs) and hidden state saturation (i.e. $\\cos(\\mathbf{h}^n\_t, \\mathbf{h}^{n+1}\_t)$) as confidence scores for exit decisions. They found softmax responses result in best inference speedup.
 
@@ -467,7 +467,7 @@ The idea was introduced by **Image Transformer** ([Parmer, et al 2018](https://a
 - The encoder generates a contextualized, per-pixel-channel representation of the source image;
 - Then the decoder autoregressively generates an output image, one channel per pixel at each time step.
 
-Let’s label the representation of the current pixel to be generated as the query $\\mathbf{q}$. Other positions whose representations will be used for computing $\\mathbf{q}$ are key vector $\\mathbf{k}\_1, \\mathbf{k}\_2, \\dots$ and they together form a memory matrix $\\mathbf{M}$. The scope of $\\mathbf{M}$ defines the context window for pixel query $\\mathbf{q}$.
+Let's label the representation of the current pixel to be generated as the query $\\mathbf{q}$. Other positions whose representations will be used for computing $\\mathbf{q}$ are key vector $\\mathbf{k}\_1, \\mathbf{k}\_2, \\dots$ and they together form a memory matrix $\\mathbf{M}$. The scope of $\\mathbf{M}$ defines the context window for pixel query $\\mathbf{q}$.
 
 Image Transformer introduced two types of localized $\\mathbf{M}$, as illustrated below.
 
@@ -482,17 +482,17 @@ Fig. 17. Illustration of 1D and 2D attention span for visual inputs in Image Tra
 
 **Sparse Transformer** ([Child et al., 2019](https://arxiv.org/abs/1904.10509)) introduced _factorized self-attention_, through sparse matrix factorization, making it possible to train dense attention networks with hundreds of layers on sequence length up to 16,384, which would be infeasible on modern hardware otherwise.
 
-Given a set of attention connectivity pattern $\\mathcal{S} = \\{S\_1, \\dots, S\_n\\}$, where each $S\_i$ records a set of key positions that the $i$-th query vector attends to.
+Given a set of attention connectivity pattern $\mathcal{S} = \{S\_1, \\dots, S\_n\}$, where each $S\_i$ records a set of key positions that the $i$-th query vector attends to.
 
-$$ \\begin{aligned} \\text{Attend}(\\mathbf{X}, \\mathcal{S}) &= \\Big( a(\\mathbf{x}\_i, S_i) \\Big)\_{i \\in \\{1, \\dots, L\\}} \\\\ \\text{ where } a(\\mathbf{x}\_i, S_i) &= \\text{softmax}\\Big(\\frac{(\\mathbf{x}\_i \\mathbf{W}^q)(\\mathbf{x}\_j \\mathbf{W}^k)\_{j \\in S_i}^\\top}{\\sqrt{d_k}}\\Big) (\\mathbf{x}\_j \\mathbf{W}^v)\_{j \\in S_i} \\end{aligned} $$
+$$ \\begin{aligned} \text{Attend}(\\mathbf{X}, \mathcal{S}) &= \\Big( a(\\mathbf{x}\_i, S_i) \\Big)\_{i \in \{1, \\dots, L\}} \\\\ \text{ where } a(\\mathbf{x}\_i, S_i) &= \text{softmax}\\Big(\\frac{(\\mathbf{x}\_i \\mathbf{W}^q)(\\mathbf{x}\_j \\mathbf{W}^k)\_{j \in S_i}^\\top}{\\sqrt{d_k}}\\Big) (\\mathbf{x}\_j \\mathbf{W}^v)\_{j \in S_i} \\end{aligned} $$
 
-Note that although the size of $S\_i$ is not fixed, $a(\\mathbf{x}\_i, S\_i)$ is always of size $d\_v$ and thus $\\text{Attend}(\\mathbf{X}, \\mathcal{S}) \\in \\mathbb{R}^{L \\times d\_v}$.
+Note that although the size of $S\_i$ is not fixed, $a(\\mathbf{x}\_i, S\_i)$ is always of size $d\_v$ and thus $\text{Attend}(\\mathbf{X}, \mathcal{S}) \in \\mathbb{R}^{L \\times d\_v}$.
 
-In anto-regressive models, one attention span is defined as $S\_i = \\{j: j \\leq i\\}$ as it allows each token to attend to all the positions in the past.
+In anto-regressive models, one attention span is defined as $S\_i = \{j: j \\leq i\}$ as it allows each token to attend to all the positions in the past.
 
 In factorized self-attention, the set $S\_i$ is decomposed into a _tree_ of dependencies, such that for every pair of $(i, j)$ where $j \\leq i$, there is a path connecting $i$ back to $j$ and $i$ can attend to $j$ either directly or indirectly.
 
-Precisely, the set $S\_i$ is divided into $p$ _non-overlapping_ subsets, where the $m$-th subset is denoted as $A^{(m)}\_i \\subset S\_i, m = 1,\\dots, p$. Therefore the path between the output position $i$ and any $j$ has a maximum length $p + 1$. For example, if $(j, a, b, c, \\dots, i)$ is a path of indices between $i$ and $j$, we would have $j \\in A\_a^{(1)}, a \\in A\_b^{(2)}, b \\in A\_c^{(3)}, \\dots$, so on and so forth.
+Precisely, the set $S\_i$ is divided into $p$ _non-overlapping_ subsets, where the $m$-th subset is denoted as $A^{(m)}\_i \\subset S\_i, m = 1,\\dots, p$. Therefore the path between the output position $i$ and any $j$ has a maximum length $p + 1$. For example, if $(j, a, b, c, \\dots, i)$ is a path of indices between $i$ and $j$, we would have $j \in A\_a^{(1)}, a \in A\_b^{(2)}, b \in A\_c^{(3)}, \\dots$, so on and so forth.
 
 **Sparse Factorized Attention**
 
@@ -502,37 +502,37 @@ Sparse Transformer proposed two types of fractorized attention. It is easier to 
 
 Fig. 18. The top row illustrates the attention connectivity patterns in (a) Transformer, (b) Sparse Transformer with strided attention, and (c) Sparse Transformer with fixed attention. The bottom row contains corresponding self-attention connectivity matrices. Note that the top and bottom rows are not in the same scale. (Image source: [Child et al., 2019](https://arxiv.org/abs/1904.10509) + a few of extra annotations.)
 
-1.  _Strided_ attention with stride $\\ell \\sim \\sqrt{n}$. This works well with image data as the structure is aligned with strides. In the image case, each pixel would attend to all the previous $\\ell$ pixels in the raster scanning order (naturally cover the entire width of the image) and then those pixels attend to others in the same column (defined by another attention connectivity subset).
+1.  _Strided_ attention with stride $\ell \\sim \\sqrt{n}$. This works well with image data as the structure is aligned with strides. In the image case, each pixel would attend to all the previous $\ell$ pixels in the raster scanning order (naturally cover the entire width of the image) and then those pixels attend to others in the same column (defined by another attention connectivity subset).
 
-    $$ \\begin{aligned} A_i^{(1)} &= \\{ t, t+1, \\dots, i\\} \\text{, where } t = \\max(0, i - \\ell) \\\\ A_i^{(2)} &= \\{j: (i-j) \\mod \\ell = 0\\} \\end{aligned} $$
+    $$ \\begin{aligned} A_i^{(1)} &= \{ t, t+1, \\dots, i\} \text{, where } t = \\max(0, i - \ell) \\\\ A_i^{(2)} &= \{j: (i-j) \\mod \ell = 0\} \\end{aligned} $$
 
 2.  _Fixed_ attention. A small set of tokens summarize previous locations and propagate that information to all future locations.
 
-    $$ \\begin{aligned} A_i^{(1)} &= \\{j: \\lfloor \\frac{j}{\\ell} \\rfloor = \\lfloor \\frac{i}{\\ell} \\rfloor \\} \\\\ A_i^{(2)} &= \\{j: j \\mod \\ell \\in \\{\\ell-c, \\dots, \\ell-1\\} \\} \\end{aligned} $$
+    $$ \\begin{aligned} A_i^{(1)} &= \{j: \\lfloor \\frac{j}{\ell} \\rfloor = \\lfloor \\frac{i}{\ell} \\rfloor \} \\\\ A_i^{(2)} &= \{j: j \\mod \ell \in \{\ell-c, \\dots, \ell-1\} \} \\end{aligned} $$
 
-    where $c$ is a hyperparameter. If $c=1$, it restricts the representation whereas many depend on a few positions. The paper chose $c\\in \\{ 8, 16, 32 \\}$ for $\\ell \\in \\{ 128, 256 \\}$.
+    where $c$ is a hyperparameter. If $c=1$, it restricts the representation whereas many depend on a few positions. The paper chose $c\in \{ 8, 16, 32 \}$ for $\ell \in \{ 128, 256 \}$.
 
 **Use Factorized Self-Attention in Transformer**
 
 There are three ways to use sparse factorized attention patterns in Transformer architecture:
 
 1.  One attention type per residual block and then interleave them,  
-    $\\text{attn}(\\mathbf{X}) = \\text{Attend}(\\mathbf{X}, A^{(n \\mod p)}) \\mathbf{W}^o$, where $n$ is the index of the current residual block.
+    $\text{attn}(\\mathbf{X}) = \text{Attend}(\\mathbf{X}, A^{(n \\mod p)}) \\mathbf{W}^o$, where $n$ is the index of the current residual block.
 2.  Set up a single head which attends to locations that all the factorized heads attend to,  
-    $\\text{attn}(\\mathbf{X}) = \\text{Attend}(\\mathbf{X}, \\cup\_{m=1}^p A^{(m)}) \\mathbf{W}^o $.
+    $\text{attn}(\\mathbf{X}) = \text{Attend}(\\mathbf{X}, \\cup\_{m=1}^p A^{(m)}) \\mathbf{W}^o $.
 3.  Use a multi-head attention mechanism, but different from vanilla Transformer, each head might adopt a pattern presented above, 1 or 2. $\\rightarrow$ This option often performs the best.
 
 Sparse Transformer also proposed a set of changes so as to train the Transformer up to hundreds of layers, including gradient checkpointing, recomputing attention & FF layers during the backward pass, mixed precision training, efficient block-sparse implementation, etc. Please check the [paper](https://arxiv.org/abs/1904.10509) for more details or my previous post on [techniques for scaling up model training](https://lilianweng.github.io/posts/2021-09-25-train-large/).
 
-**Blockwise Attention** ([Qiu et al. 2019](https://arxiv.org/abs/1911.02972)) introduces a _sparse block matrix_ to only allow each token to attend to a small set of other tokens. Each attention matrix of size $L \\times L$ is partitioned into $n \\times n$ smaller blocks of size $\\frac{L}{n}\\times\\frac{L}{n}$ and a sparse block matrix $\\mathbf{M} \\in \\{0, 1\\}^{L \\times L}$ is defined by a permutation $\\pi$ of ${1, \\dots, n}$, which records the column index per row in the block matrix.
+**Blockwise Attention** ([Qiu et al. 2019](https://arxiv.org/abs/1911.02972)) introduces a _sparse block matrix_ to only allow each token to attend to a small set of other tokens. Each attention matrix of size $L \\times L$ is partitioned into $n \\times n$ smaller blocks of size $\\frac{L}{n}\\times\\frac{L}{n}$ and a sparse block matrix $\\mathbf{M} \in \{0, 1\}^{L \\times L}$ is defined by a permutation $\\pi$ of ${1, \\dots, n}$, which records the column index per row in the block matrix.
 
-$$ \\begin{aligned} \\text{attn}(\\mathbf{Q}, \\mathbf{K}, \\mathbf{V}, \\mathbf{M}) &= \\text{softmax}\\Big(\\frac{\\mathbf{Q}\\mathbf{K}^\\top}{\\sqrt{d}} \\odot \\mathbf{M}\\Big)\\mathbf{V} \\\\ (\\mathbf{A} \\odot \\mathbf{M})\_{ij} &= \\begin{cases} A\_{ij} & \\text{if }M\_{ij} = 1 \\\\ -\\infty & \\text{if }M\_{ij} = 0 \\\\ \\end{cases} \\\\ \\text{where } M\_{ij} &= \\begin{cases} 1 & \\text{if }\\pi\\big(\\lfloor\\frac{(i-1)n}{L} + 1\\rfloor\\big) = \\lfloor\\frac{(j-1)n}{L} + 1\\rfloor \\\\ 0 & \\text{otherwise} \\end{cases} \\end{aligned} $$
+$$ \\begin{aligned} \text{attn}(\\mathbf{Q}, \\mathbf{K}, \\mathbf{V}, \\mathbf{M}) &= \text{softmax}\\Big(\\frac{\\mathbf{Q}\\mathbf{K}^\\top}{\\sqrt{d}} \\odot \\mathbf{M}\\Big)\\mathbf{V} \\\\ (\\mathbf{A} \\odot \\mathbf{M})\_{ij} &= \\begin{cases} A\_{ij} & \text{if }M\_{ij} = 1 \\\\ -\infty & \text{if }M\_{ij} = 0 \\\\ \\end{cases} \\\\ \text{where } M\_{ij} &= \\begin{cases} 1 & \text{if }\\pi\\big(\\lfloor\\frac{(i-1)n}{L} + 1\\rfloor\\big) = \\lfloor\\frac{(j-1)n}{L} + 1\\rfloor \\\\ 0 & \text{otherwise} \\end{cases} \\end{aligned} $$
 
 The actual implementation of Blockwise Attention only stores QKV as block matrices, each of size $n\\times n$:
 
-$$ \\text{Blockwise-attn}(\\mathbf{Q}, \\mathbf{K}, \\mathbf{V}, \\mathbf{M}) = \\begin{bmatrix} \\text{softmax}\\big(\\frac{\\hat{\\mathbf{q}}\_1\\hat{\\mathbf{k}}\_{\\pi(1)}^\\top}{\\sqrt{d}} \\Big)\\hat{\\mathbf{v}}\_{\\pi(1)} \\\\ \\vdots \\\\ \\text{softmax}\\big(\\frac{\\hat{\\mathbf{q}}\_n\\hat{\\mathbf{k}}\_{\\pi(n)}^\\top}{\\sqrt{d}} \\odot \\Big)\\hat{\\mathbf{v}}\_{\\pi(n)} \\\\ \\end{bmatrix} $$
+$$ \text{Blockwise-attn}(\\mathbf{Q}, \\mathbf{K}, \\mathbf{V}, \\mathbf{M}) = \\begin{bmatrix} \text{softmax}\\big(\\frac{\\hat{\\mathbf{q}}\_1\\hat{\\mathbf{k}}\_{\\pi(1)}^\\top}{\\sqrt{d}} \\Big)\\hat{\\mathbf{v}}\_{\\pi(1)} \\\\ \\vdots \\\\ \text{softmax}\\big(\\frac{\\hat{\\mathbf{q}}\_n\\hat{\\mathbf{k}}\_{\\pi(n)}^\\top}{\\sqrt{d}} \\odot \\Big)\\hat{\\mathbf{v}}\_{\\pi(n)} \\\\ \\end{bmatrix} $$
 
-where $\\hat{\\mathbf{q}}\_i$, $\\hat{\\mathbf{k}}\_i$ and $\\hat{\\mathbf{v}}\_i$ are the $i$-the row in the QKV block matrix respectively. Each $\\mathbf{q}\_i\\mathbf{k}\_{\\pi(i)}^\\top, \\forall i = 1, \\dots, n$ is of size $\\frac{N}{n}\\times\\frac{N}{n}$ and therefore Blockwise Attention is able to reduce the memory complexity of attention matrix from $\\mathcal{O}(L^2)$ to $\\mathcal{O}(\\frac{L}{n}\\times\\frac{L}{n} \\times n) = \\mathcal{O}(L^2/n)$.
+where $\\hat{\\mathbf{q}}\_i$, $\\hat{\\mathbf{k}}\_i$ and $\\hat{\\mathbf{v}}\_i$ are the $i$-the row in the QKV block matrix respectively. Each $\\mathbf{q}\_i\\mathbf{k}\_{\\pi(i)}^\\top, \\forall i = 1, \\dots, n$ is of size $\\frac{N}{n}\\times\\frac{N}{n}$ and therefore Blockwise Attention is able to reduce the memory complexity of attention matrix from $\mathcal{O}(L^2)$ to $\mathcal{O}(\\frac{L}{n}\\times\\frac{L}{n} \\times n) = \mathcal{O}(L^2/n)$.
 
 ### Combination of Local and Global Context[#](#combination-of-local-and-global-context)
 
@@ -540,9 +540,9 @@ where $\\hat{\\mathbf{q}}\_i$, $\\hat{\\mathbf{k}}\_i$ and $\\hat{\\mathbf{v}}\_
 
 **Global-Local Attention** of _ETC_ ([Ainslie et al. 2019](https://aclanthology.org/2020.emnlp-main.19/)) takes two inputs, (1) the long input $\\mathbf{x}^l$ of size $n\_l$ which is the regular input sequence and (2) the global input $\\mathbf{x}^g$ of size $n\_g$ which contains a smaller number of auxiliary tokens, $n\_g \\ll n\_l$. Attention is thus split into four components based on directional attention across these two inputs: g2g, g2l, l2g and l2l. Because the l2l attention piece can be very large, it is restricted to a fixed size attention span of radius $w$ (i.e. local attention span) and the l2l matrix can be reshaped to $n\_l \\times (2w+1)$.
 
-ETC utilizes four binary matrices to handle structured inputs, $\\mathbf{M}^{g2g}$, $\\mathbf{M}^{g2l}$, $\\mathbf{M}^{l2g}$ and $\\mathbf{M}^{l2l}$. For example, each element $z^g\_i \\in \\mathbb{R}^d$ in the attention output $z^g = (z^g\_1, \\dots, z^g\_{n\_g})$ for g2g attention piece is formatted as:
+ETC utilizes four binary matrices to handle structured inputs, $\\mathbf{M}^{g2g}$, $\\mathbf{M}^{g2l}$, $\\mathbf{M}^{l2g}$ and $\\mathbf{M}^{l2l}$. For example, each element $z^g\_i \in \\mathbb{R}^d$ in the attention output $z^g = (z^g\_1, \\dots, z^g\_{n\_g})$ for g2g attention piece is formatted as:
 
-$$ \\begin{aligned} a^{g2g}\_{ij} = \\frac{1}{\\sqrt{d}} x^g_i \\mathbf{W}^Q (x^g_j \\mathbf{W}^K + P^K\_{ij})^\\top - (1- M^{g2g}\_{ij})C \\\\ A^{g2g}\_{ij} = \\frac{\\exp(a^{g2g}\_{ij})}{\\sum\_{k=1}^{n_g} \\exp(a^{g2g}\_{ik})} \\quad z^g_i = \\sum^{n_g}\_{j=1} A^{g2g}\_{ij} x^g_j \\mathbf{W}^V \\end{aligned} $$
+$$ \\begin{aligned} a^{g2g}\_{ij} = \\frac{1}{\\sqrt{d}} x^g_i \\mathbf{W}^Q (x^g_j \\mathbf{W}^K + P^K\_{ij})^\\top - (1- M^{g2g}\_{ij})C \\\\ A^{g2g}\_{ij} = \\frac{\\exp(a^{g2g}\_{ij})}{\sum\_{k=1}^{n_g} \\exp(a^{g2g}\_{ik})} \quad z^g_i = \sum^{n_g}\_{j=1} A^{g2g}\_{ij} x^g_j \\mathbf{W}^V \\end{aligned} $$
 
 where $P^K\_{ij}$ is a learnable vector for relative position encoding and $C$ is a very large constant ($C=10000$ in the paper) to offset any attention weights when mask is off.
 
@@ -574,20 +574,20 @@ The improvements proposed by **Reformer** ([Kitaev, et al. 2020](https://arxiv.o
 
 Reformer proposed two main changes:
 
-1.  Replace the dot-product attention with _locality-sensitive hashing (LSH) attention_, reducing the complexity from $\\mathcal{O}(L^2)$ to $\\mathcal{O}(L\\log L)$.
+1.  Replace the dot-product attention with _locality-sensitive hashing (LSH) attention_, reducing the complexity from $\mathcal{O}(L^2)$ to $\mathcal{O}(L\\log L)$.
 2.  Replace the standard residual blocks with _reversible residual layers_, which allows storing activations only once during training instead of $N$ times (i.e. proportional to the number of layers).
 
 **Locality-Sensitive Hashing Attention**
 
-In $\\mathbf{Q} \\mathbf{K}^\\top$ part of the [attention formula](#attention-and-self-attention), we are only interested in the largest elements as only large elements contribute a lot after softmax. For each query $\\mathbf{q}\_i \\in \\mathbf{Q}$, we are looking for row vectors in $\\mathbf{K}$ closest to $\\mathbf{q}\_i$. In order to find nearest neighbors quickly in high-dimensional space, Reformer incorporates [Locality-Sensitive Hashing (LSH)](https://en.wikipedia.org/wiki/Locality-sensitive_hashing) into its attention mechanism.
+In $\\mathbf{Q} \\mathbf{K}^\\top$ part of the [attention formula](#attention-and-self-attention), we are only interested in the largest elements as only large elements contribute a lot after softmax. For each query $\\mathbf{q}\_i \in \\mathbf{Q}$, we are looking for row vectors in $\\mathbf{K}$ closest to $\\mathbf{q}\_i$. In order to find nearest neighbors quickly in high-dimensional space, Reformer incorporates [Locality-Sensitive Hashing (LSH)](https://en.wikipedia.org/wiki/Locality-sensitive_hashing) into its attention mechanism.
 
-A hashing scheme $x \\mapsto h(x)$ is _locality-sensitive_ if it preserves the distancing information between data points, such that close vectors obtain similar hashes while distant vectors have very different ones. The Reformer adopts a hashing scheme as such, given a fixed random matrix $\\mathbf{R} \\in \\mathbb{R}^{d \\times b/2}$ (where $b$ is a hyperparam), the hash function is $h(x) = \\arg\\max(\[xR; −xR\])$.
+A hashing scheme $x \\mapsto h(x)$ is _locality-sensitive_ if it preserves the distancing information between data points, such that close vectors obtain similar hashes while distant vectors have very different ones. The Reformer adopts a hashing scheme as such, given a fixed random matrix $\\mathbf{R} \in \\mathbb{R}^{d \\times b/2}$ (where $b$ is a hyperparam), the hash function is $h(x) = \\arg\\max(\[xR; −xR\])$.
 
 ![](LSH-attention-matrix.png)
 
 Fig. 20. Illustration of Locality-Sensitive Hashing (LSH) attention. (Image source: right part of Figure 1 in [Kitaev, et al. 2020](https://arxiv.org/abs/2001.04451)).
 
-In LSH attention, a query can only attend to positions in the same hashing bucket, $S\_i = \\{j: h(\\mathbf{q}\_i) = h(\\mathbf{k}\_j)\\}$. It is carried out in the following process, as illustrated in Fig. 20:
+In LSH attention, a query can only attend to positions in the same hashing bucket, $S\_i = \{j: h(\\mathbf{q}\_i) = h(\\mathbf{k}\_j)\}$. It is carried out in the following process, as illustrated in Fig. 20:
 
 - (a) The attention matrix for full attention is often sparse.
 - (b) Using LSH, we can sort the keys and queries to be aligned according to their hash buckets.
@@ -612,25 +612,25 @@ $$ x_2 = y_2 - G(y_1), \\; x_1 = y_1 − F(x_2) $$
 
 Reformer applies the same idea to Transformer by combination attention ($F$) and feed-forward layers ($G$) within a reversible net block:
 
-$$ Y_1 = X_1 + \\text{Attention}(X_2), \\; Y_2 = X_2 + \\text{FeedForward}(Y_1) $$
+$$ Y_1 = X_1 + \text{Attention}(X_2), \\; Y_2 = X_2 + \text{FeedForward}(Y_1) $$
 
 The memory can be further reduced by chunking the feed-forward computation:
 
-$$ Y_2 = \[Y_2^{(1)}; \\dots; Y_2^{(c)}\] = \[X_2^{(1)} + \\text{FeedForward}(Y_1^{(1)}); \\dots; X_2^{(c)} + \\text{FeedForward}(Y_1^{(c)})\] $$
+$$ Y_2 = \[Y_2^{(1)}; \\dots; Y_2^{(c)}\] = \[X_2^{(1)} + \text{FeedForward}(Y_1^{(1)}); \\dots; X_2^{(c)} + \text{FeedForward}(Y_1^{(c)})\] $$
 
 The resulting reversible Transformer does not need to store activation in every layer.
 
 **Routing Transformer** ([Roy et al. 2021](https://arxiv.org/abs/2003.05997)) is also built on content-based clustering of keys and queries. Instead of using a static hashing function like LSH, it utilizes online $k$-means clustering and combines it with local, temporal sparse attention to reduce the attention complexity from $O(L^2)$ to $O(L^{1.5})$.
 
-Within routing attention, both keys and queries are clustered with $k$-means clustering method and the same set of centroids $\\boldsymbol{\\mu} = (\\mu\_1, \\dots, \\mu\_k) \\in \\mathbb{R}^{k \\times d}$. Queries are routed to keys that get assigned to the same centroid. The total complexity is $O(Lkd + L^2d/k)$, where $O(Lkd)$ is for running clustering assignments and $O(L^2d/k)$ is for attention computation. The cluster centroids are updated by EMA (exponential moving average) using all associated keys and queries.
+Within routing attention, both keys and queries are clustered with $k$-means clustering method and the same set of centroids $\\boldsymbol{\\mu} = (\\mu\_1, \\dots, \\mu\_k) \in \\mathbb{R}^{k \\times d}$. Queries are routed to keys that get assigned to the same centroid. The total complexity is $O(Lkd + L^2d/k)$, where $O(Lkd)$ is for running clustering assignments and $O(L^2d/k)$ is for attention computation. The cluster centroids are updated by EMA (exponential moving average) using all associated keys and queries.
 
 In the experiments for Routing Transformer, some best config only has routing attention enabled in the last two layers of the model and half of the attention heads, while the other half utilizing local attention. They also observed that local attention is a pretty strong baseline and larger attention window always leads to better results.
 
 ## Low-Rank Attention[#](#low-rank-attention)
 
-**Linformer** ([Wang et al. 2020](https://arxiv.org/abs/2006.04768)) approximates the full attention matrix with a _low rank_ matrix, reducing the time & space complexity to be _linear_. Instead of using expensive SVD to identify low rank decomposition, Linformer adds two linear projections $\\mathbf{E}\_i, \\mathbf{F}\_i \\in \\mathbb{R}^{L \\times k}$ for key and value matrices, respectively, reducing their dimensions from $L \\times d$ to $k \\times d$. As long as $k \\ll L$, the attention memory can be greatly reduced.
+**Linformer** ([Wang et al. 2020](https://arxiv.org/abs/2006.04768)) approximates the full attention matrix with a _low rank_ matrix, reducing the time & space complexity to be _linear_. Instead of using expensive SVD to identify low rank decomposition, Linformer adds two linear projections $\\mathbf{E}\_i, \\mathbf{F}\_i \in \\mathbb{R}^{L \\times k}$ for key and value matrices, respectively, reducing their dimensions from $L \\times d$ to $k \\times d$. As long as $k \\ll L$, the attention memory can be greatly reduced.
 
-$$ \\begin{aligned} \\overline{\\text{head}}\_i &= \\text{attn}(\\mathbf{X}\_q\\mathbf{W}^q_i, \\mathbf{E}\_i\\mathbf{X}\_k\\mathbf{W}^k_i, \\mathbf{F}\_i\\mathbf{X}\_v\\mathbf{W}^v_i) \\\\ &= \\underbrace{\\text{softmax}\\Big( \\frac{\\mathbf{X}\_q\\mathbf{W}^q_i (\\mathbf{E}\_i \\mathbf{X}\_k\\mathbf{W}^k_i)^\\top}{\\sqrt{d}} \\Big)}\_{\\text{low rank attention matrix }\\bar{A} \\in \\mathbb{R}^{k \\times d}} \\mathbf{F}\_i \\mathbf{X}\_v\\mathbf{W}^v_i \\end{aligned} $$
+$$ \\begin{aligned} \\overline{\text{head}}\_i &= \text{attn}(\\mathbf{X}\_q\\mathbf{W}^q_i, \\mathbf{E}\_i\\mathbf{X}\_k\\mathbf{W}^k_i, \\mathbf{F}\_i\\mathbf{X}\_v\\mathbf{W}^v_i) \\\\ &= \\underbrace{\text{softmax}\\Big( \\frac{\\mathbf{X}\_q\\mathbf{W}^q_i (\\mathbf{E}\_i \\mathbf{X}\_k\\mathbf{W}^k_i)^\\top}{\\sqrt{d}} \\Big)}\_{\text{low rank attention matrix }\\bar{A} \in \\mathbb{R}^{k \\times d}} \\mathbf{F}\_i \\mathbf{X}\_v\\mathbf{W}^v_i \\end{aligned} $$
 
 Additional techniques can be applied to further improve efficiency of Linformer:
 
@@ -650,23 +650,23 @@ The main theorem behind RFA is from [Rahimi & Recht, 2007](https://people.eecs.b
 >
 > $$ \\phi(\\mathbf{x}) = \\frac{1}{\\sqrt{D}}\[\\sin(\\mathbf{w}\_1^\\top \\mathbf{x}), \\dots, \\sin(\\mathbf{w}\_D^\\top \\mathbf{x}), \\cos(\\mathbf{w}\_1^\\top \\mathbf{x}), \\dots, \\cos(\\mathbf{w}\_D^\\top \\mathbf{x})\]^\\top $$
 >
-> When $d$-dimensional random vectors $\\mathbf{w}\_i$ are i.i.d. from $\\mathcal{N}(\\mathbf{0}, \\sigma^2\\mathbf{I}\_d)$, $$ \\mathbb{E}\_{\\mathbf{w}\_i} \[\\phi(\\mathbf{x}) \\cdot \\phi(\\mathbf{y})\] = \\exp(-\\frac{\\| \\mathbf{x} - \\mathbf{y} \\|^2}{2\\sigma^2}) $$
+> When $d$-dimensional random vectors $\\mathbf{w}\_i$ are i.i.d. from $\mathcal{N}(\\mathbf{0}, \\sigma^2\\mathbf{I}\_d)$, $$ \\mathbb{E}\_{\\mathbf{w}\_i} \[\\phi(\\mathbf{x}) \\cdot \\phi(\\mathbf{y})\] = \\exp(-\\frac{\\| \\mathbf{x} - \\mathbf{y} \\|^2}{2\\sigma^2}) $$
 
 An unbiased estimation of $\\exp(\\mathbf{x} \\cdot \\mathbf{y})$ is:
 
-$$ \\begin{aligned} \\exp(\\mathbf{x} \\cdot \\mathbf{y} / \\sigma^2) &= \\exp(\\frac{1}{2\\sigma^2}(\\|\\mathbf{x}\\|^2 + \\|\\mathbf{y}\\|^2 - \\|\\mathbf{x} - \\mathbf{y}\\|^2) \\\\ &= \\exp(\\frac{\\|\\mathbf{x}\\|^2}{2\\sigma^2}) \\exp(\\frac{\\|\\mathbf{y}\\|^2}{2\\sigma^2}) ( - \\frac{\\|\\mathbf{x} - \\mathbf{y}\\|^2}{2\\sigma^2}) \\\\ &\\approx \\exp(\\frac{\\|\\mathbf{x}\\|^2}{2\\sigma^2}) \\exp(\\frac{\\|\\mathbf{y}\\|^2}{2\\sigma^2})\\;\\phi(\\mathbf{x})\\cdot\\phi(\\mathbf{y}) \\\\ &= \\exp(\\frac{1}{\\sigma^2})\\;\\phi(\\mathbf{x})\\cdot\\phi(\\mathbf{y}) & \\text{; unit vectors} \\end{aligned} $$
+$$ \\begin{aligned} \\exp(\\mathbf{x} \\cdot \\mathbf{y} / \\sigma^2) &= \\exp(\\frac{1}{2\\sigma^2}(\\|\\mathbf{x}\\|^2 + \\|\\mathbf{y}\\|^2 - \\|\\mathbf{x} - \\mathbf{y}\\|^2) \\\\ &= \\exp(\\frac{\\|\\mathbf{x}\\|^2}{2\\sigma^2}) \\exp(\\frac{\\|\\mathbf{y}\\|^2}{2\\sigma^2}) ( - \\frac{\\|\\mathbf{x} - \\mathbf{y}\\|^2}{2\\sigma^2}) \\\\ &\\approx \\exp(\\frac{\\|\\mathbf{x}\\|^2}{2\\sigma^2}) \\exp(\\frac{\\|\\mathbf{y}\\|^2}{2\\sigma^2})\\;\\phi(\\mathbf{x})\\cdot\\phi(\\mathbf{y}) \\\\ &= \\exp(\\frac{1}{\\sigma^2})\\;\\phi(\\mathbf{x})\\cdot\\phi(\\mathbf{y}) & \text{; unit vectors} \\end{aligned} $$
 
 Then we can write the attention function as follows, where $\\otimes$ is outer product operation and $\\sigma^2$ is the temperature:
 
-$$ \\begin{aligned} \\text{attn}(\\mathbf{q}\_t, \\{\\mathbf{k}\_i\\}, \\{\\mathbf{v}\_i\\}) &= \\sum_i \\frac{\\exp(\\mathbf{q}\_t\\cdot\\mathbf{k}\_i/\\sigma^2)}{\\sum_j \\exp(\\mathbf{q}\_t\\cdot\\mathbf{k}\_j/\\sigma^2)}\\mathbf{v}\_i^\\top \\approx \\sum_i \\frac{\\phi(\\mathbf{q}\_t)\\phi(\\mathbf{k}\_i)\\mathbf{v}\_i^\\top}{\\sum_j \\phi(\\mathbf{q}\_t)\\phi(\\mathbf{k}\_j)} \\\\ &= \\color{green}{\\frac{\\phi(\\mathbf{q}\_t)^\\top \\sum_i \\phi(\\mathbf{k}\_i)\\otimes\\mathbf{v}\_i}{\\phi(\\mathbf{q}\_t)^\\top \\sum_j \\phi(\\mathbf{k}\_j)} = \\text{RFA}(\\mathbf{q}\_t, \\{\\mathbf{k}\_i\\}, \\{\\mathbf{v}\_i\\})} \\end{aligned} $$
+$$ \\begin{aligned} \text{attn}(\\mathbf{q}\_t, \{\\mathbf{k}\_i\}, \{\\mathbf{v}\_i\}) &= \sum_i \\frac{\\exp(\\mathbf{q}\_t\\cdot\\mathbf{k}\_i/\\sigma^2)}{\sum_j \\exp(\\mathbf{q}\_t\\cdot\\mathbf{k}\_j/\\sigma^2)}\\mathbf{v}\_i^\\top \\approx \sum_i \\frac{\\phi(\\mathbf{q}\_t)\\phi(\\mathbf{k}\_i)\\mathbf{v}\_i^\\top}{\sum_j \\phi(\\mathbf{q}\_t)\\phi(\\mathbf{k}\_j)} \\\\ &= \\color{green}{\\frac{\\phi(\\mathbf{q}\_t)^\\top \sum_i \\phi(\\mathbf{k}\_i)\\otimes\\mathbf{v}\_i}{\\phi(\\mathbf{q}\_t)^\\top \sum_j \\phi(\\mathbf{k}\_j)} = \text{RFA}(\\mathbf{q}\_t, \{\\mathbf{k}\_i\}, \{\\mathbf{v}\_i\})} \\end{aligned} $$
 
 ![](RFA.png)
 
 Fig. 23. (Left) The order of computation for default softmax operation. (Right) The order of computation when using random feature attention, a lot cheaper than default softmax. (Image source: [Peng et al. 2021](https://arxiv.org/abs/2103.02143)).
 
-**Causal Attention RFA** has token at time step $t$ only attend to earlier keys and values $\\{\\mathbf{k}\_i\\}\_{i \\leq t}, \\{\\mathbf{v}\_i\\}\_{i \\leq t}$. Let us use a tuple of variables, $(\\mathbf{S}\_t \\in \\mathbb{R}^{2D \\times d}, \\mathbf{z} \\in \\mathbb{R}^{2D})$, to track the hidden state history at time step $t$, similar to RNNs:
+**Causal Attention RFA** has token at time step $t$ only attend to earlier keys and values $\{\\mathbf{k}\_i\}\_{i \\leq t}, \{\\mathbf{v}\_i\}\_{i \\leq t}$. Let us use a tuple of variables, $(\\mathbf{S}\_t \in \\mathbb{R}^{2D \\times d}, \\mathbf{z} \in \\mathbb{R}^{2D})$, to track the hidden state history at time step $t$, similar to RNNs:
 
-$$ \\begin{aligned} &\\text{causal-RFA}(\\mathbf{q}\_t, \\{\\mathbf{k}\_i\\}\_{i \\leq t}, \\{\\mathbf{v}\_i\\}\_{i \\leq t}) = \\frac{\\phi(\\mathbf{q}\_t)^\\top \\mathbf{S}\_t}{\\phi(\\mathbf{q}\_t) \\cdot \\mathbf{z}\_t} \\\\ &\\text{where } \\mathbf{S}\_t = \\mathbf{S}\_{t-1} + \\phi(\\mathbf{k}\_t)\\otimes\\mathbf{v}\_t, \\quad \\mathbf{z}\_t = \\mathbf{z}\_{t-1} + \\phi(\\mathbf{k}\_t) \\end{aligned} $$
+$$ \\begin{aligned} &\text{causal-RFA}(\\mathbf{q}\_t, \{\\mathbf{k}\_i\}\_{i \\leq t}, \{\\mathbf{v}\_i\}\_{i \\leq t}) = \\frac{\\phi(\\mathbf{q}\_t)^\\top \\mathbf{S}\_t}{\\phi(\\mathbf{q}\_t) \\cdot \\mathbf{z}\_t} \\\\ &\text{where } \\mathbf{S}\_t = \\mathbf{S}\_{t-1} + \\phi(\\mathbf{k}\_t)\\otimes\\mathbf{v}\_t, \quad \\mathbf{z}\_t = \\mathbf{z}\_{t-1} + \\phi(\\mathbf{k}\_t) \\end{aligned} $$
 
 where $2D$ is the size of $\\phi(.)$ and $D$ should be no less than the model size $d$ for reasonable approximation.
 
@@ -697,7 +697,7 @@ Fig. 25. Comparison of the model architecture of Transformer-XL, Transformer-XL 
 
 **Decision Transformer** (**DT**; [Chen et al 2021](https://arxiv.org/abs/2106.01345)) formulates Reinforcement Learning problems as a process of _conditional sequence modeling_, outputting the optimal actions conditioned on the desired return, past states and actions. It therefore becomes straightforward to use Transformer architecture. Decision Transformer is for [off-policy RL](https://lilianweng.github.io/posts/2018-02-19-rl-overview/#key-concepts), where the model only has access to a fixed collection of trajectories collected by other policies.
 
-To encourage the model to learn how to act in order to achieve a desired return, it feeds the model with desired future return $\\hat{R} = \\sum\_{t'=t}^T r\_{t'}$ instead of the current reward. The trajectory consists of a list of triplets, (return-to-go $\\hat{R}\_t, state $s\_t$, action $a\_t$), and it is used as an input sequence for Transformer:
+To encourage the model to learn how to act in order to achieve a desired return, it feeds the model with desired future return $\\hat{R} = \sum\_{t'=t}^T r\_{t'}$ instead of the current reward. The trajectory consists of a list of triplets, (return-to-go $\\hat{R}\_t, state $s\_t$, action $a\_t$), and it is used as an input sequence for Transformer:
 
 $$ \\tau = (\\hat{R}\_1, s_1, a_1, \\hat{R}\_2, s_2, a_2, \\dots, \\hat{R}\_T, s_T, a_T) $$
 
@@ -714,7 +714,7 @@ The experiments compared DT with several model-free RL algorithm baselines and s
 
 Cited as:
 
-> Weng, Lilian. (Jan 2023). The transformer family version 2.0. Lil’Log. https://lilianweng.github.io/posts/2023-01-27-the-transformer-family-v2/.
+> Weng, Lilian. (Jan 2023). The transformer family version 2.0. Lil'Log. https://lilianweng.github.io/posts/2023-01-27-the-transformer-family-v2/.
 
 Or
 

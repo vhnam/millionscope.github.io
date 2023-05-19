@@ -61,7 +61,7 @@ Fig. 2. The data scale versus the model performance. (Recreated based on: [https
 
 # Deep Learning Models[#](#deep-learning-models)
 
-Next, let’s go through a few classical deep learning models.
+Next, let's go through a few classical deep learning models.
 
 ## Convolutional Neural Network[#](#convolutional-neural-network)
 
@@ -89,7 +89,7 @@ A recurrent neural network model is born with the capability to process long seq
 
 Fig. 5. A recurrent neural network with one hidden unit (left) and its unrolling version in time (right). The unrolling version illustrates what happens in time: $s\\\_{t-1}$, $s\\\_{t}$, and $s\\\_{t+1}$ are the same unit with different states at different time steps $t-1$, $t$, and $t+1$. (Image source: [LeCun, Bengio, and Hinton, 2015](http://pages.cs.wisc.edu/~dyer/cs540/handouts/deep-learning-nature2015.pdf); [Fig. 5](https://www.nature.com/nature/journal/v521/n7553/fig_tab/nature14539_F5.html))
 
-However, simple perceptron neurons that linearly combine the current input element and the last unit state may easily lose the long-term dependencies. For example, we start a sentence with “Alice is working at …” and later after a whole paragraph, we want to start the next sentence with “She” or “He” correctly. If the model forgets the character’s name “Alice”, we can never know. To resolve the issue, researchers created a special neuron with a much more complicated internal structure for memorizing long-term context, named [“Long-short term memory (LSTM)"](http://web.eecs.utk.edu/~itamar/courses/ECE-692/Bobby_paper1.pdf) cell. It is smart enough to learn for how long it should memorize the old information, when to forget, when to make use of the new data, and how to combine the old memory with new input. This [introduction](http://colah.github.io/posts/2015-08-Understanding-LSTMs/) is so well written that I recommend everyone with interest in LSTM to read it. It has been officially promoted in the [Tensorflow documentation](https://www.tensorflow.org/tutorials/recurrent) ;-)
+However, simple perceptron neurons that linearly combine the current input element and the last unit state may easily lose the long-term dependencies. For example, we start a sentence with “Alice is working at …” and later after a whole paragraph, we want to start the next sentence with “She” or “He” correctly. If the model forgets the character's name “Alice”, we can never know. To resolve the issue, researchers created a special neuron with a much more complicated internal structure for memorizing long-term context, named [“Long-short term memory (LSTM)"](http://web.eecs.utk.edu/~itamar/courses/ECE-692/Bobby_paper1.pdf) cell. It is smart enough to learn for how long it should memorize the old information, when to forget, when to make use of the new data, and how to combine the old memory with new input. This [introduction](http://colah.github.io/posts/2015-08-Understanding-LSTMs/) is so well written that I recommend everyone with interest in LSTM to read it. It has been officially promoted in the [Tensorflow documentation](https://www.tensorflow.org/tutorials/recurrent) ;-)
 
 ![](LSTM.png)
 
@@ -115,7 +115,7 @@ Different from the previous models, autoencoders are for unsupervised learning. 
 
 ![](autoencoder.png)
 
-Fig. 9. An autoencoder model has a bottleneck layer with only a few neurons. (Image source: Geoffrey Hinton’s Coursera class ["Neural Networks for Machine Learning"](https://www.coursera.org/learn/neural-networks) - [Week 15](https://www.coursera.org/learn/neural-networks/home/week/15))
+Fig. 9. An autoencoder model has a bottleneck layer with only a few neurons. (Image source: Geoffrey Hinton's Coursera class ["Neural Networks for Machine Learning"](https://www.coursera.org/learn/neural-networks) - [Week 15](https://www.coursera.org/learn/neural-networks/home/week/15))
 
 [Hinton and Salakhutdinov](https://pdfs.semanticscholar.org/7d76/b71b700846901ac4ac119403aa737a285e36.pdf) used autoencoders to compress documents on a variety of topics. As shown in Fig 10, when both PCA and autoencoder were applied to reduce the documents onto two dimensions, autoencoder demonstrated a much better outcome. With the help of autoencoder, we can do efficient data compression to speed up the information retrieval including both documents and images.
 

@@ -103,7 +103,7 @@ We interact with the env through two major api calls:
 
 [Q-learning](https://lilianweng.github.io/posts/2018-02-19-rl-overview/#q-learning-off-policy-td-control) (Watkins & Dayan, 1992) learns the action value (“Q-value”) and update it according to the [Bellman equation](https://lilianweng.github.io/posts/2018-02-19-rl-overview/#bellman-equations). The key point is while estimating what is the next action, it does not follow the current policy but rather adopt the best Q value (the part in red) independently.
 
-$$ Q(s, a) \\leftarrow (1 - \\alpha) Q(s, a) + \\alpha (r + \\gamma \\color{red}{\\max\_{a' \\in \\mathcal{A}} Q(s', a')}) $$
+$$ Q(s, a) \\leftarrow (1 - \\alpha) Q(s, a) + \\alpha (r + \\gamma \\color{red}{\\max\_{a' \in \mathcal{A}} Q(s', a')}) $$
 
 In a naive implementation, the Q value for all (s, a) pairs can be simply tracked in a dict. No complicated machine learning model is involved yet.
 
@@ -155,7 +155,7 @@ Most gym environments have a multi-dimensional continuous observation space (`gy
         high=[2.4, 2.0, 0.42, 3.5]
     )
 
-Let’s plug in the interaction with a gym env and update the Q function every time a new transition is generated. When picking the action, we use ε-greedy to force exploration.
+Let's plug in the interaction with a gym env and update the Q function every time a new transition is generated. When picking the action, we use ε-greedy to force exploration.
 
     import gym
     import numpy as np
@@ -199,11 +199,11 @@ Often we start with a high `epsilon` and gradually decrease it during the traini
 
 The main loss function looks like the following,
 
-$$ \\begin{aligned} & Y(s, a, r, s') = r + \\gamma \\max\_{a'} Q\_{\\theta^{-}}(s', a') \\\\ & \\mathcal{L}(\\theta) = \\mathbb{E}\_{(s, a, r, s') \\sim U(D)} \\Big\[ \\big( Y(s, a, r, s') - Q\_\\theta(s, a) \\big)^2 \\Big\] \\end{aligned} $$
+$$ \\begin{aligned} & Y(s, a, r, s') = r + \\gamma \\max\_{a'} Q\_{\\theta^{-}}(s', a') \\\\ & \mathcal{L}(\\theta) = \\mathbb{E}\_{(s, a, r, s') \\sim U(D)} \\Big\[ \\big( Y(s, a, r, s') - Q\_\\theta(s, a) \\big)^2 \\Big\] \\end{aligned} $$
 
 The Q network can be a multi-layer dense neural network, a convolutional network, or a recurrent network, depending on the problem. In the [full implementation](https://github.com/lilianweng/deep-reinforcement-learning-gym/blob/master/playground/policies/dqn.py) of the DQN policy, it is determined by the `model_type` parameter, one of (“dense”, “conv”, “lstm”).
 
-In the following example, I’m using a 2-layer densely connected neural network to learn Q values for the cart pole balancing problem.
+In the following example, I'm using a 2-layer densely connected neural network to learn Q values for the cart pole balancing problem.
 
     import gym
     env = gym.make('CartPole-v1')
@@ -282,13 +282,13 @@ The target network is updated by copying the primary Q network parameters over e
 
 ## Double Q-Learning[#](#double-q-learning)
 
-If we look into the standard form of the Q value target, $Y(s, a) = r + \\gamma \\max\_{a' \\in \\mathcal{A}} Q\_\\theta (s', a')$, it is easy to notice that we use $Q\_\\theta$ to select the best next action at state s' and then apply the action value predicted by the same $Q\_\\theta$. This two-step reinforcing procedure could potentially lead to overestimation of an (already) overestimated value, further leading to training instability. The solution proposed by double Q-learning ([Hasselt, 2010](http://papers.nips.cc/paper/3964-double-q-learning.pdf)) is to decouple the action selection and action value estimation by using two Q networks, $Q\_1$ and $Q\_2$: when $Q\_1$ is being updated, $Q\_2$ decides the best next action, and vice versa.
+If we look into the standard form of the Q value target, $Y(s, a) = r + \\gamma \\max\_{a' \in \mathcal{A}} Q\_\\theta (s', a')$, it is easy to notice that we use $Q\_\\theta$ to select the best next action at state s' and then apply the action value predicted by the same $Q\_\\theta$. This two-step reinforcing procedure could potentially lead to overestimation of an (already) overestimated value, further leading to training instability. The solution proposed by double Q-learning ([Hasselt, 2010](http://papers.nips.cc/paper/3964-double-q-learning.pdf)) is to decouple the action selection and action value estimation by using two Q networks, $Q\_1$ and $Q\_2$: when $Q\_1$ is being updated, $Q\_2$ decides the best next action, and vice versa.
 
-$$ Y_1(s, a, r, s') = r + \\gamma Q_1 (s', \\arg\\max\_{a' \\in \\mathcal{A}}Q_2(s', a'))\\\\ Y_2(s, a, r, s') = r + \\gamma Q_2 (s', \\arg\\max\_{a' \\in \\mathcal{A}}Q_1(s', a')) $$
+$$ Y_1(s, a, r, s') = r + \\gamma Q_1 (s', \\arg\\max\_{a' \in \mathcal{A}}Q_2(s', a'))\\\\ Y_2(s, a, r, s') = r + \\gamma Q_2 (s', \\arg\\max\_{a' \in \mathcal{A}}Q_1(s', a')) $$
 
 To incorporate double Q-learning into DQN, the minimum modification ([Hasselt, Guez, & Silver, 2016](https://arxiv.org/pdf/1509.06461.pdf)) is to use the primary Q network to select the action while the action value is estimated by the target network:
 
-$$ Y(s, a, r, s') = r + \\gamma Q\_{\\theta^{-}}(s', \\arg\\max\_{a' \\in \\mathcal{A}} Q\_\\theta(s', a')) $$
+$$ Y(s, a, r, s') = r + \\gamma Q\_{\\theta^{-}}(s', \\arg\\max\_{a' \in \mathcal{A}} Q\_\\theta(s', a')) $$
 
 In the code, we add a new tensor for getting the action selected by the primary Q network as the input and a tensor operation for selecting this action.
 
@@ -316,11 +316,11 @@ During the episode rollout, we compute the `actions_next` by feeding the next st
 
 The dueling Q-network ([Wang et al., 2016](https://arxiv.org/pdf/1511.06581.pdf)) is equipped with an enhanced network architecture: the output layer branches out into two heads, one for predicting state value, V, and the other for [advantage](https://lilianweng.github.io/posts/2018-02-19-rl-overview/#value-function), A. The Q-value is then reconstructed, $Q(s, a) = V(s) + A(s, a)$.
 
-$$ \\begin{aligned} A(s, a) &= Q(s, a) - V(s)\\\\ V(s) &= \\sum_a Q(s, a) \\pi(a \\vert s) = \\sum_a (V(s) + A(s, a)) \\pi(a \\vert s) = V(s) + \\sum_a A(s, a)\\pi(a \\vert s)\\\\ \\text{Thus, }& \\sum_a A(s, a)\\pi(a \\vert s) = 0 \\end{aligned} $$
+$$ \\begin{aligned} A(s, a) &= Q(s, a) - V(s)\\\\ V(s) &= \sum_a Q(s, a) \\pi(a \vert s) = \sum_a (V(s) + A(s, a)) \\pi(a \vert s) = V(s) + \sum_a A(s, a)\\pi(a \vert s)\\\\ \text{Thus, }& \sum_a A(s, a)\\pi(a \vert s) = 0 \\end{aligned} $$
 
-To make sure the estimated advantage values sum up to zero, $\\sum\_a A(s, a)\\pi(a \\vert s) = 0$, we deduct the mean value from the prediction.
+To make sure the estimated advantage values sum up to zero, $\sum\_a A(s, a)\\pi(a \vert s) = 0$, we deduct the mean value from the prediction.
 
-$$ Q(s, a) = V(s) + (A(s, a) - \\frac{1}{|\\mathcal{A}|} \\sum_a A(s, a)) $$
+$$ Q(s, a) = V(s) + (A(s, a) - \\frac{1}{|\mathcal{A}|} \sum_a A(s, a)) $$
 
 The code change is straightforward:
 
@@ -348,7 +348,7 @@ The returns are computed during rollouts and then fed into the Tensorflow graph 
     actions = tf.placeholder(tf.int32, shape=(None,), name='action')
     returns = tf.placeholder(tf.float32, shape=(None,), name='return')
 
-The policy network is contructed. We update the policy parameters by minimizing the loss function, $\\mathcal{L} = - (G\_t - V(s)) \\log \\pi(a \\vert s)$. [tf.nn.sparse_softmax_cross_entropy_with_logits()](https://www.tensorflow.org/api_docs/python/tf/nn/sparse_softmax_cross_entropy_with_logits) asks for the raw logits as inputs, rather then the probabilities after softmax, and that’s why we do not have a softmax layer on top of the policy network.
+The policy network is contructed. We update the policy parameters by minimizing the loss function, $\mathcal{L} = - (G\_t - V(s)) \\log \\pi(a \vert s)$. [tf.nn.sparse_softmax_cross_entropy_with_logits()](https://www.tensorflow.org/api_docs/python/tf/nn/sparse_softmax_cross_entropy_with_logits) asks for the raw logits as inputs, rather then the probabilities after softmax, and that's why we do not have a softmax layer on top of the policy network.
 
     # Policy network
     pi = dense_nn(states, [32, 32, env.action_space.n], name='pi_network')
@@ -408,11 +408,11 @@ The full implementation of REINFORCE is [here](https://github.com/lilianweng/dee
 
 The [actor-critic](https://lilianweng.github.io/posts/2018-04-08-policy-gradient/#actor-critic) algorithm learns two models at the same time, the actor for learning the best policy and the critic for estimating the state value.
 
-1.  Initialize the actor network, $\\pi(a \\vert s)$ and the critic, $V(s)$
-2.  Collect a new transition (s, a, r, s'): Sample the action $a \\sim \\pi(a \\vert s)$ for the current state s, and get the reward r and the next state s'.
+1.  Initialize the actor network, $\\pi(a \vert s)$ and the critic, $V(s)$
+2.  Collect a new transition (s, a, r, s'): Sample the action $a \\sim \\pi(a \vert s)$ for the current state s, and get the reward r and the next state s'.
 3.  Compute the TD target during episode rollout, $G\_t = r + \\gamma V(s')$ and TD error, $\\delta\_t = r + \\gamma V(s') - V(s)$.
 4.  Update the critic network by minimizing the critic loss: $L\_c = (V(s) - G\_t)$.
-5.  Update the actor network by minimizing the actor loss: $L\_a = - \\delta\_t \\log \\pi(a \\vert s)$.
+5.  Update the actor network by minimizing the actor loss: $L\_a = - \\delta\_t \\log \\pi(a \vert s)$.
 6.  Set s' = s and repeat step 2.-5.
 
 Overall the implementation looks pretty similar to REINFORCE with an extra critic network. The full implementation is here.

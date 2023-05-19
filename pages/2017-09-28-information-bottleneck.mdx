@@ -32,7 +32,7 @@ Professor Naftali Tishby passed away in 2021. Hope the post can introduce his co
 
 Recently I watched the talk [“Information Theory in Deep Learning”](https://youtu.be/bLqJHjXihK8) by Prof Naftali Tishby and found it very interesting. He presented how to apply the information theory to study the growth and transformation of deep neural networks during training. Using the [Information Bottleneck (IB)](https://arxiv.org/pdf/physics/0004057.pdf) method, he proposed a new learning bound for deep neural networks (DNN), as the traditional learning theory fails due to the exponentially large number of parameters. Another keen observation is that DNN training involves two distinct phases: First, the network is trained to fully represent the input data and minimize the generalization error; then, it learns to forget the irrelevant details by compressing the representation of the input.
 
-Most of the materials in this post are from Prof Tishby’s talk and [related papers](https://lilianweng.github.io/posts/2017-09-28-information-bottleneck/#references).
+Most of the materials in this post are from Prof Tishby's talk and [related papers](https://lilianweng.github.io/posts/2017-09-28-information-bottleneck/#references).
 
 # Basic Concepts[#](#basic-concepts)
 
@@ -44,7 +44,7 @@ A Markov process is a [“memoryless”](http://mathworld.wolfram.com/Memoryless
 
 KL divergence measures how one probability distribution $p$ diverges from a second expected probability distribution $q$. It is asymmetric.
 
-$$ \\begin{aligned} D\_{KL}(p \\| q) &= \\sum_x p(x) \\log \\frac{p(x)}{q(x)} \\\\ &= - \\sum_x p(x)\\log q(x) + \\sum_x p(x)\\log p(x) \\\\ &= H(P, Q) - H(P) \\end{aligned} $$
+$$ \\begin{aligned} D\_{KL}(p \\| q) &= \sum_x p(x) \\log \\frac{p(x)}{q(x)} \\\\ &= - \sum_x p(x)\\log q(x) + \sum_x p(x)\\log p(x) \\\\ &= H(P, Q) - H(P) \\end{aligned} $$
 
 $D\_{KL}$ achieves the minimum zero when $p(x)$ == $q(x)$ everywhere.
 
@@ -52,7 +52,7 @@ $D\_{KL}$ achieves the minimum zero when $p(x)$ == $q(x)$ everywhere.
 
 Mutual information measures the mutual dependence between two variables. It quantifies the “amount of information” obtained about one random variable through the other random variable. Mutual information is symmetric.
 
-$$ \\begin{aligned} I(X;Y) &= D\_{KL}\[p(x,y) \\| p(x)p(y)\] \\\\ &= \\sum\_{x \\in X, y \\in Y} p(x, y) \\log(\\frac{p(x, y)}{p(x)p(y)}) \\\\ &= \\sum\_{x \\in X, y \\in Y} p(x, y) \\log(\\frac{p(x|y)}{p(x)}) \\\\ &= H(X) - H(X|Y) \\\\ \\end{aligned} $$
+$$ \\begin{aligned} I(X;Y) &= D\_{KL}\[p(x,y) \\| p(x)p(y)\] \\\\ &= \sum\_{x \in X, y \in Y} p(x, y) \\log(\\frac{p(x, y)}{p(x)p(y)}) \\\\ &= \sum\_{x \in X, y \in Y} p(x, y) \\log(\\frac{p(x|y)}{p(x)}) \\\\ &= H(X) - H(X|Y) \\\\ \\end{aligned} $$
 
 [**Data Processing Inequality (DPI)**](https://en.wikipedia.org/wiki/Data_processing_inequality)
 
@@ -82,7 +82,7 @@ A DNN is designed to learn how to describe $X$ to predict $Y$ and eventually, to
 
 ## Information Plane Theorem[#](#information-plane-theorem)
 
-A DNN has successive internal representations of $X$, a set of hidden layers $\\{T\_i\\}$. The _information plane_ theorem characterizes each layer by its encoder and decoder information. The encoder is a representation of the input data $X$, while the decoder translates the information in the current layer to the target ouput $Y$.
+A DNN has successive internal representations of $X$, a set of hidden layers $\{T\_i\}$. The _information plane_ theorem characterizes each layer by its encoder and decoder information. The encoder is a representation of the input data $X$, while the decoder translates the information in the current layer to the target ouput $Y$.
 
 Precisely, in an information plane plot:
 
@@ -97,11 +97,11 @@ Each dot in Fig. 2. marks the encoder/ decoder mutual information of one hidden 
 
 ![](ib-information-plane-merged.png)
 
-Fig. 3. Here is an aggregated view of Fig 2. The compression happens after the generalization error becomes very small. (Image source: [Tishby’ talk 15:15](https://youtu.be/bLqJHjXihK8?t=15m15s))
+Fig. 3. Here is an aggregated view of Fig 2. The compression happens after the generalization error becomes very small. (Image source: [Tishby' talk 15:15](https://youtu.be/bLqJHjXihK8?t=15m15s))
 
 ## Two Optimization Phases[#](#two-optimization-phases)
 
-Tracking the normalized mean and standard deviation of each layer’s weights in time also reveals two optimization phases of the training process.
+Tracking the normalized mean and standard deviation of each layer's weights in time also reveals two optimization phases of the training process.
 
 ![](ib-mean-variation.png)
 
@@ -118,7 +118,7 @@ The generalization bounds defined by the classic learning theory is:
 $$ \\epsilon^2 < \\frac{\\log|H\_\\epsilon| + \\log{1/\\delta}}{2m} $$
 
 - $\\epsilon$: The difference between the training error and the generalization error. The generalization error measures how accurate the prediction of an algorithm is for previously unseen data.
-- $H\_\\epsilon$: $\\epsilon$-cover of the hypothesis class. Typically we assume the size $\\vert H\_\\epsilon \\vert \\sim (1/\\epsilon)^d$.
+- $H\_\\epsilon$: $\\epsilon$-cover of the hypothesis class. Typically we assume the size $\vert H\_\\epsilon \vert \\sim (1/\\epsilon)^d$.
 - $\\delta$: Confidence.
 - $m$: The number of training samples.
 - $d$: The VC dimension of the hypothesis.
@@ -131,17 +131,17 @@ However, it does not work for deep learning. The larger a network is, the more p
 
 To solve this counterintuitive observation, Tishby et al. proposed a new input compression bound for DNN.
 
-First let us have $T\_\\epsilon$ as an $\\epsilon$-partition of the input variable $X$. This partition compresses the input with respect to the homogeneity to the labels into small cells. The cells in total can cover the whole input space. If the prediction outputs binary values, we can replace the cardinality of the hypothesis, $\\vert H\_\\epsilon \\vert$, with $2^{\\vert T\_\\epsilon \\vert}$.
+First let us have $T\_\\epsilon$ as an $\\epsilon$-partition of the input variable $X$. This partition compresses the input with respect to the homogeneity to the labels into small cells. The cells in total can cover the whole input space. If the prediction outputs binary values, we can replace the cardinality of the hypothesis, $\vert H\_\\epsilon \vert$, with $2^{\vert T\_\\epsilon \vert}$.
 
 $$ |H\_\\epsilon| \\sim 2^{|X|} \\to 2^{|T\_\\epsilon|} $$
 
-When $X$ is large, the size of $X$ is approximately $2^{H(X)}$. Each cell in the $\\epsilon$-partition is of size $2^{H(X \\vert T\_\\epsilon)}$. Therefore we have $\\vert T\_\\epsilon \\vert \\sim \\frac{2^{H(X)}}{2^{H(X \\vert T\_\\epsilon)}} = 2^{I(T\_\\epsilon; X)}$. Then the input compression bound becomes:
+When $X$ is large, the size of $X$ is approximately $2^{H(X)}$. Each cell in the $\\epsilon$-partition is of size $2^{H(X \vert T\_\\epsilon)}$. Therefore we have $\vert T\_\\epsilon \vert \\sim \\frac{2^{H(X)}}{2^{H(X \vert T\_\\epsilon)}} = 2^{I(T\_\\epsilon; X)}$. Then the input compression bound becomes:
 
 $$ \\epsilon^2 < \\frac{2^{I(T\_\\epsilon; X)} + \\log{1/\\delta}}{2m} $$
 
 ![](ib-bound.png)
 
-Fig. 5. The black line is the optimal achievable information bottleneck (IB) limit. The red line corresponds to the upper bound on the out-of-sample IB distortion, when trained on a finite sample set. $\\Delta C$ is the complexity gap and $\\Delta G$ is the generalization gap. (Recreated based on [Tishby’ talk 24:50](https://youtu.be/bLqJHjXihK8?t=24m56s))
+Fig. 5. The black line is the optimal achievable information bottleneck (IB) limit. The red line corresponds to the upper bound on the out-of-sample IB distortion, when trained on a finite sample set. $\\Delta C$ is the complexity gap and $\\Delta G$ is the generalization gap. (Recreated based on [Tishby' talk 24:50](https://youtu.be/bLqJHjXihK8?t=24m56s))
 
 # Network Size and Training Data Size[#](#network-size-and-training-data-size)
 
@@ -153,7 +153,7 @@ Having more layers give us computational benefits and speed up the training proc
 
 Fig. 6. The optimization time is much shorter (fewer epochs) with more hidden layers. (Image source: [Shwartz-Ziv and Tishby, 2017](https://arxiv.org/pdf/1703.00810.pdf))
 
-**Compression through stochastic relaxation**: According to the [diffusion equation](https://en.wikipedia.org/wiki/Fokker%E2%80%93Planck_equation), the relaxation time of layer $k$ is proportional to the exponential of this layer’s compression amount $\\Delta S\_k$: $\\Delta t\_k \\sim \\exp(\\Delta S\_k)$. We can compute the layer compression as $\\Delta S\_k = I(X; T\_k) - I(X; T\_{k-1})$. Because $\\exp(\\sum\_k \\Delta S\_k) \\geq \\sum\_k \\exp(\\Delta S\_k)$, we would expect an exponential decrease in training epochs with more hidden layers (larger $k$).
+**Compression through stochastic relaxation**: According to the [diffusion equation](https://en.wikipedia.org/wiki/Fokker%E2%80%93Planck_equation), the relaxation time of layer $k$ is proportional to the exponential of this layer's compression amount $\\Delta S\_k$: $\\Delta t\_k \\sim \\exp(\\Delta S\_k)$. We can compute the layer compression as $\\Delta S\_k = I(X; T\_k) - I(X; T\_{k-1})$. Because $\\exp(\sum\_k \\Delta S\_k) \\geq \sum\_k \\exp(\\Delta S\_k)$, we would expect an exponential decrease in training epochs with more hidden layers (larger $k$).
 
 ## The Benefit of More Training Samples[#](#the-benefit-of-more-training-samples)
 
