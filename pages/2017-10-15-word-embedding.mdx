@@ -55,10 +55,10 @@ The following example demonstrates multiple pairs of target and context words as
 
 Sliding window (size = 5)
 
+```
 Target word
 
 Context
-
 [The man who]
 
 the
@@ -106,12 +106,10 @@ should, swing, sword
 sword
 
 swing, the
-
-{:.info}
-
+```
 Each context-target pair is treated as a new observation in the data. For example, the target word "swing" in the above case produces four training samples: ("swing", "sentence"), ("swing", "should"), ("swing", "the"), and ("swing", "sword").
 
-![](word2vec-skip-gram.png)
+![](assets/images/2017-10-15-word-embedding/word2vec-skip-gram.png)
 
 Fig. 1. The skip-gram model. Both the input vector $\mathbf{x}$ and the output $\mathbf{y}$ are one-hot encoded word representations. The hidden layer is the word embedding of size $N$.
 
@@ -129,7 +127,7 @@ According to Fig. 1,
 
 The Continuous Bag-of-Words (CBOW) is another similar model for learning word vectors. It predicts the target word (i.e. "swing") from source context words (i.e., "sentence should the sword").
 
-![](word2vec-cbow.png)
+![](assets/images/2017-10-15-word-embedding/word2vec-cbow.png)
 
 Fig. 2. The CBOW model. Word vectors of multiple context words are averaged to get a fixed-length vector as in the hidden layer. Other symbols have the same meanings as in Fig 1.
 
@@ -151,7 +149,7 @@ This is accurate as presented in Fig. 1. However, when $V$ is extremely large, c
 
 Morin and Bengio ([2005](https://www.iro.umontreal.ca/~lisa/pointeurs/hierarchical-nnlm-aistats05.pdf)) proposed hierarchical softmax to make the sum calculation faster with the help of a binary tree structure. The hierarchical softmax encodes the language model's output softmax layer into a tree hierarchy, where each leaf is one word and each internal node stands for relative probabilities of the children nodes.
 
-![](word2vec-hierarchical-softmax.png)
+![](assets/images/2017-10-15-word-embedding/word2vec-hierarchical-softmax.png)
 
 Fig. 3. An illustration of the hierarchical softmax binary tree. The leaf nodes in white are words in the vocabulary. The gray inner nodes carry information on the probabilities of reaching its child nodes. One path starting from the root to the leaf $w\\_i$. $n(w\\_i, j)$ denotes the j-th node on this path. (Image source: [word2vec Parameter Learning Explained](https://arxiv.org/pdf/1411.2738.pdf))
 
@@ -390,15 +388,15 @@ In the GoT word embedding space, the top similar words to "king" and "queen" are
 ---
 
 Cited as:
-
-    @article{weng2017wordembedding,
-      title   = "Learning word embedding",
-      author  = "Weng, Lilian",
-      journal = "lilianweng.github.io",
-      year    = "2017",
-      url     = "https://lilianweng.github.io/posts/2017-10-15-word-embedding/"
-    }
-
+```
+@article{weng2017wordembedding,
+    title   = "Learning word embedding",
+    author  = "Weng, Lilian",
+    journal = "lilianweng.github.io",
+    year    = "2017",
+    url     = "https://lilianweng.github.io/posts/2017-10-15-word-embedding/"
+}
+```
 # References[#](#references)
 
 [1] Tensorflow Tutorial [Vector Representations of Words](https://www.tensorflow.org/tutorials/word2vec).

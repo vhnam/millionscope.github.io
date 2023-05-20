@@ -480,7 +480,7 @@ Here is the algorithm outline:
     1.  Reset gradient: dθ = 0 and dw = 0.
     2.  Synchronize thread-specific parameters with global ones: θ' = θ and w' = w.
     3.  $t_\text{start}$ = t and get $s_t$.
-    4.  While ($s_t \\neq \text{TERMINAL}$) and ($t - t_\text{start} <= t_\text{max}$):
+    4.  While ($s_t \neq \text{TERMINAL}$) and ($t - t_\text{start} <= t_\text{max}$):
         1.  Pick the action $a_t \sim \pi(a_t \vert s_t; \theta')$ and receive a new reward $r_t$ and a new state $s_{t+1}$.
         2.  Update t = t + 1 and T = T + 1.
     5.  Initialize the variable that holds the return estimation$$R = \begin{cases} 0 & \text{if } s_t \text{ is TERMINAL} \\ V(s_t; w') & \text{otherwise} \end{cases}$$.

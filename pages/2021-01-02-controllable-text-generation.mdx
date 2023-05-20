@@ -289,7 +289,7 @@ Paraphrasing is a quick way to explore more prompts similar to the known version
 
 [Ribeiro et al (2018)](https://www.aclweb.org/anthology/P18-1079/) identified _semantically equivalent adversaries (SEA)_ by generating a variety of paraphrases $\{x'\}$ of input $x$ until it triggers a different prediction of target function $f$:
 
-$$\begin{aligned} SEA(x, x') &= \mathbb{1}[\text{SemEq}(x, x') \\land f(x) \\neq f(x')] \\ \text{where SemEq}(x, x') &= \mathbb{1}[\min\Big(1, \frac{p(x'\vert x)}{p(x\vert x)} \Big) \geq \tau] \end{aligned}$$
+$$\begin{aligned} SEA(x, x') &= \mathbb{1}[\text{SemEq}(x, x') \\land f(x) \neq f(x')] \\ \text{where SemEq}(x, x') &= \mathbb{1}[\min\Big(1, \frac{p(x'\vert x)}{p(x\vert x)} \Big) \geq \tau] \end{aligned}$$
 
 The rules extracted from SEA are considered as "bugs" in the model. Applying those rules as data augmentation in model training helps robustify the model and fix bugs.
 

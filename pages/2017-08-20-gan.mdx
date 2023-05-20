@@ -53,7 +53,7 @@ It is noticeable according to the formula that KL divergence is asymmetric. In c
 
 $$D_{JS}(p \| q) = \frac{1}{2} D_{KL}(p \| \frac{p + q}{2}) + \frac{1}{2} D_{KL}(q \| \frac{p + q}{2})$$
 
-![](KL_JS_divergence.png)
+![](assets/images/2017-08-20-gan/KL_JS_divergence.png)
 
 Fig. 1. Given two Gaussian distribution, $p$ with mean=0 and std=1 and $q$ with mean=1 and std=1. The average of two distributions is labelled as $m=(p+q)/2$. KL divergence $D_{KL}$ is asymmetric but JS divergence $D_{JS}$ is symmetric.
 
@@ -66,7 +66,7 @@ GAN consists of two models:
 - A discriminator $D$ estimates the probability of a given sample coming from the real dataset. It works as a critic and is optimized to tell the fake samples from the real ones.
 - A generator $G$ outputs synthetic samples given a noise variable input $z$ ($z$ brings in potential output diversity). It is trained to capture the real data distribution so that its generative samples can be as real as possible, or in other words, can trick the discriminator to offer a high probability.
 
-![](GAN.png)
+![](assets/images/2017-08-20-gan/GAN.png)
 
 Fig. 2. Architecture of a generative adversarial network. (Image source: [www.kdnuggets.com/2017/01/generative-...-learning.html](http://www.kdnuggets.com/2017/01/generative-adversarial-networks-hot-topic-machine-learning.html))
 
@@ -156,7 +156,7 @@ Let's check out a simple example to better understand why it is difficult to fin
 
 Because $\frac{\partial f_1}{\partial x} = y$ and $\frac{\partial f_2}{\partial y} = -x$, we update $x$ with $x-\eta \cdot y$ and $y$ with $y+ \eta \cdot x$ simulitanously in one iteration, where $\eta$ is the learning rate. Once $x$ and $y$ have different signs, every following gradient update causes huge oscillation and the instability gets worse in time, as shown in Fig. 3.
 
-![](nash_equilibrium.png)
+![](assets/images/2017-08-20-gan/nash_equilibrium.png)
 
 Fig. 3. A simulation of our example for updating $x$ to minimize $xy$ and updating $y$ to minimize $-xy$. The learning rate $\eta = 0.1$. With more iterations, the oscillation grows more and more unstable.
 
@@ -182,7 +182,7 @@ $p_g$ lies in a low dimensional manifolds, too. Whenever the generator is asked 
 
 Because both $p_g$ and $p_r$ rest in low dimensional manifolds, they are almost certainly gonna be disjoint (See Fig. 4). When they have disjoint supports, we are always capable of finding a perfect discriminator that separates real and fake samples 100% correctly. Check the [paper](https://arxiv.org/pdf/1701.04862.pdf) if you are curious about the proof.
 
-![](low_dim_manifold.png)
+![](assets/images/2017-08-20-gan/low_dim_manifold.png)
 
 Fig. 4. Low dimensional manifolds in high dimension space can hardly have overlaps. (Left) Two lines in a three-dimension space. (Right) Two surfaces in a three-dimension space.
 
@@ -190,7 +190,7 @@ Fig. 4. Low dimensional manifolds in high dimension space can hardly have overla
 
 When the discriminator is perfect, we are guaranteed with $D(x) = 1, \forall x \in p_r$ and $D(x) = 0, \forall x \in p_g$. Therefore the loss function $L$ falls to zero and we end up with no gradient to update the loss during learning iterations. Fig. 5 demonstrates an experiment when the discriminator gets better, the gradient vanishes fast.
 
-![](GAN_vanishing_gradient.png)
+![](assets/images/2017-08-20-gan/GAN_vanishing_gradient.png)
 
 Fig. 5. First, a DCGAN is trained for 1, 10 and 25 epochs. Then, with the \*\*generator fixed\*\*, a discriminator is trained from scratch and measure the gradients with the original cost function. We see the gradient norms \*\*decay quickly\*\* (in log scale), in the best case 5 orders of magnitude after 4000 discriminator iterations. (Image source: [Arjovsky and Bottou, 2017](https://arxiv.org/pdf/1701.04862.pdf))
 
@@ -205,7 +205,7 @@ This dilemma clearly is capable to make the GAN training very tough.
 
 During the training, the generator may collapse to a setting where it always produces same outputs. This is a common failure case for GANs, commonly referred to as **Mode Collapse**. Even though the generator might be able to trick the corresponding discriminator, it fails to learn to represent the complex real-world data distribution and gets stuck in a small space with extremely low variety.
 
-![](mode_collapse.png)
+![](assets/images/2017-08-20-gan/mode_collapse.png)
 
 Fig. 6. A DCGAN model is trained with an MLP network with 4 layers, 512 units and ReLU activation function, configured to lack a strong inductive bias for image generation. The results shows a significant degree of mode collapse. (Image source: [Arjovsky, Chintala, & Bottou, 2017.](https://arxiv.org/pdf/1701.07875.pdf))
 
@@ -275,7 +275,7 @@ $$\begin{aligned} \delta_0 &= 0\\ \delta_1 &= 0 + 3 - 1 = 2\\ \delta_2 &= 2 + 2 
 
 Finally the Earth Mover's distance is $W = \sum \vert \delta_i \vert = 5$.
 
-![](EM_distance_discrete.png)
+![](assets/images/2017-08-20-gan/EM_distance_discrete.png)
 
 Fig. 7. Step-by-step plan of moving dirt between piles in $P$ and $Q$ to make them match.
 
@@ -301,17 +301,17 @@ Suppose we have two probability distributions, $P$ and $Q$:
 
 $$\forall (x, y) \in P, x = 0 \text{ and } y \sim U(0, 1)\\ \forall (x, y) \in Q, x = \theta, 0 \leq \theta \leq 1 \text{ and } y \sim U(0, 1)\\$$
 
-![](wasserstein_simple_example.png)
+![](assets/images/2017-08-20-gan/wasserstein_simple_example.png)
 
-Fig. 8. There is no overlap between $P$ and $Q$ when $\theta \\neq 0$.
+Fig. 8. There is no overlap between $P$ and $Q$ when $\theta \neq 0$.
 
-When $\theta \\neq 0$:
+When $\theta \neq 0$:
 
 $$\begin{aligned} D_{KL}(P \| Q) &= \sum_{x=0, y \sim U(0, 1)} 1 \cdot \log\frac{1}{0} = +\infty \\ D_{KL}(Q \| P) &= \sum_{x=\theta, y \sim U(0, 1)} 1 \cdot \log\frac{1}{0} = +\infty \\ D_{JS}(P, Q) &= \frac{1}{2}(\sum_{x=0, y \sim U(0, 1)} 1 \cdot \log\frac{1}{1/2} + \sum_{x=0, y \sim U(0, 1)} 1 \cdot \log\frac{1}{1/2}) = \log 2\\ W(P, Q) &= |\theta| \end{aligned}$$
 
 But when $\theta = 0$, two distributions are fully overlapped:
 
-$$\begin{aligned} D_{KL}(P \| Q) &= D_{KL}(Q \| P) = D_{JS}(P, Q) = 0\\ W(P, Q) &= 0 = \\lvert \theta \\rvert \end{aligned}$$
+$$\begin{aligned} D_{KL}(P \| Q) &= D_{KL}(Q \| P) = D_{JS}(P, Q) = 0\\ W(P, Q) &= 0 = \lvert \theta \rvert \end{aligned}$$
 
 $D_{KL}$ gives us inifity when two distributions are disjoint. The value of $D_{JS}$ has sudden jump, not differentiable at $\theta = 0$. Only Wasserstein metric provides a smooth measure, which is super helpful for a stable learning process using gradient descents.
 
@@ -319,9 +319,9 @@ $D_{KL}$ gives us inifity when two distributions are disjoint. The value of $D_{
 
 It is intractable to exhaust all the possible joint distributions in $\Pi(p_r, p_g)$ to compute $\inf_{\gamma \sim \Pi(p_r, p_g)}$. Thus the authors proposed a smart transformation of the formula based on the Kantorovich-Rubinstein duality to:
 
-$$W(p_r, p_g) = \frac{1}{K} \\sup_{\| f \|_L \leq K} \mathbb{E}_{x \sim p_r}[f(x)] - \mathbb{E}_{x \sim p_g}[f(x)]$$
+$$W(p_r, p_g) = \frac{1}{K} \sup_{\| f \|_L \leq K} \mathbb{E}_{x \sim p_r}[f(x)] - \mathbb{E}_{x \sim p_g}[f(x)]$$
 
-where $\\sup$ ([supremum](https://en.wikipedia.org/wiki/Infimum_and_supremum)) is the opposite of $inf$ (infimum); we want to measure the least upper bound or, in even simpler words, the maximum value.
+where $\sup$ ([supremum](https://en.wikipedia.org/wiki/Infimum_and_supremum)) is the opposite of $inf$ (infimum); we want to measure the least upper bound or, in even simpler words, the maximum value.
 
 **Lipschitz continuity?**
 
@@ -329,9 +329,9 @@ The function $f$ in the new form of Wasserstein metric is demanded to satisfy $|
 
 A real-valued function $f: \mathbb{R} \rightarrow \mathbb{R}$ is called $K$-Lipschitz continuous if there exists a real constant $K \geq 0$ such that, for all $x_1, x_2 \in \mathbb{R}$,
 
-$$\\lvert f(x_1) - f(x_2) \\rvert \leq K \\lvert x_1 - x_2 \\rvert$$
+$$\lvert f(x_1) - f(x_2) \rvert \leq K \lvert x_1 - x_2 \rvert$$
 
-Here $K$ is known as a Lipschitz constant for function $f(.)$. Functions that are everywhere continuously differentiable is Lipschitz continuous, because the derivative, estimated as $\frac{\\lvert f(x_1) - f(x_2) \\rvert}{\\lvert x_1 - x_2 \\rvert}$, has bounds. However, a Lipschitz continuous function may not be everywhere differentiable, such as $f(x) = \\lvert x \\rvert$.
+Here $K$ is known as a Lipschitz constant for function $f(.)$. Functions that are everywhere continuously differentiable is Lipschitz continuous, because the derivative, estimated as $\frac{\lvert f(x_1) - f(x_2) \rvert}{\lvert x_1 - x_2 \rvert}$, has bounds. However, a Lipschitz continuous function may not be everywhere differentiable, such as $f(x) = \lvert x \rvert$.
 
 Explaining how the transformation happens on the Wasserstein distance formula is worthy of a long post by itself, so I skip the details here. If you are interested in how to compute Wasserstein metric using linear programming, or how to transfer Wasserstein metric into its dual form according to the Kantorovich-Rubinstein Duality, read this [awesome post](https://vincentherrmann.github.io/blog/wasserstein/).
 
@@ -343,7 +343,7 @@ Thus the "discriminator" is not a direct critic of telling the fake samples apar
 
 One big problem is to maintain the $K$-Lipschitz continuity of $f_w$ during the training in order to make everything work out. The paper presents a simple but very practical trick: After every gradient update, clamp the weights $w$ to a small window, such as $[-0.01, 0.01]$, resulting in a compact parameter space $W$ and thus $f_w$ obtains its lower and upper bounds to preserve the Lipschitz continuity.
 
-![](WGAN_algorithm.png)
+![](assets/images/2017-08-20-gan/WGAN_algorithm.png)
 
 Fig. 9. Algorithm of Wasserstein generative adversarial network. (Image source: [Arjovsky, Chintala, & Bottou, 2017.](https://arxiv.org/pdf/1701.07875.pdf))
 
@@ -359,13 +359,13 @@ Sadly, Wasserstein GAN is not perfect. Even the authors of the original WGAN pap
 
 Some improvement, precisely replacing weight clipping with **gradient penalty**, has been discussed in [Gulrajani et al. 2017](https://arxiv.org/pdf/1704.00028.pdf). I will leave this to a future post.
 
-# Example: Create New Pokemons![#](#example-create-new-pokemons)
+# Example: Create New Pokemons [#](#example-create-new-pokemons)
 
 Just for fun, I tried out [carpedm20/DCGAN-tensorflow](https://github.com/carpedm20/DCGAN-tensorflow) on a tiny dataset, [Pokemon sprites](https://github.com/PokeAPI/sprites/). The dataset only has 900-ish pokemon images, including different levels of same pokemon species.
 
 Let's check out what types of new pokemons the model is able to create. Unfortunately due to the tiny training data, the new pokemons only have rough shapes without details. The shapes and colors do look better with more training epoches! Hooray!
 
-![](pokemon-GAN.png)
+![](assets/images/2017-08-20-gan/pokemon-GAN.png)
 
 Fig. 10. Train [carpedm20/DCGAN-tensorflow](https://github.com/carpedm20/DCGAN-tensorflow) on a set of Pokemon sprite images. The sample outputs are listed after training epoches = 7, 21, 49.
 
@@ -374,26 +374,26 @@ If you are interested in a commented version of [carpedm20/DCGAN-tensorflow](htt
 ---
 
 Cited as:
-
-    @article{weng2017gan,
-      title   = "From GAN to WGAN",
-      author  = "Weng, Lilian",
-      journal = "lilianweng.github.io",
-      year    = "2017",
-      url     = "https://lilianweng.github.io/posts/2017-08-20-gan/"
-    }
-
+```bibtex
+@article{weng2017gan,
+  title   = "From GAN to WGAN",
+  author  = "Weng, Lilian",
+  journal = "lilianweng.github.io",
+  year    = "2017",
+  url     = "https://lilianweng.github.io/posts/2017-08-20-gan/"
+}
+```
 OR
-
-    @misc{weng2019gan,
-        title={From GAN to WGAN},
-        author={Lilian Weng},
-        year={2019},
-        eprint={1904.08994},
-        archivePrefix={arXiv},
-        primaryClass={cs.LG}
-    }
-
+```bibtex
+@misc{weng2019gan,
+    title={From GAN to WGAN},
+    author={Lilian Weng},
+    year={2019},
+    eprint={1904.08994},
+    archivePrefix={arXiv},
+    primaryClass={cs.LG}
+}
+```
 # References[#](#references)
 
 [1] Goodfellow, Ian, et al. ["Generative adversarial nets."](https://arxiv.org/pdf/1406.2661.pdf) NIPS, 2014.

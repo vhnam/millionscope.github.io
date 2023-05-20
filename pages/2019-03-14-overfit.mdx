@@ -141,7 +141,7 @@ Let $a_i = \boldsymbol{x}_i \boldsymbol{w}$, we would like to find a suitable $\
 
 $$\mathbf{M}_\text{ReLU} = [a_i - b_j]_{i \times j} = \begin{bmatrix} a_1 - b_1 & 0 & 0 & \dots & 0 \\ \vdots & \ddots & & & \vdots \\ a_i - b_1 & \dots & a_i - b_i & \dots & 0\\ \vdots & & & \ddots & \vdots \\ a_n - b_1 & a_n - b_2 & \dots & \dots & a_n - b_n \\ \end{bmatrix}$$
 
-It is a nonsingular square matrix as $\\det(\mathbf{M}_\text{ReLU}) \\neq 0$, so we can always find suitable $\boldsymbol{v}$ to solve $\boldsymbol{v}\mathbf{M}_\text{ReLU}=\boldsymbol{y}$ (In other words, the column space of $\mathbf{M}_\text{ReLU}$ is all of $\mathbb{R}^n$ and we can find a linear combination of column vectors to obtain any $\boldsymbol{y}$).
+It is a nonsingular square matrix as $\\det(\mathbf{M}_\text{ReLU}) \neq 0$, so we can always find suitable $\boldsymbol{v}$ to solve $\boldsymbol{v}\mathbf{M}_\text{ReLU}=\boldsymbol{y}$ (In other words, the column space of $\mathbf{M}_\text{ReLU}$ is all of $\mathbb{R}^n$ and we can find a linear combination of column vectors to obtain any $\boldsymbol{y}$).
 
 ## Deep NN can Learn Random Noise[#](#deep-nn-can-learn-random-noise)
 

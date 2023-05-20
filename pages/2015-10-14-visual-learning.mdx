@@ -274,13 +274,13 @@ So, now we have four possibilities:
 - Alice using her own code$$(H(q) = 1.75 ~\text{bits})$$
 - Bob using Alice's code$$(H_q(p) = 2.375 ~\text{bits})$$
 
-This isn't necessarily as intuitive as one might think. For example, we can see that$$H_p(q) \\neq H_q(p)$$. Is there some way we can see how these four values relate to each other?
+This isn't necessarily as intuitive as one might think. For example, we can see that$$H_p(q) \neq H_q(p)$$. Is there some way we can see how these four values relate to each other?
 
 In the following diagram, each subplot represents one of these 4 possibilities. Each subplot visualizes average message length the same way our previous diagrams did. They are organized in a square, so that if the messages are coming from the same distribution the plots are beside each other, and if they use the same codes they are on top of each other. This allows you to kind of visually slide the distributions and codes together.
 
 ![](assets/images/2015-09-Visual-Information/CrossEntropyCompare.png)
 
-Can you see why$$H_p(q) \\neq H_q(p)$$?$$H_q(p)$$is large because there is an event (blue) which is very common under$$p$$but gets a long code because it is very uncommon under$$q$$. On the other hand, common events under$$q$$are less common under$$p$$, but the difference is less drastic, so$$H_p(q)$$isn't as high.
+Can you see why$$H_p(q) \neq H_q(p)$$?$$H_q(p)$$is large because there is an event (blue) which is very common under$$p$$but gets a long code because it is very uncommon under$$q$$. On the other hand, common events under$$q$$are less common under$$p$$, but the difference is less drastic, so$$H_p(q)$$isn't as high.
 
 Cross-entropy isn't symmetric.
 

@@ -176,7 +176,7 @@ Fig. 5. Illustration of the unsupervised data generation (UDG) framework. (Image
 The few-shot prompts of UDG contain a small number of unlabeled examples, as well as a task-specific natural language description of the desired label. Because some generated examples are noisy, they implemented **noisy label annealing** (**NLA**) techniques to filter potentially misaligned samples out during the training processes. NLA gradually removes noisy training signals in time during training when the model starts to disagree with its pseudo label with high confidence. At each training step $t$, a given example $(\mathbf{x}_i, \hat{y}_i)$ is considered noisy and should be removed if:
 
 - The model predicted probability is higher than a threshold $p(\bar{y}_i \vert \mathbf{x}_i) > \mu_t$ where $\bar{y}_i = \arg\max_y p(y \vert \mathbf{x}_i)$;
-- And the predicted label is different from the synthetic label, $\bar{y}_i \\neq \hat{y}_i$.
+- And the predicted label is different from the synthetic label, $\bar{y}_i \neq \hat{y}_i$.
 
 Note that the threshold $\mu_t$ is time-dependent, initialized as 0.9 and then gradually annealed to $1/\text{num_of_classes}$ in time.
 

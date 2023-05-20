@@ -158,7 +158,7 @@ Fig. 4. Oops, I guess not this Thompson? (Credit goes to [Ben Taborsky](https://
 
 At each time step, we want to select action a according to the probability that a is **optimal**:
 
-$$\begin{aligned} \pi(a \\; \vert \\; h_t) &= \mathbb{P} [ Q(a) > Q(a'), \forall a' \\neq a \\; \vert \\; h_t] \\ &= \mathbb{E}_{\mathcal{R} \vert h_t} [ \mathbb{1}(a = \arg\max_{a \in \mathcal{A}} Q(a)) ] \end{aligned}$$
+$$\begin{aligned} \pi(a \\; \vert \\; h_t) &= \mathbb{P} [ Q(a) > Q(a'), \forall a' \neq a \\; \vert \\; h_t] \\ &= \mathbb{E}_{\mathcal{R} \vert h_t} [ \mathbb{1}(a = \arg\max_{a \in \mathcal{A}} Q(a)) ] \end{aligned}$$
 
 where $\pi(a ; \vert ; h_t)$ is the probability of taking action a given the history $h_t$.
 
