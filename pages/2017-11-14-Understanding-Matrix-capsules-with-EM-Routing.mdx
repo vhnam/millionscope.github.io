@@ -294,14 +294,14 @@ Since we share the transformation matrix, we just need 3x3x32x32x4x4 parameters 
 
 Here is the summary of each layer and the shape of their outputs:
 
-| Layer Name     | Apply                                                                                                                              | Output shape                                                        |
-| -------------- | ---------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
-| MNist image    |                                                                                                                                    | 28, 28, 1                                                           |
-| ReLU Conv1     | Regular Convolution (CNN) layer using 5x5 kernels with 32 output channels, stride 2 and padding                                    | 14, 14, 32                                                          |
+| Layer Name     | Apply                                                                                                                              | Output shape                                                    |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| MNist image    |                                                                                                                                    | 28, 28, 1                                                       |
+| ReLU Conv1     | Regular Convolution (CNN) layer using 5x5 kernels with 32 output channels, stride 2 and padding                                    | 14, 14, 32                                                      |
 | PrimaryCaps    | Modified convolution layer with 1x1 kernels, strides 1 with padding and outputing 32 capsules. Requiring 32x32x(4x4+1) parameters. | <nobr>pose (14, 14, 32, 4, 4), </nobr> activations (14, 14, 32) |
-| ConvCaps1      | Capsule convolution with 3x3 kernels, strides 2 and no padding. Requiring 3x3x32x32x4x4 parameters.                                | poses (6, 6, 32, 4, 4), activations (6, 6, 32)                      |
-| ConvCaps2      | Capsule convolution with 3x3 kernels, strides 1 and no padding                                                                     | poses (4, 4, 32, 4, 4), activations (4, 4, 32)                      |
-| Class Capsules | Capsule with 1x1 kernel. Requiring 32x10x4x4 parameters.                                                                           | poses (10, 4, 4), activations (10)                                  |
+| ConvCaps1      | Capsule convolution with 3x3 kernels, strides 2 and no padding. Requiring 3x3x32x32x4x4 parameters.                                | poses (6, 6, 32, 4, 4), activations (6, 6, 32)                  |
+| ConvCaps2      | Capsule convolution with 3x3 kernels, strides 1 and no padding                                                                     | poses (4, 4, 32, 4, 4), activations (4, 4, 32)                  |
+| Class Capsules | Capsule with 1x1 kernel. Requiring 32x10x4x4 parameters.                                                                           | poses (10, 4, 4), activations (10)                              |
 
 For the rest of the article, we will cover a detail implementation using Tensor. Here is the code in building our layers:
 

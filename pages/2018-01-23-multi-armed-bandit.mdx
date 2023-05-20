@@ -34,7 +34,7 @@ The algorithms are implemented for Bernoulli bandit in [lilianweng/multi-armed-b
 
 The exploration vs exploitation dilemma exists in many aspects of our life. Say, your favorite restaurant is right around the corner. If you go there every day, you would be confident of what you will get, but miss the chances of discovering an even better option. If you try new places all the time, very likely you are gonna have to eat unpleasant food from time to time. Similarly, online advisors try to balance between the known most attractive ads and the new ads that might be even more successful.
 
-![](exploration_vs_exploitation.png)
+![](assets/images/2018-01-23-multi-armed-bandit/exploration_vs_exploitation.png)
 
 Fig. 1. A real-life example of the exploration vs exploitation dilemma: where to eat? (Image source: UC Berkeley AI course [slide](http://ai.berkeley.edu/lecture_slides.html), [lecture 11](http://ai.berkeley.edu/slides/Lecture%2011%20--%20Reinforcement%20Learning%20II/SP14%20CS188%20Lecture%2011%20--%20Reinforcement%20Learning%20II.pptx).)
 
@@ -46,7 +46,7 @@ The [multi-armed bandit](https://en.wikipedia.org/wiki/Multi-armed_bandit) probl
 
 In this post, we will only discuss the setting of having an infinite number of trials. The restriction on a finite number of trials introduces a new type of exploration problem. For instance, if the number of trials is smaller than the number of slot machines, we cannot even try every machine to estimate the reward probability (!) and hence we have to behave smartly w.r.t. a limited set of knowledge and resources (i.e. time).
 
-![](bern_bandit.png)
+![](assets/images/2018-01-23-multi-armed-bandit/bern_bandit.png)
 
 Fig. 2. An illustration of how a Bernoulli multi-armed bandit works. The reward probabilities are \*\*unknown\*\* to the player.
 
@@ -142,7 +142,7 @@ In UCB or UCB1 algorithm, we do not assume any prior on the reward distribution 
 
 For example, if we expect the mean reward of every slot machine to be Gaussian as in Fig 2, we can set the upper bound as 95% confidence interval by setting $\hat{U}_t(a)$ to be twice the standard deviation.
 
-![](bern_UCB.png)
+![](assets/images/2018-01-23-multi-armed-bandit/bern_UCB.png)
 
 Fig. 3. When the expected reward has a Gaussian distribution. $\sigma(a\\_i)$ is the standard deviation and $c\sigma(a\\_i)$ is the upper confidence bound. The constant $c$ is a adjustable hyperparameter. (Image source: [UCL RL course lecture 9's slides](http://www0.cs.ucl.ac.uk/staff/d.silver/web/Teaching_files/XX.pdf))
 
@@ -152,7 +152,7 @@ Check my toy implementation of [UCB1](https://github.com/lilianweng/multi-armed-
 
 Thompson sampling has a simple idea but it works great for solving the multi-armed bandit problem.
 
-![](klay-thompson.jpg)
+![](assets/images/2018-01-23-multi-armed-bandit/klay-thompson.jpg)
 
 Fig. 4. Oops, I guess not this Thompson? (Credit goes to [Ben Taborsky](https://www.linkedin.com/in/benjamin-taborsky); he has a full theorem of how Thompson invented while pondering over who to pass the ball. Yes I stole his joke.)
 
@@ -181,7 +181,7 @@ However, for many practical and complex problems, it can be computationally intr
 
 I implemented the above algorithms in [lilianweng/multi-armed-bandit](https://github.com/lilianweng/multi-armed-bandit). A [BernoulliBandit](https://github.com/lilianweng/multi-armed-bandit/blob/master/bandits.py#L13) object can be constructed with a list of random or predefined reward probabilities. The bandit algorithms are implemented as subclasses of [Solver](https://github.com/lilianweng/multi-armed-bandit/blob/master/solvers.py#L9), taking a Bandit object as the target problem. The cumulative regrets are tracked in time.
 
-![](bandit_experiment.png)
+![](assets/images/2018-01-23-multi-armed-bandit/bandit_experiment.png)
 
 Fig. 4. The result of a small experiment on solving a Bernoulli bandit with K = 10 slot machines with reward probabilities, {0.0, 0.1, 0.2, ..., 0.9}. Each solver runs 10000 steps.
 
@@ -191,12 +191,13 @@ Fig. 4. The result of a small experiment on solving a Bernoulli bandit with K = 
 
 We need exploration because information is valuable. In terms of the exploration strategies, we can do no exploration at all, focusing on the short-term returns. Or we occasionally explore at random. Or even further, we explore and we are picky about which options to explore — actions with higher uncertainty are favored because they can provide higher information gain.
 
-![](bandit_solution_summary.png)
+![](assets/images/2018-01-23-multi-armed-bandit/bandit_solution_summary.png)
 
 ---
 
 Cited as:
 
+```
     @article{weng2018bandit,
       title   = "The Multi-Armed Bandit Problem and Its Solutions",
       author  = "Weng, Lilian",
@@ -204,6 +205,7 @@ Cited as:
       year    = "2018",
       url     = "https://lilianweng.github.io/posts/2018-01-23-multi-armed-bandit/"
     }
+```
 
 # References[#](#references)
 

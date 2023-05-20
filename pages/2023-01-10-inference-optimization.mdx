@@ -224,7 +224,7 @@ Sparsity is an effective way to scale up model capacity while keeping model infe
 
 Fig. 7. A matrix of 2:4 structured sparsity and its compressed representation. (Image source: [Nvidia blog](https://developer.nvidia.com/blog/accelerating-inference-with-sparsity-using-ampere-and-tensorrt/))
 
-To sparsify a dense neural network to follow a N:M structured sparsity pattern, [Nvidia (2020)](https://images.nvidia.com/aem-dam/en-zz/Solutions/data-center/nvidia-ampere-architecture-whitepaper.pdf) suggested using the three-step [routine workflow](#routine-workflow) for training a pruned network: train –> prune to satisfy 2:4 sparsity –> retrain.
+To sparsify a dense neural network to follow a N:M structured sparsity pattern, [Nvidia (2020)](https://images.nvidia.com/aem-dam/en-zz/Solutions/data-center/nvidia-ampere-architecture-whitepaper.pdf) suggested using the three-step [routine workflow](#routine-workflow) for training a pruned network: train -> prune to satisfy 2:4 sparsity -> retrain.
 
 Permuting columns can provide more options in the pruning process to maintain parameters of large magnitude or to satisfy a special restriction like N:M sparsity ([Pool & Yu 2021](https://proceedings.neurips.cc/paper/2021/hash/6e8404c3b93a9527c8db241a1846599a-Abstract.html)). As long as paired axes of two matrices are permuted in the same order, the results of matrix multiplication would not change. For example,
 

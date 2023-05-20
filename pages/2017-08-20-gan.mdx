@@ -14,7 +14,7 @@ Source : https://lilianweng.github.io/posts/2017-08-20-gan/
 
 Table of Contents
 
-- [Kullback–Leibler and Jensen–Shannon Divergence](#kullbackleibler-and-jensenshannon-divergence)
+- [Kullback-Leibler and Jensen-Shannon Divergence](#kullbackleibler-and-jensenshannon-divergence)
 - [Generative Adversarial Network (GAN)](#generative-adversarial-network-gan)
   - [What is the optimal value for D?](#what-is-the-optimal-value-for-d)
   - [What is the global optimal?](#what-is-the-global-optimal)
@@ -40,11 +40,11 @@ Table of Contents
 
 Here I would like to explain the maths behind the generative adversarial network framework, why it is hard to be trained, and finally introduce a modified version of GAN intended to solve the training difficulties.
 
-# Kullback–Leibler and Jensen–Shannon Divergence[#](#kullbackleibler-and-jensenshannon-divergence)
+# Kullback-Leibler and Jensen-Shannon Divergence[#](#kullbackleibler-and-jensenshannon-divergence)
 
 Before we start examining GANs closely, let us first review two metrics for quantifying the similarity between two probability distributions.
 
-(1) [KL (Kullback–Leibler) divergence](https://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence) measures how one probability distribution $p$ diverges from a second expected probability distribution $q$.
+(1) [KL (Kullback-Leibler) divergence](https://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence) measures how one probability distribution $p$ diverges from a second expected probability distribution $q$.
 
 $$D_{KL}(p \| q) = \int_x p(x) \log \frac{p(x)}{q(x)} dx$$
 
@@ -52,7 +52,7 @@ $D_{KL}$ achieves the minimum zero when $p(x)$ == $q(x)$ everywhere.
 
 It is noticeable according to the formula that KL divergence is asymmetric. In cases where $p(x)$ is close to zero, but $q(x)$ is significantly non-zero, the $q$'s effect is disregarded. It could cause buggy results when we just want to measure the similarity between two equally important distributions.
 
-(2) [Jensen–Shannon Divergence](https://en.wikipedia.org/wiki/Jensen%E2%80%93Shannon_divergence) is another measure of similarity between two probability distributions, bounded by $\[0, 1\]$. JS divergence is symmetric (yay!) and more smooth. Check this [Quora post](https://www.quora.com/Why-isnt-the-Jensen-Shannon-divergence-used-more-often-than-the-Kullback-Leibler-since-JS-is-symmetric-thus-possibly-a-better-indicator-of-distance) if you are interested in reading more about the comparison between KL divergence and JS divergence.
+(2) [Jensen-Shannon Divergence](https://en.wikipedia.org/wiki/Jensen%E2%80%93Shannon_divergence) is another measure of similarity between two probability distributions, bounded by $\[0, 1\]$. JS divergence is symmetric (yay!) and more smooth. Check this [Quora post](https://www.quora.com/Why-isnt-the-Jensen-Shannon-divergence-used-more-often-than-the-Kullback-Leibler-since-JS-is-symmetric-thus-possibly-a-better-indicator-of-distance) if you are interested in reading more about the comparison between KL divergence and JS divergence.
 
 $$D_{JS}(p \| q) = \frac{1}{2} D_{KL}(p \| \frac{p + q}{2}) + \frac{1}{2} D_{KL}(q \| \frac{p + q}{2})$$
 
