@@ -45,7 +45,7 @@ Training RL algorithms can be notoriously difficult sometimes. If the meta-learn
 
 I encountered a paper written in 2001 by [Hochreiter et al.](http://snowedin.net/tmp/Hochreiter2001.pdf) when reading [Wang et al., 2016](https://arxiv.org/pdf/1611.05763.pdf). Although the idea was proposed for supervised learning, there are so many resemblances to the current approach to meta-RL.
 
-![](Hochreiter-meta-learning.png)
+![](assets/images/2019-06-23-meta-rl/Hochreiter-meta-learning.png)
 
 Fig. 1. The meta-learning system consists of the supervisory and the subordinate systems. The subordinate system is a recurrent neural network that takes as input both the observation at the current time step, $x\\_t$ and the label at the last time step, $y\\_{t-1}$. (Image source: [Hochreiter et al., 2001](http://snowedin.net/tmp/Hochreiter2001.pdf))
 
@@ -93,7 +93,7 @@ Reward function.
 
 Note that common state $\mathcal{S}$ and action space $\mathcal{A}$ are used above, so that a (stochastic) policy: $\pi_\theta: \mathcal{S} \times \mathcal{A} \to \mathbb{R}_{+}$ would get inputs compatible across different tasks. The test tasks are sampled from the same distribution $\mathcal{M}$ or slightly modified version.
 
-![](meta-RL-illustration.png)
+![](assets/images/2019-06-23-meta-rl/meta-RL-illustration.png)
 
 Fig. 2. Illustration of meta-RL, containing two optimization loops. The outer loop samples a new environment in every iteration and adjusts parameters that determine the agent's behavior. In the inner loop, the agent interacts with the environment and optimizes for the maximal reward. (Image source: [Botvinick, et al. 2019](https://www.cell.com/action/showPdf?pii=S1364-6613%2819%2930061-0))
 
@@ -113,11 +113,11 @@ The training procedure works as follows:
 3.  Collect multiple trajectories and update the model weights;
 4.  Repeat from step 1.
 
-![](L2RL.png)
+![](assets/images/2019-06-23-meta-rl/L2RL.png)
 
 Fig. 3. In the meta-RL paper, different actor-critic architectures all use a recurrent model. Last reward and last action are additional inputs. The observation is fed into the LSTM either as a one-hot vector or as an embedding vector after passed through an encoder model. (Image source: [Wang et al., 2016](https://arxiv.org/abs/1611.05763))
 
-![](RL_2.png)
+![](assets/images/2019-06-23-meta-rl/RL_2.png)
 
 Fig. 4. As described in the RL^2 paper, illustration of the procedure of the model interacting with a series of MDPs in training time . (Image source: [Duan et al., 2017](https://arxiv.org/abs/1611.02779))
 
@@ -217,7 +217,7 @@ The [exploitation vs exploration](https://lilianweng.github.io/posts/2018-01-23-
 
 In addition, the loss function includes a KL divergence between the learned latent variable and a unit Gaussian prior, $D_\text{KL}(\mathcal{N}(\mu_i, \sigma_i)|\mathcal{N}(0, \mathbf{I}))$. On one hand, it restricts the learned latent space not too far from a common prior. On the other hand, it creates the variational evidence lower bound ([ELBO](http://users.umiacs.umd.edu/~xyang35/files/understanding-variational-lower.pdf)) for the reward function. Interestingly the paper found that $(\mu_i, \sigma_i)$ for each task are usually close to the prior at convergence.
 
-![](MAESN.png)
+![](assets/images/2019-06-23-meta-rl/MAESN.png)
 
 Fig. 5. The policy is conditioned on a latent variable variable $z\\_i \sim \mathcal{N}(\mu, \sigma)$ that is sampled once every episode. Each task has different hyperparameters for the latent variable distribution, $(\mu\\_i, \sigma\\_i)$ and they are optimized in the outer loop. (Image source: [Gupta et al, 2018](http://papers.nips.cc/paper/7776-meta-reinforcement-learning-of-structured-exploration-strategies.pdf))
 
@@ -239,13 +239,13 @@ As a tabular RL method, MFEC suffers from large memory consumption and a lack of
 
 The episodic memory in NEC is a Differentiable Neural Dictionary (**DND**), where the key is a convolutional embedding vector of input image pixels and the value stores estimated Q value. Given an inquiry key, the output is a weighted sum of values of top similar keys, where the weight is a normalized kernel measure between the query key and the selected key in the dictionary. This sounds like a hard [attention](https://lilianweng.github.io/posts/2018-06-24-attention/) machanism.
 
-![](neural-episodic-control.png)
+![](assets/images/2019-06-23-meta-rl/neural-episodic-control.png)
 
 Fig. 6 Illustrations of episodic memory module in NEC and two operations on a differentiable neural dictionary. (Image source: [Pritzel et al., 2016](https://arxiv.org/abs/1703.01988))
 
 Further, **Episodic LSTM** ([Ritter et al., 2018](https://arxiv.org/abs/1805.09692)) enhances the basic LSTM architecture with a DND episodic memory, which stores task context embeddings as keys and the LSTM cell states as values. The stored hidden states are retrieved and added directly to the current cell state through the same gating mechanism within LSTM:
 
-![](episodic-LSTM.png)
+![](assets/images/2019-06-23-meta-rl/episodic-LSTM.png)
 
 Fig. 7. Illustration of the episodic LSTM architecture. The additional structure of episodic memory is in bold. (Image source: [Ritter et al., 2018](https://arxiv.org/abs/1805.09692))
 
@@ -274,7 +274,7 @@ Randomizing parameters in a simulator is an easy way to obtain tasks with modifi
 
 **POET** ([Wang et al, 2019](https://arxiv.org/abs/1901.01753)), a framework based on the evolutionary algorithm, attempts to generate tasks while the problems themselves are being solved. The implementation of POET is only specifically designed for a simple 2D [bipedal walker](https://gym.openai.com/envs/BipedalWalkerHardcore-v2/) environment but points out an interesting direction. It is noteworthy that the evolutionary algorithm has had some compelling applications in Deep Learning like [EPG](#meta-learning-the-loss-function) and PBT (Population-Based Training; [Jaderberg et al, 2017](https://arxiv.org/abs/1711.09846)).
 
-![](POET.png)
+![](assets/images/2019-06-23-meta-rl/POET.png)
 
 Fig. 8. An example bipedal walking environment (top) and an overview of POET (bottom). (Image source: [POET blog post](https://eng.uber.com/poet-open-ended-deep-learning/))
 
@@ -306,7 +306,7 @@ $$\begin{aligned} \mathcal{F}(\theta) &= I(S; Z) + H\[A \mid S\] - I(A; Z \mid S
 
 where $I(.)$ is mutual information and $H\[.\]$ is entropy measure. We cannot integrate all states to compute $p(z \mid s)$, so approximate it with $D_\phi(z \mid s)$ — that is the diversity-driven discriminator function.
 
-![](DIAYN.png)
+![](assets/images/2019-06-23-meta-rl/DIAYN.png)
 
 Fig. 9. DIAYN Algorithm. (Image source: [Eysenbach et al., 2019](https://arxiv.org/abs/1802.06070))
 
@@ -315,7 +315,7 @@ Once the discriminator function is learned, sampling a new MDP for training is s
 ---
 
 Cited as:
-
+```
     @article{weng2019metaRL,
       title   = "Meta Reinforcement Learning",
       author  = "Weng, Lilian",
@@ -323,7 +323,7 @@ Cited as:
       year    = "2019",
       url     = "https://lilianweng.github.io/posts/2019-06-23-meta-rl/"
     }
-
+```
 # References[#](#references)
 
 \[1\] Richard S. Sutton. ["The Bitter Lesson."](http://incompleteideas.net/IncIdeas/BitterLesson.html) March 13, 2019.
