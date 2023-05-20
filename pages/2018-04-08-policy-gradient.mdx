@@ -176,7 +176,7 @@ $$\nabla_\theta J(\theta) = \mathbb{E}_\pi \[Q^\pi(s, a) \nabla_\theta \\ln \pi_
 
 Here is a nice summary of a general form of policy gradient methods borrowed from the [GAE](https://arxiv.org/pdf/1506.02438.pdf) (general advantage estimation) paper ([Schulman et al., 2016](https://arxiv.org/abs/1506.02438)) and this [post](https://danieltakeshi.github.io/2017/04/02/notes-on-the-generalized-advantage-estimation-paper/) thoroughly discussed several components in GAE , highly recommended.
 
-![](general_form_policy_gradient.png)
+![](assets/images/2018-04-08-policy-gradient/general_form_policy_gradient.png)
 
 Fig. 1. A general form of policy gradient methods. (Image source: [Schulman et al., 2016](https://arxiv.org/abs/1506.02438))
 
@@ -271,9 +271,9 @@ Here is the algorithm outline:
         2.  Update $t = t + 1$ and $T = T + 1$
     5.  Initialize the variable that holds the return estimation
 
-   $$R = \begin{cases} 0 & \text{if } s_t \text{ is TERMINAL} \\ V_{w'}(s_t) & \text{otherwise} \end{cases}$$
+$$R = \begin{cases} 0 & \text{if } s_t \text{ is TERMINAL} \\ V_{w'}(s_t) & \text{otherwise} \end{cases}$$
 
-    6\. For $i = t-1, \dots, t\\_\text{start}$: 1. $R \\leftarrow \gamma R + R\\_i$; here R is a MC measure of $G\\_i$. 2. Accumulate gradients w.r.t. $\theta'$: $d\theta \\leftarrow d\theta + \nabla\\_{\theta'} \log \pi\\_{\theta'}(a\\_i \vert s\\_i)(R - V\\_{w'}(s\\_i))$;  
+    6\. For $i = t-1, \dots, t\\_\text{start}$: 1. $R \\leftarrow \gamma R + R\\_i$; here R is a MC measure of $G\\_i$. 2. Accumulate gradients w.r.t. $\theta'$: $d\theta \\leftarrow d\theta + \nabla\\_{\theta'} \log \pi\\_{\theta'}(a\\_i \vert s\\_i)(R - V\\_{w'}(s\\_i))$;
     Accumulate gradients w.r.t. w': $dw \\leftarrow dw + 2 (R - V\\_{w'}(s\\_i)) \nabla\\_{w'} (R - V\\_{w'}(s\\_i))$. 7. Update asynchronously $\theta$ using $\\mathrm{d}\theta$, and $w$ using $\\mathrm{d}w$.
 
 A3C enables the parallelism in multiple agent training. The gradient accumulation step (6.2) can be considered as a parallelized reformation of minibatch-based stochastic gradient update: the values of $w$ or $\theta$ get corrected by a little bit in the direction of each training thread independently.
@@ -286,7 +286,7 @@ A3C enables the parallelism in multiple agent training. The gradient accumulatio
 
 A2C has been [shown](https://blog.openai.com/baselines-acktr-a2c/) to be able to utilize GPUs more efficiently and work better with large batch sizes while achieving same or better performance than A3C.
 
-![](A3C_vs_A2C.png)
+![](assets/images/2018-04-08-policy-gradient/A3C_vs_A2C.png)
 
 Fig. 2. The architecture of A3C versus A2C.
 
@@ -340,7 +340,7 @@ In addition, DDPG does soft updates ("conservative policy iteration") on the par
 
 One detail in the paper that is particularly useful in robotics is on how to normalize the different physical units of low dimensional features. For example, a model is designed to learn a policy with the robot's positions and velocities as input; these physical statistics are different by nature and even statistics of the same type may vary a lot across multiple robots. [Batch normalization](http://proceedings.mlr.press/v37/ioffe15.pdf) is applied to fix it by normalizing every dimension across samples in one minibatch.
 
-![](DDPG_algo.png)
+![](assets/images/2018-04-08-policy-gradient/DDPG_algo.png)
 
 Fig 3. DDPG Algorithm. (Image source: [Lillicrap, et al., 2015](https://arxiv.org/pdf/1509.02971.pdf))
 
@@ -364,7 +364,7 @@ $$r(s_0, a_0) + \mathbb{E}\[\sum_{n=1}^{N-1} r(s_n, a_n) + \gamma^N Q(s_N, \mu_\
 
 (4) **Prioritized Experience Replay ([PER](https://arxiv.org/abs/1511.05952))**: The last piece of modification is to do sampling from the replay buffer of size $R$ with an non-uniform probability $p_i$. In this way, a sample $i$ has the probability $(Rp_i)^{-1}$ to be selected and thus the importance weight is $(Rp_i)^{-1}$.
 
-![](D4PG_algo.png)
+![](assets/images/2018-04-08-policy-gradient/D4PG_algo.png)
 
 Fig. 4. D4PG algorithm (Image source: [Barth-Maron, et al. 2018](https://openreview.net/forum?id=SyZipzbCb)); Note that in the original paper, the variable letters are chosen slightly differently from what in the post; i.e. I use $\mu(.)$ for representing a deterministic policy instead of $\pi(.)$.
 
@@ -406,7 +406,7 @@ In summary, MADDPG added three additional ingredients on top of DDPG to make it 
 - Actors are able to use estimated policies of other agents for learning;
 - Policy ensembling is good for reducing variance.
 
-![](MADDPG.png)
+![](assets/images/2018-04-08-policy-gradient/MADDPG.png)
 
 Fig. 5. The architecture design of MADDPG. (Image source: [Lowe et al., 2017](https://arxiv.org/pdf/1706.02275.pdf))
 
@@ -470,7 +470,7 @@ The failure modes are:
 
 Discretizing the action space or use Beta distribution helps avoid failure mode 1&3 associated with Gaussian policy. Using KL regularization (same motivation as in [TRPO](#trpo)) as an alternative surrogate model helps resolve failure mode 1&2.
 
-![](ppo-loss-functions.png)
+![](assets/images/2018-04-08-policy-gradient/ppo-loss-functions.png)
 
 ## PPG[#](#ppg)
 
@@ -485,7 +485,7 @@ $$\begin{aligned} L^\text{joint} &= L^\text{aux} + \beta_\text{clone} \cdot \mat
 
 where $\beta_\text{clone}$ is a hyperparameter for controlling how much we would like to keep the policy not diverge too much from its original behavior while optimizing the auxiliary objectives.
 
-![](PPG_algo.png)
+![](assets/images/2018-04-08-policy-gradient/PPG_algo.png)
 
 Fig. 6. The algorithm of PPG. (Image source: [Cobbe, et al 2020](https://arxiv.org/abs/2009.04416))
 
@@ -497,7 +497,7 @@ where
 
 PPG leads to a significant improvement on sample efficiency compared to PPO.
 
-![](PPG_exp.png)
+![](assets/images/2018-04-08-policy-gradient/PPG_exp.png)
 
 Fig. 7. The mean normalized performance of PPG vs PPO on the [Procgen](https://arxiv.org/abs/1912.01588) benchmark. (Image source: [Cobbe, et al 2020](https://arxiv.org/abs/2009.04416))
 
@@ -620,7 +620,7 @@ This update guarantees that $Q^{\pi_\text{new}}(s_t, a_t) \\geq Q^{\pi_\text{old
 
 Once we have defined the objective functions and gradients for soft action-state value, soft state value and the policy network, the soft actor-critic algorithm is straightforward:
 
-![](SAC_algo.png)
+![](assets/images/2018-04-08-policy-gradient/SAC_algo.png)
 
 Fig. 8. The soft actor-critic algorithm. (Image source: [original paper](https://arxiv.org/abs/1801.01290))
 
@@ -697,7 +697,7 @@ $$J(\alpha) = \mathbb{E}_{a_t \sim \pi_t} \[-\alpha \log \pi_t(a_t \mid s_t) - \
 
 The final algorithm is same as SAC except for learning $\alpha$ explicitly with respect to the objective $J(\alpha)$ (see Fig. 7):
 
-![](SAC2_algo.png)
+![](assets/images/2018-04-08-policy-gradient/SAC2_algo.png)
 
 Fig. 9. The soft actor-critic algorithm with automatically adjusted temperature. (Image source: [original paper](https://arxiv.org/abs/1812.05905))
 
@@ -729,7 +729,7 @@ This approach mimics the idea of [SARSA](https://lilianweng.github.io/posts/2018
 
 Here is the final algorithm:
 
-![](TD3.png)
+![](assets/images/2018-04-08-policy-gradient/TD3.png)
 
 Fig. 10. TD3 Algorithm. (Image source: [Fujimoto et al., 2018](https://arxiv.org/abs/1802.09477))
 
@@ -790,7 +790,7 @@ $$\begin{aligned} \phi^{\*}(\theta_i) &= \mathbb{E}_{\\vartheta \sim q'} \[\nabl
 - The first term in red encourages $\theta_i$ learning towards the high probability regions of $q$ that is shared across similar particles. => to be similar to other particles
 - The second term in green pushes particles away from each other and therefore diversifies the policy. => to be dissimilar to other particles
 
-![](SVPG.png)
+![](assets/images/2018-04-08-policy-gradient/SVPG.png)
 
 Usually the temperature $\alpha$ follows an annealing scheme so that the training process does more exploration at the beginning but more exploitation at a later stage.
 
@@ -802,7 +802,7 @@ In order to scale up RL training to achieve a very high throughput, **IMPALA** (
 
 Multiple actors generate experience in parallel, while the learner optimizes both policy and value function parameters using all the generated experience. Actors update their parameters with the latest policy from the learner periodically. Because acting and learning are decoupled, we can add many more actor machines to generate a lot more trajectories per time unit. As the training policy and the behavior policy are not totally synchronized, there is a _gap_ between them and thus we need off-policy corrections.
 
-![](IMPALA.png)
+![](assets/images/2018-04-08-policy-gradient/IMPALA.png)
 
 Let the value function $V_\theta$ parameterized by $\theta$ and the policy $\pi_\phi$ parameterized by $\phi$. Also we know the trajectories in the replay buffer are collected by a slightly older policy $\mu$.
 
@@ -826,7 +826,7 @@ where $r_t + \gamma v_{t+1}$ is the estimated Q value, from which a state-depend
 
 In the experiments, IMPALA is used to train one agent over multiple tasks. Two different model architectures are involved, a shallow model (left) and a deep residual model (right).
 
-![](IMPALA-arch.png)
+![](assets/images/2018-04-08-policy-gradient/IMPALA-arch.png)
 
 # Quick Summary[#](#quick-summary)
 
@@ -851,6 +851,7 @@ After reading through all the algorithms above, I list a few building blocks or 
 
 Cited as:
 
+```
     @article{weng2018PG,
       title   = "Policy Gradient Algorithms",
       author  = "Weng, Lilian",
@@ -858,6 +859,7 @@ Cited as:
       year    = "2018",
       url     = "https://lilianweng.github.io/posts/2018-04-08-policy-gradient/"
     }
+```
 
 # References[#](#references)
 
