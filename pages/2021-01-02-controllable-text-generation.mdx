@@ -200,9 +200,9 @@ $$ x_\text{trig} = \arg\min_{x'_\text{trig}} \mathbb{E}_{x\sim\mathcal{X}} \[\ma
 
 The search operates in the embedding space. The embedding of every trigger token $e_{\text{trig}_i}$ is first initialized to some default value and then gets updated to minimize the first-order Taylor expansion of the task-specific loss around the current token embedding:
 
-$$ e^{(t+1)}_\text{trig} = \arg\min_{e\in\mathcal{V}} \[e - e^{(t)}_{\text{trig}_i}\]^\top \\nabla_{e^{(t)}_{\text{trig}_i}} \mathcal{L} $$
+$$ e^{(t+1)}_\text{trig} = \arg\min_{e\in\mathcal{V}} \[e - e^{(t)}_{\text{trig}_i}\]^\top \nabla_{e^{(t)}_{\text{trig}_i}} \mathcal{L} $$
 
-where $\mathcal{V}$ refers to the embedding matrix of all the tokens. $\\nabla_{e^{(t)}_{\text{trig}_i}} \mathcal{L}$ is the average gradient of the task loss over a batch at iteration $t$. We can brute-force the optimal $e$ by a $\vert \mathcal{V} \vert d$-dimensional dot product, which is cheap and can be computed in parallel.
+where $\mathcal{V}$ refers to the embedding matrix of all the tokens. $\nabla_{e^{(t)}_{\text{trig}_i}} \mathcal{L}$ is the average gradient of the task loss over a batch at iteration $t$. We can brute-force the optimal $e$ by a $\vert \mathcal{V} \vert d$-dimensional dot product, which is cheap and can be computed in parallel.
 
 ![](universal-adv-triggers.png)
 
@@ -399,7 +399,7 @@ Instead of fine-tuning the entire model, only fine-tuning a small extra set of p
 
 In computer vision, plug-and-play generative networks (PPGN; [Nguyen et al., 2017](https://arxiv.org/abs/1612.00005)) generate images with different attributes by plugging a discriminator $p(a \vert x)$ into a base generative model $p(x)$. Then the sample with a desired attribute $a$ can be sampled from $p(x \vert a) \\propto p(a \vert x)p(x)$. Inspired by PPGN, the **plug-and-play language model** (**PPLM**; [Dathathri et al., 2019](https://arxiv.org/abs/1912.02164)) combines one or multiple simple attribute models with a pretrained language model for controllable text generation.
 
-Given an attribute $a$ and the generated sample $x$, let an attribute model be $p(a\vert x)$. To control content generation, the current latent representation at time $t$, $H_t$ (containing a list of key-value pairs per layer), can be shifted by $\\Delta H_t$ in the direction of the sum of two gradients:
+Given an attribute $a$ and the generated sample $x$, let an attribute model be $p(a\vert x)$. To control content generation, the current latent representation at time $t$, $H_t$ (containing a list of key-value pairs per layer), can be shifted by $\Delta H_t$ in the direction of the sum of two gradients:
 
 - One toward higher log-likelihood of the attribute $a$ under $p(a \vert x)$ — so that the output content acquires a desired attribute.
 - The other toward higher log-likelihood of the unmodified language model $p(x)$ — so that the generated text is still in fluent and smooth natural language.
@@ -407,11 +407,11 @@ Given an attribute $a$ and the generated sample $x$, let an attribute model be $
 To shift the output, at decoding time, PPLM runs one forward → one backward → one forward, three passes in total:
 
 1.  First a forward pass is performed to compute the likelihood of attribute $a$ by $p(a\vert x)$;
-2.  Let $\\Delta H_t$ be a stepwise update to the hidden state $H_t$ such that $(H_t + \\Delta H_t)$ shifts the distribution of generated text closer to having the attribute $a$. $\\Delta H_t$ is initialized at zero. Then a backward pass updates the LM hidden states using normalized gradients from the attribute model $\\nabla_{\\Delta H_t} \log p(a \vert H_t + \\Delta H_t)$ as
+2.  Let $\Delta H_t$ be a stepwise update to the hidden state $H_t$ such that $(H_t + \Delta H_t)$ shifts the distribution of generated text closer to having the attribute $a$. $\Delta H_t$ is initialized at zero. Then a backward pass updates the LM hidden states using normalized gradients from the attribute model $\nabla_{\Delta H_t} \log p(a \vert H_t + \Delta H_t)$ as
 
-$$ \\Delta H_t \\leftarrow \\Delta H_t + \alpha \frac{\\nabla_{\\Delta H_t} \log p(a|H_t + \\Delta H_t)}{\| \\nabla_{\\Delta H_t} \log p(a|H_t + \\Delta H_t) \|^\gamma} $$
+$$ \Delta H_t \\leftarrow \Delta H_t + \alpha \frac{\nabla_{\Delta H_t} \log p(a|H_t + \Delta H_t)}{\| \nabla_{\Delta H_t} \log p(a|H_t + \Delta H_t) \|^\gamma} $$
 
-where $\gamma$ is a normalization scaling coefficient, set per layer. $\alpha$ is step size. This update can be repeated $m \in \[3, 10\]$ times 3. The final forward pass recomputes a new distribution over the vocabulary, generated from the updated latents $\tilde{H}_t = H_t + \\Delta H_t$. The next token is sampled from the updated distribution.
+where $\gamma$ is a normalization scaling coefficient, set per layer. $\alpha$ is step size. This update can be repeated $m \in \[3, 10\]$ times 3. The final forward pass recomputes a new distribution over the vocabulary, generated from the updated latents $\tilde{H}_t = H_t + \Delta H_t$. The next token is sampled from the updated distribution.
 
 ![](PPLM.png)
 
@@ -443,7 +443,7 @@ Similar to PPLM, **DELOREAN** (DEcoding for nonmonotonic LOgical REAsoNing; [Qin
 
 Given the representation $\tilde{y}^{(t-1)}$ at iteration $t$, it runs the following procedures:
 
-1.  **Backward**: The constraint is represented as a loss function $\mathcal{L}(\mathbf{x}, \tilde{\mathbf{y}}^{(t-1)}, z))$. The logits are updated via gradient descent: $\tilde{y}^{(t), b}_n = \tilde{y}_n^{(t-1)} - \lambda \\nabla_{\tilde{y}_n} \mathcal{L}(\mathbf{x}, \tilde{\mathbf{y}}^{(t-1)}, z)$.
+1.  **Backward**: The constraint is represented as a loss function $\mathcal{L}(\mathbf{x}, \tilde{\mathbf{y}}^{(t-1)}, z))$. The logits are updated via gradient descent: $\tilde{y}^{(t), b}_n = \tilde{y}_n^{(t-1)} - \lambda \nabla_{\tilde{y}_n} \mathcal{L}(\mathbf{x}, \tilde{\mathbf{y}}^{(t-1)}, z)$.
 2.  **Forward**: Run forward pass to ensure the generated text is fluent. $\tilde{y}^{(t),f}_n = \text{LM}(\mathbf{x}, \tilde{\mathbf{y}}^{(t)}_{1:n-1})$.
 3.  Then linearly combine two logits together to create a new representation $\tilde{y}^{(t)}_n = \gamma \tilde{y}^{(t), f}_n + (1-\gamma) \tilde{y}^{(t), b}_n$. Note that each $\tilde{y}^{(t)}_n$ is needed to sample the next $\tilde{y}^{(t),f}_{n+1}$.
 
@@ -523,7 +523,7 @@ Using SGD over the objective $|\boldsymbol{\mu}(\boldsymbol{\lambda}) - \bar{\bo
 
 The EBM $P(x)$ can compute ratios of probabilities of two sequences, but cannot sample from $p(x)$ with knowing $Z$. In order to sample from a sequential EBM, the paper proposed to use [Distributional Policy Gradient](https://arxiv.org/abs/1912.08517) (DPG; but not this [DPG](https://lilianweng.github.io/posts/2018-04-08-policy-gradient/#dpg)) with the objective to obtain an autoregressive policy $\pi_\theta$ to approximate a target distribution $p$ by minimizing the cross entropy $H(p, \pi_\theta)$. DPG runs through a sequence of iterations. Within each iteration, the proposed distribution $q$ is used for sampling and we can correct the cross entropy loss with importance weights too:
 
-$$ \begin{aligned} \\nabla_\theta H(p, \pi_\theta) &= - \\nabla_\theta \mathbb{E}_{x\sim p} \log \pi_\theta(x) = - \mathbb{E}_{x\sim p} \\nabla_\theta \log \pi_\theta(x) \\ &= - \mathbb{E}_{x\sim q} \frac{p(x)}{q(x)} \\nabla_\theta \log \pi_\theta(x) = - \frac{1}{Z}\mathbb{E}_{x\sim q} \frac{P(x)}{q(x)} \\nabla_\theta \log \pi_\theta(x) \end{aligned} $$
+$$ \begin{aligned} \nabla_\theta H(p, \pi_\theta) &= - \nabla_\theta \mathbb{E}_{x\sim p} \log \pi_\theta(x) = - \mathbb{E}_{x\sim p} \nabla_\theta \log \pi_\theta(x) \\ &= - \mathbb{E}_{x\sim q} \frac{p(x)}{q(x)} \nabla_\theta \log \pi_\theta(x) = - \frac{1}{Z}\mathbb{E}_{x\sim q} \frac{P(x)}{q(x)} \nabla_\theta \log \pi_\theta(x) \end{aligned} $$
 
 To learn such a $\pi_\theta$, the paper adopts a KL-adaptive version of DPG: It only updates $q$ when the estimated policy $\pi_\theta$ gets closer to $p$. This adaptive step is important for fast convergence.
 

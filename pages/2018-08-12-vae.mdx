@@ -304,7 +304,7 @@ Note that the discrete latent variables can have different shapes in differnet a
 
 Fig. 10. The architecture of VQ-VAE (Image source: [van den Oord, et al. 2017](http://papers.nips.cc/paper/7210-neural-discrete-representation-learning.pdf))
 
-Because argmin() is non-differentiable on a discrete space, the gradients $\\nabla_z L$ from decoder input $\mathbf{z}_q$ is copied to the encoder output $\mathbf{z}_e$. Other than reconstruction loss, VQ-VAE also optimizes:
+Because argmin() is non-differentiable on a discrete space, the gradients $\nabla_z L$ from decoder input $\mathbf{z}_q$ is copied to the encoder output $\mathbf{z}_e$. Other than reconstruction loss, VQ-VAE also optimizes:
 
 - _VQ loss_: The L2 error between the embedding space and the encoder outputs.
 - _Commitment loss_: A measure to encourage the encoder output to stay close to the embedding space and to prevent it from fluctuating too frequently from one code vector to another.

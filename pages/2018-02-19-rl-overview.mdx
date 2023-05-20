@@ -424,11 +424,11 @@ Check Sec 13.1 in Sutton & Barto (2017) for why this is the case.
 
 Then,
 
-$$ \begin{aligned} \mathcal{J}(\theta) &= \sum_{s \in \mathcal{S}} d(s) \sum_{a \in \mathcal{A}} \pi(a \vert s; \theta) Q_\pi(s, a) \\ \\nabla \mathcal{J}(\theta) &= \sum_{s \in \mathcal{S}} d(s) \sum_{a \in \mathcal{A}} \\nabla \pi(a \vert s; \theta) Q_\pi(s, a) \\ &= \sum_{s \in \mathcal{S}} d(s) \sum_{a \in \mathcal{A}} \pi(a \vert s; \theta) \frac{\\nabla \pi(a \vert s; \theta)}{\pi(a \vert s; \theta)} Q_\pi(s, a) \\ & = \sum_{s \in \mathcal{S}} d(s) \sum_{a \in \mathcal{A}} \pi(a \vert s; \theta) \\nabla \\ln \pi(a \vert s; \theta) Q_\pi(s, a) \\ & = \mathbb{E}_{\pi_\theta} \[\\nabla \\ln \pi(a \vert s; \theta) Q_\pi(s, a)\] \end{aligned} $$
+$$ \begin{aligned} \mathcal{J}(\theta) &= \sum_{s \in \mathcal{S}} d(s) \sum_{a \in \mathcal{A}} \pi(a \vert s; \theta) Q_\pi(s, a) \\ \nabla \mathcal{J}(\theta) &= \sum_{s \in \mathcal{S}} d(s) \sum_{a \in \mathcal{A}} \nabla \pi(a \vert s; \theta) Q_\pi(s, a) \\ &= \sum_{s \in \mathcal{S}} d(s) \sum_{a \in \mathcal{A}} \pi(a \vert s; \theta) \frac{\nabla \pi(a \vert s; \theta)}{\pi(a \vert s; \theta)} Q_\pi(s, a) \\ & = \sum_{s \in \mathcal{S}} d(s) \sum_{a \in \mathcal{A}} \pi(a \vert s; \theta) \nabla \\ln \pi(a \vert s; \theta) Q_\pi(s, a) \\ & = \mathbb{E}_{\pi_\theta} \[\nabla \\ln \pi(a \vert s; \theta) Q_\pi(s, a)\] \end{aligned} $$
 
 This result is named “Policy Gradient Theorem” which lays the theoretical foundation for various policy gradient algorithms:
 
-$$ \\nabla \mathcal{J}(\theta) = \mathbb{E}_{\pi_\theta} \[\\nabla \\ln \pi(a \vert s, \theta) Q_\pi(s, a)\] $$
+$$ \nabla \mathcal{J}(\theta) = \mathbb{E}_{\pi_\theta} \[\nabla \\ln \pi(a \vert s, \theta) Q_\pi(s, a)\] $$
 
 ### REINFORCE[#](#reinforce)
 
@@ -440,7 +440,7 @@ A commonly used variation of REINFORCE is to subtract a baseline value from the 
 2.  Generate one episode $S_1, A_1, R_2, S_2, A_2, \dots, S_T$
 3.  For t=1, 2, … , T:
     1.  Estimate the the return G_t since the time step t.
-    2.  $\theta \\leftarrow \theta + \alpha \gamma^t G_t \\nabla \\ln \pi(A_t \vert S_t, \theta)$.
+    2.  $\theta \\leftarrow \theta + \alpha \gamma^t G_t \nabla \\ln \pi(A_t \vert S_t, \theta)$.
 
 ### Actor-Critic[#](#actor-critic)
 
@@ -455,11 +455,11 @@ Let's see how it works in an action-value actor-critic algorithm.
 2.  For t = 1… T:
     1.  Sample reward $r_t \sim R(s, a)$ and next state $s' \sim P(s' \vert s, a)$.
     2.  Then sample the next action $a' \sim \pi(s', a'; \theta)$.
-    3.  Update policy parameters: $\theta \\leftarrow \theta + \alpha_\theta Q(s, a; w) \\nabla_\theta \\ln \pi(a \vert s; \theta)$.
+    3.  Update policy parameters: $\theta \\leftarrow \theta + \alpha_\theta Q(s, a; w) \nabla_\theta \\ln \pi(a \vert s; \theta)$.
     4.  Compute the correction for action-value at time t:  
         $G_{t:t+1} = r_t + \gamma Q(s', a'; w) - Q(s, a; w)$  
         and use it to update value function parameters:  
-        $w \\leftarrow w + \alpha_w G_{t:t+1} \\nabla_w Q(s, a; w) $.
+        $w \\leftarrow w + \alpha_w G_{t:t+1} \nabla_w Q(s, a; w) $.
     5.  Update $a \\leftarrow a'$ and $s \\leftarrow s'$.
 
 $\alpha_\theta$ and $\alpha_w$ are two learning rates for policy and value function parameter updates, respectively.
@@ -486,8 +486,8 @@ Here is the algorithm outline:
     5.  Initialize the variable that holds the return estimation $$R = \begin{cases} 0 & \text{if } s_t \text{ is TERMINAL} \\ V(s_t; w') & \text{otherwise} \end{cases}$$.
     6.  For $i = t-1, \dots, t_\text{start}$:
         1.  $R \\leftarrow r_i + \gamma R$; here R is a MC measure of $G_i$.
-        2.  Accumulate gradients w.r.t. θ': $d\theta \\leftarrow d\theta + \\nabla_{\theta'} \log \pi(a_i \vert s_i; \theta')(R - V(s_i; w'))$;  
-            Accumulate gradients w.r.t. w': $dw \\leftarrow dw + \\nabla_{w'} (R - V(s_i; w'))^2$.
+        2.  Accumulate gradients w.r.t. θ': $d\theta \\leftarrow d\theta + \nabla_{\theta'} \log \pi(a_i \vert s_i; \theta')(R - V(s_i; w'))$;  
+            Accumulate gradients w.r.t. w': $dw \\leftarrow dw + \nabla_{w'} (R - V(s_i; w'))^2$.
     7.  Update synchronously θ using dθ, and w using dw.
 
 A3C enables the parallelism in multiple agent training. The gradient accumulation step (6.2) can be considered as a reformation of minibatch-based stochastic gradient update: the values of w or θ get corrected by a little bit in the direction of each training thread independently.
@@ -500,11 +500,11 @@ Say, we start with a population of random solutions. All of them are capable of 
 
 Very different from the popular MDP-based approaches as what we have introduced above, ES aims to learn the policy parameter $\theta$ without value approximation. Let's assume the distribution over the parameter $\theta$ is an [isotropic](https://math.stackexchange.com/questions/1991961/gaussian-distribution-is-isotropic) multivariate Gaussian with mean $\mu$ and fixed covariance $\sigma^2I$. The gradient of $F(\theta)$ is calculated:
 
-$$ \begin{aligned} & \\nabla_\theta \mathbb{E}_{\theta \sim N(\mu, \sigma^2)} F(\theta) \\ =& \\nabla_\theta \int_\theta F(\theta) \\Pr(\theta) && \text{Pr(.) is the Gaussian density function.} \\ =& \int_\theta F(\theta) \\Pr(\theta) \frac{\\nabla_\theta \\Pr(\theta)}{\\Pr(\theta)} \\ =& \int_\theta F(\theta) \\Pr(\theta) \\nabla_\theta \log \\Pr(\theta) \\ =& \mathbb{E}_{\theta \sim N(\mu, \sigma^2)} \[F(\theta) \\nabla_\theta \log \\Pr(\theta)\] && \text{Similar to how we do policy gradient update.} \\ =& \mathbb{E}_{\theta \sim N(\mu, \sigma^2)} \Big\[ F(\theta) \\nabla_\theta \log \Big( \frac{1}{\sqrt{2\pi\sigma^2}} e^{-\frac{(\theta - \mu)^2}{2 \sigma^2 }} \Big) \Big\] \\ =& \mathbb{E}_{\theta \sim N(\mu, \sigma^2)} \Big\[ F(\theta) \\nabla_\theta \Big( -\log \sqrt{2\pi\sigma^2} - \frac{(\theta - \mu)^2}{2 \sigma^2} \Big) \Big\] \\ =& \mathbb{E}_{\theta \sim N(\mu, \sigma^2)} \Big\[ F(\theta) \frac{\theta - \mu}{\sigma^2} \Big\] \end{aligned} $$
+$$ \begin{aligned} & \nabla_\theta \mathbb{E}_{\theta \sim N(\mu, \sigma^2)} F(\theta) \\ =& \nabla_\theta \int_\theta F(\theta) \\Pr(\theta) && \text{Pr(.) is the Gaussian density function.} \\ =& \int_\theta F(\theta) \\Pr(\theta) \frac{\nabla_\theta \\Pr(\theta)}{\\Pr(\theta)} \\ =& \int_\theta F(\theta) \\Pr(\theta) \nabla_\theta \log \\Pr(\theta) \\ =& \mathbb{E}_{\theta \sim N(\mu, \sigma^2)} \[F(\theta) \nabla_\theta \log \\Pr(\theta)\] && \text{Similar to how we do policy gradient update.} \\ =& \mathbb{E}_{\theta \sim N(\mu, \sigma^2)} \Big\[ F(\theta) \nabla_\theta \log \Big( \frac{1}{\sqrt{2\pi\sigma^2}} e^{-\frac{(\theta - \mu)^2}{2 \sigma^2 }} \Big) \Big\] \\ =& \mathbb{E}_{\theta \sim N(\mu, \sigma^2)} \Big\[ F(\theta) \nabla_\theta \Big( -\log \sqrt{2\pi\sigma^2} - \frac{(\theta - \mu)^2}{2 \sigma^2} \Big) \Big\] \\ =& \mathbb{E}_{\theta \sim N(\mu, \sigma^2)} \Big\[ F(\theta) \frac{\theta - \mu}{\sigma^2} \Big\] \end{aligned} $$
 
 We can rewrite this formula in terms of a “mean” parameter $\theta$ (different from the $\theta$ above; this $\theta$ is the base gene for further mutation), $\\epsilon \sim N(0, I)$ and therefore $\theta + \\epsilon \sigma \sim N(\theta, \sigma^2)$. $\\epsilon$ controls how much Gaussian noises should be added to create mutation:
 
-$$ \\nabla_\theta \mathbb{E}_{\\epsilon \sim N(0, I)} F(\theta + \sigma \\epsilon) = \frac{1}{\sigma} \mathbb{E}_{\\epsilon \sim N(0, I)} \[F(\theta + \sigma \\epsilon) \\epsilon\] $$
+$$ \nabla_\theta \mathbb{E}_{\\epsilon \sim N(0, I)} F(\theta + \sigma \\epsilon) = \frac{1}{\sigma} \mathbb{E}_{\\epsilon \sim N(0, I)} \[F(\theta + \sigma \\epsilon) \\epsilon\] $$
 
 ![](EA_RL_parallel.png)
 

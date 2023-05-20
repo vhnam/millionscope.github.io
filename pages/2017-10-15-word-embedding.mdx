@@ -189,13 +189,13 @@ $$ \mathcal{L}_{\theta} = - \log \frac{\exp({v'_{w_O}}^{\top}{v_{w_I}})}{\sum_{i
 
 To start training the model using back-propagation with SGD, we need to compute the gradient of the loss function. For simplicity, let's label $z_{IO} = {v'_{w_O}}^{\top}{v_{w_I}}$.
 
-$$ \begin{align} \\nabla_\theta \mathcal{L}_{\theta} &= \\nabla_\theta\big( - z_{IO} + \log \sum_{i=1}^V e^{z_{Ii}} \big) \\ &= - \\nabla_\theta z_{IO} + \\nabla_\theta \big( \log \sum_{i=1}^V e^{z_{Ii}} \big) \\ &= - \\nabla_\theta z_{IO} + \frac{1}{\sum_{i=1}^V e^{z_{Ii}}} \sum_{i=1}^V e^{z_{Ii}} \\nabla_\theta z_{Ii} \\ &= - \\nabla_\theta z_{IO} + \sum_{i=1}^V \frac{e^{z_{Ii}}}{\sum_{i=1}^V e^{z_{Ii}}} \\nabla_\theta z_{Ii} \\ &= - \\nabla_\theta z_{IO} + \sum_{i=1}^V p(w_i \vert w_I) \\nabla_\theta z_{Ii} \\ &= - \\nabla_\theta z_{IO} + \mathbb{E}_{w_i \sim Q(\tilde{w})} \\nabla_\theta z_{Ii} \end{align} $$
+$$ \begin{align} \nabla_\theta \mathcal{L}_{\theta} &= \nabla_\theta\big( - z_{IO} + \log \sum_{i=1}^V e^{z_{Ii}} \big) \\ &= - \nabla_\theta z_{IO} + \nabla_\theta \big( \log \sum_{i=1}^V e^{z_{Ii}} \big) \\ &= - \nabla_\theta z_{IO} + \frac{1}{\sum_{i=1}^V e^{z_{Ii}}} \sum_{i=1}^V e^{z_{Ii}} \nabla_\theta z_{Ii} \\ &= - \nabla_\theta z_{IO} + \sum_{i=1}^V \frac{e^{z_{Ii}}}{\sum_{i=1}^V e^{z_{Ii}}} \nabla_\theta z_{Ii} \\ &= - \nabla_\theta z_{IO} + \sum_{i=1}^V p(w_i \vert w_I) \nabla_\theta z_{Ii} \\ &= - \nabla_\theta z_{IO} + \mathbb{E}_{w_i \sim Q(\tilde{w})} \nabla_\theta z_{Ii} \end{align} $$
 
 where $Q(\tilde{w})$ is the distribution of noise samples.
 
-According to the formula above, the correct output word has a positive reinforcement according to the first term (the larger $\\nabla_\theta z_{IO}$ the better loss we have), while other words have a negative impact as captured by the second term.
+According to the formula above, the correct output word has a positive reinforcement according to the first term (the larger $\nabla_\theta z_{IO}$ the better loss we have), while other words have a negative impact as captured by the second term.
 
-How to estimate $\mathbb{E}_{w_i \sim Q(\tilde{w})} \\nabla_\theta {v'_{w_i}}^{\top}{v_{w_I}}$ with a sample set of noise words rather than scanning through the entire vocabulary is the key of using cross-entropy-based sampling approach.
+How to estimate $\mathbb{E}_{w_i \sim Q(\tilde{w})} \nabla_\theta {v'_{w_i}}^{\top}{v_{w_I}}$ with a sample set of noise words rather than scanning through the entire vocabulary is the key of using cross-entropy-based sampling approach.
 
 ## Noise Contrastive Estimation (NCE)[#](#noise-contrastive-estimation-nce)
 

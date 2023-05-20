@@ -166,13 +166,13 @@ Meanwhile, let's say we have a meta-objective function $J(\tau, \theta, \eta)$ a
 2.  Then we continue running the policy $\pi_{\theta'}$ to collect a new set of experiences $\tau'$, just following $\tau$ consecutively in time. The performance is measured as $J(\tau', \theta', \bar{\eta})$ with a fixed meta-parameter $\bar{\eta}$.
 3.  The gradient of meta-objective $J(\tau', \theta', \bar{\eta})$ w.r.t. $\eta$ is used to update $\eta$:
 
-$$ \begin{aligned} \\Delta \eta &= -\beta \frac{\partial J(\tau', \theta', \bar{\eta})}{\partial \eta} \\ &= -\beta \frac{\partial J(\tau', \theta', \bar{\eta})}{\partial \theta'} \frac{d\theta'}{d\eta} & \\scriptstyle{\text{ ; single variable chain rule.}} \\ &= -\beta \frac{\partial J(\tau', \theta', \bar{\eta})}{\partial \theta'} \frac{\partial (\theta + f(\tau, \theta, \eta))}{\partial\eta} \\ &= -\beta \frac{\partial J(\tau', \theta', \bar{\eta})}{\partial \theta'} \Big(\frac{d\theta}{d\eta} + \frac{\partial f(\tau, \theta, \eta)}{\partial\theta}\frac{d\theta}{d\eta} + \frac{\partial f(\tau, \theta, \eta)}{\partial\eta}\frac{d\eta}{d\eta} \Big) & \\scriptstyle{\text{; multivariable chain rule.}}\\ &= -\beta \frac{\partial J(\tau', \theta', \bar{\eta})}{\partial \theta'} \Big( \color{red}{\big(\mathbf{I} + \frac{\partial f(\tau, \theta, \eta)}{\partial\theta}\big)}\frac{d\theta}{d\eta} + \frac{\partial f(\tau, \theta, \eta)}{\partial\eta}\Big) & \\scriptstyle{\text{; secondary gradient term in red.}} \end{aligned} $$
+$$ \begin{aligned} \Delta \eta &= -\beta \frac{\partial J(\tau', \theta', \bar{\eta})}{\partial \eta} \\ &= -\beta \frac{\partial J(\tau', \theta', \bar{\eta})}{\partial \theta'} \frac{d\theta'}{d\eta} & \\scriptstyle{\text{ ; single variable chain rule.}} \\ &= -\beta \frac{\partial J(\tau', \theta', \bar{\eta})}{\partial \theta'} \frac{\partial (\theta + f(\tau, \theta, \eta))}{\partial\eta} \\ &= -\beta \frac{\partial J(\tau', \theta', \bar{\eta})}{\partial \theta'} \Big(\frac{d\theta}{d\eta} + \frac{\partial f(\tau, \theta, \eta)}{\partial\theta}\frac{d\theta}{d\eta} + \frac{\partial f(\tau, \theta, \eta)}{\partial\eta}\frac{d\eta}{d\eta} \Big) & \\scriptstyle{\text{; multivariable chain rule.}}\\ &= -\beta \frac{\partial J(\tau', \theta', \bar{\eta})}{\partial \theta'} \Big( \color{red}{\big(\mathbf{I} + \frac{\partial f(\tau, \theta, \eta)}{\partial\theta}\big)}\frac{d\theta}{d\eta} + \frac{\partial f(\tau, \theta, \eta)}{\partial\eta}\Big) & \\scriptstyle{\text{; secondary gradient term in red.}} \end{aligned} $$
 
 where $\beta$ is the learning rate for $\eta$.
 
 The meta-gradient RL algorithm simplifies the computation by setting the secondary gradient term to zero, $\mathbf{I} + \partial g(\tau, \theta, \eta)/\partial\theta = 0$ — this choice prefers the immediate effect of the meta-parameters $\eta$ on the parameters $\theta$. Eventually we get:
 
-$$ \\Delta \eta = -\beta \frac{\partial J(\tau', \theta', \bar{\eta})}{\partial \theta'} \frac{\partial f(\tau, \theta, \eta)}{\partial\eta} $$
+$$ \Delta \eta = -\beta \frac{\partial J(\tau', \theta', \bar{\eta})}{\partial \theta'} \frac{\partial f(\tau, \theta, \eta)}{\partial\eta} $$
 
 Experiments in the paper adopted the meta-objective function same as $TD(\lambda)$ algorithm, minimizing the error between the approximated value function $v_\theta(s)$ and the $\lambda$-return:
 
@@ -182,7 +182,7 @@ $$ \begin{aligned} J(\tau, \theta, \eta) &= (G^\lambda_\eta(\tau) - v_\theta(s))
 
 In policy gradient algorithms, the expected total reward is maximized by updating the policy parameters $\theta$ in the direction of estimated gradient ([Schulman et al., 2016](https://arxiv.org/abs/1506.02438)),
 
-$$ g = \mathbb{E}\[\sum_{t=0}^\infty \\Psi_t \\nabla_\theta \log \pi_\theta (a_t \mid s_t)\] $$
+$$ g = \mathbb{E}\[\sum_{t=0}^\infty \\Psi_t \nabla_\theta \log \pi_\theta (a_t \mid s_t)\] $$
 
 where the candidates for $\\Psi_t$ include the trajectory return $G_t$, the Q value $Q(s_t, a_t)$, or the advantage value $A(s_t, a_t)$. The corresponding surrogate loss function for the policy gradient can be reverse-engineered:
 
@@ -197,7 +197,7 @@ Similar to many meta-learning algorithms, EPG has two optimization loops:
 
 A general idea is to train a population of $N$ agents, each of them is trained with the loss function $L_{\phi + \sigma \\epsilon_i}$ parameterized with $\phi$ added with a small Gaussian noise $\\epsilon_i \sim \mathcal{N}(0, \mathbf{I})$ of standard deviation $\sigma$. During the inner loop's training, EPG tracks a history of experience and updates the policy parameters according to the loss function $L_{\phi + \sigma\\epsilon_i}$ for each agent:
 
-$$ \theta_i \\leftarrow \theta - \alpha_\text{in} \\nabla_\theta L_{\phi + \sigma \\epsilon_i} (\pi_\theta, \tau_{t-K, \dots, t}) $$
+$$ \theta_i \\leftarrow \theta - \alpha_\text{in} \nabla_\theta L_{\phi + \sigma \\epsilon_i} (\pi_\theta, \tau_{t-K, \dots, t}) $$
 
 where $\alpha_\text{in}$ is the learning rate of the inner loop and $\tau_{t-K, \dots, t}$ is a sequence of $M$ transitions up to the current time step $t$.
 

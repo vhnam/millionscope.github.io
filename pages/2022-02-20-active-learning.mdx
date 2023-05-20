@@ -240,7 +240,7 @@ $$ \mathcal{L}_\text{CE} = -\mathbb{E}_{(\mathbf{x}^l, y) \sim \mathcal{X}} \sum
 
 (2) When training on the unlabeled examples, MAL relies on a _minimax_ game setup
 
-$$ \begin{aligned} \mathcal{L}_\text{Ent} &= -\sum^K_{k=1} p(y=k \vert \mathbf{u}) \log p(y=k\vert \mathbf{u}) \\ \theta^\*_F, \theta^\*_C &= \min_F\max_C \mathcal{L}_\text{Ent} \\ \theta_F &\gets \theta_F - \alpha_1 \\nabla \mathcal{L}_\text{Ent} \\ \theta_C &\gets \theta_C + \alpha_2 \\nabla \mathcal{L}_\text{Ent} \end{aligned} $$
+$$ \begin{aligned} \mathcal{L}_\text{Ent} &= -\sum^K_{k=1} p(y=k \vert \mathbf{u}) \log p(y=k\vert \mathbf{u}) \\ \theta^\*_F, \theta^\*_C &= \min_F\max_C \mathcal{L}_\text{Ent} \\ \theta_F &\gets \theta_F - \alpha_1 \nabla \mathcal{L}_\text{Ent} \\ \theta_C &\gets \theta_C + \alpha_2 \nabla \mathcal{L}_\text{Ent} \end{aligned} $$
 
 where,
 
@@ -313,9 +313,9 @@ Fig. 10. Algorithm of BADGE (batch active learning by diverse gradient embedding
 
 [Settles et al. (2008)](https://papers.nips.cc/paper/2007/hash/a1519de5b5d44b31a01de013b9b51a80-Abstract.html) introduced an active learning query strategy, named **EGL** (Expected Gradient Length). The motivation is to find samples that can trigger the greatest update on the model if their labels are known.
 
-Let $\\nabla \mathcal{L}(\theta)$ be the gradient of the loss function with respect to the model parameters. Specifically, given an unlabeled sample $\mathbf{x}_i$, we need to calculate the gradient assuming the label is $y \in \mathcal{Y}$, $\\nabla \mathcal{L}^{(y)}(\theta)$. Because the true label $y_i$ is unknown, EGL relies on the current model belief to compute the expected gradient change:
+Let $\nabla \mathcal{L}(\theta)$ be the gradient of the loss function with respect to the model parameters. Specifically, given an unlabeled sample $\mathbf{x}_i$, we need to calculate the gradient assuming the label is $y \in \mathcal{Y}$, $\nabla \mathcal{L}^{(y)}(\theta)$. Because the true label $y_i$ is unknown, EGL relies on the current model belief to compute the expected gradient change:
 
-$$ \text{EGL}(\mathbf{x}_i) = \sum_{y_i \in \mathcal{Y}} p(y=y_i \vert \mathbf{x}) \|\\nabla \mathcal{L}^{(y_i)}(\theta)\| $$
+$$ \text{EGL}(\mathbf{x}_i) = \sum_{y_i \in \mathcal{Y}} p(y=y_i \vert \mathbf{x}) \|\nabla \mathcal{L}^{(y_i)}(\theta)\| $$
 
 **BALD** (Bayesian Active Learning by Disagreement; [Houlsby et al. 2011](https://arxiv.org/abs/1112.5745)) aims to identify samples to maximize the information gain about the model weights, that is equivalent to maximize the decrease in expected posterior entropy.
 

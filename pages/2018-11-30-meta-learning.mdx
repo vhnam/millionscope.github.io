@@ -352,12 +352,12 @@ Fig.9. The MetaNet architecture.
     - a. Compute a loss for representation learning; i.e., cross entropy for the verification task:  
       $\mathcal{L}^\text{emb}_t = \mathbf{1}_{y'_i=y'_j} \log P_t + (1 - \mathbf{1}_{y'_i=y'_j})\log(1 - P_t)\text{, where }P_t = \sigma(\mathbf{W}\vert f_\theta(\mathbf{x}_{(t,1)}) - f_\theta(\mathbf{x}_{(t,2)})\vert)$
 
-2.  Compute the task-level fast weights: $\theta^+ = F_w(\\nabla_\theta \mathcal{L}^\text{emb}_1, \dots, \mathcal{L}^\text{emb}_T)$
+2.  Compute the task-level fast weights: $\theta^+ = F_w(\nabla_\theta \mathcal{L}^\text{emb}_1, \dots, \mathcal{L}^\text{emb}_T)$
 3.  Next go through examples in the support set $S$ and compute the example-level fast weights. Meanwhile, update the memory with learned representations.  
     for $i=1, \dots, K$:
 
     - a. The base learner outputs a probability distribution: $P(\hat{y}_i \vert \mathbf{x}_i) = g_\phi(\mathbf{x}_i)$ and the loss can be cross-entropy or MSE: $\mathcal{L}^\text{task}_i = y'_i \log g_\phi(\mathbf{x}'_i) + (1- y'_i) \log (1 - g_\phi(\mathbf{x}'_i))$
-    - b. Extract meta information (loss gradients) of the task and compute the example-level fast weights: $\phi_i^+ = G_v(\\nabla_\phi\mathcal{L}^\text{task}_i)$
+    - b. Extract meta information (loss gradients) of the task and compute the example-level fast weights: $\phi_i^+ = G_v(\nabla_\phi\mathcal{L}^\text{task}_i)$
       - Then store $\phi^+_i$ into $i$-th location of the “value” memory $\mathbf{M}$.
     - d. Encode the support sample into a task-specific input representation using both slow and fast weights: $r'_i = f_{\theta, \theta^+}(\mathbf{x}'_i)$
       - Then store $r'_i$ into $i$-th location of the “key” memory $\mathbf{R}$.
@@ -394,15 +394,15 @@ The meta-learner is modeled as a LSTM, because:
 
 The update for the learner's parameters at time step t with a learning rate $\alpha_t$ is:
 
-$$ \theta_t = \theta_{t-1} - \alpha_t \\nabla_{\theta_{t-1}}\mathcal{L}_t $$
+$$ \theta_t = \theta_{t-1} - \alpha_t \nabla_{\theta_{t-1}}\mathcal{L}_t $$
 
-It has the same form as the cell state update in LSTM, if we set forget gate $f_t=1$, input gate $i_t = \alpha_t$, cell state $c_t = \theta_t$, and new cell state $\tilde{c}_t = -\\nabla_{\theta_{t-1}}\mathcal{L}_t$:
+It has the same form as the cell state update in LSTM, if we set forget gate $f_t=1$, input gate $i_t = \alpha_t$, cell state $c_t = \theta_t$, and new cell state $\tilde{c}_t = -\nabla_{\theta_{t-1}}\mathcal{L}_t$:
 
-$$ \begin{aligned} c_t &= f_t \odot c_{t-1} + i_t \odot \tilde{c}_t\\ &= \theta_{t-1} - \alpha_t\\nabla_{\theta_{t-1}}\mathcal{L}_t \end{aligned} $$
+$$ \begin{aligned} c_t &= f_t \odot c_{t-1} + i_t \odot \tilde{c}_t\\ &= \theta_{t-1} - \alpha_t\nabla_{\theta_{t-1}}\mathcal{L}_t \end{aligned} $$
 
 While fixing $f_t=1$ and $i_t=\alpha_t$ might not be the optimal, both of them can be learnable and adaptable to different datasets.
 
-$$ \begin{aligned} f_t &= \sigma(\mathbf{W}_f \cdot \[\\nabla_{\theta_{t-1}}\mathcal{L}_t, \mathcal{L}_t, \theta_{t-1}, f_{t-1}\] + \mathbf{b}_f) & \\scriptstyle{\text{; how much to forget the old value of parameters.}}\\ i_t &= \sigma(\mathbf{W}_i \cdot \[\\nabla_{\theta_{t-1}}\mathcal{L}_t, \mathcal{L}_t, \theta_{t-1}, i_{t-1}\] + \mathbf{b}_i) & \\scriptstyle{\text{; corresponding to the learning rate at time step t.}}\\ \tilde{\theta}_t &= -\\nabla_{\theta_{t-1}}\mathcal{L}_t &\\ \theta_t &= f_t \odot \theta_{t-1} + i_t \odot \tilde{\theta}_t &\\ \end{aligned} $$
+$$ \begin{aligned} f_t &= \sigma(\mathbf{W}_f \cdot \[\nabla_{\theta_{t-1}}\mathcal{L}_t, \mathcal{L}_t, \theta_{t-1}, f_{t-1}\] + \mathbf{b}_f) & \\scriptstyle{\text{; how much to forget the old value of parameters.}}\\ i_t &= \sigma(\mathbf{W}_i \cdot \[\nabla_{\theta_{t-1}}\mathcal{L}_t, \mathcal{L}_t, \theta_{t-1}, i_{t-1}\] + \mathbf{b}_i) & \\scriptstyle{\text{; corresponding to the learning rate at time step t.}}\\ \tilde{\theta}_t &= -\nabla_{\theta_{t-1}}\mathcal{L}_t &\\ \theta_t &= f_t \odot \theta_{t-1} + i_t \odot \tilde{\theta}_t &\\ \end{aligned} $$
 
 ### Model Setup[#](#model-setup)
 
@@ -415,7 +415,7 @@ The training process mimics what happens during test, since it has been proved t
 Two implementation details to pay extra attention to:
 
 1.  How to compress the parameter space in LSTM meta-learner? As the meta-learner is modeling parameters of another neural network, it would have hundreds of thousands of variables to learn. Following the [idea](https://arxiv.org/abs/1606.04474) of sharing parameters across coordinates,
-2.  To simplify the training process, the meta-learner assumes that the loss $\mathcal{L}_t$ and the gradient $\\nabla_{\theta_{t-1}} \mathcal{L}_t$ are independent.
+2.  To simplify the training process, the meta-learner assumes that the loss $\mathcal{L}_t$ and the gradient $\nabla_{\theta_{t-1}} \mathcal{L}_t$ are independent.
 
 ![](train-meta-learner.png)
 
@@ -425,7 +425,7 @@ Two implementation details to pay extra attention to:
 
 Let's say our model is $f_\theta$ with parameters $\theta$. Given a task $\tau_i$ and its associated dataset $(\mathcal{D}^{(i)}_\text{train}, \mathcal{D}^{(i)}_\text{test})$, we can update the model parameters by one or more gradient descent steps (the following example only contains one step):
 
-$$ \theta'_i = \theta - \alpha \\nabla_\theta\mathcal{L}^{(0)}_{\tau_i}(f_\theta) $$
+$$ \theta'_i = \theta - \alpha \nabla_\theta\mathcal{L}^{(0)}_{\tau_i}(f_\theta) $$
 
 where $\mathcal{L}^{(0)}$ is the loss computed using the mini data batch with id (0).
 
@@ -435,7 +435,7 @@ Fig. 11. Diagram of MAML. (Image source: [original paper](https://arxiv.org/abs/
 
 Well, the above formula only optimizes for one task. To achieve a good generalization across a variety of tasks, we would like to find the optimal $\theta^\*$ so that the task-specific fine-tuning is more efficient. Now, we sample a new data batch with id (1) for updating the meta-objective. The loss, denoted as $\mathcal{L}^{(1)}$, depends on the mini batch (1). The superscripts in $\mathcal{L}^{(0)}$ and $\mathcal{L}^{(1)}$ only indicate different data batches, and they refer to the same loss objective for the same task.
 
-$$ \begin{aligned} \theta^\* &= \arg\min_\theta \sum_{\tau_i \sim p(\tau)} \mathcal{L}_{\tau_i}^{(1)} (f_{\theta'_i}) = \arg\min_\theta \sum_{\tau_i \sim p(\tau)} \mathcal{L}_{\tau_i}^{(1)} (f_{\theta - \alpha\\nabla_\theta \mathcal{L}_{\tau_i}^{(0)}(f_\theta)}) & \\ \theta &\\leftarrow \theta - \beta \\nabla_{\theta} \sum_{\tau_i \sim p(\tau)} \mathcal{L}_{\tau_i}^{(1)} (f_{\theta - \alpha\\nabla_\theta \mathcal{L}_{\tau_i}^{(0)}(f_\theta)}) & \\scriptstyle{\text{; updating rule}} \end{aligned} $$
+$$ \begin{aligned} \theta^\* &= \arg\min_\theta \sum_{\tau_i \sim p(\tau)} \mathcal{L}_{\tau_i}^{(1)} (f_{\theta'_i}) = \arg\min_\theta \sum_{\tau_i \sim p(\tau)} \mathcal{L}_{\tau_i}^{(1)} (f_{\theta - \alpha\nabla_\theta \mathcal{L}_{\tau_i}^{(0)}(f_\theta)}) & \\ \theta &\\leftarrow \theta - \beta \nabla_{\theta} \sum_{\tau_i \sim p(\tau)} \mathcal{L}_{\tau_i}^{(1)} (f_{\theta - \alpha\nabla_\theta \mathcal{L}_{\tau_i}^{(0)}(f_\theta)}) & \\scriptstyle{\text{; updating rule}} \end{aligned} $$
 
 ![](maml-algo.png)
 
@@ -447,19 +447,19 @@ The meta-optimization step above relies on second derivatives. To make the compu
 
 Let's consider the case of performing $k$ inner gradient steps, $k\\geq1$. Starting with the initial model parameter $\theta_\text{meta}$:
 
-$$ \begin{aligned} \theta_0 &= \theta_\text{meta}\\ \theta_1 &= \theta_0 - \alpha\\nabla_\theta\mathcal{L}^{(0)}(\theta_0)\\ \theta_2 &= \theta_1 - \alpha\\nabla_\theta\mathcal{L}^{(0)}(\theta_1)\\ &\dots\\ \theta_k &= \theta_{k-1} - \alpha\\nabla_\theta\mathcal{L}^{(0)}(\theta_{k-1}) \end{aligned} $$
+$$ \begin{aligned} \theta_0 &= \theta_\text{meta}\\ \theta_1 &= \theta_0 - \alpha\nabla_\theta\mathcal{L}^{(0)}(\theta_0)\\ \theta_2 &= \theta_1 - \alpha\nabla_\theta\mathcal{L}^{(0)}(\theta_1)\\ &\dots\\ \theta_k &= \theta_{k-1} - \alpha\nabla_\theta\mathcal{L}^{(0)}(\theta_{k-1}) \end{aligned} $$
 
 Then in the outer loop, we sample a new data batch for updating the meta-objective.
 
-$$ \begin{aligned} \theta_\text{meta} &\\leftarrow \theta_\text{meta} - \beta g_\text{MAML} & \\scriptstyle{\text{; update for meta-objective}} \\\[2mm\] \text{where } g_\text{MAML} &= \\nabla_{\theta} \mathcal{L}^{(1)}(\theta_k) &\\\[2mm\] &= \\nabla_{\theta_k} \mathcal{L}^{(1)}(\theta_k) \cdot (\\nabla_{\theta_{k-1}} \theta_k) \dots (\\nabla_{\theta_0} \theta_1) \cdot (\\nabla_{\theta} \theta_0) & \\scriptstyle{\text{; following the chain rule}} \\ &= \\nabla_{\theta_k} \mathcal{L}^{(1)}(\theta_k) \cdot \Big( \prod_{i=1}^k \\nabla_{\theta_{i-1}} \theta_i \Big) \cdot I & \\ &= \\nabla_{\theta_k} \mathcal{L}^{(1)}(\theta_k) \cdot \prod_{i=1}^k \\nabla_{\theta_{i-1}} (\theta_{i-1} - \alpha\\nabla_\theta\mathcal{L}^{(0)}(\theta_{i-1})) & \\ &= \\nabla_{\theta_k} \mathcal{L}^{(1)}(\theta_k) \cdot \prod_{i=1}^k (I - \alpha\\nabla_{\theta_{i-1}}(\\nabla_\theta\mathcal{L}^{(0)}(\theta_{i-1}))) & \end{aligned} $$
+$$ \begin{aligned} \theta_\text{meta} &\\leftarrow \theta_\text{meta} - \beta g_\text{MAML} & \\scriptstyle{\text{; update for meta-objective}} \\\[2mm\] \text{where } g_\text{MAML} &= \nabla_{\theta} \mathcal{L}^{(1)}(\theta_k) &\\\[2mm\] &= \nabla_{\theta_k} \mathcal{L}^{(1)}(\theta_k) \cdot (\nabla_{\theta_{k-1}} \theta_k) \dots (\nabla_{\theta_0} \theta_1) \cdot (\nabla_{\theta} \theta_0) & \\scriptstyle{\text{; following the chain rule}} \\ &= \nabla_{\theta_k} \mathcal{L}^{(1)}(\theta_k) \cdot \Big( \prod_{i=1}^k \nabla_{\theta_{i-1}} \theta_i \Big) \cdot I & \\ &= \nabla_{\theta_k} \mathcal{L}^{(1)}(\theta_k) \cdot \prod_{i=1}^k \nabla_{\theta_{i-1}} (\theta_{i-1} - \alpha\nabla_\theta\mathcal{L}^{(0)}(\theta_{i-1})) & \\ &= \nabla_{\theta_k} \mathcal{L}^{(1)}(\theta_k) \cdot \prod_{i=1}^k (I - \alpha\nabla_{\theta_{i-1}}(\nabla_\theta\mathcal{L}^{(0)}(\theta_{i-1}))) & \end{aligned} $$
 
 The MAML gradient is:
 
-$$ g_\text{MAML} = \\nabla_{\theta_k} \mathcal{L}^{(1)}(\theta_k) \cdot \prod_{i=1}^k (I - \alpha \color{red}{\\nabla_{\theta_{i-1}}(\\nabla_\theta\mathcal{L}^{(0)}(\theta_{i-1}))}) $$
+$$ g_\text{MAML} = \nabla_{\theta_k} \mathcal{L}^{(1)}(\theta_k) \cdot \prod_{i=1}^k (I - \alpha \color{red}{\nabla_{\theta_{i-1}}(\nabla_\theta\mathcal{L}^{(0)}(\theta_{i-1}))}) $$
 
 The First-Order MAML ignores the second derivative part in red. It is simplified as follows, equivalent to the derivative of the last inner gradient update result.
 
-$$ g_\text{FOMAML} = \\nabla_{\theta_k} \mathcal{L}^{(1)}(\theta_k) $$
+$$ g_\text{FOMAML} = \nabla_{\theta_k} \mathcal{L}^{(1)}(\theta_k) $$
 
 ## Reptile[#](#reptile)
 
@@ -495,25 +495,25 @@ $$ \text{dist}(\theta, \mathcal{W}_{\tau}^\*) = \text{dist}(\theta, W_{\tau}^\*(
 
 The gradient of the squared euclidean distance is:
 
-$$ \begin{aligned} \\nabla_\theta\[\frac{1}{2}\text{dist}(\theta, \mathcal{W}_{\tau_i}^\*)^2\] &= \\nabla_\theta\[\frac{1}{2}\text{dist}(\theta, W_{\tau_i}^\*(\theta))^2\] & \\ &= \\nabla_\theta\[\frac{1}{2}(\theta - W_{\tau_i}^\*(\theta))^2\] & \\ &= \theta - W_{\tau_i}^\*(\theta) & \\scriptstyle{\text{; See notes.}} \end{aligned} $$
+$$ \begin{aligned} \nabla_\theta\[\frac{1}{2}\text{dist}(\theta, \mathcal{W}_{\tau_i}^\*)^2\] &= \nabla_\theta\[\frac{1}{2}\text{dist}(\theta, W_{\tau_i}^\*(\theta))^2\] & \\ &= \nabla_\theta\[\frac{1}{2}(\theta - W_{\tau_i}^\*(\theta))^2\] & \\ &= \theta - W_{\tau_i}^\*(\theta) & \\scriptstyle{\text{; See notes.}} \end{aligned} $$
 
 Notes: According to the Reptile paper, “_the gradient of the squared euclidean distance between a point Θ and a set S is the vector 2(Θ − p), where p is the closest point in S to Θ_”. Technically the closest point in S is also a function of Θ, but I'm not sure why the gradient does not need to worry about the derivative of p. (Please feel free to leave me a comment or send me an email about this if you have ideas.)
 
 Thus the update rule for one stochastic gradient step is:
 
-$$ \theta = \theta - \alpha \\nabla_\theta\[\frac{1}{2} \text{dist}(\theta, \mathcal{W}_{\tau_i}^\*)^2\] = \theta - \alpha(\theta - W_{\tau_i}^\*(\theta)) = (1-\alpha)\theta + \alpha W_{\tau_i}^\*(\theta) $$
+$$ \theta = \theta - \alpha \nabla_\theta\[\frac{1}{2} \text{dist}(\theta, \mathcal{W}_{\tau_i}^\*)^2\] = \theta - \alpha(\theta - W_{\tau_i}^\*(\theta)) = (1-\alpha)\theta + \alpha W_{\tau_i}^\*(\theta) $$
 
 The closest point on the optimal task manifold $W_{\tau_i}^\*(\theta)$ cannot be computed exactly, but Reptile approximates it using $\text{SGD}(\mathcal{L}_\tau, \theta, k)$.
 
 ### Reptile vs FOMAML[#](#reptile-vs-fomaml)
 
-To demonstrate the deeper connection between Reptile and MAML, let's expand the update formula with an example performing two gradient steps, k=2 in $\text{SGD}(.)$. Same as defined [above](#maml), $\mathcal{L}^{(0)}$ and $\mathcal{L}^{(1)}$ are losses using different mini-batches of data. For ease of reading, we adopt two simplified annotations: $g^{(i)}_j = \\nabla_{\theta} \mathcal{L}^{(i)}(\theta_j)$ and $H^{(i)}_j = \\nabla^2_{\theta} \mathcal{L}^{(i)}(\theta_j)$.
+To demonstrate the deeper connection between Reptile and MAML, let's expand the update formula with an example performing two gradient steps, k=2 in $\text{SGD}(.)$. Same as defined [above](#maml), $\mathcal{L}^{(0)}$ and $\mathcal{L}^{(1)}$ are losses using different mini-batches of data. For ease of reading, we adopt two simplified annotations: $g^{(i)}_j = \nabla_{\theta} \mathcal{L}^{(i)}(\theta_j)$ and $H^{(i)}_j = \nabla^2_{\theta} \mathcal{L}^{(i)}(\theta_j)$.
 
-$$ \begin{aligned} \theta_0 &= \theta_\text{meta}\\ \theta_1 &= \theta_0 - \alpha\\nabla_\theta\mathcal{L}^{(0)}(\theta_0)= \theta_0 - \alpha g^{(0)}_0 \\ \theta_2 &= \theta_1 - \alpha\\nabla_\theta\mathcal{L}^{(1)}(\theta_1) = \theta_0 - \alpha g^{(0)}_0 - \alpha g^{(1)}_1 \end{aligned} $$
+$$ \begin{aligned} \theta_0 &= \theta_\text{meta}\\ \theta_1 &= \theta_0 - \alpha\nabla_\theta\mathcal{L}^{(0)}(\theta_0)= \theta_0 - \alpha g^{(0)}_0 \\ \theta_2 &= \theta_1 - \alpha\nabla_\theta\mathcal{L}^{(1)}(\theta_1) = \theta_0 - \alpha g^{(0)}_0 - \alpha g^{(1)}_1 \end{aligned} $$
 
 According to the [early section](#first-order-maml), the gradient of FOMAML is the last inner gradient update result. Therefore, when k=1:
 
-$$ \begin{aligned} g_\text{FOMAML} &= \\nabla_{\theta_1} \mathcal{L}^{(1)}(\theta_1) = g^{(1)}_1 \\ g_\text{MAML} &= \\nabla_{\theta_1} \mathcal{L}^{(1)}(\theta_1) \cdot (I - \alpha\\nabla^2_{\theta} \mathcal{L}^{(0)}(\theta_0)) = g^{(1)}_1 - \alpha H^{(0)}_0 g^{(1)}_1 \end{aligned} $$
+$$ \begin{aligned} g_\text{FOMAML} &= \nabla_{\theta_1} \mathcal{L}^{(1)}(\theta_1) = g^{(1)}_1 \\ g_\text{MAML} &= \nabla_{\theta_1} \mathcal{L}^{(1)}(\theta_1) \cdot (I - \alpha\nabla^2_{\theta} \mathcal{L}^{(0)}(\theta_0)) = g^{(1)}_1 - \alpha H^{(0)}_0 g^{(1)}_1 \end{aligned} $$
 
 The Reptile gradient is defined as:
 
@@ -531,9 +531,9 @@ Next let's try further expand $g^{(1)}_1$ using [Taylor expansion](https://en.wi
 
 $$ f(x) = f(a) + \frac{f'(a)}{1!}(x-a) + \frac{f''(a)}{2!}(x-a)^2 + \dots = \sum_{i=0}^\infty \frac{f^{(i)}(a)}{i!}(x-a)^i $$
 
-We can consider $\\nabla_{\theta}\mathcal{L}^{(1)}(.)$ as a function and $\theta_0$ as a value point. The Taylor expansion of $g_1^{(1)}$ at the value point $\theta_0$ is:
+We can consider $\nabla_{\theta}\mathcal{L}^{(1)}(.)$ as a function and $\theta_0$ as a value point. The Taylor expansion of $g_1^{(1)}$ at the value point $\theta_0$ is:
 
-$$ \begin{aligned} g_1^{(1)} &= \\nabla_{\theta}\mathcal{L}^{(1)}(\theta_1) \\ &= \\nabla_{\theta}\mathcal{L}^{(1)}(\theta_0) + \\nabla^2_\theta\mathcal{L}^{(1)}(\theta_0)(\theta_1 - \theta_0) + \frac{1}{2}\\nabla^3_\theta\mathcal{L}^{(1)}(\theta_0)(\theta_1 - \theta_0)^2 + \dots & \\ &= g_0^{(1)} - \alpha H^{(1)}_0 g_0^{(0)} + \frac{\alpha^2}{2}\\nabla^3_\theta\mathcal{L}^{(1)}(\theta_0) (g_0^{(0)})^2 + \dots & \\scriptstyle{\text{; because }\theta_1-\theta_0=-\alpha g_0^{(0)}} \\ &= g_0^{(1)} - \alpha H^{(1)}_0 g_0^{(0)} + O(\alpha^2) \end{aligned} $$
+$$ \begin{aligned} g_1^{(1)} &= \nabla_{\theta}\mathcal{L}^{(1)}(\theta_1) \\ &= \nabla_{\theta}\mathcal{L}^{(1)}(\theta_0) + \nabla^2_\theta\mathcal{L}^{(1)}(\theta_0)(\theta_1 - \theta_0) + \frac{1}{2}\nabla^3_\theta\mathcal{L}^{(1)}(\theta_0)(\theta_1 - \theta_0)^2 + \dots & \\ &= g_0^{(1)} - \alpha H^{(1)}_0 g_0^{(0)} + \frac{\alpha^2}{2}\nabla^3_\theta\mathcal{L}^{(1)}(\theta_0) (g_0^{(0)})^2 + \dots & \\scriptstyle{\text{; because }\theta_1-\theta_0=-\alpha g_0^{(0)}} \\ &= g_0^{(1)} - \alpha H^{(1)}_0 g_0^{(0)} + O(\alpha^2) \end{aligned} $$
 
 Plug in the expanded form of $g_1^{(1)}$ into the MAML gradients with one step inner gradient update:
 
@@ -552,7 +552,7 @@ During training, we often average over multiple data batches. In our example, th
 Let,
 
 - $A = \mathbb{E}_{\tau,0,1} \[g_0^{(0)}\] = \mathbb{E}_{\tau,0,1} \[g_0^{(1)}\]$; it is the average gradient of task loss. We expect to improve the model parameter to achieve better task performance by following this direction pointed by $A$.
-- $B = \mathbb{E}_{\tau,0,1} \[H^{(1)}_0 g_0^{(0)}\] = \frac{1}{2}\mathbb{E}_{\tau,0,1} \[H^{(1)}_0 g_0^{(0)} + H^{(0)}_0 g_0^{(1)}\] = \frac{1}{2}\mathbb{E}_{\tau,0,1} \[\\nabla_\theta(g^{(0)}_0 g_0^{(1)})\]$; it is the direction (gradient) that increases the inner product of gradients of two different mini batches for the same task. We expect to improve the model parameter to achieve better generalization over different data by following this direction pointed by $B$.
+- $B = \mathbb{E}_{\tau,0,1} \[H^{(1)}_0 g_0^{(0)}\] = \frac{1}{2}\mathbb{E}_{\tau,0,1} \[H^{(1)}_0 g_0^{(0)} + H^{(0)}_0 g_0^{(1)}\] = \frac{1}{2}\mathbb{E}_{\tau,0,1} \[\nabla_\theta(g^{(0)}_0 g_0^{(1)})\]$; it is the direction (gradient) that increases the inner product of gradients of two different mini batches for the same task. We expect to improve the model parameter to achieve better generalization over different data by following this direction pointed by $B$.
 
 To conclude, both MAML and Reptile aim to optimize for the same goal, better task performance (guided by A) and better generalization (guided by B), when the gradient update is approximated by first three leading terms.
 

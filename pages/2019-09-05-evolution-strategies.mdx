@@ -268,27 +268,27 @@ $$ d^{\*}_\text{N} = \\operatorname\*{argmax}_{\text{KL}\[p_\theta \| p_{\theta+
 
 ## Estimation using Fisher Information Matrix[#](#estimation-using-fisher-information-matrix)
 
-But, how to compute $\text{KL}\[p_\theta | p_{\theta+\\Delta\theta}\]$ precisely? By running Taylor expansion of $\log p_{\theta + d}$ at $\theta$, we get:
+But, how to compute $\text{KL}\[p_\theta | p_{\theta+\Delta\theta}\]$ precisely? By running Taylor expansion of $\log p_{\theta + d}$ at $\theta$, we get:
 
-$$ \begin{aligned} & \text{KL}\[p_\theta \| p_{\theta+d}\] \\ &= \mathbb{E}_{x \sim p_\theta} \[\log p_\theta(x) - \log p_{\theta+d}(x)\] & \\ &\approx \mathbb{E}_{x \sim p_\theta} \[ \log p_\theta(x) -( \log p_{\theta}(x) + \\nabla_\theta \log p_{\theta}(x) d + \frac{1}{2}d^\top \\nabla^2_\theta \log p_{\theta}(x) d)\] & \\scriptstyle{\text{; Taylor expand }\log p_{\theta+d}} \\ &\approx - \mathbb{E}_x \[\\nabla_\theta \log p_{\theta}(x)\] d - \frac{1}{2}d^\top \mathbb{E}_x \[\\nabla^2_\theta \log p_{\theta}(x)\] d & \end{aligned} $$
+$$ \begin{aligned} & \text{KL}\[p_\theta \| p_{\theta+d}\] \\ &= \mathbb{E}_{x \sim p_\theta} \[\log p_\theta(x) - \log p_{\theta+d}(x)\] & \\ &\approx \mathbb{E}_{x \sim p_\theta} \[ \log p_\theta(x) -( \log p_{\theta}(x) + \nabla_\theta \log p_{\theta}(x) d + \frac{1}{2}d^\top \nabla^2_\theta \log p_{\theta}(x) d)\] & \\scriptstyle{\text{; Taylor expand }\log p_{\theta+d}} \\ &\approx - \mathbb{E}_x \[\nabla_\theta \log p_{\theta}(x)\] d - \frac{1}{2}d^\top \mathbb{E}_x \[\nabla^2_\theta \log p_{\theta}(x)\] d & \end{aligned} $$
 
 where
 
-$$ \begin{aligned} \mathbb{E}_x \[\\nabla_\theta \log p_{\theta}\] d &= \int_{x\sim p_\theta} p_\theta(x) \\nabla_\theta \log p_\theta(x) & \\ &= \int_{x\sim p_\theta} p_\theta(x) \frac{1}{p_\theta(x)} \\nabla_\theta p_\theta(x) & \\ &= \\nabla_\theta \Big( \int_{x} p_\theta(x) \Big) & \\scriptstyle{\textrm{; note that }p_\theta(x)\textrm{ is probability distribution.}} \\ &= \\nabla_\theta (1) = 0 \end{aligned} $$
+$$ \begin{aligned} \mathbb{E}_x \[\nabla_\theta \log p_{\theta}\] d &= \int_{x\sim p_\theta} p_\theta(x) \nabla_\theta \log p_\theta(x) & \\ &= \int_{x\sim p_\theta} p_\theta(x) \frac{1}{p_\theta(x)} \nabla_\theta p_\theta(x) & \\ &= \nabla_\theta \Big( \int_{x} p_\theta(x) \Big) & \\scriptstyle{\textrm{; note that }p_\theta(x)\textrm{ is probability distribution.}} \\ &= \nabla_\theta (1) = 0 \end{aligned} $$
 
 Finally we have,
 
-$$ \text{KL}\[p_\theta \| p_{\theta+d}\] = - \frac{1}{2}d^\top \mathbf{F}_\theta d \text{, where }\mathbf{F}_\theta = \mathbb{E}_x \[(\\nabla_\theta \log p_{\theta}) (\\nabla_\theta \log p_{\theta})^\top\] $$
+$$ \text{KL}\[p_\theta \| p_{\theta+d}\] = - \frac{1}{2}d^\top \mathbf{F}_\theta d \text{, where }\mathbf{F}_\theta = \mathbb{E}_x \[(\nabla_\theta \log p_{\theta}) (\nabla_\theta \log p_{\theta})^\top\] $$
 
-where $\mathbf{F}_\theta$ is called the **[Fisher Information Matrix](http://mathworld.wolfram.com/FisherInformationMatrix.html)** and [it is](https://wiseodd.github.io/techblog/2018/03/11/fisher-information/) the covariance matrix of $\\nabla_\theta \log p_\theta$ since $\mathbb{E}\[\\nabla_\theta \log p_\theta\] = 0$.
+where $\mathbf{F}_\theta$ is called the **[Fisher Information Matrix](http://mathworld.wolfram.com/FisherInformationMatrix.html)** and [it is](https://wiseodd.github.io/techblog/2018/03/11/fisher-information/) the covariance matrix of $\nabla_\theta \log p_\theta$ since $\mathbb{E}\[\nabla_\theta \log p_\theta\] = 0$.
 
 The solution to the following optimization problem:
 
-$$ \max \mathcal{J}(\theta + d) \approx \max \big( \mathcal{J}(\theta) + {\\nabla_\theta\mathcal{J}(\theta)}^\top d \big)\\;\text{ s.t. }\text{KL}\[p_\theta \| p_{\theta+d}\] - \\epsilon = 0 $$
+$$ \max \mathcal{J}(\theta + d) \approx \max \big( \mathcal{J}(\theta) + {\nabla_\theta\mathcal{J}(\theta)}^\top d \big)\\;\text{ s.t. }\text{KL}\[p_\theta \| p_{\theta+d}\] - \\epsilon = 0 $$
 
 can be found using a Lagrangian multiplier,
 
-$$ \begin{aligned} \mathcal{L}(\theta, d, \beta) &= \mathcal{J}(\theta) + \\nabla_\theta\mathcal{J}(\theta)^\top d - \beta (\frac{1}{2}d^\top \mathbf{F}_\theta d + \\epsilon) = 0 \text{ s.t. } \beta > 0 \\ \\nabla_d \mathcal{L}(\theta, d, \beta) &= \\nabla_\theta\mathcal{J}(\theta) - \beta\mathbf{F}_\theta d = 0 \\ \text{Thus } d_\text{N}^\* &= \\nabla_\theta^\text{N} \mathcal{J}(\theta) = \mathbf{F}_\theta^{-1} \\nabla_\theta\mathcal{J}(\theta) \end{aligned} $$
+$$ \begin{aligned} \mathcal{L}(\theta, d, \beta) &= \mathcal{J}(\theta) + \nabla_\theta\mathcal{J}(\theta)^\top d - \beta (\frac{1}{2}d^\top \mathbf{F}_\theta d + \\epsilon) = 0 \text{ s.t. } \beta > 0 \\ \nabla_d \mathcal{L}(\theta, d, \beta) &= \nabla_\theta\mathcal{J}(\theta) - \beta\mathbf{F}_\theta d = 0 \\ \text{Thus } d_\text{N}^\* &= \nabla_\theta^\text{N} \mathcal{J}(\theta) = \mathbf{F}_\theta^{-1} \nabla_\theta\mathcal{J}(\theta) \end{aligned} $$
 
 where $d_\text{N}^\*$ only extracts the direction of the optimal moving step on $\theta$, ignoring the scalar $\beta^{-1}$.
 
@@ -304,7 +304,7 @@ $$ \mathcal{J}(\theta) = \mathbb{E}_{x\sim p_\theta(x)} \[f(x)\] = \int_x f(x) p
 
 Using the same log-likelihood [trick](http://blog.shakirm.com/2015/11/machine-learning-trick-of-the-day-5-log-derivative-trick/) in [REINFORCE](https://lilianweng.github.io/posts/2018-04-08-policy-gradient/#reinforce):
 
-$$ \begin{aligned} \\nabla_\theta\mathcal{J}(\theta) &= \\nabla_\theta \int_x f(x) p_\theta(x) dx \\ &= \int_x f(x) \frac{p_\theta(x)}{p_\theta(x)}\\nabla_\theta p_\theta(x) dx \\ & = \int_x f(x) p_\theta(x) \\nabla_\theta \log p_\theta(x) dx \\ & = \mathbb{E}_{x \sim p_\theta} \[f(x) \\nabla_\theta \log p_\theta(x)\] \end{aligned} $$
+$$ \begin{aligned} \nabla_\theta\mathcal{J}(\theta) &= \nabla_\theta \int_x f(x) p_\theta(x) dx \\ &= \int_x f(x) \frac{p_\theta(x)}{p_\theta(x)}\nabla_\theta p_\theta(x) dx \\ & = \int_x f(x) p_\theta(x) \nabla_\theta \log p_\theta(x) dx \\ & = \mathbb{E}_{x \sim p_\theta} \[f(x) \nabla_\theta \log p_\theta(x)\] \end{aligned} $$
 
 ![](NES-algorithm.png)
 
@@ -327,7 +327,7 @@ $$ \theta \sim \mathcal{N}(\hat{\theta}, \sigma^2 I) \text{ equivalent to } \the
 
 The gradient for $\theta$ update is:
 
-$$ \begin{aligned} & \\nabla_\theta \mathbb{E}_{\theta\sim\mathcal{N}(\hat{\theta}, \sigma^2 I)} F(\theta) \\ &= \\nabla_\theta \mathbb{E}_{\\epsilon\sim\mathcal{N}(0, I)} F(\hat{\theta} + \sigma\\epsilon) \\ &= \\nabla_\theta \int_{\\epsilon} p(\\epsilon) F(\hat{\theta} + \sigma\\epsilon) d\\epsilon & \\scriptstyle{\text{; Gaussian }p(\\epsilon)=(2\pi)^{-\frac{n}{2}} \exp(-\frac{1}{2}\\epsilon^\top\\epsilon)} \\ &= \int_{\\epsilon} p(\\epsilon) \\nabla_\\epsilon \log p(\\epsilon) \\nabla_\theta \\epsilon\\;F(\hat{\theta} + \sigma\\epsilon) d\\epsilon & \\scriptstyle{\text{; log-likelihood trick}}\\ &= \mathbb{E}_{\\epsilon\sim\mathcal{N}(0, I)} \[ \\nabla_\\epsilon \big(-\frac{1}{2}\\epsilon^\top\\epsilon\big) \\nabla_\theta \big(\frac{\theta - \hat{\theta}}{\sigma}\big) F(\hat{\theta} + \sigma\\epsilon) \] & \\ &= \mathbb{E}_{\\epsilon\sim\mathcal{N}(0, I)} \[ (-\\epsilon) (\frac{1}{\sigma}) F(\hat{\theta} + \sigma\\epsilon) \] & \\ &= \frac{1}{\sigma}\mathbb{E}_{\\epsilon\sim\mathcal{N}(0, I)} \[ \\epsilon F(\hat{\theta} + \sigma\\epsilon) \] & \\scriptstyle{\text{; negative sign can be absorbed.}} \end{aligned} $$
+$$ \begin{aligned} & \nabla_\theta \mathbb{E}_{\theta\sim\mathcal{N}(\hat{\theta}, \sigma^2 I)} F(\theta) \\ &= \nabla_\theta \mathbb{E}_{\\epsilon\sim\mathcal{N}(0, I)} F(\hat{\theta} + \sigma\\epsilon) \\ &= \nabla_\theta \int_{\\epsilon} p(\\epsilon) F(\hat{\theta} + \sigma\\epsilon) d\\epsilon & \\scriptstyle{\text{; Gaussian }p(\\epsilon)=(2\pi)^{-\frac{n}{2}} \exp(-\frac{1}{2}\\epsilon^\top\\epsilon)} \\ &= \int_{\\epsilon} p(\\epsilon) \nabla_\\epsilon \log p(\\epsilon) \nabla_\theta \\epsilon\\;F(\hat{\theta} + \sigma\\epsilon) d\\epsilon & \\scriptstyle{\text{; log-likelihood trick}}\\ &= \mathbb{E}_{\\epsilon\sim\mathcal{N}(0, I)} \[ \nabla_\\epsilon \big(-\frac{1}{2}\\epsilon^\top\\epsilon\big) \nabla_\theta \big(\frac{\theta - \hat{\theta}}{\sigma}\big) F(\hat{\theta} + \sigma\\epsilon) \] & \\ &= \mathbb{E}_{\\epsilon\sim\mathcal{N}(0, I)} \[ (-\\epsilon) (\frac{1}{\sigma}) F(\hat{\theta} + \sigma\\epsilon) \] & \\ &= \frac{1}{\sigma}\mathbb{E}_{\\epsilon\sim\mathcal{N}(0, I)} \[ \\epsilon F(\hat{\theta} + \sigma\\epsilon) \] & \\scriptstyle{\text{; negative sign can be absorbed.}} \end{aligned} $$
 
 In one generation, we can sample many $epsilon_i, i=1,\dots,n$ and evaluate the fitness _in parallel_. One beautiful design is that no large model parameter needs to be shared. By only communicating the random seeds between workers, it is enough for the master node to do parameter update. This approach is later extended to adaptively learn a loss function; see my previous post on [Evolved Policy Gradient](https://lilianweng.github.io/posts/2019-06-23-meta-rl/#meta-learning-the-loss-function).
 
@@ -350,7 +350,7 @@ $$ N(\theta, \mathcal{A}) = \frac{1}{\lambda} \sum_{i=1}^\lambda \| b(\pi_\theta
 
 The ES optimization step relies on the novelty score instead of fitness:
 
-$$ \\nabla_\theta \mathbb{E}_{\theta\sim\mathcal{N}(\hat{\theta}, \sigma^2 I)} N(\theta, \mathcal{A}) = \frac{1}{\sigma}\mathbb{E}_{\\epsilon\sim\mathcal{N}(0, I)} \[ \\epsilon N(\hat{\theta} + \sigma\\epsilon, \mathcal{A}) \] $$
+$$ \nabla_\theta \mathbb{E}_{\theta\sim\mathcal{N}(\hat{\theta}, \sigma^2 I)} N(\theta, \mathcal{A}) = \frac{1}{\sigma}\mathbb{E}_{\\epsilon\sim\mathcal{N}(0, I)} \[ \\epsilon N(\hat{\theta} + \sigma\\epsilon, \mathcal{A}) \] $$
 
 NS-ES maintains a group of $M$ independently trained agents (“meta-population”), $\mathcal{M} = \{\theta_1, \dots, \theta_M \}$ and picks one to advance proportional to the novelty score. Eventually we select the best policy. This process is equivalent to ensembling; also see the same idea in [SVPG](https://lilianweng.github.io/posts/2018-04-08-policy-gradient/#svpg).
 

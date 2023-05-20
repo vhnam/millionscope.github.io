@@ -208,15 +208,15 @@ Fig. 7. Self-diagnosis abilities for identifying undesired attributes. The groun
 
 Given an input prompt $\mathbf{x}$, a textual description of undesired attributes $s$, and the language model $M$, self-debiasing computes the difference between the probability of next words without and with the self-debiasing template $\text{sdb}(.)$:
 
-$$ \\Delta(w, \mathbf{x}, s) = p_M(w\vert\mathbf{x}) - p_M(w\vert\text{sdb}(\mathbf{x}, s)) $$
+$$ \Delta(w, \mathbf{x}, s) = p_M(w\vert\mathbf{x}) - p_M(w\vert\text{sdb}(\mathbf{x}, s)) $$
 
-Because $\text{sdb}(.)$ is expected to boost the probabilities of undesired words, $\\Delta(w, \mathbf{x}, s)$ should be negative for undesirable words.
+Because $\text{sdb}(.)$ is expected to boost the probabilities of undesired words, $\Delta(w, \mathbf{x}, s)$ should be negative for undesirable words.
 
-In self-diasing decoding, a scaling function of the probability difference $\alpha(\\Delta(w, \mathbf{x}, s)): \mathbb{R}\to\[0,1\]$ is used to alter the true sampling distribution,
+In self-diasing decoding, a scaling function of the probability difference $\alpha(\Delta(w, \mathbf{x}, s)): \mathbb{R}\to\[0,1\]$ is used to alter the true sampling distribution,
 
-$$ \tilde{p}_M(w\vert\mathbf{x}) \\propto \alpha(\\Delta(w, \mathbf{x}, s)) p_M(w\vert\mathbf{x}) $$
+$$ \tilde{p}_M(w\vert\mathbf{x}) \\propto \alpha(\Delta(w, \mathbf{x}, s)) p_M(w\vert\mathbf{x}) $$
 
-In the paper, they used a soft variant where the probabilities of the words with negative $\\Delta$ are reduced w.r.t. the magnitude of $\\Delta(w, \mathbf{x}, s)$:
+In the paper, they used a soft variant where the probabilities of the words with negative $\Delta$ are reduced w.r.t. the magnitude of $\Delta(w, \mathbf{x}, s)$:
 
 $$ \alpha(x)=\begin{cases} 1 & \text{ if } x\\geq 0 \\ e^{\lambda\cdot x} & \text{ otherwise} \end{cases} $$
 
