@@ -219,11 +219,11 @@ $$\begin{align} p(d=0 \vert w, w_I) &= \frac{p(d=0, w \vert w_I)}{p(d=1, w \vert
 
 Finally the loss function of NCE's binary classifier becomes:
 
-$$\begin{align} \mathcal{L}_\theta & = - [ \log p(d=1 \vert w, w_I) + \sum_{\\substack{i=1 \\ \tilde{w}_i \sim Q}}^N \log p(d=0|\tilde{w}_i, w_I)] \\ & = - [ \log \frac{p(w \vert w_I)}{p(w \vert w_I) + Nq(\tilde{w})} + \sum_{\\substack{i=1 \\ \tilde{w}_i \sim Q}}^N \log \frac{Nq(\tilde{w}_i)}{p(w \vert w_I) + Nq(\tilde{w}_i)}] \end{align}$$
+$$\begin{align} \mathcal{L}_\theta & = - [ \log p(d=1 \vert w, w_I) + \sum_{\substack{i=1 \\ \tilde{w}_i \sim Q}}^N \log p(d=0|\tilde{w}_i, w_I)] \\ & = - [ \log \frac{p(w \vert w_I)}{p(w \vert w_I) + Nq(\tilde{w})} + \sum_{\substack{i=1 \\ \tilde{w}_i \sim Q}}^N \log \frac{Nq(\tilde{w}_i)}{p(w \vert w_I) + Nq(\tilde{w}_i)}] \end{align}$$
 
 However, $p(w \vert w_I)$ still involves summing up the entire vocabulary in the denominator. Let's label the denominator as a partition function of the input word, $Z(w_I)$. A common assumption is $Z(w) \approx 1$ given that we expect the softmax output layer to be normalized ([Minh and Teh, 2012](https://www.cs.toronto.edu/~amnih/papers/ncelm.pdf)). Then the loss function is simplified to:
 
-$$\mathcal{L}_\theta = - [ \log \frac{\exp({v'_w}^{\top}{v_{w_I}})}{\exp({v'_w}^{\top}{v_{w_I}}) + Nq(\tilde{w})} + \sum_{\\substack{i=1 \\ \tilde{w}_i \sim Q}}^N \log \frac{Nq(\tilde{w}_i)}{\exp({v'_w}^{\top}{v_{w_I}}) + Nq(\tilde{w}_i)}]$$
+$$\mathcal{L}_\theta = - [ \log \frac{\exp({v'_w}^{\top}{v_{w_I}})}{\exp({v'_w}^{\top}{v_{w_I}}) + Nq(\tilde{w})} + \sum_{\substack{i=1 \\ \tilde{w}_i \sim Q}}^N \log \frac{Nq(\tilde{w}_i)}{\exp({v'_w}^{\top}{v_{w_I}}) + Nq(\tilde{w}_i)}]$$
 
 The noise distribution $Q$ is a tunable parameter and we would like to design it in a way so that:
 
@@ -242,7 +242,7 @@ $$\begin{align} p(d=1 \vert w_, w_I) &= \sigma({v'_{w}}^\top v_{w_I}) \\ p(d=0 \
 
 The final NCE loss function looks like:
 
-$$\mathcal{L}_\theta = - [ \log \sigma({v'_{w}}^\top v_{w_I}) + \sum_{\\substack{i=1 \\ \tilde{w}_i \sim Q}}^N \log \sigma(-{v'_{\tilde{w}_i}}^\top v_{w_I})]$$
+$$\mathcal{L}_\theta = - [ \log \sigma({v'_{w}}^\top v_{w_I}) + \sum_{\substack{i=1 \\ \tilde{w}_i \sim Q}}^N \log \sigma(-{v'_{\tilde{w}_i}}^\top v_{w_I})]$$
 
 # Other Tips for Learning Word Embedding[#](#other-tips-for-learning-word-embedding)
 

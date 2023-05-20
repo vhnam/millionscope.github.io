@@ -145,7 +145,7 @@ Given a context vector $\mathbf{c}$, the positive sample should be drawn from th
 
 $$p(C=\texttt{pos} \vert X, \mathbf{c}) = \frac{p(x_\texttt{pos} \vert \mathbf{c}) \prod_{i=1,\dots,N; i \\neq \texttt{pos}} p(\mathbf{x}_i)}{\sum_{j=1}^N \big[ p(\mathbf{x}_j \vert \mathbf{c}) \prod_{i=1,\dots,N; i \\neq j} p(\mathbf{x}_i) \big]} = \frac{ \frac{p(\mathbf{x}_\texttt{pos}\vert c)}{p(\mathbf{x}_\texttt{pos})} }{ \sum_{j=1}^N \frac{p(\mathbf{x}_j\vert \mathbf{c})}{p(\mathbf{x}_j)} } = \frac{f(\mathbf{x}_\texttt{pos}, \mathbf{c})}{ \sum_{j=1}^N f(\mathbf{x}_j, \mathbf{c}) }$$
 
-where the scoring function is $f(\mathbf{x}, \mathbf{c}) \\propto \frac{p(\mathbf{x}\vert\mathbf{c})}{p(\mathbf{x})}$.
+where the scoring function is $f(\mathbf{x}, \mathbf{c}) \propto \frac{p(\mathbf{x}\vert\mathbf{c})}{p(\mathbf{x})}$.
 
 The InfoNCE loss optimizes the negative log probability of classifying the positive sample correctly:
 
@@ -159,7 +159,7 @@ where the logarithmic term in blue is estimated by $f$.
 
 For sequence prediction tasks, rather than modeling the future observations $p_k(\mathbf{x}_{t+k} \vert \mathbf{c}_t)$ directly (which could be fairly expensive), CPC models a density function to preserve the mutual information between $\mathbf{x}_{t+k}$ and $\mathbf{c}_t$:
 
-$$f_k(\mathbf{x}_{t+k}, \mathbf{c}_t) = \exp(\mathbf{z}_{t+k}^\top \mathbf{W}_k \mathbf{c}_t) \\propto \frac{p(\mathbf{x}_{t+k}\vert\mathbf{c}_t)}{p(\mathbf{x}_{t+k})}$$
+$$f_k(\mathbf{x}_{t+k}, \mathbf{c}_t) = \exp(\mathbf{z}_{t+k}^\top \mathbf{W}_k \mathbf{c}_t) \propto \frac{p(\mathbf{x}_{t+k}\vert\mathbf{c}_t)}{p(\mathbf{x}_{t+k})}$$
 
 where $\mathbf{z}_{t+k}$ is the encoded input and $\mathbf{W}_k$ is a trainable weight matrix.
 
@@ -184,7 +184,7 @@ Most recent studies follow the following definition of contrastive learning obje
 
 To learn an encoder $f(\mathbf{x})$ to learn a _L2-normalized feature vector_, the contrastive learning objective is:
 
-$$\begin{aligned} \mathcal{L}_\text{contrastive} &= \mathbb{E}_{(\mathbf{x},\mathbf{x}^+)\sim p_\texttt{pos}, \{\mathbf{x}^-_i\}^M_{i=1} \\overset{\text{i.i.d}}{\sim} p_\texttt{data} } \Big[ -\log\frac{\exp(f(\mathbf{x})^\top f(\mathbf{x}^+) / \tau)}{ \exp(f(\mathbf{x})^\top f(\mathbf{x}^+) / \tau) + \sum_{i=1}^M \exp(f(\mathbf{x})^\top f(\mathbf{x}_i^-) / \tau)} \Big] & \\ &\approx \mathbb{E}_{(\mathbf{x},\mathbf{x}^+)\sim p_\texttt{pos}, \{\mathbf{x}^-_i\}^M_{i=1} \\overset{\text{i.i.d}}{\sim} p_\texttt{data} }\Big[ - f(\mathbf{x})^\top f(\mathbf{x}^+) / \tau + \log\big(\sum_{i=1}^M \exp(f(\mathbf{x})^\top f(\mathbf{x}_i^-) / \tau)\big) \Big] & \\scriptstyle{\text{; Assuming infinite negatives}} \\ &= -\frac{1}{\tau}\mathbb{E}_{(\mathbf{x},\mathbf{x}^+)\sim p_\texttt{pos}}f(\mathbf{x})^\top f(\mathbf{x}^+) + \mathbb{E}_{ \mathbf{x} \sim p_\texttt{data}} \Big[ \log \mathbb{E}_{\mathbf{x}^- \sim p_\texttt{data}} \big[ \sum_{i=1}^M \exp(f(\mathbf{x})^\top f(\mathbf{x}_i^-) / \tau)\big] \Big] & \end{aligned}$$
+$$\begin{aligned} \mathcal{L}_\text{contrastive} &= \mathbb{E}_{(\mathbf{x},\mathbf{x}^+)\sim p_\texttt{pos}, \{\mathbf{x}^-_i\}^M_{i=1} \\overset{\text{i.i.d}}{\sim} p_\texttt{data} } \Big[ -\log\frac{\exp(f(\mathbf{x})^\top f(\mathbf{x}^+) / \tau)}{ \exp(f(\mathbf{x})^\top f(\mathbf{x}^+) / \tau) + \sum_{i=1}^M \exp(f(\mathbf{x})^\top f(\mathbf{x}_i^-) / \tau)} \Big] & \\ &\approx \mathbb{E}_{(\mathbf{x},\mathbf{x}^+)\sim p_\texttt{pos}, \{\mathbf{x}^-_i\}^M_{i=1} \\overset{\text{i.i.d}}{\sim} p_\texttt{data} }\Big[ - f(\mathbf{x})^\top f(\mathbf{x}^+) / \tau + \log\big(\sum_{i=1}^M \exp(f(\mathbf{x})^\top f(\mathbf{x}_i^-) / \tau)\big) \Big] & \scriptstyle{\text{; Assuming infinite negatives}} \\ &= -\frac{1}{\tau}\mathbb{E}_{(\mathbf{x},\mathbf{x}^+)\sim p_\texttt{pos}}f(\mathbf{x})^\top f(\mathbf{x}^+) + \mathbb{E}_{ \mathbf{x} \sim p_\texttt{data}} \Big[ \log \mathbb{E}_{\mathbf{x}^- \sim p_\texttt{data}} \big[ \sum_{i=1}^M \exp(f(\mathbf{x})^\top f(\mathbf{x}_i^-) / \tau)\big] \Big] & \end{aligned}$$
 
 # Key Ingredients[#](#key-ingredients)
 
@@ -233,7 +233,7 @@ Fig. 4. t-SNE visualization of learned representation with debiased contrastive 
 
 Following the above annotation, [Robinson et al. (2021)](https://arxiv.org/abs/2010.04592) modified the sampling probabilities to target at hard negatives by up-weighting the probability $p^-_x(x')$ to be proportional to its similarity to the anchor sample. The new sampling probability $q_\beta(x^-)$ is:
 
-$$q_\beta(\mathbf{x}^-) \\propto \exp(\beta f(\mathbf{x})^\top f(\mathbf{x}^-)) \cdot p(\mathbf{x}^-)$$
+$$q_\beta(\mathbf{x}^-) \propto \exp(\beta f(\mathbf{x})^\top f(\mathbf{x}^-)) \cdot p(\mathbf{x}^-)$$
 
 where $\beta$ is a hyperparameter to tune.
 
@@ -335,7 +335,7 @@ Fig. 9. Algorithm of Barlow Twins in Pytorch style pseudo code. (Image source: [
 
 ### BYOL[#](#byol)
 
-Different from the above approaches, interestingly, **BYOL** (Bootstrap Your Own Latent; [Grill, et al 2020](https://arxiv.org/abs/2006.07733)) claims to achieve a new state-of-the-art results _without using egative samples_. It relies on two neural networks, referred to as _online_ and _target_ networks that interact and learn from each other. The target network (parameterized by $\\xi$) has the same architecture as the online one (parameterized by $\theta$), but with polyak averaged weights, $\\xi \\leftarrow \tau \\xi + (1-\tau) \theta$.
+Different from the above approaches, interestingly, **BYOL** (Bootstrap Your Own Latent; [Grill, et al 2020](https://arxiv.org/abs/2006.07733)) claims to achieve a new state-of-the-art results _without using egative samples_. It relies on two neural networks, referred to as _online_ and _target_ networks that interact and learn from each other. The target network (parameterized by $\xi$) has the same architecture as the online one (parameterized by $\theta$), but with polyak averaged weights, $\xi \\leftarrow \tau \xi + (1-\tau) \theta$.
 
 The goal is to learn a presentation $y$ that can be used in downstream tasks. The online network parameterized by $\theta$ contains:
 
@@ -343,7 +343,7 @@ The goal is to learn a presentation $y$ that can be used in downstream tasks. Th
 - A projector $g_\theta$;
 - A predictor $q_\theta$.
 
-The target network has the same network architecture, but with different parameter $\\xi$, updated by polyak averaging $\theta$: $\\xi \\leftarrow \tau \\xi + (1-\tau) \theta$.
+The target network has the same network architecture, but with different parameter $\xi$, updated by polyak averaging $\theta$: $\xi \\leftarrow \tau \xi + (1-\tau) \theta$.
 
 ![](assets/images/2021-05-31-contrastive/BYOL.png)
 
@@ -352,8 +352,8 @@ Fig. 10. The model architecture of BYOL. After training, we only care about $f\\
 Given an image $\mathbf{x}$, the BYOL loss is constructed as follows:
 
 - Create two augmented views: $\mathbf{v}=t(\mathbf{x}); \mathbf{v}'=t'(\mathbf{x})$ with augmentations sampled $t \sim \mathcal{T}, t' \sim \mathcal{T}'$;
-- Then they are encoded into representations, $\mathbf{y}_\theta=f_\theta(\mathbf{v}), \mathbf{y}'=f_\\xi(\mathbf{v}')$;
-- Then they are projected into latent variables, $\mathbf{z}_\theta=g_\theta(\mathbf{y}_\theta), \mathbf{z}'=g_\\xi(\mathbf{y}')$;
+- Then they are encoded into representations, $\mathbf{y}_\theta=f_\theta(\mathbf{v}), \mathbf{y}'=f_\xi(\mathbf{v}')$;
+- Then they are projected into latent variables, $\mathbf{z}_\theta=g_\theta(\mathbf{y}_\theta), \mathbf{z}'=g_\xi(\mathbf{y}')$;
 - The online network outputs a prediction $q_\theta(\mathbf{z}_\theta)$;
 - Both $q_\theta(\mathbf{z}_\theta)$ and $\mathbf{z}'$ are L2-normalized, giving us $\bar{q}_\theta(\mathbf{z}_\theta) = q_\theta(\mathbf{z}_\theta) / | q_\theta(\mathbf{z}_\theta) |$ and $\bar{\mathbf{z}'} = \mathbf{z}' / |\mathbf{z}'|$;
 - The loss $\mathcal{L}^\text{BYOL}_\theta$ is MSE between L2-normalized prediction $\bar{q}_\theta(\mathbf{z})$ and $\bar{\mathbf{z}'}$;

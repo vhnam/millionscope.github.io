@@ -8,7 +8,7 @@ author: Lilian Weng
 date: 2017-06-21
 ---
 
-Source : https://lilianweng.github.io
+Source : https://lilianweng.github.io/posts/2020-01-29-curriculum-rl
 
 # Curriculum for Reinforcement Learning
 
@@ -131,7 +131,8 @@ Let us consider Alice and Bob as two separate copies for one RL agent trained in
 
 Note that since B has to repeat the actions between the same pair of $(s_0, s_t)$ of A, this framework only works in reversible or resettable environments.
 
-Alice should learn to push Bob out of his comfort zone, but not give him impossible tasks. Bob's reward is set as $R_B = -\gamma t_B$ and Alice's reward is $R_A = \gamma \max(0, t_B - t_A)$, where $t_B$ is the total time for B to complete the task, $t_A$ is the time until Alice performs the STOP action and $\gamma$ is a scalar constant to rescale the reward to be comparable with the external task reward. If B fails a task, $t_B = t_\max - t_A$. Both policies are goal-conditioned. The losses imply:
+Alice should learn to push Bob out of his comfort zone, but not give him impossible tasks. Bob's reward is set as $R_B = -\gamma t_B$ and Alice's reward is $R_A = \gamma \max(0, t_B - t_A)$, where $t_B$ is the total time for B to complete the task, $t_A$ is the time until Alice performs the STOP action and $\gamma$ is a scalar constant to rescale the reward to be comparable with the external task reward.
+If B fails a task, $t_B = t_{max} - t_A$. Both policies are goal-conditioned. The losses imply:
 
 1.  B wants to finish a task asap.
 2.  A prefers tasks that take more time of B.
@@ -147,7 +148,7 @@ Often RL policy needs to be able to perform over a set of tasks. The goal should
 
 The approach of Generative Goal Learning ([Florensa, et al. 2018](https://arxiv.org/abs/1705.06366)) relies on a **Goal GAN** to generate desired goals automatically. In their experiment, the reward is very sparse, just a binary flag for whether a goal is achieved or not and the policy is conditioned on goal,
 
-$$\begin{aligned} \pi^{\*}(a_t\vert s_t, g) &= \arg\max_\pi \mathbb{E}_{g\sim p_g(.)} R^g(\pi) \\ \text{where }R^g(\pi) &= \mathbb{E}_\pi(.\mid s_t, g) \mathbf{1}[\\exists t \in [1,\dots, T]: s_t \in S^g] \end{aligned}$$
+$$\begin{aligned} \pi^{\*}(a_t\vert s_t, g) &= \arg\max_\pi \mathbb{E}_{g\sim p_g(.)} R^g(\pi) \\ \text{where }R^g(\pi) &= \mathbb{E}_\pi(.\mid s_t, g) \mathbf{1}[\exists t \in [1,\dots, T]: s_t \in S^g] \end{aligned}$$
 
 Here $R^g(\pi)$ is the expected return, also equivalent to the success probability. Given sampled trajectories from the current policy, as long as any state belongs to the goal set, the return will be positive.
 
@@ -190,18 +191,21 @@ Following the same idea, [Racaniere & Lampinen, et al. (2019)](https://arxiv.org
 The generator is optimized with three objectives:
 
 1.  Goal **validity**: The proposed goal should be achievable by an expert policy. The corresponding generative loss is designed to increase the likelihood of generating goals that the solver policy has achieved before (like in [HER](https://arxiv.org/abs/1707.01495)).
-    - $\mathcal{L}_\text{val}$ is the negative log-likelihood of generated goals that have been solved by the solver in the past.
 
-$$\begin{align\*} \mathcal{L}_\text{val} = \mathbb{E}_{\\substack{ g \sim \text{ achieved by solver}, \\ \\xi \in \text{Uniform}(0, \delta), \\ f \in \text{Uniform}(0, 1) }} \big[ -\log p(G^{-1}(g + \\xi, f)) \big] \end{align\*}$$
+    - $\mathcal{L}_\text{val}$ is the negative log-likelihood of generated goals that have been solved by the solver in the past.
+      {/* - $$\begin{align\*} \mathcal{L}_\text{val} = \mathbb{E}_{\substack{ g \sim \text{ achieved by solver}, \\ \xi \in \text{Uniform}(0, \delta), \\ f \in \text{Uniform}(0, 1) }} \big[ -\log p(G^{-1}(g + \xi, f)) \big] \end{align\*}$$ */}
+      {/* - $$ \begin{align*} \mathcal{L}_\text{val} = \mathbb{E}_{\substack{ g \sim \text{ achieved by solver}, \\ \xi \in \text{Uniform}(0, \delta), \\ f \in \text{Uniform}(0, 1) }} \big[ -\log p(G^{-1}(g + \xi, f)) \big]\end{align*} $$ */}
+    - $$ \begin{aligned} \mathcal{L}_\text{val} = \mathbb{E}_{\substack{ g \sim \text{ achieved by solver}, \\ \xi \in \text{Uniform}(0, \delta), \\ f \in \text{Uniform}(0, 1) }} \big[ -\log p(G^{-1}(g + \xi, f)) \big] \end{aligned}$$
 
 2.  Goal **feasibility**: The proposed goal should be achievable by the current policy; that is, the level of difficulty should be appropriate.
-    - $\mathcal{L}_\text{feas}$ is the output probability by the judge model $D$ on the generated goal $G(z, f)$ should match the desired $f$.
 
-$$\begin{align\*} \mathcal{L}_\text{feas} = \mathbb{E}_{\\substack{ z \in \mathcal{N}(0, 1), \\ f \in \text{Uniform}(0, 1) }} \big[ D(G(z, f)) - \sigma^{-1}(f)^2 \big] \end{align\*}$$
+    - $\mathcal{L}_\text{feas}$ is the output probability by the judge model $D$ on the generated goal $G(z, f)$ should match the desired $f$.
+      {/* - $$\begin{align\*} \mathcal{L}_\text{feas} = \mathbb{E}_{\substack{ z \in \mathcal{N}(0, 1), \\ f \in \text{Uniform}(0, 1) }} \big[ D(G(z, f)) - \sigma^{-1}(f)^2 \big] \end{align\*}$$ */}
+    - $$\begin{aligned} \mathcal{L}_\text{feas} = \mathbb{E}_{\substack{ z \in \mathcal{N}(0, 1), \\ f \in \text{Uniform}(0, 1) }} \big[ D(G(z, f)) - \sigma^{-1}(f)^2 \big] \end{aligned}$$
 
 3.  Goal **coverage**: We should maximize the entropy of generated goals to encourage diverse goal and to improve the coverage over the goal space.
 
-$$\begin{align\*} \mathcal{L}_\text{cov} = \mathbb{E}_{\\substack{ z \in \mathcal{N}(0, 1), \\ f \in \text{Uniform}(0, 1) }} \big[ \log p(G(z, f)) \big] \end{align\*}$$
+    - $$\begin{aligned} \mathcal{L}_\text{cov} = \mathbb{E}_{\substack{ z \in \mathcal{N}(0, 1), \\ f \in \text{Uniform}(0, 1) }} \big[ \log p(G(z, f)) \big] \end{aligned}$$
 
 Their experiments showed complex environments require all three losses above. When the environment is changing between episodes, both the goal generator and the discriminator need to be conditioned on environmental observation to produce better results. If there is a desired goal distribution, an additional loss can be added to match a desired goal distribution using Wasserstein distance. Using this loss, the generator can push the solver toward mastering the desired tasks more efficiently.
 
@@ -240,7 +244,7 @@ Given a trajectory $\tau$, it makes sense for the policy to maximize the mutual 
 
 Then we have,
 
-$$\begin{aligned} I(\tau; z) &= \mathcal{H}(z) - \mathcal{H}(z \vert s_1,\dots, s_T) \\ &\\geq \mathbb{E}_{s \in \tau} [\mathcal{H}(z) - \mathcal{H}(z\vert s)] & \\scriptstyle{\text{; discard the order of states.}} \\ &= \mathbb{E}_{s \in \tau} [\mathcal{H}(s_t) - \mathcal{H}(s\vert z)] & \\scriptstyle{\text{; by definition of MI.}} \\ &= \mathbb{E}_{z\sim q_\phi(z), s\sim \pi_\theta(s|z)} [\log q_\phi(s|z) - \log \pi_\theta(s)] \\ &\approx \mathbb{E}_{z\sim q_\phi(z), s\sim \pi_\theta(s|z)} [\color{green}{\log q_\phi(s|z) - \log q_\phi(s)}] & \\scriptstyle{\text{; assume learned marginal distr. matches policy.}} \end{aligned}$$
+$$\begin{aligned} I(\tau; z) &= \mathcal{H}(z) - \mathcal{H}(z \vert s_1,\dots, s_T) \\ &\geq \mathbb{E}_{s \in \tau} [\mathcal{H}(z) - \mathcal{H}(z\vert s)] & \scriptstyle{\text{; discard the order of states.}} \\ &= \mathbb{E}_{s \in \tau} [\mathcal{H}(s_t) - \mathcal{H}(s\vert z)] & \scriptstyle{\text{; by definition of MI.}} \\ &= \mathbb{E}_{z\sim q_\phi(z), s\sim \pi_\theta(s|z)} [\log q_\phi(s|z) - \log \pi_\theta(s)] \\ &\approx \mathbb{E}_{z\sim q_\phi(z), s\sim \pi_\theta(s|z)} [\color{green}{\log q_\phi(s|z) - \log q_\phi(s)}] & \scriptstyle{\text{; assume learned marginal distr. matches policy.}} \end{aligned}$$
 
 We can set the reward as $\log q_\phi(s \vert z) - \log q_\phi(s)$, as shown in the red part in the equation above. In order to balance between task-specific exploration (as in red below) and latent skill matching (as in blue below) , a parameter $\lambda \in [0, 1]$ is added. Each realization of $z \sim q_\phi(z)$ induces a reward function $r_z(s)$ (remember that reward + CMP => MDP) as follows:
 
@@ -250,7 +254,8 @@ $$\begin{aligned} r_z(s) &= \lambda \log q_\phi(s|z) - \log q_\phi(s) \\ &= \lam
 
 Fig. 9. The algorithm of CARML. (Image source: [Jabri, et al 2019](https://arxiv.org/abs/1912.04226))
 
-Learning a latent skill space can be done in different ways, such as in [Hausman, et al. 2018](https://openreview.net/forum?id=rk07ZXZRb). The goal of their approach is to learn a task-conditioned policy, $\pi(a \vert s, t^{(i)})$, where $t^{(i)}$ is from a discrete list of $N$ tasks, $\mathcal{T} = [t^{(1)}, \dots, t^{(N)}]$. However, rather than learning $N$ separate solutions, one per task, it would be nice to learn a latent skill space so that each task could be represented in a distribution over skills and thus skills are _reused between tasks_. The policy is defined as $\pi_\theta(a \vert s,t) = \int \pi_\theta(a \vert z,s,t) p_\phi(z \vert t)\\mathrm{d}z$, where $\pi_\theta$ and $p_\phi$ are policy and embedding networks to learn, respectively. If $z$ is discrete, i.e. drawn from a set of $K$ skills, then the policy becomes a mixture of $K$ sub-policies. The policy training uses [SAC](http://127.0.0.1:4000/lil-log/2018/04/07/policy-gradient-algorithms.html#sac) and the dependency on $z$ is introduced in the entropy term.
+Learning a latent skill space can be done in different ways, such as in [Hausman, et al. 2018](https://openreview.net/forum?id=rk07ZXZRb). The goal of their approach is to learn a task-conditioned policy, $\pi(a \vert s, t^{(i)})$, where $t^{(i)}$ is from a discrete list of $N$ tasks, $\mathcal{T} = [t^{(1)}, \dots, t^{(N)}]$. However, rather than learning $N$ separate solutions, one per task, it would be nice to learn a latent skill space so that each task could be represented in a distribution over skills and thus skills are _reused between tasks_. The policy is defined as $\pi_\theta(a \vert s,t) = \int \pi_\theta(a \vert z,s,t) p_\phi(z \vert t)\mathrm{d}z$, where $\pi_\theta$ and $p_\phi$ are policy and embedding networks to learn, respectively. If $z$ is discrete, i.e. drawn from a set of $K$ skills, then the policy becomes a mixture of $K$ sub-policies. The policy training uses [SAC](http://127.0.0.1:4000/lil-log/2018/04/07/policy-gradient-algorithms.html#sac) and the dependency on $z$ is introduced in the entropy term.
+
 
 # Curriculum through Distillation[#](#curriculum-through-distillation)
 
@@ -264,9 +269,9 @@ A progressive network has the following structure:
 2.  Once switch to the next task, we need to add a new column to adapt to the new context while freezing $\theta^{(1)}$ to lock down the learned skills from the previous task. The new column has activation layers labelled as $h^{(2)}_i, i=1, \dots, L$, and parameters $\theta^{(2)}$.
 3.  Step 2 can be repeated with every new task. The $i$-th layer activation in the $k$-th column depends on the previous activation layers in all the existing columns:
 
-$$h^{(k)}_i = f(W^{(k)}_i h^{(k)}_{i-1} + \sum_{j < k} U_i^{(k:j)} h^{(j)}_{i-1})$$
-
-    where $W^{(k)}_i$ is the weight matrix of the layer $i$ in the column $k$; $U_i^{(k:j)}, j < k$ are the weight matrices for projecting the layer $i-1$ of the column $j$ to the layer $i$ of column $k$ ($ j < k $). The above weights matrices should be learned. $f(.)$ is a non-linear activation function by choice.
+$$h^{(k)}_i = f(W^{(k)}_i h^{(k)}_{i-1} + \sum_{j < k} U_i^{(k:j)} h^{(j)}_{i-1})$$ where $W^{(k)}_i$ is the weight matrix of the layer $i$ in the column $k$;
+$U_i^{( k\:j )}, j < k$ 
+are the weight matrices for projecting the layer $i-1$ of the column $j$ to the layer $i$ of column $k$ ($ j < k $). The above weights matrices should be learned. $f(.)$ is a non-linear activation function by choice.
 
 ![](assets/images/2020-01-29-curriculum-rl/progressive-networks.png)
 
@@ -280,7 +285,7 @@ One use case for the progressive network is to do sim2real transfer ([Rusu, et a
 
 In the meantime, M&M learns a categorical distribution $c \sim \text{Categorical}(1, \dots, K \vert \alpha)$ with [pmf](https://en.wikipedia.org/wiki/Probability_mass_function) $p(c=i) = \alpha_i$ probability to pick which policy to use at a given time. The mixed M&M policy is a simple weighted sum: $\pi_\text{mm}(a \vert s) = \sum_{i=1}^K \alpha_i \pi_i(a \vert s)$. Curriculum learning is realized by dynamically adjusting $\alpha_i$, from $\alpha_K=0$ to $\alpha_K=1$. The tuning of $\alpha$ can be manual or through [population-based training](https://lilianweng.github.io/posts/2019-09-05-evolution-strategies/#hyperparameter-tuning-pbt).
 
-To encourage cooperation rather than competition among policies, besides the RL loss $\mathcal{L}_\text{RL}$, another [distillation](https://arxiv.org/abs/1511.06295)\-like loss $\mathcal{L}_\text{mm}(\theta)$ is added. The knowledge transfer loss $\mathcal{L}_\text{mm}(\theta)$ measures the KL divergence between two policies, $\\propto D_\text{KL}(\pi_{i}(. \vert s) | \pi_j(. \vert s))$ for $i < j$. It encourages complex agents to match the simpler ones early on. The final loss is $\mathcal{L} = \mathcal{L}_\text{RL}(\theta \vert \pi_\text{mm}) + \lambda \mathcal{L}_\text{mm}(\theta)$.
+To encourage cooperation rather than competition among policies, besides the RL loss $\mathcal{L}_\text{RL}$, another [distillation](https://arxiv.org/abs/1511.06295)\-like loss $\mathcal{L}_\text{mm}(\theta)$ is added. The knowledge transfer loss $\mathcal{L}_\text{mm}(\theta)$ measures the KL divergence between two policies, $\propto D_\text{KL}(\pi_{i}(. \vert s) | \pi_j(. \vert s))$ for $i < j$. It encourages complex agents to match the simpler ones early on. The final loss is $\mathcal{L} = \mathcal{L}_\text{RL}(\theta \vert \pi_\text{mm}) + \lambda \mathcal{L}_\text{mm}(\theta)$.
 
 ![](assets/images/2020-01-29-curriculum-rl/mix-and-match.png)
 
@@ -295,14 +300,14 @@ Cited as:
 Or
 
 ```bibtex
-    @article{weng2020curriculum,
-      title   = "Curriculum for Reinforcement Learning",
-      author  = "Weng, Lilian",
-      journal = "lilianweng.github.io",
-      year    = "2020",
-      month   = "Jan",
-      url     = "https://lilianweng.github.io/posts/2020-01-29-curriculum-rl/"
-    }
+@article{weng2020curriculum,
+  title   = "Curriculum for Reinforcement Learning",
+  author  = "Weng, Lilian",
+  journal = "lilianweng.github.io",
+  year    = "2020",
+  month   = "Jan",
+  url     = "https://lilianweng.github.io/posts/2020-01-29-curriculum-rl/"
+}
 ```
 
 # References[#](#references)

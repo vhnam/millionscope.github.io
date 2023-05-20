@@ -79,7 +79,7 @@ A dataset $\mathcal{D}$ contains pairs of feature vectors and labels, $\mathcal{
 
 The optimal parameters should maximize the probability of true labels across multiple training batches $B \subset \mathcal{D}$:
 
-$$\begin{aligned} \theta^\* &= {\arg\max}_{\theta} \mathbb{E}_{(\mathbf{x}, y)\in \mathcal{D}}[P_\theta(y \vert \mathbf{x})] &\\ \theta^\* &= {\arg\max}_{\theta} \mathbb{E}_{B\subset \mathcal{D}}[\sum_{(\mathbf{x}, y)\in B}P_\theta(y \vert \mathbf{x})] & \\scriptstyle{\text{; trained with mini-batches.}} \end{aligned}$$
+$$\begin{aligned} \theta^\* &= {\arg\max}_{\theta} \mathbb{E}_{(\mathbf{x}, y)\in \mathcal{D}}[P_\theta(y \vert \mathbf{x})] &\\ \theta^\* &= {\arg\max}_{\theta} \mathbb{E}_{B\subset \mathcal{D}}[\sum_{(\mathbf{x}, y)\in B}P_\theta(y \vert \mathbf{x})] & \scriptstyle{\text{; trained with mini-batches.}} \end{aligned}$$
 
 In few-shot classification, the goal is to reduce the prediction error on data samples with unknown labels given a small support set for "fast learning" (think of how "fine-tuning" works). To make the training process mimics what happens during inference, we would like to "fake" datasets with a subset of labels to avoid exposing all the labels to the model and modify the optimization procedure accordingly to encourage fast learning:
 
@@ -400,7 +400,7 @@ $$\begin{aligned} c_t &= f_t \odot c_{t-1} + i_t \odot \tilde{c}_t\\ &= \theta_{
 
 While fixing $f_t=1$ and $i_t=\alpha_t$ might not be the optimal, both of them can be learnable and adaptable to different datasets.
 
-$$\begin{aligned} f_t &= \sigma(\mathbf{W}_f \cdot [\nabla_{\theta_{t-1}}\mathcal{L}_t, \mathcal{L}_t, \theta_{t-1}, f_{t-1}] + \mathbf{b}_f) & \\scriptstyle{\text{; how much to forget the old value of parameters.}}\\ i_t &= \sigma(\mathbf{W}_i \cdot [\nabla_{\theta_{t-1}}\mathcal{L}_t, \mathcal{L}_t, \theta_{t-1}, i_{t-1}] + \mathbf{b}_i) & \\scriptstyle{\text{; corresponding to the learning rate at time step t.}}\\ \tilde{\theta}_t &= -\nabla_{\theta_{t-1}}\mathcal{L}_t &\\ \theta_t &= f_t \odot \theta_{t-1} + i_t \odot \tilde{\theta}_t &\\ \end{aligned}$$
+$$\begin{aligned} f_t &= \sigma(\mathbf{W}_f \cdot [\nabla_{\theta_{t-1}}\mathcal{L}_t, \mathcal{L}_t, \theta_{t-1}, f_{t-1}] + \mathbf{b}_f) & \scriptstyle{\text{; how much to forget the old value of parameters.}}\\ i_t &= \sigma(\mathbf{W}_i \cdot [\nabla_{\theta_{t-1}}\mathcal{L}_t, \mathcal{L}_t, \theta_{t-1}, i_{t-1}] + \mathbf{b}_i) & \scriptstyle{\text{; corresponding to the learning rate at time step t.}}\\ \tilde{\theta}_t &= -\nabla_{\theta_{t-1}}\mathcal{L}_t &\\ \theta_t &= f_t \odot \theta_{t-1} + i_t \odot \tilde{\theta}_t &\\ \end{aligned}$$
 
 ### Model Setup[#](#model-setup)
 
@@ -433,7 +433,7 @@ Fig. 11. Diagram of MAML. (Image source: [original paper](https://arxiv.org/abs/
 
 Well, the above formula only optimizes for one task. To achieve a good generalization across a variety of tasks, we would like to find the optimal $\theta^\*$ so that the task-specific fine-tuning is more efficient. Now, we sample a new data batch with id (1) for updating the meta-objective. The loss, denoted as $\mathcal{L}^{(1)}$, depends on the mini batch (1). The superscripts in $\mathcal{L}^{(0)}$ and $\mathcal{L}^{(1)}$ only indicate different data batches, and they refer to the same loss objective for the same task.
 
-$$\begin{aligned} \theta^\* &= \arg\min_\theta \sum_{\tau_i \sim p(\tau)} \mathcal{L}_{\tau_i}^{(1)} (f_{\theta'_i}) = \arg\min_\theta \sum_{\tau_i \sim p(\tau)} \mathcal{L}_{\tau_i}^{(1)} (f_{\theta - \alpha\nabla_\theta \mathcal{L}_{\tau_i}^{(0)}(f_\theta)}) & \\ \theta &\\leftarrow \theta - \beta \nabla_{\theta} \sum_{\tau_i \sim p(\tau)} \mathcal{L}_{\tau_i}^{(1)} (f_{\theta - \alpha\nabla_\theta \mathcal{L}_{\tau_i}^{(0)}(f_\theta)}) & \\scriptstyle{\text{; updating rule}} \end{aligned}$$
+$$\begin{aligned} \theta^\* &= \arg\min_\theta \sum_{\tau_i \sim p(\tau)} \mathcal{L}_{\tau_i}^{(1)} (f_{\theta'_i}) = \arg\min_\theta \sum_{\tau_i \sim p(\tau)} \mathcal{L}_{\tau_i}^{(1)} (f_{\theta - \alpha\nabla_\theta \mathcal{L}_{\tau_i}^{(0)}(f_\theta)}) & \\ \theta &\\leftarrow \theta - \beta \nabla_{\theta} \sum_{\tau_i \sim p(\tau)} \mathcal{L}_{\tau_i}^{(1)} (f_{\theta - \alpha\nabla_\theta \mathcal{L}_{\tau_i}^{(0)}(f_\theta)}) & \scriptstyle{\text{; updating rule}} \end{aligned}$$
 
 ![](assets/images/2018-11-30-meta-learning/maml-algo.png)
 
@@ -443,13 +443,13 @@ Fig. 12. The general form of MAML algorithm. (Image source: [original paper](htt
 
 The meta-optimization step above relies on second derivatives. To make the computation less expensive, a modified version of MAML omits second derivatives, resulting in a simplified and cheaper implementation, known as **First-Order MAML (FOMAML)**.
 
-Let's consider the case of performing $k$ inner gradient steps, $k\\geq1$. Starting with the initial model parameter $\theta_\text{meta}$:
+Let's consider the case of performing $k$ inner gradient steps, $k\geq1$. Starting with the initial model parameter $\theta_\text{meta}$:
 
 $$\begin{aligned} \theta_0 &= \theta_\text{meta}\\ \theta_1 &= \theta_0 - \alpha\nabla_\theta\mathcal{L}^{(0)}(\theta_0)\\ \theta_2 &= \theta_1 - \alpha\nabla_\theta\mathcal{L}^{(0)}(\theta_1)\\ &\dots\\ \theta_k &= \theta_{k-1} - \alpha\nabla_\theta\mathcal{L}^{(0)}(\theta_{k-1}) \end{aligned}$$
 
 Then in the outer loop, we sample a new data batch for updating the meta-objective.
 
-$$\begin{aligned} \theta_\text{meta} &\\leftarrow \theta_\text{meta} - \beta g_\text{MAML} & \\scriptstyle{\text{; update for meta-objective}} \\[2mm] \text{where } g_\text{MAML} &= \nabla_{\theta} \mathcal{L}^{(1)}(\theta_k) &\\[2mm] &= \nabla_{\theta_k} \mathcal{L}^{(1)}(\theta_k) \cdot (\nabla_{\theta_{k-1}} \theta_k) \dots (\nabla_{\theta_0} \theta_1) \cdot (\nabla_{\theta} \theta_0) & \\scriptstyle{\text{; following the chain rule}} \\ &= \nabla_{\theta_k} \mathcal{L}^{(1)}(\theta_k) \cdot \Big( \prod_{i=1}^k \nabla_{\theta_{i-1}} \theta_i \Big) \cdot I & \\ &= \nabla_{\theta_k} \mathcal{L}^{(1)}(\theta_k) \cdot \prod_{i=1}^k \nabla_{\theta_{i-1}} (\theta_{i-1} - \alpha\nabla_\theta\mathcal{L}^{(0)}(\theta_{i-1})) & \\ &= \nabla_{\theta_k} \mathcal{L}^{(1)}(\theta_k) \cdot \prod_{i=1}^k (I - \alpha\nabla_{\theta_{i-1}}(\nabla_\theta\mathcal{L}^{(0)}(\theta_{i-1}))) & \end{aligned}$$
+$$\begin{aligned} \theta_\text{meta} &\\leftarrow \theta_\text{meta} - \beta g_\text{MAML} & \scriptstyle{\text{; update for meta-objective}} \\[2mm] \text{where } g_\text{MAML} &= \nabla_{\theta} \mathcal{L}^{(1)}(\theta_k) &\\[2mm] &= \nabla_{\theta_k} \mathcal{L}^{(1)}(\theta_k) \cdot (\nabla_{\theta_{k-1}} \theta_k) \dots (\nabla_{\theta_0} \theta_1) \cdot (\nabla_{\theta} \theta_0) & \scriptstyle{\text{; following the chain rule}} \\ &= \nabla_{\theta_k} \mathcal{L}^{(1)}(\theta_k) \cdot \Big( \prod_{i=1}^k \nabla_{\theta_{i-1}} \theta_i \Big) \cdot I & \\ &= \nabla_{\theta_k} \mathcal{L}^{(1)}(\theta_k) \cdot \prod_{i=1}^k \nabla_{\theta_{i-1}} (\theta_{i-1} - \alpha\nabla_\theta\mathcal{L}^{(0)}(\theta_{i-1})) & \\ &= \nabla_{\theta_k} \mathcal{L}^{(1)}(\theta_k) \cdot \prod_{i=1}^k (I - \alpha\nabla_{\theta_{i-1}}(\nabla_\theta\mathcal{L}^{(0)}(\theta_{i-1}))) & \end{aligned}$$
 
 The MAML gradient is:
 
@@ -493,7 +493,7 @@ $$\text{dist}(\theta, \mathcal{W}_{\tau}^\*) = \text{dist}(\theta, W_{\tau}^\*(\
 
 The gradient of the squared euclidean distance is:
 
-$$\begin{aligned} \nabla_\theta[\frac{1}{2}\text{dist}(\theta, \mathcal{W}_{\tau_i}^\*)^2] &= \nabla_\theta[\frac{1}{2}\text{dist}(\theta, W_{\tau_i}^\*(\theta))^2] & \\ &= \nabla_\theta[\frac{1}{2}(\theta - W_{\tau_i}^\*(\theta))^2] & \\ &= \theta - W_{\tau_i}^\*(\theta) & \\scriptstyle{\text{; See notes.}} \end{aligned}$$
+$$\begin{aligned} \nabla_\theta[\frac{1}{2}\text{dist}(\theta, \mathcal{W}_{\tau_i}^\*)^2] &= \nabla_\theta[\frac{1}{2}\text{dist}(\theta, W_{\tau_i}^\*(\theta))^2] & \\ &= \nabla_\theta[\frac{1}{2}(\theta - W_{\tau_i}^\*(\theta))^2] & \\ &= \theta - W_{\tau_i}^\*(\theta) & \scriptstyle{\text{; See notes.}} \end{aligned}$$
 
 Notes: According to the Reptile paper, "_the gradient of the squared euclidean distance between a point Θ and a set S is the vector 2(Θ - p), where p is the closest point in S to Θ_". Technically the closest point in S is also a function of Θ, but I'm not sure why the gradient does not need to worry about the derivative of p. (Please feel free to leave me a comment or send me an email about this if you have ideas.)
 
@@ -531,7 +531,7 @@ $$f(x) = f(a) + \frac{f'(a)}{1!}(x-a) + \frac{f''(a)}{2!}(x-a)^2 + \dots = \sum_
 
 We can consider $\nabla_{\theta}\mathcal{L}^{(1)}(.)$ as a function and $\theta_0$ as a value point. The Taylor expansion of $g_1^{(1)}$ at the value point $\theta_0$ is:
 
-$$\begin{aligned} g_1^{(1)} &= \nabla_{\theta}\mathcal{L}^{(1)}(\theta_1) \\ &= \nabla_{\theta}\mathcal{L}^{(1)}(\theta_0) + \nabla^2_\theta\mathcal{L}^{(1)}(\theta_0)(\theta_1 - \theta_0) + \frac{1}{2}\nabla^3_\theta\mathcal{L}^{(1)}(\theta_0)(\theta_1 - \theta_0)^2 + \dots & \\ &= g_0^{(1)} - \alpha H^{(1)}_0 g_0^{(0)} + \frac{\alpha^2}{2}\nabla^3_\theta\mathcal{L}^{(1)}(\theta_0) (g_0^{(0)})^2 + \dots & \\scriptstyle{\text{; because }\theta_1-\theta_0=-\alpha g_0^{(0)}} \\ &= g_0^{(1)} - \alpha H^{(1)}_0 g_0^{(0)} + O(\alpha^2) \end{aligned}$$
+$$\begin{aligned} g_1^{(1)} &= \nabla_{\theta}\mathcal{L}^{(1)}(\theta_1) \\ &= \nabla_{\theta}\mathcal{L}^{(1)}(\theta_0) + \nabla^2_\theta\mathcal{L}^{(1)}(\theta_0)(\theta_1 - \theta_0) + \frac{1}{2}\nabla^3_\theta\mathcal{L}^{(1)}(\theta_0)(\theta_1 - \theta_0)^2 + \dots & \\ &= g_0^{(1)} - \alpha H^{(1)}_0 g_0^{(0)} + \frac{\alpha^2}{2}\nabla^3_\theta\mathcal{L}^{(1)}(\theta_0) (g_0^{(0)})^2 + \dots & \scriptstyle{\text{; because }\theta_1-\theta_0=-\alpha g_0^{(0)}} \\ &= g_0^{(1)} - \alpha H^{(1)}_0 g_0^{(0)} + O(\alpha^2) \end{aligned}$$
 
 Plug in the expanded form of $g_1^{(1)}$ into the MAML gradients with one step inner gradient update:
 

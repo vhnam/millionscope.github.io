@@ -56,7 +56,7 @@ $$\begin{aligned} I(X;Y) &= D_{KL}[p(x,y) \| p(x)p(y)] \\ &= \sum_{x \in X, y \i
 
 [**Data Processing Inequality (DPI)**](https://en.wikipedia.org/wiki/Data_processing_inequality)
 
-For any markov chain: $X \to Y \to Z$, we would have $I(X; Y) \\geq I(X; Z)$.
+For any markov chain: $X \to Y \to Z$, we would have $I(X; Y) \geq I(X; Z)$.
 
 A deep neural network can be viewed as a Markov chain, and thus when we are moving down the layers of a DNN, the mutual information between the layer and the input can only decrease.
 
@@ -76,7 +76,7 @@ Fig. 1. The structure of a deep neural network, which consists of the target lab
 
 If we label the hidden layers of a DNN as $h_1, h_2, \dots, h_m$ as in Fig. 1, we can view each layer as one state of a Markov Chain: $ h_i \to h_{i+1}$. According to DPI, we would have:
 
-$$\begin{aligned} H(X) \\geq I(X; h_1) \\geq I(X; h_2) \\geq \dots \\geq I(X; h_m) \\geq I(X; \hat{Y}) \\ I(X; Y) \\geq I(h_1; Y) \\geq I(h_2; Y) \\geq \dots \\geq I(h_m; Y) \\geq I(\hat{Y}; Y) \end{aligned}$$
+$$\begin{aligned} H(X) \geq I(X; h_1) \geq I(X; h_2) \geq \dots \geq I(X; h_m) \geq I(X; \hat{Y}) \\ I(X; Y) \geq I(h_1; Y) \geq I(h_2; Y) \geq \dots \geq I(h_m; Y) \geq I(\hat{Y}; Y) \end{aligned}$$
 
 A DNN is designed to learn how to describe $X$ to predict $Y$ and eventually, to compress $X$ to only hold the information related to $Y$. Tishby describes this processing as _"successive refinement of relevant information"_.
 
@@ -153,7 +153,7 @@ Having more layers give us computational benefits and speed up the training proc
 
 Fig. 6. The optimization time is much shorter (fewer epochs) with more hidden layers. (Image source: [Shwartz-Ziv and Tishby, 2017](https://arxiv.org/pdf/1703.00810.pdf))
 
-**Compression through stochastic relaxation**: According to the [diffusion equation](https://en.wikipedia.org/wiki/Fokker%E2%80%93Planck_equation), the relaxation time of layer $k$ is proportional to the exponential of this layer's compression amount $\Delta S_k$: $\Delta t_k \sim \exp(\Delta S_k)$. We can compute the layer compression as $\Delta S_k = I(X; T_k) - I(X; T_{k-1})$. Because $\exp(\sum_k \Delta S_k) \\geq \sum_k \exp(\Delta S_k)$, we would expect an exponential decrease in training epochs with more hidden layers (larger $k$).
+**Compression through stochastic relaxation**: According to the [diffusion equation](https://en.wikipedia.org/wiki/Fokker%E2%80%93Planck_equation), the relaxation time of layer $k$ is proportional to the exponential of this layer's compression amount $\Delta S_k$: $\Delta t_k \sim \exp(\Delta S_k)$. We can compute the layer compression as $\Delta S_k = I(X; T_k) - I(X; T_{k-1})$. Because $\exp(\sum_k \Delta S_k) \geq \sum_k \exp(\Delta S_k)$, we would expect an exponential decrease in training epochs with more hidden layers (larger $k$).
 
 ## The Benefit of More Training Samples[#](#the-benefit-of-more-training-samples)
 

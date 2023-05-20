@@ -182,7 +182,7 @@ where $\mathbf{w}$ is a weight vector to learn.
 
 Once the feature vectors are constructed for the question and all the related paragraphs, the reader needs to predict the probabilities of each position in a paragraph to be the start and the end of an answer span, $p_\text{start}(i_s)$ and $p_\text{end}(i_s)$, respectively. Across all the paragraphs, the optimal span is returned as the final answer with maximum $p*\text{start}(i_s) \times p*\text{end}(i_e) $.
 
-$$\begin{aligned} p_\text{start}(i_s) \\propto \exp(\mathbf{z}_{i_s} \mathbf{W}_s \mathbf{x}) \\ p_\text{end}(i_e) \\propto \exp(\mathbf{z}_{i_e} \mathbf{W}_e \mathbf{x}) \\ \text{ s.t. } i_s \leq i_e \leq i_s + 15 \end{aligned}$$
+$$\begin{aligned} p_\text{start}(i_s) \propto \exp(\mathbf{z}_{i_s} \mathbf{W}_s \mathbf{x}) \\ p_\text{end}(i_e) \propto \exp(\mathbf{z}_{i_e} \mathbf{W}_e \mathbf{x}) \\ \text{ s.t. } i_s \leq i_e \leq i_s + 15 \end{aligned}$$
 
 where $\mathbf{W}_s$ and $\mathbf{W}_e$ are learned parameters.
 
@@ -284,13 +284,13 @@ $$\mathcal{L}(x, y) = \mathcal{L}_\text{early}(x, y) + \mathcal{L}_\text{full}(x
 
 (1) Find all correct text spans within top $k$ evidence blocks and optimize for the marginal likelihood of a text span $s$ that matches the true answer $y$:
 
-$$\begin{aligned} h_s &= \text{BERT}_R(x, y)^{(\text{START}(s))} \\ h_e &= \text{BERT}_R(x, y)^{(\text{END}(s))} \\ S_\text{read}(z, s, x) &= \text{MLP}([h_s; h_e]) \\ p(z, s \vert x) &= \frac{\exp(S_\text{read}(z, s, x))}{\sum_{z'\in\text{TOP}(k)} \sum_{s'\in z'} \exp(S_\text{read}(z', s', x))} \\ L_\text{full}(x, y) &= - \log \sum_{\\substack{z \in \text{TOP}(k)\\ s \in z}} \sum_{y=\text{TEXT}(s)} p(z, s \vert x) \end{aligned}$$
+$$\begin{aligned} h_s &= \text{BERT}_R(x, y)^{(\text{START}(s))} \\ h_e &= \text{BERT}_R(x, y)^{(\text{END}(s))} \\ S_\text{read}(z, s, x) &= \text{MLP}([h_s; h_e]) \\ p(z, s \vert x) &= \frac{\exp(S_\text{read}(z, s, x))}{\sum_{z'\in\text{TOP}(k)} \sum_{s'\in z'} \exp(S_\text{read}(z', s', x))} \\ L_\text{full}(x, y) &= - \log \sum_{\substack{z \in \text{TOP}(k)\\ s \in z}} \sum_{y=\text{TEXT}(s)} p(z, s \vert x) \end{aligned}$$
 
 where $y=\text{TEXT}(s)$ indicates whether the answer $y$ matches the text span $s$. $\text{TOP}(k)$ is the top $k$ retrieved blocks according to $S_\text{retr}(z, x)$. The paper sets $k=5$.
 
 (2) At the early stage of learning, when the retriever is not strong enough, it is possible none of the top $k$ blocks contains the answer. To avoid such sparse learning signals, ORQA considers a larger set of $c$ evidence blocks for more aggressive learning. The paper has $c=5000$.
 
-$$L_\text{early}(x, y) = -\log \sum_{\\substack{z\in \text{TOP}(c)\\y\in\text{TEXT}(z)}} p_\text{early}(z\vert x) = -\log \sum_{\\substack{z\in \text{TOP}(c)\\y\in\text{TEXT}(z)}} \frac{\exp(S_\text{retr}(z, x)}{\sum_{z'\in\text{TOP}(c)} \exp(S_\text{retr}(z', x)}$$
+$$L_\text{early}(x, y) = -\log \sum_{\substack{z\in \text{TOP}(c)\\y\in\text{TEXT}(z)}} p_\text{early}(z\vert x) = -\log \sum_{\substack{z\in \text{TOP}(c)\\y\in\text{TEXT}(z)}} \frac{\exp(S_\text{retr}(z, x)}{\sum_{z'\in\text{TOP}(c)} \exp(S_\text{retr}(z', x)}$$
 
 Some issues in SQuAD dataset were discussed in the ORQA paper:
 
@@ -351,7 +351,7 @@ They pair the BERT model with different types of context, including adversarial 
 
 RAG consists of a retriever model $p_\eta(z \vert x)$ and a generator model $p_\theta(y_i \vert x, z, y_{1:i-1})$:
 
-- The retriever uses the input sequence $x$ to retrieve text passages $z$, implemented as a [DPR](#DPR) retriever. $\log p_\eta(z \vert x) \\propto E_z(z)^\top E_x(x)$.
+- The retriever uses the input sequence $x$ to retrieve text passages $z$, implemented as a [DPR](#DPR) retriever. $\log p_\eta(z \vert x) \propto E_z(z)^\top E_x(x)$.
 - The generator uses $z$ as additional context when generating the target sequence $y$, where the context and the question are simply concatenated.
 
 Depending on whether using the same or different retrieved documents for each token generation, there are two versions of RAG:

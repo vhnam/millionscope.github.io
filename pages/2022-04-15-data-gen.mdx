@@ -327,7 +327,7 @@ where $P_{\mathcal{D}_\rho}(\tilde{y} \vert \mathbf{x})$ can be estimated using 
 
 Sample reweighting schemes can be learned by a separate network. _Learning to reweight_ (**L2R**; [Ren et al. 2018](https://arxiv.org/abs/1803.09050)) is a meta-learning approach to directly optimize the weights in pursuit of best validation performance on a known set of clean data. Each example gets assigned with the weight based on its gradient direction. The weighted loss to minimize $\theta^\*(\mathbf{w})$ involves a set of training weights $\{w_i\}_{i=1}^n$ as unknown hyperparameters. These sample training weights $w_i$ are learned to minimize the loss on this unbiased validate set, $\mathcal{D}_c = \{x^\text{valid}_j\}_{j=1}^m$.
 
-$$\begin{aligned} \theta^{\*}(\mathbf{w}) &= \arg\min_\theta \sum_{i=1}^n w_i f(x_i; \theta) \\ \text{where optimal }\mathbf{w}^{\*} &= \arg\min_{\mathbf{w}, \mathbf{w} \\geq \mathbf{0}} \frac{1}{m} \sum_{j=1}^m f(\mathbf{x}^\text{valid}_j; \theta^{\*}(\mathbf{w})) \end{aligned}$$
+$$\begin{aligned} \theta^{\*}(\mathbf{w}) &= \arg\min_\theta \sum_{i=1}^n w_i f(x_i; \theta) \\ \text{where optimal }\mathbf{w}^{\*} &= \arg\min_{\mathbf{w}, \mathbf{w} \geq \mathbf{0}} \frac{1}{m} \sum_{j=1}^m f(\mathbf{x}^\text{valid}_j; \theta^{\*}(\mathbf{w})) \end{aligned}$$
 
 The learning process involves two nested loops of optimization, so pretty expensive, 3x training time.
 

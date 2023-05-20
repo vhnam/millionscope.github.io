@@ -49,7 +49,7 @@ By adopting different decoding methods, we can place restrictions or preferences
 
 Since the final layer of the model predicts logits $o$ over the vocabulary space, the next token can be sampled by applying softmax with temperature $T$. The probability of sampling the $i$-th token is
 
-$$p_i \\propto \frac{\exp(o_i / T)}{\sum_j \exp(o_j/T)}$$
+$$p_i \propto \frac{\exp(o_i / T)}{\sum_j \exp(o_j/T)}$$
 
 A low temperature would make the distribution sharper and a high value makes it softer.
 
@@ -100,7 +100,7 @@ $$\mathbf{y}^\* = \arg\max_{\mathbf{y}\in\mathcal{Y}} \big( \underbrace{\log p_\
 
 Since we expect maximum probability to have minimum surprise, the surprisal of a LM at time step $t$ can be defined as follows:
 
-$$\begin{aligned} u_0(\texttt{BOS}) &= 0 \text{ ; BOS is a placeholder token for the beginning of a sentence.}\\ u_t(y) &= -\log P_\theta(y \vert \mathbf{x}, \mathbf{y}_{<{t}}) \text{ for }t \\geq 1 \end{aligned}$$
+$$\begin{aligned} u_0(\texttt{BOS}) &= 0 \text{ ; BOS is a placeholder token for the beginning of a sentence.}\\ u_t(y) &= -\log P_\theta(y \vert \mathbf{x}, \mathbf{y}_{<{t}}) \text{ for }t \geq 1 \end{aligned}$$
 
 The MAP (maximum a posteriori) part demands for sequences with maximum probability given context, while the regularizer introduces other constraints. It is possible a global optimal strategy may need to have a high-surprisal step occasionally so that it can shorten the output length or produce more low-surprisal steps afterwards.
 
@@ -158,13 +158,13 @@ Since we cannot learn a perfect optimal classifier, the importance weight would 
 2.  Flattening: add a power scaling parameter $\alpha > 0$, $\hat{w}_\phi(\mathbf{x}_i)^\alpha$.
 3.  Clipping: specify a lower bound $\max(\hat{w}_\phi(\mathbf{x}_i), \beta)$.
 
-To sample from an importance resampled generative model, $\mathbf{x}\sim p_{\theta, \phi}(\mathbf{x}) \\propto p_\theta(\mathbf{x})\hat{w}_\phi(\mathbf{x})$, they adopt SIR (Sampling-Importance-Resampling),
+To sample from an importance resampled generative model, $\mathbf{x}\sim p_{\theta, \phi}(\mathbf{x}) \propto p_\theta(\mathbf{x})\hat{w}_\phi(\mathbf{x})$, they adopt SIR (Sampling-Importance-Resampling),
 
 ![](assets/images/2021-01-02-controllable-text-generation/SIR-importance-resampling.png)
 
 Fig. 4. The algorithm for sampling from a generative model according to importance weights $\hat{w}(\mathbf{x}\\_i)$ using SIR. (Image source: [Grover et al., 2019)](https://arxiv.org/abs/1906.09531))
 
-[Deng et al., 2020](https://arxiv.org/abs/2004.11714) proposed to learn a EBM to steer a LM in the [residual space](https://arxiv.org/abs/1906.03351), $P_\theta(x) \\propto P_\text{LM}(x)\exp(-E_\theta(x))$, where $P_\theta$ is the joint model; $E_\theta$ is the residual energy function to be learned. If we know the partition function $Z$, we can model the generative model for generative a sequence $x_{p+1}, \dots, x_T$ as:
+[Deng et al., 2020](https://arxiv.org/abs/2004.11714) proposed to learn a EBM to steer a LM in the [residual space](https://arxiv.org/abs/1906.03351), $P_\theta(x) \propto P_\text{LM}(x)\exp(-E_\theta(x))$, where $P_\theta$ is the joint model; $E_\theta$ is the residual energy function to be learned. If we know the partition function $Z$, we can model the generative model for generative a sequence $x_{p+1}, \dots, x_T$ as:
 
 $$P_\theta(x_{p+1:T}\vert x_{1:p}) = \frac{P_\text{LM}(x_{p+1:T}\vert x_{1:p}) \exp(-E_\theta(x_{1:T}))}{Z_\theta(x_{1:p})}$$
 
@@ -289,7 +289,7 @@ Paraphrasing is a quick way to explore more prompts similar to the known version
 
 [Ribeiro et al (2018)](https://www.aclweb.org/anthology/P18-1079/) identified _semantically equivalent adversaries (SEA)_ by generating a variety of paraphrases $\{x'\}$ of input $x$ until it triggers a different prediction of target function $f$:
 
-$$\begin{aligned} SEA(x, x') &= \mathbb{1}[\text{SemEq}(x, x') \\land f(x) \\neq f(x')] \\ \text{where SemEq}(x, x') &= \mathbb{1}[\min\Big(1, \frac{p(x'\vert x)}{p(x\vert x)} \Big) \\geq \tau] \end{aligned}$$
+$$\begin{aligned} SEA(x, x') &= \mathbb{1}[\text{SemEq}(x, x') \\land f(x) \\neq f(x')] \\ \text{where SemEq}(x, x') &= \mathbb{1}[\min\Big(1, \frac{p(x'\vert x)}{p(x\vert x)} \Big) \geq \tau] \end{aligned}$$
 
 The rules extracted from SEA are considered as "bugs" in the model. Applying those rules as data augmentation in model training helps robustify the model and fix bugs.
 
@@ -317,7 +317,7 @@ Conditional training aims to learn a generative model conditioned on a control v
 
 Fig. 16. Datasets used for training CTRL and associated control codes. (Image source: Edited from Table 7 in [Keskar et al., 2019](https://arxiv.org/abs/1909.05858))
 
-The control code also can be used for _domain annotation_ given tokens, because $p(z \vert x) \\propto p(x \vert z) p(z)$, assuming the prior over domains is uniform. One limitation of CTRL is the lack of control for _what not to generate_ (e.g. avoid toxicity).
+The control code also can be used for _domain annotation_ given tokens, because $p(z \vert x) \propto p(x \vert z) p(z)$, assuming the prior over domains is uniform. One limitation of CTRL is the lack of control for _what not to generate_ (e.g. avoid toxicity).
 
 ![](assets/images/2021-01-02-controllable-text-generation/CTRL-examples.png)
 
@@ -393,7 +393,7 @@ Fig. 19. The overview of fine-tuning the language model policy from human feedba
 
 Instead of fine-tuning the entire model, only fine-tuning a small extra set of parameters while the base model stays fixed is computationally cheaper.
 
-In computer vision, plug-and-play generative networks (PPGN; [Nguyen et al., 2017](https://arxiv.org/abs/1612.00005)) generate images with different attributes by plugging a discriminator $p(a \vert x)$ into a base generative model $p(x)$. Then the sample with a desired attribute $a$ can be sampled from $p(x \vert a) \\propto p(a \vert x)p(x)$. Inspired by PPGN, the **plug-and-play language model** (**PPLM**; [Dathathri et al., 2019](https://arxiv.org/abs/1912.02164)) combines one or multiple simple attribute models with a pretrained language model for controllable text generation.
+In computer vision, plug-and-play generative networks (PPGN; [Nguyen et al., 2017](https://arxiv.org/abs/1612.00005)) generate images with different attributes by plugging a discriminator $p(a \vert x)$ into a base generative model $p(x)$. Then the sample with a desired attribute $a$ can be sampled from $p(x \vert a) \propto p(a \vert x)p(x)$. Inspired by PPGN, the **plug-and-play language model** (**PPLM**; [Dathathri et al., 2019](https://arxiv.org/abs/1912.02164)) combines one or multiple simple attribute models with a pretrained language model for controllable text generation.
 
 Given an attribute $a$ and the generated sample $x$, let an attribute model be $p(a\vert x)$. To control content generation, the current latent representation at time $t$, $H_t$ (containing a list of key-value pairs per layer), can be shifted by $\Delta H_t$ in the direction of the sum of two gradients:
 
@@ -462,7 +462,7 @@ $$p(x_t\vert x_{<{t}}, z) = \text{softmax}(\text{logits}_\text{LM}(x_t \vert x_{
 
 By Bayesian rule, we have
 
-$$p(x_t\vert x_{<{t}}, z) = \frac{p(z \vert x_{\leq t})}{p(z)} p(x_t \vert x_{<{t}}) \\propto p(z \vert x_{\leq t}) p(x_t \vert x_{<{t}})$$
+$$p(x_t\vert x_{<{t}}, z) = \frac{p(z \vert x_{\leq t})}{p(z)} p(x_t \vert x_{<{t}}) \propto p(z \vert x_{\leq t}) p(x_t \vert x_{<{t}})$$
 
 And therefore the auxiliary model $\text{logits}_\text{aux}(x_t \vert x_{<t}, z))$ effectively should learn to predict $p(z \vert x_{\leq t})$. In the experiments of [Zeldes et al., 2020](https://arxiv.org/abs/2006.16823), the auxiliary model can re-use the intermediate layers of the pre-trained LM for feature extraction.
 
@@ -487,7 +487,7 @@ Fig. 24. An illustration of how GeDi works via Bayesian rule. (Image source: [Kr
 
 They finetuned a GPT2-medium model with control code similar to how [CTRL](#ctrl) is trained to form a CC-LM using a linear combination of discriminative loss and generative loss. This discriminator model is then used as GiDe to guide generation by a larger language model like GPT2-XL.
 
-One way of decoding from GeDi is to sample from a weighted posterior $p^w(x_{t+1}\vert x_{1:t}, z) \\propto p(z \vert x_{1:t+1})^w p(x_{t+1} \vert x_{1:t})$ where $w>1$ applies additional bias toward the desired class $z$. In the sampling process, only tokens with the class or next-token probability larger than a certain threshold are selected.
+One way of decoding from GeDi is to sample from a weighted posterior $p^w(x_{t+1}\vert x_{1:t}, z) \propto p(z \vert x_{1:t+1})^w p(x_{t+1} \vert x_{1:t})$ where $w>1$ applies additional bias toward the desired class $z$. In the sampling process, only tokens with the class or next-token probability larger than a certain threshold are selected.
 
 GeDi guided generation in their experiments showed strong controllability and ran 30x faster than [PPLM](#pplm).
 
@@ -505,7 +505,7 @@ $$\begin{aligned} \bar{\boldsymbol{\mu}} &= \mathbb{E}_{x\sim p}\boldsymbol{\phi
 
 where $\mathcal{C}$ is the set of all distributions over $X$ that satisfy the moment constraints.
 
-According to theorems in Information Geometry, $p$ can be approximated by an EBM (energy-based model; an unnormalized probability distribution) $P$ in the form of exponential function, such that $p(x) \\propto P(x)$ and $p(x)=\frac{1}{Z}P(x)$ where $Z=\sum_x P(x)$. The energy-based model can be approximated by:
+According to theorems in Information Geometry, $p$ can be approximated by an EBM (energy-based model; an unnormalized probability distribution) $P$ in the form of exponential function, such that $p(x) \propto P(x)$ and $p(x)=\frac{1}{Z}P(x)$ where $Z=\sum_x P(x)$. The energy-based model can be approximated by:
 
 $$P(x)=a(x)\exp\big(\sum_i \lambda_i \phi_i(x)\big)=a(x)\exp(\boldsymbol{\lambda}\cdot\boldsymbol{\phi}(x))$$
 

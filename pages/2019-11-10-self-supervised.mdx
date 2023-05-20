@@ -210,7 +210,7 @@ $$I(x; c) = \sum_{x, c} p(x, c) \log\frac{p(x, c)}{p(x)p(c)} = \sum_{x, c} p(x, 
 
 Rather than modeling the future observations $p_k(x_{t+k} \vert c_t)$ directly (which could be fairly expensive), CPC models a density function to preserve the mutual information between $x_{t+k}$ and $c_t$:
 
-$$f_k(x_{t+k}, c_t) = \exp(z_{t+k}^\top W_k c_t) \\propto \frac{p(x_{t+k}|c_t)}{p(x_{t+k})}$$
+$$f_k(x_{t+k}, c_t) = \exp(z_{t+k}^\top W_k c_t) \propto \frac{p(x_{t+k}|c_t)}{p(x_{t+k})}$$
 
 where $f_k$ can be unnormalized and a linear transformation $W_k^\top c_t$ is used for the prediction with a different $W_k$ matrix for every step $k$.
 
@@ -470,7 +470,7 @@ where $\phi(s)$ is the embedding of state $s$; symbols with bar are functions (r
 
 The function $D$ quantifies the distance between two probability distributions and should be chosen carefully. DeepMDP focuses on _Wasserstein-1_ metric (also known as ["earth-mover distance"](https://lilianweng.github.io/posts/2017-08-20-gan/#what-is-wasserstein-distance)). The Wasserstein-1 distance between distributions $P$ and $Q$ on a metric space $(M, d)$ (i.e., $d: M \times M \to \mathbb{R}$) is:
 
-$$W_d (P, Q) = \inf_{\lambda \in \Pi(P, Q)} \int_{M \times M} d(x, y) \lambda(x, y) \\; \\mathrm{d}x \\mathrm{d}y$$
+$$W_d (P, Q) = \inf_{\lambda \in \Pi(P, Q)} \int_{M \times M} d(x, y) \lambda(x, y) \\; \mathrm{d}x \mathrm{d}y$$
 
 where $\Pi(P, Q)$ is the set of all [couplings](<https://en.wikipedia.org/wiki/Coupling_(probability)>) of $P$ and $Q$. $d(x, y)$ defines the cost of moving a particle from point $x$ to point $y$.
 

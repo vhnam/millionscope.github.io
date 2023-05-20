@@ -293,7 +293,7 @@ Fig. 7. Attention weights with one standard deviation as error bars versus memor
 
 At inference time, the next token probability is a weighted sum of two predictions:
 
-$$\begin{aligned} p(y \vert \mathbf{x}) &= \lambda \\; p_\text{kNN}(y \vert \mathbf{x}) + (1- \lambda) \\; p_\text{LM}(y \vert \mathbf{x}) \\ p_\text{kNN}(y \vert \mathbf{x}) &\\propto \sum_{(k_i, w_i) \in \mathcal{N}} \mathbb{1}[y = w_i] \exp(-d(k_i, f(\mathbf{x}))) \end{aligned}$$
+$$\begin{aligned} p(y \vert \mathbf{x}) &= \lambda \\; p_\text{kNN}(y \vert \mathbf{x}) + (1- \lambda) \\; p_\text{LM}(y \vert \mathbf{x}) \\ p_\text{kNN}(y \vert \mathbf{x}) &\propto \sum_{(k_i, w_i) \in \mathcal{N}} \mathbb{1}[y = w_i] \exp(-d(k_i, f(\mathbf{x}))) \end{aligned}$$
 
 where $\mathcal{N}$ contains a set of nearest neighbor data points retrieved by $k$NN; $d(., .)$ is a distance function such as L2 distance.
 

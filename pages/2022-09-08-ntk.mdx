@@ -104,7 +104,7 @@ Now let's look into the forward pass computation in every layer in detail. For $
 
 $$\begin{aligned} A^{(0)} &= \mathbf{x} \\ \tilde{A}^{(l+1)}(\mathbf{x}) &= \frac{1}{\sqrt{n*l}} {\mathbf{w}^{(l)}}^\top A^{(l)} + \beta\mathbf{b}^{(l)}\quad\in\mathbb{R}^{n*{l+1}} & \text{; pre-activations}\\ A^{(l+1)}(\mathbf{x}) &= \sigma(\tilde{A}^{(l+1)}(\mathbf{x}))\quad\in\mathbb{R}^{n\_{l+1}} & \text{; post-activations} \end{aligned}$$
 
-Note that the _NTK parameterization_ applies a rescale weight $1/\sqrt{n_l}$ on the transformation to avoid divergence with infinite-width networks. The constant scalar $\beta \\geq 0$ controls how much effort the bias terms have.
+Note that the _NTK parameterization_ applies a rescale weight $1/\sqrt{n_l}$ on the transformation to avoid divergence with infinite-width networks. The constant scalar $\beta \geq 0$ controls how much effort the bias terms have.
 
 All the network parameters are initialized as an i.i.d Gaussian $\mathcal{N}(0, 1)$ in the following analysis.
 

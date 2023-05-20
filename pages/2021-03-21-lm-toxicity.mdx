@@ -216,11 +216,11 @@ Because $\text{sdb}(.)$ is expected to boost the probabilities of undesired word
 
 In self-diasing decoding, a scaling function of the probability difference $\alpha(\Delta(w, \mathbf{x}, s)): \mathbb{R}\to[0,1]$ is used to alter the true sampling distribution,
 
-$$\tilde{p}_M(w\vert\mathbf{x}) \\propto \alpha(\Delta(w, \mathbf{x}, s)) p_M(w\vert\mathbf{x})$$
+$$\tilde{p}_M(w\vert\mathbf{x}) \propto \alpha(\Delta(w, \mathbf{x}, s)) p_M(w\vert\mathbf{x})$$
 
 In the paper, they used a soft variant where the probabilities of the words with negative $\Delta$ are reduced w.r.t. the magnitude of $\Delta(w, \mathbf{x}, s)$:
 
-$$\alpha(x)=\begin{cases} 1 & \text{ if } x\\geq 0 \\ e^{\lambda\cdot x} & \text{ otherwise} \end{cases}$$
+$$\alpha(x)=\begin{cases} 1 & \text{ if } x\geq 0 \\ e^{\lambda\cdot x} & \text{ otherwise} \end{cases}$$
 
 ![](assets/images/2021-03-21-lm-toxicity/self-debiasing-decoding.png)
 
