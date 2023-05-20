@@ -260,11 +260,11 @@ Natural Evolution Strategies (**NES**; [Wierstra, et al, 2008](https://arxiv.org
 
 Given an objective function $\mathcal{J}(\theta)$ parameterized by $\theta$, let's say our goal is to find the optimal $\theta$ to maximize the objective function value. A _plain gradient_ finds the steepest direction within a small Euclidean distance from the current $\theta$; the distance restriction is applied on the parameter space. In other words, we compute the plain gradient with respect to a small change of the absolute value of $\theta$. The optimal step is:
 
-$$d^{\*} = \\operatorname\*{argmax}_{\|d\| = \\epsilon} \mathcal{J}(\theta + d)\text{, where }\\epsilon \to 0$$
+$$d^{\*} = \\operatorname\*{argmax}_{\|d\| = \epsilon} \mathcal{J}(\theta + d)\text{, where }\epsilon \to 0$$
 
 Differently, _natural gradient_ works with a probability [distribution](https://arxiv.org/abs/1301.3584v7) [space](https://wiseodd.github.io/techblog/2018/03/14/natural-gradient/) parameterized by $\theta$, $p_\theta(x)$ (referred to as "search distribution” in NES [paper](https://arxiv.org/abs/1106.4487)). It looks for the steepest direction within a small step in the distribution space where the distance is measured by KL divergence. With this constraint we ensure that each update is moving along the distributional manifold with constant speed, without being slowed down by its curvature.
 
-$$d^{\*}_\text{N} = \\operatorname\*{argmax}_{\text{KL}\[p_\theta \| p_{\theta+d}\] = \\epsilon} \mathcal{J}(\theta + d)$$
+$$d^{\*}_\text{N} = \\operatorname\*{argmax}_{\text{KL}\[p_\theta \| p_{\theta+d}\] = \epsilon} \mathcal{J}(\theta + d)$$
 
 ## Estimation using Fisher Information Matrix[#](#estimation-using-fisher-information-matrix)
 
@@ -284,11 +284,11 @@ where $\mathbf{F}_\theta$ is called the **[Fisher Information Matrix](http://mat
 
 The solution to the following optimization problem:
 
-$$\max \mathcal{J}(\theta + d) \approx \max \big( \mathcal{J}(\theta) + {\nabla_\theta\mathcal{J}(\theta)}^\top d \big)\\;\text{ s.t. }\text{KL}\[p_\theta \| p_{\theta+d}\] - \\epsilon = 0$$
+$$\max \mathcal{J}(\theta + d) \approx \max \big( \mathcal{J}(\theta) + {\nabla_\theta\mathcal{J}(\theta)}^\top d \big)\\;\text{ s.t. }\text{KL}\[p_\theta \| p_{\theta+d}\] - \epsilon = 0$$
 
 can be found using a Lagrangian multiplier,
 
-$$\begin{aligned} \mathcal{L}(\theta, d, \beta) &= \mathcal{J}(\theta) + \nabla_\theta\mathcal{J}(\theta)^\top d - \beta (\frac{1}{2}d^\top \mathbf{F}_\theta d + \\epsilon) = 0 \text{ s.t. } \beta > 0 \\ \nabla_d \mathcal{L}(\theta, d, \beta) &= \nabla_\theta\mathcal{J}(\theta) - \beta\mathbf{F}_\theta d = 0 \\ \text{Thus } d_\text{N}^\* &= \nabla_\theta^\text{N} \mathcal{J}(\theta) = \mathbf{F}_\theta^{-1} \nabla_\theta\mathcal{J}(\theta) \end{aligned}$$
+$$\begin{aligned} \mathcal{L}(\theta, d, \beta) &= \mathcal{J}(\theta) + \nabla_\theta\mathcal{J}(\theta)^\top d - \beta (\frac{1}{2}d^\top \mathbf{F}_\theta d + \epsilon) = 0 \text{ s.t. } \beta > 0 \\ \nabla_d \mathcal{L}(\theta, d, \beta) &= \nabla_\theta\mathcal{J}(\theta) - \beta\mathbf{F}_\theta d = 0 \\ \text{Thus } d_\text{N}^\* &= \nabla_\theta^\text{N} \mathcal{J}(\theta) = \mathbf{F}_\theta^{-1} \nabla_\theta\mathcal{J}(\theta) \end{aligned}$$
 
 where $d_\text{N}^\*$ only extracts the direction of the optimal moving step on $\theta$, ignoring the scalar $\beta^{-1}$.
 
@@ -319,15 +319,15 @@ Besides natural gradients, NES adopts a couple of important heuristics to make t
 
 The concept of using evolutionary algorithms in reinforcement learning can be traced back [long ago](https://arxiv.org/abs/1106.0221), but only constrained to tabular RL due to computational limitations.
 
-Inspired by [NES](#natural-evolution-strategies), researchers at OpenAI ([Salimans, et al. 2017](https://arxiv.org/abs/1703.03864)) proposed to use NES as a gradient-free black-box optimizer to find optimal policy parameters $\theta$ that maximizes the return function $F(\theta)$. The key is to add Gaussian noise $\\epsilon$ on the model parameter $\theta$ and then use the log-likelihood trick to write it as the gradient of the Gaussian pdf. Eventually only the noise term is left as a weighting scalar for measured performance.
+Inspired by [NES](#natural-evolution-strategies), researchers at OpenAI ([Salimans, et al. 2017](https://arxiv.org/abs/1703.03864)) proposed to use NES as a gradient-free black-box optimizer to find optimal policy parameters $\theta$ that maximizes the return function $F(\theta)$. The key is to add Gaussian noise $\epsilon$ on the model parameter $\theta$ and then use the log-likelihood trick to write it as the gradient of the Gaussian pdf. Eventually only the noise term is left as a weighting scalar for measured performance.
 
 Let's say the current parameter value is $\hat{\theta}$ (the added hat is to distinguish the value from the random variable $\theta$). The search distribution of $\theta$ is designed to be an isotropic multivariate Gaussian with a mean $\hat{\theta}$ and a fixed covariance matrix $\sigma^2 I$,
 
-$$\theta \sim \mathcal{N}(\hat{\theta}, \sigma^2 I) \text{ equivalent to } \theta = \hat{\theta} + \sigma\\epsilon, \\epsilon \sim \mathcal{N}(0, I)$$
+$$\theta \sim \mathcal{N}(\hat{\theta}, \sigma^2 I) \text{ equivalent to } \theta = \hat{\theta} + \sigma\epsilon, \epsilon \sim \mathcal{N}(0, I)$$
 
 The gradient for $\theta$ update is:
 
-$$\begin{aligned} & \nabla_\theta \mathbb{E}_{\theta\sim\mathcal{N}(\hat{\theta}, \sigma^2 I)} F(\theta) \\ &= \nabla_\theta \mathbb{E}_{\\epsilon\sim\mathcal{N}(0, I)} F(\hat{\theta} + \sigma\\epsilon) \\ &= \nabla_\theta \int_{\\epsilon} p(\\epsilon) F(\hat{\theta} + \sigma\\epsilon) d\\epsilon & \\scriptstyle{\text{; Gaussian }p(\\epsilon)=(2\pi)^{-\frac{n}{2}} \exp(-\frac{1}{2}\\epsilon^\top\\epsilon)} \\ &= \int_{\\epsilon} p(\\epsilon) \nabla_\\epsilon \log p(\\epsilon) \nabla_\theta \\epsilon\\;F(\hat{\theta} + \sigma\\epsilon) d\\epsilon & \\scriptstyle{\text{; log-likelihood trick}}\\ &= \mathbb{E}_{\\epsilon\sim\mathcal{N}(0, I)} \[ \nabla_\\epsilon \big(-\frac{1}{2}\\epsilon^\top\\epsilon\big) \nabla_\theta \big(\frac{\theta - \hat{\theta}}{\sigma}\big) F(\hat{\theta} + \sigma\\epsilon) \] & \\ &= \mathbb{E}_{\\epsilon\sim\mathcal{N}(0, I)} \[ (-\\epsilon) (\frac{1}{\sigma}) F(\hat{\theta} + \sigma\\epsilon) \] & \\ &= \frac{1}{\sigma}\mathbb{E}_{\\epsilon\sim\mathcal{N}(0, I)} \[ \\epsilon F(\hat{\theta} + \sigma\\epsilon) \] & \\scriptstyle{\text{; negative sign can be absorbed.}} \end{aligned}$$
+$$\begin{aligned} & \nabla_\theta \mathbb{E}_{\theta\sim\mathcal{N}(\hat{\theta}, \sigma^2 I)} F(\theta) \\ &= \nabla_\theta \mathbb{E}_{\epsilon\sim\mathcal{N}(0, I)} F(\hat{\theta} + \sigma\epsilon) \\ &= \nabla_\theta \int_{\epsilon} p(\epsilon) F(\hat{\theta} + \sigma\epsilon) d\epsilon & \\scriptstyle{\text{; Gaussian }p(\epsilon)=(2\pi)^{-\frac{n}{2}} \exp(-\frac{1}{2}\epsilon^\top\epsilon)} \\ &= \int_{\epsilon} p(\epsilon) \nabla_\epsilon \log p(\epsilon) \nabla_\theta \epsilon\\;F(\hat{\theta} + \sigma\epsilon) d\epsilon & \\scriptstyle{\text{; log-likelihood trick}}\\ &= \mathbb{E}_{\epsilon\sim\mathcal{N}(0, I)} \[ \nabla_\epsilon \big(-\frac{1}{2}\epsilon^\top\epsilon\big) \nabla_\theta \big(\frac{\theta - \hat{\theta}}{\sigma}\big) F(\hat{\theta} + \sigma\epsilon) \] & \\ &= \mathbb{E}_{\epsilon\sim\mathcal{N}(0, I)} \[ (-\epsilon) (\frac{1}{\sigma}) F(\hat{\theta} + \sigma\epsilon) \] & \\ &= \frac{1}{\sigma}\mathbb{E}_{\epsilon\sim\mathcal{N}(0, I)} \[ \epsilon F(\hat{\theta} + \sigma\epsilon) \] & \\scriptstyle{\text{; negative sign can be absorbed.}} \end{aligned}$$
 
 In one generation, we can sample many $epsilon_i, i=1,\dots,n$ and evaluate the fitness _in parallel_. One beautiful design is that no large model parameter needs to be shared. By only communicating the random seeds between workers, it is enough for the master node to do parameter update. This approach is later extended to adaptively learn a loss function; see my previous post on [Evolved Policy Gradient](https://lilianweng.github.io/posts/2019-06-23-meta-rl/#meta-learning-the-loss-function).
 
@@ -335,7 +335,7 @@ In one generation, we can sample many $epsilon_i, i=1,\dots,n$ and evaluate the 
 
 Fig. 5. The algorithm for training a RL policy using evolution strategies. (Image source: [ES-for-RL](https://arxiv.org/abs/1703.03864) paper)
 
-To make the performance more robust, OpenAI ES adopts virtual batch normalization (BN with mini-batch used for calculating statistics fixed), mirror sampling (sampling a pair of $(-\\epsilon, \\epsilon)$ for evaluation), and [fitness shaping](#fitness-shaping).
+To make the performance more robust, OpenAI ES adopts virtual batch normalization (BN with mini-batch used for calculating statistics fixed), mirror sampling (sampling a pair of $(-\epsilon, \epsilon)$ for evaluation), and [fitness shaping](#fitness-shaping).
 
 ## Exploration with ES[#](#exploration-with-es)
 
@@ -350,11 +350,11 @@ $$N(\theta, \mathcal{A}) = \frac{1}{\lambda} \sum_{i=1}^\lambda \| b(\pi_\theta)
 
 The ES optimization step relies on the novelty score instead of fitness:
 
-$$\nabla_\theta \mathbb{E}_{\theta\sim\mathcal{N}(\hat{\theta}, \sigma^2 I)} N(\theta, \mathcal{A}) = \frac{1}{\sigma}\mathbb{E}_{\\epsilon\sim\mathcal{N}(0, I)} \[ \\epsilon N(\hat{\theta} + \sigma\\epsilon, \mathcal{A}) \]$$
+$$\nabla_\theta \mathbb{E}_{\theta\sim\mathcal{N}(\hat{\theta}, \sigma^2 I)} N(\theta, \mathcal{A}) = \frac{1}{\sigma}\mathbb{E}_{\epsilon\sim\mathcal{N}(0, I)} \[ \epsilon N(\hat{\theta} + \sigma\epsilon, \mathcal{A}) \]$$
 
 NS-ES maintains a group of $M$ independently trained agents ("meta-population”), $\mathcal{M} = \{\theta_1, \dots, \theta_M \}$ and picks one to advance proportional to the novelty score. Eventually we select the best policy. This process is equivalent to ensembling; also see the same idea in [SVPG](https://lilianweng.github.io/posts/2018-04-08-policy-gradient/#svpg).
 
-$$\begin{aligned} m &\\leftarrow \text{pick } i=1,\dots,M\text{ according to probability}\frac{N(\theta_i, \mathcal{A})}{\sum_{j=1}^M N(\theta_j, \mathcal{A})} \\ \theta_m^{(t+1)} &\\leftarrow \theta_m^{(t)} + \alpha \frac{1}{\sigma}\sum_{i=1}^N \\epsilon_i N(\theta^{(t)}_m + \\epsilon_i, \mathcal{A}) \text{ where }\\epsilon_i \sim \mathcal{N}(0, I) \end{aligned}$$
+$$\begin{aligned} m &\\leftarrow \text{pick } i=1,\dots,M\text{ according to probability}\frac{N(\theta_i, \mathcal{A})}{\sum_{j=1}^M N(\theta_j, \mathcal{A})} \\ \theta_m^{(t+1)} &\\leftarrow \theta_m^{(t)} + \alpha \frac{1}{\sigma}\sum_{i=1}^N \epsilon_i N(\theta^{(t)}_m + \epsilon_i, \mathcal{A}) \text{ where }\epsilon_i \sim \mathcal{N}(0, I) \end{aligned}$$
 
 where $N$ is the number of Gaussian perturbation noise vectors and $\alpha$ is the learning rate.
 
@@ -362,11 +362,11 @@ NS-ES completely discards the reward function and only optimizes for novelty to 
 
 **NSR-ES**:
 
-$$\theta_m^{(t+1)} \\leftarrow \theta_m^{(t)} + \alpha \frac{1}{\sigma}\sum_{i=1}^N \\epsilon_i \frac{N(\theta^{(t)}_m + \\epsilon_i, \mathcal{A}) + F(\theta^{(t)}_m + \\epsilon_i)}{2}$$
+$$\theta_m^{(t+1)} \\leftarrow \theta_m^{(t)} + \alpha \frac{1}{\sigma}\sum_{i=1}^N \epsilon_i \frac{N(\theta^{(t)}_m + \epsilon_i, \mathcal{A}) + F(\theta^{(t)}_m + \epsilon_i)}{2}$$
 
 **NSRAdapt-ES (NSRA-ES)**: the adaptive weighting parameter $w = 1.0$ initially. We start decreasing $w$ if performance stays flat for a number of generations. Then when the performance starts to increase, we stop decreasing $w$ but increase it instead. In this way, fitness is preferred when the performance stops growing but novelty is preferred otherwise.
 
-$$\theta_m^{(t+1)} \\leftarrow \theta_m^{(t)} + \alpha \frac{1}{\sigma}\sum_{i=1}^N \\epsilon_i \big((1-w) N(\theta^{(t)}_m + \\epsilon_i, \mathcal{A}) + w F(\theta^{(t)}_m + \\epsilon_i)\big)$$
+$$\theta_m^{(t+1)} \\leftarrow \theta_m^{(t)} + \alpha \frac{1}{\sigma}\sum_{i=1}^N \epsilon_i \big((1-w) N(\theta^{(t)}_m + \epsilon_i, \mathcal{A}) + w F(\theta^{(t)}_m + \epsilon_i)\big)$$
 
 ![](assets/images/2019-11-10-self-supervised/NS-ES-experiments.png)
 

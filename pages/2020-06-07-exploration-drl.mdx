@@ -34,8 +34,6 @@ Table of Contents
 - [Citation](#citation)
 - [Reference](#reference)
 
-\[Updated on 2020-06-17: Add ["exploration via disagreement"](#exploration-via-disagreement) in the "Forward Dynamics" [section](#forward-dynamics).
-
 [Exploitation versus exploration](https://lilianweng.github.io/posts/2018-01-23-multi-armed-bandit/) is a critical topic in Reinforcement Learning. We'd like the RL agent to find the best solution as fast as possible. However, in the meantime, committing to solutions too quickly without enough exploration sounds pretty bad, as it could lead to local minima or total failure. Modern [RL](https://lilianweng.github.io/posts/2018-02-19-rl-overview/) [algorithms](https://lilianweng.github.io/posts/2018-04-08-policy-gradient/) that optimize for the best returns can achieve good exploitation quite efficiently, while exploration remains more like an open topic.
 
 I would like to discuss several common exploration strategies in Deep RL here. As this is a very big topic, my post by no means can cover all the important subtopics. I plan to update it periodically and keep further enriching the content gradually in time.
@@ -44,7 +42,7 @@ I would like to discuss several common exploration strategies in Deep RL here. A
 
 As a quick recap, let's first go through several classic exploration algorithms that work out pretty well in the multi-armed bandit problem or simple tabular RL.
 
-- **Epsilon-greedy**: The agent does random exploration occasionally with probability $\\epsilon$ and takes the optimal action most of the time with probability $1-\\epsilon$.
+- **Epsilon-greedy**: The agent does random exploration occasionally with probability $\epsilon$ and takes the optimal action most of the time with probability $1-\epsilon$.
 - **Upper confidence bounds**: The agent selects the greediest action to maximize the upper confidence bound $\hat{Q}_t(a) + \hat{U}_t(a)$, where $\hat{Q}_t(a)$ is the average rewards associated with action $a$ up to time $t$ and $\hat{U}_t(a)$ is a function reversely proportional to how many times action $a$ has been taken. See [here](https://lilianweng.github.io/posts/2018-01-23-multi-armed-bandit/#upper-confidence-bounds) for more details.
 - **Boltzmann exploration**: The agent draws actions from a [boltzmann distribution](https://en.wikipedia.org/wiki/Boltzmann_distribution) (softmax) over the learned Q values, regulated by a temperature parameter $\tau$.
 - **Thompson sampling**: The agent keeps track of a belief over the probability of optimal actions and samples from this distribution. See [here](https://lilianweng.github.io/posts/2018-01-23-multi-armed-bandit/#thompson-sampling) for more details.
@@ -158,7 +156,7 @@ Fig. 3. Architecture of the IAC (Intelligent Adaptive Curiosity) module: the int
 
 [Stadie et al. (2015)](https://arxiv.org/abs/1507.00814) trained a forward dynamics model in the encoding space defined by $\phi$, $f_\phi: (\phi(s_t), a_t) \mapsto \phi(s_{t+1})$. The model's prediction error at time $T$ is normalized by the maximum error up to time $t$, $\bar{e}_t = \frac{e_t}{\max_{i \leq t} e_i}$, so it is always between 0 and 1. The intrinsic reward is defined accordingly: $r^i_t = (\frac{\bar{e}_t(s_t, a_t)}{t \cdot C})$, where $C > 0$ is a decay constant.
 
-Encoding the state space via $\phi(.)$ is necessary, as experiments in the paper have shown that a dynamics model trained directly on raw pixels has _very poor_ behavior — assigning same exploration bonuses to all the states. In [Stadie et al. (2015)](https://arxiv.org/abs/1507.00814), the encoding function $\phi$ is learned via an autocoder (AE) and $\phi(.)$ is one of the output layers in AE. The AE can be statically trained using a set of images collected by a random agent, or dynamically trained together with the policy where the early frames are gathered using [$\\epsilon$-greedy](#classic-exploration-strategies) exploration.
+Encoding the state space via $\phi(.)$ is necessary, as experiments in the paper have shown that a dynamics model trained directly on raw pixels has _very poor_ behavior — assigning same exploration bonuses to all the states. In [Stadie et al. (2015)](https://arxiv.org/abs/1507.00814), the encoding function $\phi$ is learned via an autocoder (AE) and $\phi(.)$ is one of the output layers in AE. The AE can be statically trained using a set of images collected by a random agent, or dynamically trained together with the policy where the early frames are gathered using [$\epsilon$-greedy](#classic-exploration-strategies) exploration.
 
 Instead of autoencoder, _Intrinsic Curiosity Module_ (**ICM**; [Pathak, et al., 2017](https://arxiv.org/abs/1705.05363)) learns the state space encoding $\phi(.)$ with a self-supervised **inverse dynamics** model. Predicting the next state given the agent's own action is not easy, especially considering that some factors in the environment cannot be controlled by the agent or do not affect the agent. ICM believes that a good state feature space should exclude such factors because _they cannot influence the agent's behavior and thus the agent has no incentive for learning them_. By learning an inverse dynamics model $g: (\phi(s_t), \phi(s_{t+1})) \mapsto a_t$, the feature space only captures those changes in the environment related to the actions of our agent, and ignores the rest.
 
@@ -289,9 +287,9 @@ $$r^\text{episodic}_t \approx \frac{1}{\sqrt{\sum_{\phi_i \in N_k} K(\phi(x_t), 
 
     where $K(x, y)$ is a kernel function for measuring the distance between two samples. $N_k$ is a set of $k$ nearest neighbors in $M$ according to $K(., .)$. $c$ is a small constant to keep the denominator non-zero. In the paper, $K(x, y)$ is configured to be the inverse kernel:
 
-$$K(x, y) = \frac{\\epsilon}{\frac{d^2(x, y)}{d^2_m} + \\epsilon}$$
+$$K(x, y) = \frac{\epsilon}{\frac{d^2(x, y)}{d^2_m} + \epsilon}$$
 
-    where $d(.,.)$ is Euclidean distance between two samples and $d_m$ is a running average of the squared Euclidean distance of the k-th nearest neighbors for better robustness. $\\epsilon$ is a small constant.
+    where $d(.,.)$ is Euclidean distance between two samples and $d_m$ is a running average of the squared Euclidean distance of the k-th nearest neighbors for better robustness. $\epsilon$ is a small constant.
 
 ![](assets/images/2020-06-07-exploration-drl/NGU.png)
 

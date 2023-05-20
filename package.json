@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/MillionScope/millionscope.github.io#readme",
   "dependencies": {
+    "@napi-rs/simple-git-win32-x64-msvc": "^0.1.8",
     "@vercel/analytics": "^1.0.1",
     "next": "^13.4.3",
     "nextra": "latest",

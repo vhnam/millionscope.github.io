@@ -172,8 +172,8 @@ The variational distribution $q$ is typically a Gaussian with diagonal covarianc
 
 The process of Bayes-by-backprop can be summarized as:
 
-1.  Sample $\\epsilon \sim \mathcal{N}(0, I)$
-2.  Let $\mathbf{w} = \mu + \log(1+ \exp(\rho)) \circ \\epsilon$
+1.  Sample $\epsilon \sim \mathcal{N}(0, I)$
+2.  Let $\mathbf{w} = \mu + \log(1+ \exp(\rho)) \circ \epsilon$
 3.  Let $\theta = (\mu, \rho)$
 4.  Let $f(\mathbf{w}, \theta) = \log q(\mathbf{w} \vert \theta) - \log p(\mathbf{w})p(\mathcal{D}\vert \mathbf{w})$
 5.  Calculate the gradient of $f(\mathbf{w}, \theta)$ w.r.t. to $\mu$ and $\rho$ and then update $\theta$.
@@ -189,9 +189,9 @@ Fig. 3. Use the model with a loss prediction module to do active learning select
 
 Let $\hat{l}$ be the output of the loss prediction module and $l$ be the true loss. When training the loss prediction module, a simple MSE loss $=(l - \hat{l})^2$ is not a good choice, because the loss decreases in time as the model learns to behave better. A good learning objective should be independent of the scale changes of the target loss. They instead rely on the comparison of sample pairs. Within each batch of size $b$, there are $b/2$ pairs of samples $(\mathbf{x}_i, \mathbf{x}_j)$ and the loss prediction model is expected to correctly predict which sample has a larger loss.
 
-$$\begin{aligned} \mathcal{L}_\text{loss}(\mathbf{x}_i, \mathbf{x}_j) &= \max\big( 0, -\mathbb{1}(l(\mathbf{x}_i), l(\mathbf{x}_j)) \cdot (\hat{l}(\mathbf{x}_i) - \hat{l}(\mathbf{x}_j)) + \\epsilon \big) \\ \text{where } \mathbb{1}(l_i, l_j) &= \begin{cases} +1 & \text{if }l_i > l_j \\ -1 & \text{otherwise} \end{cases} \end{aligned}$$
+$$\begin{aligned} \mathcal{L}_\text{loss}(\mathbf{x}_i, \mathbf{x}_j) &= \max\big( 0, -\mathbb{1}(l(\mathbf{x}_i), l(\mathbf{x}_j)) \cdot (\hat{l}(\mathbf{x}_i) - \hat{l}(\mathbf{x}_j)) + \epsilon \big) \\ \text{where } \mathbb{1}(l_i, l_j) &= \begin{cases} +1 & \text{if }l_i > l_j \\ -1 & \text{otherwise} \end{cases} \end{aligned}$$
 
-where $\\epsilon$ is a predefined positive margin constant.
+where $\epsilon$ is a predefined positive margin constant.
 
 In experiments on three vision tasks, active learning selection based on the loss prediction performs better than random baseline, entropy based acquisition and [core-set](#core-sets-approach).
 
@@ -262,7 +262,7 @@ Fig. 8. Performance of MAL on ImageNet. (Table source: [Ebrahimiet al. 2021](htt
 
 **CAL** (Contrastive Active Learning; [Margatina et al. 2021](https://arxiv.org/abs/2109.03764)) intends to select [contrastive](https://lilianweng.github.io/posts/2021-05-31-contrastive/) examples. If two data points with different labels share similar network representations $\phi(.)$, they are considered as contrastive examples in CAL. Given a pair of contrastive examples $(\mathbf{x}_i, \mathbf{x}_j)$, they should
 
-$$d(\phi(\mathbf{x}_i), \phi(\mathbf{x}_j)) < \\epsilon \quad\text{and}\quad \text{KL}(p(y\vert \mathbf{x}_i) \| p(y\vert \mathbf{x}_j)) \rightarrow \infty$$
+$$d(\phi(\mathbf{x}_i), \phi(\mathbf{x}_j)) < \epsilon \quad\text{and}\quad \text{KL}(p(y\vert \mathbf{x}_i) \| p(y\vert \mathbf{x}_j)) \rightarrow \infty$$
 
 Given an unlabeled sample $\mathbf{x}$, CAL runs the following process:
 

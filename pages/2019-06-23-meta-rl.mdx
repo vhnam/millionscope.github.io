@@ -195,15 +195,15 @@ Similar to many meta-learning algorithms, EPG has two optimization loops:
 - In the internal loop, an agent learns to improve its policy $\pi_\theta$.
 - In the outer loop, the model updates the parameters $\phi$ of the loss function $L_\phi$. Because there is no explicit way to write down a differentiable equation between the return and the loss, EPG turned to [_Evolutionary Strategies_](https://en.wikipedia.org/wiki/Evolution_strategy) (ES).
 
-A general idea is to train a population of $N$ agents, each of them is trained with the loss function $L_{\phi + \sigma \\epsilon_i}$ parameterized with $\phi$ added with a small Gaussian noise $\\epsilon_i \sim \mathcal{N}(0, \mathbf{I})$ of standard deviation $\sigma$. During the inner loop's training, EPG tracks a history of experience and updates the policy parameters according to the loss function $L_{\phi + \sigma\\epsilon_i}$ for each agent:
+A general idea is to train a population of $N$ agents, each of them is trained with the loss function $L_{\phi + \sigma \epsilon_i}$ parameterized with $\phi$ added with a small Gaussian noise $\epsilon_i \sim \mathcal{N}(0, \mathbf{I})$ of standard deviation $\sigma$. During the inner loop's training, EPG tracks a history of experience and updates the policy parameters according to the loss function $L_{\phi + \sigma\epsilon_i}$ for each agent:
 
-$$\theta_i \\leftarrow \theta - \alpha_\text{in} \nabla_\theta L_{\phi + \sigma \\epsilon_i} (\pi_\theta, \tau_{t-K, \dots, t})$$
+$$\theta_i \\leftarrow \theta - \alpha_\text{in} \nabla_\theta L_{\phi + \sigma \epsilon_i} (\pi_\theta, \tau_{t-K, \dots, t})$$
 
 where $\alpha_\text{in}$ is the learning rate of the inner loop and $\tau_{t-K, \dots, t}$ is a sequence of $M$ transitions up to the current time step $t$.
 
-Once the inner loop policy is mature enough, the policy is evaluated by the mean return $\bar{G}_{\phi+\sigma\\epsilon_i}$ over multiple randomly sampled trajectories. Eventually, we are able to estimate the gradient of $\phi$ according to [NES](http://blog.otoro.net/2017/10/29/visual-evolution-strategies/) numerically ([Salimans et al, 2017](https://arxiv.org/abs/1703.03864)). While repeating this process, both the policy parameters $\theta$ and the loss function weights $\phi$ are being updated simultaneously to achieve higher returns.
+Once the inner loop policy is mature enough, the policy is evaluated by the mean return $\bar{G}_{\phi+\sigma\epsilon_i}$ over multiple randomly sampled trajectories. Eventually, we are able to estimate the gradient of $\phi$ according to [NES](http://blog.otoro.net/2017/10/29/visual-evolution-strategies/) numerically ([Salimans et al, 2017](https://arxiv.org/abs/1703.03864)). While repeating this process, both the policy parameters $\theta$ and the loss function weights $\phi$ are being updated simultaneously to achieve higher returns.
 
-$$\phi \\leftarrow \phi + \alpha_\text{out} \frac{1}{\sigma N} \sum_{i=1}^N \\epsilon_i G_{\phi+\sigma\\epsilon_i}$$
+$$\phi \\leftarrow \phi + \alpha_\text{out} \frac{1}{\sigma N} \sum_{i=1}^N \epsilon_i G_{\phi+\sigma\epsilon_i}$$
 
 where $\alpha_\text{out}$ is the learning rate of the outer loop.
 
@@ -211,7 +211,7 @@ In practice, the loss $L_\phi$ is bootstrapped with an ordinary policy gradient 
 
 ## Meta-learning the Exploration Strategies[#](#meta-learning-the-exploration-strategies)
 
-The [exploitation vs exploration](https://lilianweng.github.io/posts/2018-01-23-multi-armed-bandit/#exploitation-vs-exploration) dilemma is a critical problem in RL. Common ways to do exploration include $\\epsilon$-greedy, random noise on actions, or stochastic policy with built-in randomness on the action space.
+The [exploitation vs exploration](https://lilianweng.github.io/posts/2018-01-23-multi-armed-bandit/#exploitation-vs-exploration) dilemma is a critical problem in RL. Common ways to do exploration include $\epsilon$-greedy, random noise on actions, or stochastic policy with built-in randomness on the action space.
 
 **MAESN** ([Gupta et al, 2018](http://papers.nips.cc/paper/7776-meta-reinforcement-learning-of-structured-exploration-strategies.pdf)) is an algorithm to learn structured action noise from prior experience for better and more effective exploration. Simply adding random noise on actions cannot capture task-dependent or time-correlated exploration strategies. MAESN changes the policy to condition on a per-task random variable $z_i \sim \mathcal{N}(\mu_i, \sigma_i)$, for $i$-th task $M_i$, so we would have a policy $a \sim \pi_\theta(a\mid s, z_i)$. The latent variable $z_i$ is sampled once and fixed during one episode. Intuitively, the latent variable determines one type of behavior (or skills) that should be explored more at the beginning of a rollout and the agent would adjust its actions accordingly. Both the policy parameters and latent space are optimized to maximize the total task rewards. In the meantime, the policy learns to make use of the latent variables for exploration.
 

@@ -286,7 +286,7 @@ Next, let's dig into the fun part on how to learn optimal policy in TD learning 
 "SARSA" refers to the procedure of updaing Q-value by following a sequence of $\dots, S_t, A_t, R_{t+1}, S_{t+1}, A_{t+1}, \dots$. The idea follows the same route of [GPI](#policy-iteration). Within one episode, it works as follows:
 
 1.  Initialize $t=0$.
-2.  Start with $S_0$ and choose action $A_0 = \arg\max_{a \in \mathcal{A}} Q(S_0, a)$, where $\\epsilon$-greedy is commonly applied.
+2.  Start with $S_0$ and choose action $A_0 = \arg\max_{a \in \mathcal{A}} Q(S_0, a)$, where $\epsilon$-greedy is commonly applied.
 3.  At time $t$, after applying action $A_t$, we observe reward $R_{t+1}$ and get into the next state $S_{t+1}$.
 4.  Then pick the next action in the same way as in step 2: $A_{t+1} = \arg\max_{a \in \mathcal{A}} Q(S_{t+1}, a)$.
 5.  Update the Q-value function: $ Q(S*t, A_t) \\leftarrow Q(S_t, A_t) + \alpha (R*{t+1} + \gamma Q(S*{t+1}, A*{t+1}) - Q(S_t, A_t)) $.
@@ -300,7 +300,7 @@ The development of Q-learning ([Watkins & Dayan, 1992](https://link.springer.com
 
 1.  Initialize $t=0$.
 2.  Starts with $S_0$.
-3.  At time step $t$, we pick the action according to Q values, $A_t = \arg\max_{a \in \mathcal{A}} Q(S_t, a)$ and $\\epsilon$-greedy is commonly applied.
+3.  At time step $t$, we pick the action according to Q values, $A_t = \arg\max_{a \in \mathcal{A}} Q(S_t, a)$ and $\epsilon$-greedy is commonly applied.
 4.  After applying action $A_t$, we observe reward $R_{t+1}$ and get into the next state $S_{t+1}$.
 5.  Update the Q-value function: $Q(S_t, A_t) \\leftarrow Q(S_t, A_t) + \alpha (R_{t+1} + \gamma \max_{a \in \mathcal{A}} Q(S_{t+1}, a) - Q(S_t, A_t))$.
 6.  $t = t+1$ and repeat from step 3.
@@ -410,7 +410,7 @@ Using _gradient ascent_ we can find the best θ that produces the highest return
 
 Computing the gradient _numerically_ can be done by perturbing θ by a small amount ε in the k-th dimension. It works even when $J(\theta)$ is not differentiable (nice!), but unsurprisingly very slow.
 
-$$\frac{\partial \mathcal{J}(\theta)}{\partial \theta_k} \approx \frac{\mathcal{J}(\theta + \\epsilon u_k) - \mathcal{J}(\theta)}{\\epsilon}$$
+$$\frac{\partial \mathcal{J}(\theta)}{\partial \theta_k} \approx \frac{\mathcal{J}(\theta + \epsilon u_k) - \mathcal{J}(\theta)}{\epsilon}$$
 
 Or _analytically_,
 
@@ -502,9 +502,9 @@ Very different from the popular MDP-based approaches as what we have introduced 
 
 $$\begin{aligned} & \nabla_\theta \mathbb{E}_{\theta \sim N(\mu, \sigma^2)} F(\theta) \\ =& \nabla_\theta \int_\theta F(\theta) \\Pr(\theta) && \text{Pr(.) is the Gaussian density function.} \\ =& \int_\theta F(\theta) \\Pr(\theta) \frac{\nabla_\theta \\Pr(\theta)}{\\Pr(\theta)} \\ =& \int_\theta F(\theta) \\Pr(\theta) \nabla_\theta \log \\Pr(\theta) \\ =& \mathbb{E}_{\theta \sim N(\mu, \sigma^2)} \[F(\theta) \nabla_\theta \log \\Pr(\theta)\] && \text{Similar to how we do policy gradient update.} \\ =& \mathbb{E}_{\theta \sim N(\mu, \sigma^2)} \Big\[ F(\theta) \nabla_\theta \log \Big( \frac{1}{\sqrt{2\pi\sigma^2}} e^{-\frac{(\theta - \mu)^2}{2 \sigma^2 }} \Big) \Big\] \\ =& \mathbb{E}_{\theta \sim N(\mu, \sigma^2)} \Big\[ F(\theta) \nabla_\theta \Big( -\log \sqrt{2\pi\sigma^2} - \frac{(\theta - \mu)^2}{2 \sigma^2} \Big) \Big\] \\ =& \mathbb{E}_{\theta \sim N(\mu, \sigma^2)} \Big\[ F(\theta) \frac{\theta - \mu}{\sigma^2} \Big\] \end{aligned}$$
 
-We can rewrite this formula in terms of a "mean" parameter $\theta$ (different from the $\theta$ above; this $\theta$ is the base gene for further mutation), $\\epsilon \sim N(0, I)$ and therefore $\theta + \\epsilon \sigma \sim N(\theta, \sigma^2)$. $\\epsilon$ controls how much Gaussian noises should be added to create mutation:
+We can rewrite this formula in terms of a "mean" parameter $\theta$ (different from the $\theta$ above; this $\theta$ is the base gene for further mutation), $\epsilon \sim N(0, I)$ and therefore $\theta + \epsilon \sigma \sim N(\theta, \sigma^2)$. $\epsilon$ controls how much Gaussian noises should be added to create mutation:
 
-$$\nabla_\theta \mathbb{E}_{\\epsilon \sim N(0, I)} F(\theta + \sigma \\epsilon) = \frac{1}{\sigma} \mathbb{E}_{\\epsilon \sim N(0, I)} \[F(\theta + \sigma \\epsilon) \\epsilon\]$$
+$$\nabla_\theta \mathbb{E}_{\epsilon \sim N(0, I)} F(\theta + \sigma \epsilon) = \frac{1}{\sigma} \mathbb{E}_{\epsilon \sim N(0, I)} \[F(\theta + \sigma \epsilon) \epsilon\]$$
 
 ![](assets/images/2018-02-19-rl-overview/EA_RL_parallel.png)
 

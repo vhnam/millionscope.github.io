@@ -200,13 +200,13 @@ Fig. 5. Consistency training with noisy samples.
 
 Adversarial Training ([Goodfellow et al. 2014](https://arxiv.org/abs/1412.6572)) applies adversarial noise onto the input and trains the model to be robust to such adversarial attack. The setup works in supervised learning,
 
-$$\begin{aligned} \mathcal{L}_\text{adv}(\mathbf{x}^l, \theta) &= D\[q(y\mid \mathbf{x}^l), p_\theta(y\mid \mathbf{x}^l + r_\text{adv})\] \\ r_\text{adv} &= {\arg\max}_{r; \|r\| \leq \\epsilon} D\[q(y\mid \mathbf{x}^l), p_\theta(y\mid \mathbf{x}^l + r_\text{adv})\] \\ r_\text{adv} &\approx \\epsilon \frac{g}{\|g\|_2} \approx \\epsilon\text{sign}(g)\quad\text{where }g = \nabla_{r} D\[y, p_\theta(y\mid \mathbf{x}^l + r)\] \end{aligned}$$
+$$\begin{aligned} \mathcal{L}_\text{adv}(\mathbf{x}^l, \theta) &= D\[q(y\mid \mathbf{x}^l), p_\theta(y\mid \mathbf{x}^l + r_\text{adv})\] \\ r_\text{adv} &= {\arg\max}_{r; \|r\| \leq \epsilon} D\[q(y\mid \mathbf{x}^l), p_\theta(y\mid \mathbf{x}^l + r_\text{adv})\] \\ r_\text{adv} &\approx \epsilon \frac{g}{\|g\|_2} \approx \epsilon\text{sign}(g)\quad\text{where }g = \nabla_{r} D\[y, p_\theta(y\mid \mathbf{x}^l + r)\] \end{aligned}$$
 
 where $q(y \mid \mathbf{x}^l)$ is the true distribution, approximated by one-hot encoding of the ground truth label, $y$. $p_\theta(y \mid \mathbf{x}^l)$ is the model prediction. $D\[.,.\]$ is a distance function measuring the divergence between two distributions.
 
 **Virtual Adversarial Training** (**VAT**; [Miyato et al. 2018](https://arxiv.org/abs/1704.03976)) extends the idea to work in semi-supervised learning. Because $q(y \mid \mathbf{x}^l)$ is unknown, VAT replaces it with the current model prediction for the original input with the current weights $\hat{\theta}$. Note that $\hat{\theta}$ is a fixed copy of model weights, so there is no gradient update on $\hat{\theta}$.
 
-$$\begin{aligned} \mathcal{L}_u^\text{VAT}(\mathbf{x}, \theta) &= D\[p_{\hat{\theta}}(y\mid \mathbf{x}), p_\theta(y\mid \mathbf{x} + r_\text{vadv})\] \\ r_\text{vadv} &= {\arg\max}_{r; \|r\| \leq \\epsilon} D\[p_{\hat{\theta}}(y\mid \mathbf{x}), p_\theta(y\mid \mathbf{x} + r)\] \end{aligned}$$
+$$\begin{aligned} \mathcal{L}_u^\text{VAT}(\mathbf{x}, \theta) &= D\[p_{\hat{\theta}}(y\mid \mathbf{x}), p_\theta(y\mid \mathbf{x} + r_\text{vadv})\] \\ r_\text{vadv} &= {\arg\max}_{r; \|r\| \leq \epsilon} D\[p_{\hat{\theta}}(y\mid \mathbf{x}), p_\theta(y\mid \mathbf{x} + r)\] \end{aligned}$$
 
 The VAT loss applies to both labeled and unlabeled samples. It is a negative smoothness measure of the current model's prediction manifold at each data point. The optimization of such loss motivates the manifold to be smoother.
 

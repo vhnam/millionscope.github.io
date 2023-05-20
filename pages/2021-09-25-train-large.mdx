@@ -29,9 +29,6 @@ Table of Contents
 - [Citation](#citation)
 - [References](#references)
 
-\[Updated on 2022-03-13: add [expert choice routing](#ec).\]  
-\[Updated on 2022-06-10\]: [Greg](https://gregbrockman.com/) and I wrote a shorted and upgraded version of this post, published on OpenAI Blog: ["Techniques for Training Large Neural Networks"](https://openai.com/blog/techniques-for-training-large-neural-networks/)
-
 In recent years, we are seeing better results on many NLP benchmark tasks with larger pre-trained [language models](https://lilianweng.github.io/posts/2019-01-31-lm/). How to train large and deep neural networks is challenging, as it demands a large amount of GPU memory and a long horizon of training time.
 
 However an individual GPU worker has limited memory and the sizes of many large models have grown beyond a single GPU. There are several parallelism paradigms to enable model training across multiple GPUs, as well as a variety of model architecture and memory saving designs to help make it possible to train _very large_ neural networks.
@@ -159,7 +156,7 @@ Fig. 10. Illustration of a mixture-of-experts (MoE) layer. Only 2 out of $n$ exp
 
 A simple choice of $G$ is to multiply the input with a trainable weight matrix $G_g$ and then do softmax: $G_\sigma (x) = \text{softmax}(x W_g)$. However, this produces a dense control vector for gating and does not help save computation resources because we don't need to evaluate an expert only when $G^{(i)}(x)=0$. Thus the MoE layer only keeps the top $k$ values. It also adds tunable Gaussian noise into $G$ to improve load balancing. This mechanism is called _noisy top-k gating_.
 
-$$\begin{aligned} G(x) &= \text{softmax}( \text{topk}(H(x), k)) \\ H^{(i)}(x) &= (xW_g)^{(i)} + \\epsilon \cdot \text{softplus}((xW_\text{noise})^{(i)} ); \quad \\epsilon \sim \mathcal{N}(0, \mathbf{1}) \\ \text{topk}^{(i)}(v, k) &= \begin{cases} v^{(i)} & \text{if }v^{(i)}\text{ is in the top }k\text{ elements of }v \\ -\infty & \text{otherwise} \end{cases} \end{aligned}$$
+$$\begin{aligned} G(x) &= \text{softmax}( \text{topk}(H(x), k)) \\ H^{(i)}(x) &= (xW_g)^{(i)} + \epsilon \cdot \text{softplus}((xW_\text{noise})^{(i)} ); \quad \epsilon \sim \mathcal{N}(0, \mathbf{1}) \\ \text{topk}^{(i)}(v, k) &= \begin{cases} v^{(i)} & \text{if }v^{(i)}\text{ is in the top }k\text{ elements of }v \\ -\infty & \text{otherwise} \end{cases} \end{aligned}$$
 
 where the superscript $v^{(i)}$ denotes the i-th dimension of the vector $v$. The function $\text{topk}(., k)$ selected the top $k$ dimensions with highest values by setting other dimensions to $-\infty$.
 

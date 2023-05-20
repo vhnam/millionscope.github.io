@@ -91,7 +91,7 @@ $$\hat{Q}_t(a) = \frac{1}{N_t(a)} \sum_{\tau=1}^t r_\tau \mathbb{1}\[a_\tau = a\
 
 where $\mathbb{1}$ is a binary indicator function and $N_t(a)$ is how many times the action a has been selected so far, $N_t(a) = \sum_{\tau=1}^t \mathbb{1}\[a_\tau = a\]$.
 
-According to the ε-greedy algorithm, with a small probability $\\epsilon$ we take a random action, but otherwise (which should be the most of the time, probability 1-$\\epsilon$) we pick the best action that we have learnt so far: $\hat{a}^{\*}_t = \arg\max_{a \in \mathcal{A}} \hat{Q}_t(a)$.
+According to the ε-greedy algorithm, with a small probability $\epsilon$ we take a random action, but otherwise (which should be the most of the time, probability 1-$\epsilon$) we pick the best action that we have learnt so far: $\hat{a}^{\*}_t = \arg\max_{a \in \mathcal{A}} \hat{Q}_t(a)$.
 
 Check my toy implementation [here](https://github.com/lilianweng/multi-armed-bandit/blob/master/solvers.py#L45).
 
