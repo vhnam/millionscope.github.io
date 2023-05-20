@@ -613,7 +613,7 @@ $$ \mathbf{z}\sim p_\mathcal{Z}(\mathbf{z}) \quad \mathbf{u}=f_\phi(\mathbf{z}) 
 
 A flow-based generative model learns the invertible mapping function by maximizing the likelihood of $\mathcal{U}$'s marginal:
 
-$$ \max_\phi\mathbb{E}_{\mathbf{u}=\text{BERT}(s), s\sim\mathcal{D}} \Big\[ \log p_\mathcal{Z}(f^{-1}_\phi(\mathbf{u})) + \log\big\vert\\det\frac{\\partial f^{-1}_\phi(\mathbf{u})}{\\partial\mathbf{u}}\big\vert \Big\] $$
+$$ \max_\phi\mathbb{E}_{\mathbf{u}=\text{BERT}(s), s\sim\mathcal{D}} \Big\[ \log p_\mathcal{Z}(f^{-1}_\phi(\mathbf{u})) + \log\big\vert\\det\frac{\partial f^{-1}_\phi(\mathbf{u})}{\partial\mathbf{u}}\big\vert \Big\] $$
 
 where $s$ is a sentence sampled from the text corpus $\mathcal{D}$. Only the flow parameters $\phi$ are optimized while parameters in the pretrained BERT stay unchanged.
 

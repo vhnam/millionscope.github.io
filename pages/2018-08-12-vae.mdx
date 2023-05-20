@@ -157,7 +157,7 @@ Similar to sparse autoencoder, **Contractive Autoencoder** ([Rifai, et al, 2011]
 
 It adds a term in the loss function to penalize the representation being too sensitive to the input, and thus improve the robustness to small perturbations around the training data points. The sensitivity is measured by the Frobenius norm of the Jacobian matrix of the encoder activations with respect to the input:
 
-$$ \|J_f(\mathbf{x})\|_F^2 = \sum_{ij} \Big( \frac{\\partial h_j(\mathbf{x})}{\\partial x_i} \Big)^2 $$
+$$ \|J_f(\mathbf{x})\|_F^2 = \sum_{ij} \Big( \frac{\partial h_j(\mathbf{x})}{\partial x_i} \Big)^2 $$
 
 where $h_j$ is one unit output in the compressed code $\mathbf{z} = f(x)$.
 

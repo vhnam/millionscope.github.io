@@ -255,13 +255,13 @@ The network can achieve better performance if it was permuted before pruning, co
 
 To train a model with N:M sparsity from scratch, [Zhou & Ma, et al. (2021)](https://arxiv.org/abs/2102.04010) extended STE (Straight-Through Estimator; [Bengio et al. 2013](https://arxiv.org/abs/1308.3432)), which is commonly used for back-propagation update in model quantization, to work for magnitude pruning and sparse parameter update.
 
-STE computes the gradients of dense parameters wrt the pruned network $\widetilde{W}$, $\\partial \mathcal{L}/\\partial \widetilde{W}$, and applies that to the dense network $W$ as an approximation:
+STE computes the gradients of dense parameters wrt the pruned network $\widetilde{W}$, $\partial \mathcal{L}/\partial \widetilde{W}$, and applies that to the dense network $W$ as an approximation:
 
-$$ W\_{t+1} \gets W_t - \gamma \frac{\\partial\mathcal{L}}{\\partial\widetilde{W}} $$
+$$ W\_{t+1} \gets W_t - \gamma \frac{\partial\mathcal{L}}{\partial\widetilde{W}} $$
 
 The extended version, **SR-STE** (Sparse-refined STE), updates the dense weights $W$ by:
 
-$$ W\_{t+1} \gets W_t - \gamma \frac{\\partial\mathcal{L}}{\\partial\widetilde{W}} + \lambda_W (\bar{\mathcal{E}} \odot W_t) $$ where $\bar{\mathcal{E}}$ is the mask matrix for $\widetilde{W}$ and $\odot$ is element-wise multiplication. SR-STE is proposed to prevent large change in the binary mask by (1) restricting the values of weights pruned in $\widetilde{W}_t$, and (2) promoting the non-pruned weights in $\widetilde{W}_t$.
+$$ W\_{t+1} \gets W_t - \gamma \frac{\partial\mathcal{L}}{\partial\widetilde{W}} + \lambda_W (\bar{\mathcal{E}} \odot W_t) $$ where $\bar{\mathcal{E}}$ is the mask matrix for $\widetilde{W}$ and $\odot$ is element-wise multiplication. SR-STE is proposed to prevent large change in the binary mask by (1) restricting the values of weights pruned in $\widetilde{W}_t$, and (2) promoting the non-pruned weights in $\widetilde{W}_t$.
 
 ![](assets/images/2023-01-10-inference-optimization/SR-STE.png)
 

@@ -54,9 +54,9 @@ We should understand two key concepts before getting into the flow-based generat
 
 ## Jacobian Matrix and Determinant[#](#jacobian-matrix-and-determinant)
 
-Given a function of mapping a $n$-dimensional input vector $\mathbf{x}$ to a $m$-dimensional output vector, $\mathbf{f}: \mathbb{R}^n \mapsto \mathbb{R}^m$, the matrix of all first-order partial derivatives of this function is called the **Jacobian matrix**, $\mathbf{J}$ where one entry on the i-th row and j-th column is $\mathbf{J}_{ij} = \frac{\\partial f_i}{\\partial x_j}$.
+Given a function of mapping a $n$-dimensional input vector $\mathbf{x}$ to a $m$-dimensional output vector, $\mathbf{f}: \mathbb{R}^n \mapsto \mathbb{R}^m$, the matrix of all first-order partial derivatives of this function is called the **Jacobian matrix**, $\mathbf{J}$ where one entry on the i-th row and j-th column is $\mathbf{J}_{ij} = \frac{\partial f_i}{\partial x_j}$.
 
-$$ \mathbf{J} = \begin{bmatrix} \frac{\\partial f_1}{\\partial x_1} & \dots & \frac{\\partial f_1}{\\partial x_n} \\\[6pt\] \vdots & \ddots & \vdots \\\[6pt\] \frac{\\partial f_m}{\\partial x_1} & \dots & \frac{\\partial f_m}{\\partial x_n} \\\[6pt\] \end{bmatrix} $$
+$$ \mathbf{J} = \begin{bmatrix} \frac{\partial f_1}{\partial x_1} & \dots & \frac{\partial f_1}{\partial x_n} \\\[6pt\] \vdots & \ddots & \vdots \\\[6pt\] \frac{\partial f_m}{\partial x_1} & \dots & \frac{\partial f_m}{\partial x_n} \\\[6pt\] \end{bmatrix} $$
 
 The determinant is one real number computed as a function of all the elements in a squared matrix. Note that the determinant _only exists for **square** matrices_. The absolute value of the determinant can be thought of as a measure of _“how much multiplication by the matrix expands or contracts space”._
 
@@ -84,7 +84,7 @@ The multivariable version has a similar format:
 
 $$ \begin{aligned} \mathbf{z} &\sim \pi(\mathbf{z}), \mathbf{x} = f(\mathbf{z}), \mathbf{z} = f^{-1}(\mathbf{x}) \\ p(\mathbf{x}) &= \pi(\mathbf{z}) \\left\vert \\det \\dfrac{d \mathbf{z}}{d \mathbf{x}} \\right\vert = \pi(f^{-1}(\mathbf{x})) \\left\vert \\det \\dfrac{d f^{-1}}{d \mathbf{x}} \\right\vert \end{aligned} $$
 
-where $\\det \frac{\\partial f}{\\partial\mathbf{z}}$ is the Jacobian determinant of the function $f$. The full proof of the multivariate version is out of the scope of this post; ask Google if interested ;)
+where $\\det \frac{\partial f}{\partial\mathbf{z}}$ is the Jacobian determinant of the function $f$. The full proof of the multivariate version is out of the scope of this post; ask Google if interested ;)
 
 # What is Normalizing Flows?[#](#what-is-normalizing-flows)
 
@@ -148,7 +148,7 @@ $$ \begin{cases} \mathbf{y}_{1:d} &= \mathbf{x}_{1:d} \\ \mathbf{y}_{d+1:D} &= \
 
 Yes. It is not hard to get the Jacobian matrix and determinant of this transformation. The Jacobian is a lower triangular matrix.
 
-$$ \mathbf{J} = \begin{bmatrix} \mathbb{I}_d & \mathbf{0}_{d\times(D-d)} \\\[5pt\] \frac{\\partial \mathbf{y}_{d+1:D}}{\\partial \mathbf{x}_{1:d}} & \text{diag}(\exp(s(\mathbf{x}_{1:d}))) \end{bmatrix} $$
+$$ \mathbf{J} = \begin{bmatrix} \mathbb{I}_d & \mathbf{0}_{d\times(D-d)} \\\[5pt\] \frac{\partial \mathbf{y}_{d+1:D}}{\partial \mathbf{x}_{1:d}} & \text{diag}(\exp(s(\mathbf{x}_{1:d}))) \end{bmatrix} $$
 
 Hence the determinant is simply the product of terms on the diagonal.
 
@@ -186,11 +186,11 @@ Substep 2: **Invertible 1x1 conv**
 
 Between layers of the RealNVP flow, the ordering of channels is reversed so that all the data dimensions have a chance to be altered. A 1×1 convolution with equal number of input and output channels is _a generalization of any permutation_ of the channel ordering.
 
-Say, we have an invertible 1x1 convolution of an input $h \times w \times c$ tensor $\mathbf{h}$ with a weight matrix $\mathbf{W}$ of size $c \times c$. The output is a $h \times w \times c$ tensor, labeled as $f = \texttt{conv2d}(\mathbf{h}; \mathbf{W})$. In order to apply the change of variable rule, we need to compute the Jacobian determinant $\vert \\det\\partial f / \\partial\mathbf{h}\vert$.
+Say, we have an invertible 1x1 convolution of an input $h \times w \times c$ tensor $\mathbf{h}$ with a weight matrix $\mathbf{W}$ of size $c \times c$. The output is a $h \times w \times c$ tensor, labeled as $f = \texttt{conv2d}(\mathbf{h}; \mathbf{W})$. In order to apply the change of variable rule, we need to compute the Jacobian determinant $\vert \\det\partial f / \partial\mathbf{h}\vert$.
 
-Both the input and output of 1x1 convolution here can be viewed as a matrix of size $h \times w$. Each entry $\mathbf{x}_{ij}$ ($i=1,\dots,h, j=1,\dots,w$) in $\mathbf{h}$ is a vector of $c$ channels and each entry is multiplied by the weight matrix $\mathbf{W}$ to obtain the corresponding entry $\mathbf{y}_{ij}$ in the output matrix respectively. The derivative of each entry is $\\partial \mathbf{x}_{ij} \mathbf{W} / \\partial\mathbf{x}_{ij} = \mathbf{W}$ and there are $h \times w$ such entries in total:
+Both the input and output of 1x1 convolution here can be viewed as a matrix of size $h \times w$. Each entry $\mathbf{x}_{ij}$ ($i=1,\dots,h, j=1,\dots,w$) in $\mathbf{h}$ is a vector of $c$ channels and each entry is multiplied by the weight matrix $\mathbf{W}$ to obtain the corresponding entry $\mathbf{y}_{ij}$ in the output matrix respectively. The derivative of each entry is $\partial \mathbf{x}_{ij} \mathbf{W} / \partial\mathbf{x}_{ij} = \mathbf{W}$ and there are $h \times w$ such entries in total:
 
-$$ \log \\left\vert\\det \frac{\\partial\texttt{conv2d}(\mathbf{h}; \mathbf{W})}{\\partial\mathbf{h}}\\right\vert = \log (\vert\\det\mathbf{W}\vert^{h \cdot w}\vert) = h \cdot w \cdot \log \vert\\det\mathbf{W}\vert $$
+$$ \log \\left\vert\\det \frac{\partial\texttt{conv2d}(\mathbf{h}; \mathbf{W})}{\partial\mathbf{h}}\\right\vert = \log (\vert\\det\mathbf{W}\vert^{h \cdot w}\vert) = h \cdot w \cdot \log \vert\\det\mathbf{W}\vert $$
 
 The inverse 1x1 convolution depends on the inverse matrix $\mathbf{W}^{-1}$. Since the weight matrix is relatively small, the amount of computation for the matrix determinant ([tf.linalg.det](https://www.tensorflow.org/api_docs/python/tf/linalg/det)) and inversion ([tf.linalg.inv](https://www.tensorflow.org/api_docs/python/tf/linalg/inv)) is still under control.
 

@@ -410,7 +410,7 @@ Using _gradient ascent_ we can find the best θ that produces the highest return
 
 Computing the gradient _numerically_ can be done by perturbing θ by a small amount ε in the k-th dimension. It works even when $J(\theta)$ is not differentiable (nice!), but unsurprisingly very slow.
 
-$$ \frac{\\partial \mathcal{J}(\theta)}{\\partial \theta_k} \approx \frac{\mathcal{J}(\theta + \\epsilon u_k) - \mathcal{J}(\theta)}{\\epsilon} $$
+$$ \frac{\partial \mathcal{J}(\theta)}{\partial \theta_k} \approx \frac{\mathcal{J}(\theta + \\epsilon u_k) - \mathcal{J}(\theta)}{\\epsilon} $$
 
 Or _analytically_,
 

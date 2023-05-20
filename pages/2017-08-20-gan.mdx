@@ -157,7 +157,7 @@ Although GAN has shown great success in the realistic image generation, the trai
 
 Let's check out a simple example to better understand why it is difficult to find a Nash equilibrium in an non-cooperative game. Suppose one player takes control of $x$ to minimize $f_1(x) = xy$, while at the same time the other player constantly updates $y$ to minimize $f_2(y) = -xy$.
 
-Because $\frac{\\partial f_1}{\\partial x} = y$ and $\frac{\\partial f_2}{\\partial y} = -x$, we update $x$ with $x-\\eta \cdot y$ and $y$ with $y+ \\eta \cdot x$ simulitanously in one iteration, where $\\eta$ is the learning rate. Once $x$ and $y$ have different signs, every following gradient update causes huge oscillation and the instability gets worse in time, as shown in Fig. 3.
+Because $\frac{\partial f_1}{\partial x} = y$ and $\frac{\partial f_2}{\partial y} = -x$, we update $x$ with $x-\\eta \cdot y$ and $y$ with $y+ \\eta \cdot x$ simulitanously in one iteration, where $\\eta$ is the learning rate. Once $x$ and $y$ have different signs, every following gradient update causes huge oscillation and the instability gets worse in time, as shown in Fig. 3.
 
 ![](nash_equilibrium.png)
 
