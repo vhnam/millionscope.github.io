@@ -158,7 +158,7 @@ The model outputs colors in the the [CIE L_a_b\* color space](https://en.wikiped
 
 Due to the multimodal nature of the colorization problem, cross-entropy loss of predicted probability distribution over binned color values works better than L2 loss of the raw color values. The a*b* color space is quantized with bucket size 10.
 
-To balance between common colors (usually low a*b* values, of common backgrounds like clouds, walls, and dirt) and rare colors (which are likely associated with key objects in the image), the loss function is rebalanced with a weighting term that boosts the loss of infrequent color buckets. This is just like why we need both [tf and idf](https://en.wikipedia.org/wiki/Tf%E2%80%93idf) for scoring words in information retrieval model. The weighting term is constructed as: (1-λ) \* Gaussian-kernel-smoothed empirical probability distribution + λ \* a uniform distribution, where both distributions are over the quantized a*b* color space.
+To balance between common colors (usually low a*b* values, of common backgrounds like clouds, walls, and dirt) and rare colors (which are likely associated with key objects in the image), the loss function is rebalanced with a weighting term that boosts the loss of infrequent color buckets. This is just like why we need both [tf and idf](https://en.wikipedia.org/wiki/Tf%E2%80%93idf) for scoring words in information retrieval model. The weighting term is constructed as: $(1-\lambda)$ \* Gaussian-kernel-smoothed empirical probability distribution $+ \lambda$ \* a uniform distribution, where both distributions are over the quantized a*b* color space.
 
 ## Generative Modeling[#](#generative-modeling)
 
