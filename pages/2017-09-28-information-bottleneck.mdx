@@ -44,7 +44,7 @@ A Markov process is a [“memoryless”](http://mathworld.wolfram.com/Memoryless
 
 KL divergence measures how one probability distribution $p$ diverges from a second expected probability distribution $q$. It is asymmetric.
 
-$$ \\begin{aligned} D\_{KL}(p \\| q) &= \sum_x p(x) \\log \\frac{p(x)}{q(x)} \\\\ &= - \sum_x p(x)\\log q(x) + \sum_x p(x)\\log p(x) \\\\ &= H(P, Q) - H(P) \\end{aligned} $$
+$$ \begin{aligned} D\_{KL}(p \\| q) &= \sum_x p(x) \\log \frac{p(x)}{q(x)} \\ &= - \sum_x p(x)\\log q(x) + \sum_x p(x)\\log p(x) \\ &= H(P, Q) - H(P) \end{aligned} $$
 
 $D\_{KL}$ achieves the minimum zero when $p(x)$ == $q(x)$ everywhere.
 
@@ -52,11 +52,11 @@ $D\_{KL}$ achieves the minimum zero when $p(x)$ == $q(x)$ everywhere.
 
 Mutual information measures the mutual dependence between two variables. It quantifies the “amount of information” obtained about one random variable through the other random variable. Mutual information is symmetric.
 
-$$ \\begin{aligned} I(X;Y) &= D\_{KL}\[p(x,y) \\| p(x)p(y)\] \\\\ &= \sum\_{x \in X, y \in Y} p(x, y) \\log(\\frac{p(x, y)}{p(x)p(y)}) \\\\ &= \sum\_{x \in X, y \in Y} p(x, y) \\log(\\frac{p(x|y)}{p(x)}) \\\\ &= H(X) - H(X|Y) \\\\ \\end{aligned} $$
+$$ \begin{aligned} I(X;Y) &= D\_{KL}\[p(x,y) \\| p(x)p(y)\] \\ &= \sum\_{x \in X, y \in Y} p(x, y) \\log(\frac{p(x, y)}{p(x)p(y)}) \\ &= \sum\_{x \in X, y \in Y} p(x, y) \\log(\frac{p(x|y)}{p(x)}) \\ &= H(X) - H(X|Y) \\ \end{aligned} $$
 
 [**Data Processing Inequality (DPI)**](https://en.wikipedia.org/wiki/Data_processing_inequality)
 
-For any markov chain: $X \\to Y \\to Z$, we would have $I(X; Y) \\geq I(X; Z)$.
+For any markov chain: $X \to Y \to Z$, we would have $I(X; Y) \\geq I(X; Z)$.
 
 A deep neural network can be viewed as a Markov chain, and thus when we are moving down the layers of a DNN, the mutual information between the layer and the input can only decrease.
 
@@ -72,11 +72,11 @@ The training data contains sampled observations from the joint distribution of $
 
 ![](ib-dnn-structure.png)
 
-Fig. 1. The structure of a deep neural network, which consists of the target label $Y$, input layer $X$, hidden layers $h\\\_1, \\dots, h\\\_m$ and the final prediction $\\hat{Y}$. (Image source: [Tishby and Zaslavsky, 2015](https://arxiv.org/pdf/1503.02406.pdf))
+Fig. 1. The structure of a deep neural network, which consists of the target label $Y$, input layer $X$, hidden layers $h\\\_1, \dots, h\\\_m$ and the final prediction $\\hat{Y}$. (Image source: [Tishby and Zaslavsky, 2015](https://arxiv.org/pdf/1503.02406.pdf))
 
-If we label the hidden layers of a DNN as $h\_1, h\_2, \\dots, h\_m$ as in Fig. 1, we can view each layer as one state of a Markov Chain: $ h_i \\to h\_{i+1}$. According to DPI, we would have:
+If we label the hidden layers of a DNN as $h\_1, h\_2, \dots, h\_m$ as in Fig. 1, we can view each layer as one state of a Markov Chain: $ h_i \to h\_{i+1}$. According to DPI, we would have:
 
-$$ \\begin{aligned} H(X) \\geq I(X; h_1) \\geq I(X; h_2) \\geq \\dots \\geq I(X; h_m) \\geq I(X; \\hat{Y}) \\\\ I(X; Y) \\geq I(h_1; Y) \\geq I(h_2; Y) \\geq \\dots \\geq I(h_m; Y) \\geq I(\\hat{Y}; Y) \\end{aligned} $$
+$$ \begin{aligned} H(X) \\geq I(X; h_1) \\geq I(X; h_2) \\geq \dots \\geq I(X; h_m) \\geq I(X; \\hat{Y}) \\ I(X; Y) \\geq I(h_1; Y) \\geq I(h_2; Y) \\geq \dots \\geq I(h_m; Y) \\geq I(\\hat{Y}; Y) \end{aligned} $$
 
 A DNN is designed to learn how to describe $X$ to predict $Y$ and eventually, to compress $X$ to only hold the information related to $Y$. Tishby describes this processing as _“successive refinement of relevant information”_.
 
@@ -115,7 +115,7 @@ Among early epochs, the mean values are three magnitudes larger than the standar
 
 The generalization bounds defined by the classic learning theory is:
 
-$$ \\epsilon^2 < \\frac{\\log|H\_\\epsilon| + \\log{1/\\delta}}{2m} $$
+$$ \\epsilon^2 < \frac{\\log|H\_\\epsilon| + \\log{1/\\delta}}{2m} $$
 
 - $\\epsilon$: The difference between the training error and the generalization error. The generalization error measures how accurate the prediction of an algorithm is for previously unseen data.
 - $H\_\\epsilon$: $\\epsilon$-cover of the hypothesis class. Typically we assume the size $\vert H\_\\epsilon \vert \\sim (1/\\epsilon)^d$.
@@ -133,11 +133,11 @@ To solve this counterintuitive observation, Tishby et al. proposed a new input c
 
 First let us have $T\_\\epsilon$ as an $\\epsilon$-partition of the input variable $X$. This partition compresses the input with respect to the homogeneity to the labels into small cells. The cells in total can cover the whole input space. If the prediction outputs binary values, we can replace the cardinality of the hypothesis, $\vert H\_\\epsilon \vert$, with $2^{\vert T\_\\epsilon \vert}$.
 
-$$ |H\_\\epsilon| \\sim 2^{|X|} \\to 2^{|T\_\\epsilon|} $$
+$$ |H\_\\epsilon| \\sim 2^{|X|} \to 2^{|T\_\\epsilon|} $$
 
-When $X$ is large, the size of $X$ is approximately $2^{H(X)}$. Each cell in the $\\epsilon$-partition is of size $2^{H(X \vert T\_\\epsilon)}$. Therefore we have $\vert T\_\\epsilon \vert \\sim \\frac{2^{H(X)}}{2^{H(X \vert T\_\\epsilon)}} = 2^{I(T\_\\epsilon; X)}$. Then the input compression bound becomes:
+When $X$ is large, the size of $X$ is approximately $2^{H(X)}$. Each cell in the $\\epsilon$-partition is of size $2^{H(X \vert T\_\\epsilon)}$. Therefore we have $\vert T\_\\epsilon \vert \\sim \frac{2^{H(X)}}{2^{H(X \vert T\_\\epsilon)}} = 2^{I(T\_\\epsilon; X)}$. Then the input compression bound becomes:
 
-$$ \\epsilon^2 < \\frac{2^{I(T\_\\epsilon; X)} + \\log{1/\\delta}}{2m} $$
+$$ \\epsilon^2 < \frac{2^{I(T\_\\epsilon; X)} + \\log{1/\\delta}}{2m} $$
 
 ![](ib-bound.png)
 

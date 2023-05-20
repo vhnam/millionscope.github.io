@@ -75,7 +75,7 @@ Fig. 2. A naive model parallelism setup where the model is vertically split into
 
 In _GPipe_ ([Huang et al. 2019](https://arxiv.org/abs/1811.06965)) gradients from multiple microbatches are aggregated and applied synchronously at the end. The synchronous gradient descent guarantees learning consistency and efficiency irrespective of the number of workers. As shown in Fig. 3, bubbles still exist but are much smaller than what's in Fig. 2. Given $m$ evenly split microbatches and $d$ partitions, assuming both forward and backward per microbatch take one unit of time, the fraction of bubble is:
 
-$$ 1 - \\frac{2md}{(2m + 2(d-1))d} = \\frac{d-1}{m+d-1} $$
+$$ 1 - \frac{2md}{(2m + 2(d-1))d} = \frac{d-1}{m+d-1} $$
 
 The GPipe paper observed that the bubble overhead is almost negligible if the number of microbatches is more than 4x the number of partitions $m > 4d$ (when [activation recomputation](#activation-recomputation) is applied).
 
@@ -124,11 +124,11 @@ Let's take the transformer as an example given its popularity. The transformer m
 
 A MLP layer in a transformer contains a GEMM (General matrix multiply) followed by an non-linear GeLU transfer. Let's split weight matrix $A$ by column:
 
-$$ \\begin{aligned} \text{Split }A &= \[A_1, A_2\] \\\\ Y &=\text{GeLU}(XA) \\\\ \[Y_1, Y_2\] &= \[\text{GeLU}(XA_1), \text{GeLU}(XA_2)\] \\end{aligned} $$
+$$ \begin{aligned} \text{Split }A &= \[A_1, A_2\] \\ Y &=\text{GeLU}(XA) \\ \[Y_1, Y_2\] &= \[\text{GeLU}(XA_1), \text{GeLU}(XA_2)\] \end{aligned} $$
 
 The attention block runs GEMM with query ($Q$), key ($K$), and value weights ($V$) according to the above partitioning in parallel and then combines them with another GEMM to produce the attention head results.
 
-$$ \text{Attention}(X, Q, K, V) = \text{softmax}(\\frac{(XQ) (XK)^\\top}{\\sqrt{d_k}}) XV $$
+$$ \text{Attention}(X, Q, K, V) = \text{softmax}(\frac{(XQ) (XK)^\top}{\\sqrt{d_k}}) XV $$
 
 ![](Megatron-LM.png)
 
@@ -159,13 +159,13 @@ Fig. 10. Illustration of a mixture-of-experts (MoE) layer. Only 2 out of $n$ exp
 
 A simple choice of $G$ is to multiply the input with a trainable weight matrix $G\_g$ and then do softmax: $G\_\\sigma (x) = \text{softmax}(x W\_g)$. However, this produces a dense control vector for gating and does not help save computation resources because we don't need to evaluate an expert only when $G^{(i)}(x)=0$. Thus the MoE layer only keeps the top $k$ values. It also adds tunable Gaussian noise into $G$ to improve load balancing. This mechanism is called _noisy top-k gating_.
 
-$$ \\begin{aligned} G(x) &= \text{softmax}( \text{topk}(H(x), k)) \\\\ H^{(i)}(x) &= (xW_g)^{(i)} + \\epsilon \\cdot \text{softplus}((xW\_\text{noise})^{(i)} ); \quad \\epsilon \\sim \mathcal{N}(0, \\mathbf{1}) \\\\ \text{topk}^{(i)}(v, k) &= \\begin{cases} v^{(i)} & \text{if }v^{(i)}\text{ is in the top }k\text{ elements of }v \\\\ -\infty & \text{otherwise} \\end{cases} \\end{aligned} $$
+$$ \begin{aligned} G(x) &= \text{softmax}( \text{topk}(H(x), k)) \\ H^{(i)}(x) &= (xW_g)^{(i)} + \\epsilon \cdot \text{softplus}((xW\_\text{noise})^{(i)} ); \quad \\epsilon \\sim \mathcal{N}(0, \mathbf{1}) \\ \text{topk}^{(i)}(v, k) &= \begin{cases} v^{(i)} & \text{if }v^{(i)}\text{ is in the top }k\text{ elements of }v \\ -\infty & \text{otherwise} \end{cases} \end{aligned} $$
 
 where the superscript $v^{(i)}$ denotes the i-th dimension of the vector $v$. The function $\text{topk}(., k)$ selected the top $k$ dimensions with highest values by setting other dimensions to $-\infty$.
 
 To avoid the self-reinforcing effect that the gating network may favor a few strong experts all the time, [Shazeer et al. (2017)](https://arxiv.org/abs/1701.06538) proposed a soft constraint via an additional importance loss to encourage all the experts to have the same weights. It is equivalent to the square of the [coefficient of variation](https://en.wikipedia.org/wiki/Coefficient_of_variation) of batchwise average value per expert.
 
-$$ L\_\text{aux} = w\_\text{aux} \\cdot \text{CV}(\sum\_{x \in X} G(x))^2 $$
+$$ L\_\text{aux} = w\_\text{aux} \cdot \text{CV}(\sum\_{x \in X} G(x))^2 $$
 
 where $ \text{CV}$ is the coefficient of variation and the loss weight $w\_\text{aux}$ is a hyperparameter to tune.
 
@@ -210,15 +210,15 @@ Both GShard top-2 and Switch Transformer top-1 depend on _token choice_, where e
 
 **Export Choice (EC)** ([Zhou et al. 2022](https://arxiv.org/abs/2202.09368)) routing instead enables each expert to select the top-$k$ tokens. In this way, each expert naturally guarantees a fixed capacity and each token may be routed to multiple experts. EC can achieve perfect load balancing and is shown to improve training convergence by 2x.
 
-Given $e$ experts and an input matrix $X \in \\mathbb{R}^{n \\times d}$, the token-to-expert affinity scores are computed by: $$ S = \text{softmax}(X \\cdot W_g), \text{where } W_g \in \\mathbb{R}^{d \\times e}, S \in \\mathbb{R}^{n \\times e} $$
+Given $e$ experts and an input matrix $X \in \mathbb{R}^{n \\times d}$, the token-to-expert affinity scores are computed by: $$ S = \text{softmax}(X \cdot W_g), \text{where } W_g \in \mathbb{R}^{d \\times e}, S \in \mathbb{R}^{n \\times e} $$
 
-A token-to-expert assignment is represented by three matrices, $I, G \in \\mathbb{R}^{e\\times k}$ and $P \in \\mathbb{R}^{e \\times k \\times n}$. $I\[i,j\]$ annotates which token is the $j$-th selection by the $i$-th expert. The gating matrix $G$ stores the routing weights of selected tokens. $P$ is the one-hot version of $I$, used to produce the input matrix ($P \\cdot X \in \\mathbb{R}^{e \\times k \\times d}$) for the gated FFN layer. $$ G, I = \text{top-k}(S^\\top, k)\quad P = \text{one-hot}(I) $$
+A token-to-expert assignment is represented by three matrices, $I, G \in \mathbb{R}^{e\\times k}$ and $P \in \mathbb{R}^{e \\times k \\times n}$. $I\[i,j\]$ annotates which token is the $j$-th selection by the $i$-th expert. The gating matrix $G$ stores the routing weights of selected tokens. $P$ is the one-hot version of $I$, used to produce the input matrix ($P \cdot X \in \mathbb{R}^{e \\times k \\times d}$) for the gated FFN layer. $$ G, I = \text{top-k}(S^\top, k)\quad P = \text{one-hot}(I) $$
 
 One regularization that export choice routing explored is to limit the maximum number of experts per token.
 
-$$ \\begin{aligned} & \\max_A \\langle S^\\top, A\\rangle + \\lambda H(A) \\\\ \text{s.t.} & \\forall i: \sum\_{j'} A\[i, j'\] = k,\quad \\forall j: \sum\_{i'} A\[i', j\] \\leq b,\quad \\forall i,j: 0 \\leq A\[i,j\] \\leq 1 \\end{aligned} $$
+$$ \begin{aligned} & \max_A \langle S^\top, A\rangle + \\lambda H(A) \\ \text{s.t.} & \\forall i: \sum\_{j'} A\[i, j'\] = k,\quad \\forall j: \sum\_{i'} A\[i', j\] \\leq b,\quad \\forall i,j: 0 \\leq A\[i,j\] \\leq 1 \end{aligned} $$
 
-where each entry $A\[i,j\]$ in $A \in \\mathbb{R}^{e \\times n}$ marks whether the $i$-the expert selects the $j$-th token. Solving this is non-trivial. The paper used [Dykstra's algorithm](https://projecteuclid.org/journals/annals-of-probability/volume-13/issue-3/An-Iterative-Procedure-for-Obtaining-I-Projections-onto-the-Intersection/10.1214/aop/1176992918.full) that runs a sequence of multiple iterative computation steps. Capped expert choice results in a slight decrease in the fine-tuning performance in the experiments.
+where each entry $A\[i,j\]$ in $A \in \mathbb{R}^{e \\times n}$ marks whether the $i$-the expert selects the $j$-th token. Solving this is non-trivial. The paper used [Dykstra's algorithm](https://projecteuclid.org/journals/annals-of-probability/volume-13/issue-3/An-Iterative-Procedure-for-Obtaining-I-Projections-onto-the-Intersection/10.1214/aop/1176992918.full) that runs a sequence of multiple iterative computation steps. Capped expert choice results in a slight decrease in the fine-tuning performance in the experiments.
 
 The parameter $k$ is determined by $k=nc/e$, where $n$ is the total number of tokens in one batch and $c$ is a capacity factor indicating the average number of experts used by one token. The paper used $c=2$ in most experiments, but EC with $c=1$ still outperforms the top-1 token choice gating. Interestingly, $c=0.5$ only marginally hurts the training performance.
 
@@ -236,7 +236,7 @@ When the GPU memory is full, one option is to offload temporarily unused data to
 
 Let's say, we evenly divide an $\ell$-layer network into $d$ partitions. Only activations at partition boundaries are saved and communicated between workers. Intermediate activations at intra-partition layers are still needed for computing gradients so they are recomputed during backward passes. With activation recomputation, the memory cost for training $M(\ell)$ is:
 
-$$ M(\ell) =\\max\_{i=1,\\dots,k} \\underbrace{\text{cost-of-one-partition}(i)}\_\text{cost of back-propagation on the i-th partition} + \\underbrace{O(d)}\_\text{store intermediate outputs} = O(\\frac{\ell}{d}) + O(d) $$
+$$ M(\ell) =\max\_{i=1,\dots,k} \\underbrace{\text{cost-of-one-partition}(i)}\_\text{cost of back-propagation on the i-th partition} + \\underbrace{O(d)}\_\text{store intermediate outputs} = O(\frac{\ell}{d}) + O(d) $$
 
 The minimum cost is $O(\\sqrt{\ell})$ at $d=\\sqrt{\ell}$.
 

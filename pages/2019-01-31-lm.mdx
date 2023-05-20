@@ -86,14 +86,14 @@ Here the Neural Machine Translation ([NMT](https://github.com/THUNLP-MT/MT-Readi
 
 Fig. 1. The NMT base model used in CoVe.
 
-- A sequence of $n$ words in source language (English): $x = \[x\_1, \\dots, x\_n\]$.
-- A sequence of $m$ words in target language (German): $y = \[y\_1, \\dots, y\_m\]$.
+- A sequence of $n$ words in source language (English): $x = \[x\_1, \dots, x\_n\]$.
+- A sequence of $m$ words in target language (German): $y = \[y\_1, \dots, y\_m\]$.
 - The [GloVe](https://lilianweng.github.io/posts/2017-10-15-word-embedding/#glove-global-vectors) vectors of source words: $\text{GloVe}(x)$.
-- Randomly initialized embedding vectors of target words: $z = \[z\_1, \\dots, z\_m\]$.
-- The biLSTM encoder outputs a sequence of hidden states: $h = \[h\_1, \\dots, h\_n\] = \text{biLSTM}(\text{GloVe}(x))$ and $h\_t = \[\\overrightarrow{h}\_t; \\overleftarrow{h}\_t\]$ where the forward LSTM computes $\\overrightarrow{h}\_t = \text{LSTM}(x\_t, \\overrightarrow{h}\_{t-1})$ and the backward computation gives us $\\overleftarrow{h}\_t = \text{LSTM}(x\_t, \\overleftarrow{h}\_{t-1})$.
-- The attentional decoder outputs a distribution over words: $p(y\_t \mid H, y\_1, \\dots, y\_{t-1})$ where $H$ is a stack of hidden states $\{h\}$ along the time dimension:
+- Randomly initialized embedding vectors of target words: $z = \[z\_1, \dots, z\_m\]$.
+- The biLSTM encoder outputs a sequence of hidden states: $h = \[h\_1, \dots, h\_n\] = \text{biLSTM}(\text{GloVe}(x))$ and $h\_t = \[\\overrightarrow{h}\_t; \\overleftarrow{h}\_t\]$ where the forward LSTM computes $\\overrightarrow{h}\_t = \text{LSTM}(x\_t, \\overrightarrow{h}\_{t-1})$ and the backward computation gives us $\\overleftarrow{h}\_t = \text{LSTM}(x\_t, \\overleftarrow{h}\_{t-1})$.
+- The attentional decoder outputs a distribution over words: $p(y\_t \mid H, y\_1, \dots, y\_{t-1})$ where $H$ is a stack of hidden states $\{h\}$ along the time dimension:
 
-$$ \\begin{aligned} \text{decoder hidden state: } s_t &= \text{LSTM}(\[z\_{t-1}; \\tilde{h}\_{t-1}\], s\_{t-1}) \\\\ \text{attention weights: } \\alpha_t &= \text{softmax}(H(W_1 s_t + b_1)) \\\\ \text{context-adjusted hidden state: } \\tilde{h}\_t &= \\tanh(W_2\[H^\\top\\alpha_t;s_t\] + b_2) \\\\ \text{decoder output: } p(y_t\mid H, y_1, \\dots, y\_{t-1}) &= \text{softmax}(W\_\text{out} \\tilde{h}\_t + b\_\text{out}) \\end{aligned} $$
+$$ \begin{aligned} \text{decoder hidden state: } s_t &= \text{LSTM}(\[z\_{t-1}; \\tilde{h}\_{t-1}\], s\_{t-1}) \\ \text{attention weights: } \\alpha_t &= \text{softmax}(H(W_1 s_t + b_1)) \\ \text{context-adjusted hidden state: } \\tilde{h}\_t &= \\tanh(W_2\[H^\top\\alpha_t;s_t\] + b_2) \\ \text{decoder output: } p(y_t\mid H, y_1, \dots, y\_{t-1}) &= \text{softmax}(W\_\text{out} \\tilde{h}\_t + b\_\text{out}) \end{aligned} $$
 
 ## Use CoVe in Downstream Tasks[#](#use-cove-in-downstream-tasks)
 
@@ -121,17 +121,17 @@ In the following sections, we will see that ELMo overcomes issue (1) by unsuperv
 
 ## Bidirectional Language Model[#](#bidirectional-language-model)
 
-The bidirectional Language Model (**biLM**) is the foundation for ELMo. While the input is a sequence of $n$ tokens, $(x\_1, \\dots, x\_n)$, the language model learns to predict the probability of next token given the history.
+The bidirectional Language Model (**biLM**) is the foundation for ELMo. While the input is a sequence of $n$ tokens, $(x\_1, \dots, x\_n)$, the language model learns to predict the probability of next token given the history.
 
 In the forward pass, the history contains words before the target token,
 
-$$ p(x_1, \\dots, x_n) = \\prod\_{i=1}^n p(x_i \mid x_1, \\dots, x\_{i-1}) $$
+$$ p(x_1, \dots, x_n) = \\prod\_{i=1}^n p(x_i \mid x_1, \dots, x\_{i-1}) $$
 
 In the backward pass, the history contains words after the target token,
 
-$$ p(x_1, \\dots, x_n) = \\prod\_{i=1}^n p(x_i \mid x\_{i+1}, \\dots, x_n) $$
+$$ p(x_1, \dots, x_n) = \\prod\_{i=1}^n p(x_i \mid x\_{i+1}, \dots, x_n) $$
 
-The predictions in both directions are modeled by multi-layer LSTMs with hidden states $\\overrightarrow{\\mathbf{h}}\_{i,\ell}$ and $\\overleftarrow{\\mathbf{h}}\_{i,\ell}$ for input token $x\_i$ at the layer level $\ell=1,\\dots,L$. The final layer's hidden state $\\mathbf{h}\_{i,L} = \[\\overrightarrow{\\mathbf{h}}\_{i,L}; \\overleftarrow{\\mathbf{h}}\_{i,L}\]$ is used to output the probabilities over tokens after softmax normalization. They share the embedding layer and the softmax layer, parameterized by $\\Theta\_e$ and $\\Theta\_s$ respectively.
+The predictions in both directions are modeled by multi-layer LSTMs with hidden states $\\overrightarrow{\mathbf{h}}\_{i,\ell}$ and $\\overleftarrow{\mathbf{h}}\_{i,\ell}$ for input token $x\_i$ at the layer level $\ell=1,\dots,L$. The final layer's hidden state $\mathbf{h}\_{i,L} = \[\\overrightarrow{\mathbf{h}}\_{i,L}; \\overleftarrow{\mathbf{h}}\_{i,L}\]$ is used to output the probabilities over tokens after softmax normalization. They share the embedding layer and the softmax layer, parameterized by $\\Theta\_e$ and $\\Theta\_s$ respectively.
 
 ![](ELMo-biLSTM.png)
 
@@ -139,19 +139,19 @@ Fig. 3. The biLSTM base model of ELMo. (Image source: recreated based on the fig
 
 The model is trained to minimize the negative log likelihood (= maximize the log likelihood for true words) in both directions:
 
-$$ \\begin{aligned} \mathcal{L} = - \sum\_{i=1}^n \\Big( \\log p(x_i \mid x_1, \\dots, x\_{i-1}; \\Theta_e, \\overrightarrow{\\Theta}\_\text{LSTM}, \\Theta_s) + \\\\ \\log p(x_i \mid x\_{i+1}, \\dots, x_n; \\Theta_e, \\overleftarrow{\\Theta}\_\text{LSTM}, \\Theta_s) \\Big) \\end{aligned} $$
+$$ \begin{aligned} \mathcal{L} = - \sum\_{i=1}^n \\Big( \\log p(x_i \mid x_1, \dots, x\_{i-1}; \\Theta_e, \\overrightarrow{\\Theta}\_\text{LSTM}, \\Theta_s) + \\ \\log p(x_i \mid x\_{i+1}, \dots, x_n; \\Theta_e, \\overleftarrow{\\Theta}\_\text{LSTM}, \\Theta_s) \\Big) \end{aligned} $$
 
 ## ELMo Representations[#](#elmo-representations)
 
 On top of a $L$-layer biLM, ELMo stacks all the hidden states across layers together by learning a task-specific linear combination. The hidden state representation for the token $x\_i$ contains $2L+1$ vectors:
 
-$$ R_i = \{ \\mathbf{h}\_{i,\ell} \mid \ell = 0, \\dots, L \} $$
+$$ R_i = \{ \mathbf{h}\_{i,\ell} \mid \ell = 0, \dots, L \} $$
 
-where $\\mathbf{h}\_{0, \ell}$ is the embedding layer output and $\\mathbf{h}\_{i, \ell} = \[\\overrightarrow{\\mathbf{h}}\_{i,\ell}; \\overleftarrow{\\mathbf{h}}\_{i,\ell}\]$.
+where $\mathbf{h}\_{0, \ell}$ is the embedding layer output and $\mathbf{h}\_{i, \ell} = \[\\overrightarrow{\mathbf{h}}\_{i,\ell}; \\overleftarrow{\mathbf{h}}\_{i,\ell}\]$.
 
-The weights, $\\mathbf{s}^\text{task}$, in the linear combination are learned for each end task and normalized by softmax. The scaling factor $\\gamma^\text{task}$ is used to correct the misalignment between the distribution of biLM hidden states and the distribution of task specific representations.
+The weights, $\mathbf{s}^\text{task}$, in the linear combination are learned for each end task and normalized by softmax. The scaling factor $\\gamma^\text{task}$ is used to correct the misalignment between the distribution of biLM hidden states and the distribution of task specific representations.
 
-$$ v_i = f(R_i; \\Theta^\text{task}) = \\gamma^\text{task} \sum\_{\ell=0}^L s^\text{task}\_i \\mathbf{h}\_{i,\ell} $$
+$$ v_i = f(R_i; \\Theta^\text{task}) = \\gamma^\text{task} \sum\_{\ell=0}^L s^\text{task}\_i \mathbf{h}\_{i,\ell} $$
 
 To evaluate what kind of information is captured by hidden states across different layers, ELMo is applied on semantic-intensive and syntax-intensive tasks respectively using representations in different layers of biLM:
 
@@ -194,13 +194,13 @@ The multi-task learning encourages better generality of representation and in th
 
 Theoretically the primary prediction module can take any form, generic or task-specific design. The examples presented in the CVT paper include both cases.
 
-In sequential tagging tasks (classification for every token) like [NER](#ner) or [POS](#pos) tagging, the predictor module contains two fully connected layers and a softmax layer on the output to produce a probability distribution over class labels. For each token $\\mathbf{x}\_i$, we take the corresponding hidden states in two layers, $\\mathbf{h}\_1^{(i)}$ and $\\mathbf{h}\_2^{(i)}$:
+In sequential tagging tasks (classification for every token) like [NER](#ner) or [POS](#pos) tagging, the predictor module contains two fully connected layers and a softmax layer on the output to produce a probability distribution over class labels. For each token $\mathbf{x}\_i$, we take the corresponding hidden states in two layers, $\mathbf{h}\_1^{(i)}$ and $\mathbf{h}\_2^{(i)}$:
 
-$$ \\begin{aligned} p\_\\theta(y_i \mid \\mathbf{x}\_i) &= \text{NN}(\\mathbf{h}^{(i)}) \\\\ &= \text{NN}(\[\\mathbf{h}\_1^{(i)}; \\mathbf{h}\_2^{(i)}\]) \\\\ &= \text{softmax} \\big( \\mathbf{W}\\cdot\text{ReLU}(\\mathbf{W'}\\cdot\[\\mathbf{h}\_1^{(i)}; \\mathbf{h}\_2^{(i)}\]) + \\mathbf{b} \\big) \\end{aligned} $$
+$$ \begin{aligned} p\_\\theta(y_i \mid \mathbf{x}\_i) &= \text{NN}(\mathbf{h}^{(i)}) \\ &= \text{NN}(\[\mathbf{h}\_1^{(i)}; \mathbf{h}\_2^{(i)}\]) \\ &= \text{softmax} \\big( \mathbf{W}\cdot\text{ReLU}(\mathbf{W'}\cdot\[\mathbf{h}\_1^{(i)}; \mathbf{h}\_2^{(i)}\]) + \mathbf{b} \\big) \end{aligned} $$
 
 The auxiliary tasks are only fed with forward or backward LSTM state in the first layer. Because they only observe partial context, either on the left or right, they have to learn like a language model, trying to predict the next token given the context. The `fwd` and `bwd` auxiliary tasks only take one direction. The `future` and `past` tasks take one step further in forward and backward direction, respectively.
 
-$$ \\begin{aligned} p\_\\theta^\text{fwd}(y_i \mid \\mathbf{x}\_i) &= \text{NN}^\text{fwd}(\\overrightarrow{\\mathbf{h}}^{(i)}) \\\\ p\_\\theta^\text{bwd}(y_i \mid \\mathbf{x}\_i) &= \text{NN}^\text{bwd}(\\overleftarrow{\\mathbf{h}}^{(i)}) \\\\ p\_\\theta^\text{future}(y_i \mid \\mathbf{x}\_i) &= \text{NN}^\text{future}(\\overrightarrow{\\mathbf{h}}^{(i-1)}) \\\\ p\_\\theta^\text{past}(y_i \mid \\mathbf{x}\_i) &= \text{NN}^\text{past}(\\overleftarrow{\\mathbf{h}}^{(i+1)}) \\end{aligned} $$
+$$ \begin{aligned} p\_\\theta^\text{fwd}(y_i \mid \mathbf{x}\_i) &= \text{NN}^\text{fwd}(\\overrightarrow{\mathbf{h}}^{(i)}) \\ p\_\\theta^\text{bwd}(y_i \mid \mathbf{x}\_i) &= \text{NN}^\text{bwd}(\\overleftarrow{\mathbf{h}}^{(i)}) \\ p\_\\theta^\text{future}(y_i \mid \mathbf{x}\_i) &= \text{NN}^\text{future}(\\overrightarrow{\mathbf{h}}^{(i-1)}) \\ p\_\\theta^\text{past}(y_i \mid \mathbf{x}\_i) &= \text{NN}^\text{past}(\\overleftarrow{\mathbf{h}}^{(i+1)}) \end{aligned} $$
 
 ![](CVT-example.png)
 
@@ -219,7 +219,7 @@ ULMFiT follows three steps to achieve good transfer learning results on downstre
 1.  _General LM pre-training_: on Wikipedia text.
 2.  _Target task LM fine-tuning_: ULMFiT proposed two training techniques for stabilizing the fine-tuning process. See below.
 
-- **Discriminative fine-tuning** is motivated by the fact that different layers of LM capture different types of information (see [discussion](#elmo-representations) above). ULMFiT proposed to tune each layer with different learning rates, $\{\\eta^1, \\dots, \\eta^\ell, \\dots, \\eta^L\}$, where $\\eta$ is the base learning rate for the first layer, $\\eta^\ell$ is for the $\ell$-th layer and there are $L$ layers in total.
+- **Discriminative fine-tuning** is motivated by the fact that different layers of LM capture different types of information (see [discussion](#elmo-representations) above). ULMFiT proposed to tune each layer with different learning rates, $\{\\eta^1, \dots, \\eta^\ell, \dots, \\eta^L\}$, where $\\eta$ is the base learning rate for the first layer, $\\eta^\ell$ is for the $\ell$-th layer and there are $L$ layers in total.
 - **Slanted triangular learning rates (STLR)** refer to a special learning rate scheduling that first linearly increases the learning rate and then linearly decays it. The increase stage is short so that the model can converge to a parameter space suitable for the task fast, while the decay period is long allowing for better fine-tuning.
 
 3.  _Target task classifier fine-tuning_: The pretrained LM is augmented with two standard feed-forward layers and a softmax normalization at the end to predict a target label distribution.
@@ -250,7 +250,7 @@ Fig. 7. The transformer decoder model architecture in OpenAI GPT.
 
 The loss is the negative log-likelihood, same as [ELMo](#elmo), but without backward computation. Let's say, the context window of the size $k$ is located before the target word and the loss would look like:
 
-$$ \mathcal{L}\_\text{LM} = -\sum\_{i} \\log p(x_i\mid x\_{i-k}, \\dots, x\_{i-1}) $$
+$$ \mathcal{L}\_\text{LM} = -\sum\_{i} \\log p(x_i\mid x\_{i-k}, \dots, x\_{i-1}) $$
 
 ## Byte Pair Encoding[#](#byte-pair-encoding)
 
@@ -260,18 +260,18 @@ $$ \mathcal{L}\_\text{LM} = -\sum\_{i} \\log p(x_i\mid x\_{i-k}, \\dots, x\_{i-1
 
 The most substantial upgrade that OpenAI GPT proposed is to get rid of the task-specific model and use the pre-trained language model directly!
 
-Let's take classification as an example. Say, in the labeled dataset, each input has $n$ tokens, $\\mathbf{x} = (x\_1, \\dots, x\_n)$, and one label $y$. GPT first processes the input sequence $\\mathbf{x}$ through the pre-trained transformer decoder and the last layer output for the last token $x\_n$ is $\\mathbf{h}\_L^{(n)}$. Then with only one new trainable weight matrix $\\mathbf{W}\_y$, it can predict a distribution over class labels.
+Let's take classification as an example. Say, in the labeled dataset, each input has $n$ tokens, $\mathbf{x} = (x\_1, \dots, x\_n)$, and one label $y$. GPT first processes the input sequence $\mathbf{x}$ through the pre-trained transformer decoder and the last layer output for the last token $x\_n$ is $\mathbf{h}\_L^{(n)}$. Then with only one new trainable weight matrix $\mathbf{W}\_y$, it can predict a distribution over class labels.
 
 ![](GPT-classification.png)
 
-$$ P(y\mid x_1, \\dots, x_n) = \text{softmax}(\\mathbf{h}\_L^{(n)}\\mathbf{W}\_y) $$
+$$ P(y\mid x_1, \dots, x_n) = \text{softmax}(\mathbf{h}\_L^{(n)}\mathbf{W}\_y) $$
 
 The loss is to minimize the negative log-likelihood for true labels. In addition, adding the LM loss as an auxiliary loss is found to be beneficial, because:
 
 - (1) it helps accelerate convergence during training and
 - (2) it is expected to improve the generalization of the supervised model.
 
-$$ \\begin{aligned} \mathcal{L}\_\text{cls} &= \sum\_{(\\mathbf{x}, y) \in \mathcal{D}} \\log P(y\mid x_1, \\dots, x_n) = \sum\_{(\\mathbf{x}, y) \in \mathcal{D}} \\log \text{softmax}(\\mathbf{h}\_L^{(n)}(\\mathbf{x})\\mathbf{W}\_y) \\\\ \mathcal{L}\_\text{LM} &= -\sum\_{i} \\log p(x_i\mid x\_{i-k}, \\dots, x\_{i-1}) \\\\ \mathcal{L} &= \mathcal{L}\_\text{cls} + \\lambda \mathcal{L}\_\text{LM} \\end{aligned} $$
+$$ \begin{aligned} \mathcal{L}\_\text{cls} &= \sum\_{(\mathbf{x}, y) \in \mathcal{D}} \\log P(y\mid x_1, \dots, x_n) = \sum\_{(\mathbf{x}, y) \in \mathcal{D}} \\log \text{softmax}(\mathbf{h}\_L^{(n)}(\mathbf{x})\mathbf{W}\_y) \\ \mathcal{L}\_\text{LM} &= -\sum\_{i} \\log p(x_i\mid x\_{i-k}, \dots, x\_{i-1}) \\ \mathcal{L} &= \mathcal{L}\_\text{cls} + \\lambda \mathcal{L}\_\text{LM} \end{aligned} $$
 
 With similar designs, no customized model structure is needed for other end tasks (see Fig. 7). If the task input contains multiple sentences, a special delimiter token (`$`) is added between each pair of sentences. The embedding for this delimiter token is a new parameter we need to learn, but it should be pretty minimal.
 
@@ -348,9 +348,9 @@ Note that the first token is always forced to be `[CLS]` — a placeholder that 
 
 BERT fine-tuning requires only a few new parameters added, just like OpenAI GPT.
 
-For classification tasks, we get the prediction by taking the final hidden state of the special first token `[CLS]`, $\\mathbf{h}^\text{\[CLS\]}\_L$, and multiplying it with a small weight matrix, $\text{softmax}(\\mathbf{h}^\text{\[CLS\]}\_L \\mathbf{W}\_\text{cls})$.
+For classification tasks, we get the prediction by taking the final hidden state of the special first token `[CLS]`, $\mathbf{h}^\text{\[CLS\]}\_L$, and multiplying it with a small weight matrix, $\text{softmax}(\mathbf{h}^\text{\[CLS\]}\_L \mathbf{W}\_\text{cls})$.
 
-For [QA](#qa) tasks like SQuAD, we need to predict the text span in the given paragraph for an given question. BERT predicts two probability distributions of every token, being the start and the end of the text span. Only two new small matrices, $\\mathbf{W}\_\text{s}$ and $\\mathbf{W}\_\text{e}$, are newly learned during fine-tuning and $\text{softmax}(\\mathbf{h}^\text{(i)}\_L \\mathbf{W}\_\text{s})$ and $\text{softmax}(\\mathbf{h}^\text{(i)}\_L \\mathbf{W}\_\text{e})$ define two probability distributions.
+For [QA](#qa) tasks like SQuAD, we need to predict the text span in the given paragraph for an given question. BERT predicts two probability distributions of every token, being the start and the end of the text span. Only two new small matrices, $\mathbf{W}\_\text{s}$ and $\mathbf{W}\_\text{e}$, are newly learned during fine-tuning and $\text{softmax}(\mathbf{h}^\text{(i)}\_L \mathbf{W}\_\text{s})$ and $\text{softmax}(\mathbf{h}^\text{(i)}\_L \mathbf{W}\_\text{e})$ define two probability distributions.
 
 Overall the add-on part for end task fine-tuning is very minimal — one or two weight matrices to convert the Transform hidden states to an interpretable format. Check the paper for implementation details for other cases.
 
@@ -458,18 +458,18 @@ Fig. 15. The evaluation performance increases with the model size and the number
 
 The _Autoregressive (AR)_ model such as GPT and _autoencoder (AE)_ model such as BERT are two most common ways for language modeling. However, each has their own disadvantages: AR does not learn the bidirectional context, which is needed by downstream tasks like reading comprehension and AE assumes masked positions are independent given all other unmasked tokens which oversimplifies the long context dependency.
 
-**XLNet** ([Yang et al. 2019](https://arxiv.org/abs/1906.08237)) generalizes the AE method to incorporate the benefits of AR. XLNet proposed the **permutation language modeling** objective. For a text sequence, it samples a factorization order $\\mathbf{z}$ and decomposes the likelihood $p\_\\theta(\\mathbf{x})$ according to this factorization order,
+**XLNet** ([Yang et al. 2019](https://arxiv.org/abs/1906.08237)) generalizes the AE method to incorporate the benefits of AR. XLNet proposed the **permutation language modeling** objective. For a text sequence, it samples a factorization order $\mathbf{z}$ and decomposes the likelihood $p\_\\theta(\mathbf{x})$ according to this factorization order,
 
-$$ \\begin{aligned} \mathcal{L}\_\text{XLNet} &= - \\mathbb{E}\_{\\mathbf{z} \\sim \mathcal{Z}\_T} \\Big\[ \sum\_{t=1}^T \\log p\_\\theta (X\_{z_t} = x \mid \\mathbf{x}\_{\\mathbf{z}\_{<{t}}})\\Big\] \\\\ &= - \\mathbb{E}\_{\\mathbf{z} \\sim \mathcal{Z}\_T} \\Big\[ \\log \\frac{ \\exp(e(x)^\\top \\color{red}{h\_\\theta (\\mathbf{x}\_{\\mathbf{z}\_{<{t}}})}) }{ \sum\_{x'} \\exp(e(x')^\\top \\color{red}{h\_\\theta (\\mathbf{x}\_{\\mathbf{z}\_{<{t}}})}) } \\Big\] \\\\ &= - \\mathbb{E}\_{\\mathbf{z} \\sim \mathcal{Z}\_T} \\Big\[ \\log \\frac{ \\exp(e(x)^\\top \\color{blue}{g\_\\theta (\\mathbf{x}\_{\\mathbf{z}\_{<{t}}}, z_t)}) }{ \sum\_{x'} \\exp(e(x')^\\top \\color{blue}{g\_\\theta (\\mathbf{x}\_{\\mathbf{z}\_{<{t}}}, z_t)}) } \\Big\] \\end{aligned} $$
+$$ \begin{aligned} \mathcal{L}\_\text{XLNet} &= - \mathbb{E}\_{\mathbf{z} \\sim \mathcal{Z}\_T} \\Big\[ \sum\_{t=1}^T \\log p\_\\theta (X\_{z_t} = x \mid \mathbf{x}\_{\mathbf{z}\_{<{t}}})\\Big\] \\ &= - \mathbb{E}\_{\mathbf{z} \\sim \mathcal{Z}\_T} \\Big\[ \\log \frac{ \\exp(e(x)^\top \\color{red}{h\_\\theta (\mathbf{x}\_{\mathbf{z}\_{<{t}}})}) }{ \sum\_{x'} \\exp(e(x')^\top \\color{red}{h\_\\theta (\mathbf{x}\_{\mathbf{z}\_{<{t}}})}) } \\Big\] \\ &= - \mathbb{E}\_{\mathbf{z} \\sim \mathcal{Z}\_T} \\Big\[ \\log \frac{ \\exp(e(x)^\top \\color{blue}{g\_\\theta (\mathbf{x}\_{\mathbf{z}\_{<{t}}}, z_t)}) }{ \sum\_{x'} \\exp(e(x')^\top \\color{blue}{g\_\\theta (\mathbf{x}\_{\mathbf{z}\_{<{t}}}, z_t)}) } \\Big\] \end{aligned} $$
 
-where $\mathcal{Z}\_T$ is a set of all possible permutation of length $T$; $z\_t$ and $\\mathbf{z}\_{<t}$ denote the $t$-th element and the first $t-1$ elements of a permutation $\\mathbf{z} \in \mathcal{Z}\_T$.
+where $\mathcal{Z}\_T$ is a set of all possible permutation of length $T$; $z\_t$ and $\mathbf{z}\_{<t}$ denote the $t$-th element and the first $t-1$ elements of a permutation $\mathbf{z} \in \mathcal{Z}\_T$.
 
-Note that the naive representation of the hidden state of the context, $h\_\\theta (\\mathbf{x}\_{\\mathbf{z}\_{<t}})$ in red, does not depend on which position the model tries to predict, as the permutation breaks the default ordering. Therefore, XLNet re-parameterized it to a function of the target position too, $g\_\\theta (\\mathbf{x}\_{\\mathbf{z}\_{<t}}, z\_t)$ in blue.
+Note that the naive representation of the hidden state of the context, $h\_\\theta (\mathbf{x}\_{\mathbf{z}\_{<t}})$ in red, does not depend on which position the model tries to predict, as the permutation breaks the default ordering. Therefore, XLNet re-parameterized it to a function of the target position too, $g\_\\theta (\mathbf{x}\_{\mathbf{z}\_{<t}}, z\_t)$ in blue.
 
-However, two different requirements on $g\_\\theta (\\mathbf{x}\_{\\mathbf{z}\_{<t}}, z\_t)$ lead to a two-stream self-attention design to accommodate:
+However, two different requirements on $g\_\\theta (\mathbf{x}\_{\mathbf{z}\_{<t}}, z\_t)$ lead to a two-stream self-attention design to accommodate:
 
-1.  When predicting $x\_{z\_t}$, it should only encode the position $z\_t$ but not the content $x\_{z\_t}$; otherwise it is trivial. This is wrapped into the “query representation” $g\_{z\_t} = g\_\\theta (\\mathbf{x}\_{\\mathbf{z}\_{<t}}, z\_t)$ does not encode $x\_{z\_t}$.
-2.  When predicting $x\_j$ where $j > t$, it should encode the content $x\_{z\_t}$ as well to provide the full context. This is the “content representation” $h\_{z\_t} = h\_\\theta(\\mathbf{x}\_{\\leq t})$.
+1.  When predicting $x\_{z\_t}$, it should only encode the position $z\_t$ but not the content $x\_{z\_t}$; otherwise it is trivial. This is wrapped into the “query representation” $g\_{z\_t} = g\_\\theta (\mathbf{x}\_{\mathbf{z}\_{<t}}, z\_t)$ does not encode $x\_{z\_t}$.
+2.  When predicting $x\_j$ where $j > t$, it should encode the content $x\_{z\_t}$ as well to provide the full context. This is the “content representation” $h\_{z\_t} = h\_\\theta(\mathbf{x}\_{\\leq t})$.
 
 ![](XLNet-two-stream-attention.png)
 
@@ -477,7 +477,7 @@ Fig. 16. The illustration of two-stream self-attention mechanism in XLNet. (Imag
 
 Conceptually, the two streams of representations are updated as follows,
 
-$$ \\begin{aligned} g\_{z_t}^{(m)} &\\gets \text{Attention}(Q = g^{(m-1)}\_{z_t}, KV=\\mathbf{h}^{(m-1)}\_{\\color{red}{\\mathbf{z}\_{<{t}}}}; \\theta) &\text{(query stream: use }z_t\text{ but cannot see }x\_{z_t}\text{)}\\\\ h\_{z_t}^{(m)} &\\gets \text{Attention}(Q = h^{(m-1)}\_{z_t}, KV=\\mathbf{h}^{(m-1)}\_{\\color{blue}{\\mathbf{z}\_{\\leq t}}}; \\theta) &\text{(content stream: use both }x\_{z_t}\text{ and }x\_{z_t}\text{)}\\\\ \\end{aligned} $$
+$$ \begin{aligned} g\_{z_t}^{(m)} &\\gets \text{Attention}(Q = g^{(m-1)}\_{z_t}, KV=\mathbf{h}^{(m-1)}\_{\\color{red}{\mathbf{z}\_{<{t}}}}; \\theta) &\text{(query stream: use }z_t\text{ but cannot see }x\_{z_t}\text{)}\\ h\_{z_t}^{(m)} &\\gets \text{Attention}(Q = h^{(m-1)}\_{z_t}, KV=\mathbf{h}^{(m-1)}\_{\\color{blue}{\mathbf{z}\_{\\leq t}}}; \\theta) &\text{(content stream: use both }x\_{z_t}\text{ and }x\_{z_t}\text{)}\\ \end{aligned} $$
 
 Given the difficulty of optimization in permutation language modeling, XLNet is set to only predict the last chunk of tokens in a factorization order.
 
@@ -521,11 +521,11 @@ Fig. 20. Illustration of ELECTRA model architecture. (Image source: [Clark et al
 
 ELECTRA proposes a new pretraining task, called “Replaced Token Detection” (RTD). Let's randomly sample $k$ positions to be masked. Each selected token in the original text is replaced by a plausible alternative predicted by a small language model, known as the generator $G$. The discriminator $D$ predicts whether each token is original or replaced.
 
-$$ \\begin{aligned} \\boldsymbol{m} &= \[m_1, \\dots, m_k\] \text{ where } m_i \\sim \text{unif}\{1, n\}\text{ for } i=1, \\dots, k \\\\ \\boldsymbol{x}^\text{masked} &= \text{REPLACE}(\\boldsymbol{x}, \\boldsymbol{m}, \texttt{\[MASK\]}) \\\\ \\boldsymbol{x}^\text{corrupt} &= \text{REPLACE}(\\boldsymbol{x}, \\boldsymbol{m}, \\tilde{\\boldsymbol{x}}) \text{ where } \\tilde{x}\_t \\sim p_G(x_i \mid \\boldsymbol{x}^\text{masked}) \text{ for } i \in \\boldsymbol{m} \\\\ \\end{aligned} $$
+$$ \begin{aligned} \\boldsymbol{m} &= \[m_1, \dots, m_k\] \text{ where } m_i \\sim \text{unif}\{1, n\}\text{ for } i=1, \dots, k \\ \\boldsymbol{x}^\text{masked} &= \text{REPLACE}(\\boldsymbol{x}, \\boldsymbol{m}, \texttt{\[MASK\]}) \\ \\boldsymbol{x}^\text{corrupt} &= \text{REPLACE}(\\boldsymbol{x}, \\boldsymbol{m}, \\tilde{\\boldsymbol{x}}) \text{ where } \\tilde{x}\_t \\sim p_G(x_i \mid \\boldsymbol{x}^\text{masked}) \text{ for } i \in \\boldsymbol{m} \\ \end{aligned} $$
 
 The loss for the generator is the negative log-likelihood just as in other language models. The loss for the discriminator is the cross-entropy. Note that the generator is not adversarially trained to fool the discriminator but simply to optimize the NLL, since their experiments show negative results.
 
-$$ \\begin{aligned} \mathcal{L}\_\text{MLM}(\\mathbf{x}, \\theta_G) &= \\mathbb{E}\\Big(\sum\_{i \in \\boldsymbol{m}} -\\log p_G (x_i \mid \\boldsymbol{x}^\text{masked} )\\Big) \\\\ \mathcal{L}\_\text{Disc}(\\mathbf{x}, \\theta_D) &= \\mathbb{E}\\Big( - \\mathbb{1}\[x^\text{corrupt}\_t = x_t\] \\log D(\\boldsymbol{x}^\text{corrupt}, t) - \\mathbb{1}\[x^\text{corrupt}\_t \\neq x_t\] \\log (1 - \\log D(\\boldsymbol{x}^\text{corrupt}, t)) \\Big) \\end{aligned} $$
+$$ \begin{aligned} \mathcal{L}\_\text{MLM}(\mathbf{x}, \\theta_G) &= \mathbb{E}\\Big(\sum\_{i \in \\boldsymbol{m}} -\\log p_G (x_i \mid \\boldsymbol{x}^\text{masked} )\\Big) \\ \mathcal{L}\_\text{Disc}(\mathbf{x}, \\theta_D) &= \mathbb{E}\\Big( - \mathbb{1}\[x^\text{corrupt}\_t = x_t\] \\log D(\\boldsymbol{x}^\text{corrupt}, t) - \mathbb{1}\[x^\text{corrupt}\_t \\neq x_t\] \\log (1 - \\log D(\\boldsymbol{x}^\text{corrupt}, t)) \\Big) \end{aligned} $$
 
 They found it more beneficial to only share the embeddings between generator & discriminator while using a small generator (1/4 to 1/2 the discriminator size), rather than sharing all the weights (i.e. two models have to be the same size then). In addition, joint training of the generator and discriminator works better than two-stage training of each alternatively.
 
@@ -633,13 +633,13 @@ A [perplexity](https://en.wikipedia.org/wiki/Perplexity) of a discrete proabilit
 
 $$ 2^{H(p)} = 2^{-\sum_x p(x) \\log_2 p(x)} $$
 
-Given a sentence with $N$ words, $s = (w\_1, \\dots, w\_N)$, the entropy looks as follows, simply assuming that each word has the same frequency, $\\frac{1}{N}$:
+Given a sentence with $N$ words, $s = (w\_1, \dots, w\_N)$, the entropy looks as follows, simply assuming that each word has the same frequency, $\frac{1}{N}$:
 
-$$ H(s) = -\sum\_{i=1}^N P(w_i) \\log_2 p(w_i) = -\sum\_{i=1}^N \\frac{1}{N} \\log_2 p(w_i) $$
+$$ H(s) = -\sum\_{i=1}^N P(w_i) \\log_2 p(w_i) = -\sum\_{i=1}^N \frac{1}{N} \\log_2 p(w_i) $$
 
 The perplexity for the sentence becomes:
 
-$$ \\begin{aligned} 2^{H(s)} &= 2^{-\\frac{1}{N} \sum\_{i=1}^N \\log_2 p(w_i)} = (2^{\sum\_{i=1}^N \\log_2 p(w_i)})^{-\\frac{1}{N}} = (p(w_1) \\dots p(w_N))^{-\\frac{1}{N}} \\end{aligned} $$
+$$ \begin{aligned} 2^{H(s)} &= 2^{-\frac{1}{N} \sum\_{i=1}^N \\log_2 p(w_i)} = (2^{\sum\_{i=1}^N \\log_2 p(w_i)})^{-\frac{1}{N}} = (p(w_1) \dots p(w_N))^{-\frac{1}{N}} \end{aligned} $$
 
 A good language model should predict high word probabilities. Therefore, the smaller perplexity the better.
 

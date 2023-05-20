@@ -40,25 +40,25 @@ Mean
 
 $\mathcal{D}$
 
-The dataset, $\mathcal{D} = \{ \\mathbf{x}^{(1)}, \\mathbf{x}^{(2)}, \\dots, \\mathbf{x}^{(n)} \}$, contains $n$ data samples; $\vert\mathcal{D}\vert =n $.
+The dataset, $\mathcal{D} = \{ \mathbf{x}^{(1)}, \mathbf{x}^{(2)}, \dots, \mathbf{x}^{(n)} \}$, contains $n$ data samples; $\vert\mathcal{D}\vert =n $.
 
-$\\mathbf{x}^{(i)}$
+$\mathbf{x}^{(i)}$
 
-Each data point is a vector of $d$ dimensions, $\\mathbf{x}^{(i)} = \[x^{(i)}\_1, x^{(i)}\_2, \\dots, x^{(i)}\_d\]$.
+Each data point is a vector of $d$ dimensions, $\mathbf{x}^{(i)} = \[x^{(i)}\_1, x^{(i)}\_2, \dots, x^{(i)}\_d\]$.
 
-$\\mathbf{x}$
+$\mathbf{x}$
 
-One data sample from the dataset, $\\mathbf{x} \in \mathcal{D}$.
+One data sample from the dataset, $\mathbf{x} \in \mathcal{D}$.
 
-$\\mathbf{x}'$
+$\mathbf{x}'$
 
-The reconstructed version of $\\mathbf{x}$.
+The reconstructed version of $\mathbf{x}$.
 
-$\\tilde{\\mathbf{x}}$
+$\\tilde{\mathbf{x}}$
 
-The corrupted version of $\\mathbf{x}$.
+The corrupted version of $\mathbf{x}$.
 
-$\\mathbf{z}$
+$\mathbf{z}$
 
 The compressed code learned in the bottleneck layer.
 
@@ -74,11 +74,11 @@ $f\_{\\theta}(.)$
 
 The **decoding** function parameterized by $\\theta$.
 
-$q\_{\\phi}(\\mathbf{z}\vert\\mathbf{x})$
+$q\_{\\phi}(\mathbf{z}\vert\mathbf{x})$
 
 Estimated posterior probability function, also known as **probabilistic encoder**.
 
-$p\_{\\theta}(\\mathbf{x}\vert\\mathbf{z})$
+$p\_{\\theta}(\mathbf{x}\vert\mathbf{z})$
 
 Likelihood of generating true data sample given the latent code, also known as **probabilistic decoder**.
 
@@ -97,19 +97,19 @@ Fig. 1. Illustration of autoencoder model architecture.
 
 The encoder network essentially accomplishes the [dimensionality reduction](https://en.wikipedia.org/wiki/Dimensionality_reduction), just like how we would use Principal Component Analysis (PCA) or Matrix Factorization (MF) for. In addition, the autoencoder is explicitly optimized for the data reconstruction from the code. A good intermediate representation not only can capture latent variables, but also benefits a full [decompression](https://ai.googleblog.com/2016/09/image-compression-with-neural-networks.html) process.
 
-The model contains an encoder function $g(.)$ parameterized by $\\phi$ and a decoder function $f(.)$ parameterized by $\\theta$. The low-dimensional code learned for input $\\mathbf{x}$ in the bottleneck layer is $\\mathbf{z} = g\_\\phi(\\mathbf{x})$ and the reconstructed input is $\\mathbf{x}' = f\_\\theta(g\_\\phi(\\mathbf{x}))$.
+The model contains an encoder function $g(.)$ parameterized by $\\phi$ and a decoder function $f(.)$ parameterized by $\\theta$. The low-dimensional code learned for input $\mathbf{x}$ in the bottleneck layer is $\mathbf{z} = g\_\\phi(\mathbf{x})$ and the reconstructed input is $\mathbf{x}' = f\_\\theta(g\_\\phi(\mathbf{x}))$.
 
-The parameters $(\\theta, \\phi)$ are learned together to output a reconstructed data sample same as the original input, $\\mathbf{x} \\approx f\_\\theta(g\_\\phi(\\mathbf{x}))$, or in other words, to learn an identity function. There are various metrics to quantify the difference between two vectors, such as cross entropy when the activation function is sigmoid, or as simple as MSE loss:
+The parameters $(\\theta, \\phi)$ are learned together to output a reconstructed data sample same as the original input, $\mathbf{x} \\approx f\_\\theta(g\_\\phi(\mathbf{x}))$, or in other words, to learn an identity function. There are various metrics to quantify the difference between two vectors, such as cross entropy when the activation function is sigmoid, or as simple as MSE loss:
 
-$$ L\_\text{AE}(\\theta, \\phi) = \\frac{1}{n}\sum\_{i=1}^n (\\mathbf{x}^{(i)} - f\_\\theta(g\_\\phi(\\mathbf{x}^{(i)})))^2 $$
+$$ L\_\text{AE}(\\theta, \\phi) = \frac{1}{n}\sum\_{i=1}^n (\mathbf{x}^{(i)} - f\_\\theta(g\_\\phi(\mathbf{x}^{(i)})))^2 $$
 
 # Denoising Autoencoder[#](#denoising-autoencoder)
 
 Since the autoencoder learns the identity function, we are facing the risk of “overfitting” when there are more network parameters than the number of data points.
 
-To avoid overfitting and improve the robustness, **Denoising Autoencoder** (Vincent et al. 2008) proposed a modification to the basic autoencoder. The input is partially corrupted by adding noises to or masking some values of the input vector in a stochastic manner, $\\tilde{\\mathbf{x}} \\sim \mathcal{M}\_\mathcal{D}(\\tilde{\\mathbf{x}} \vert \\mathbf{x})$. Then the model is trained to recover the original input (note: not the corrupt one).
+To avoid overfitting and improve the robustness, **Denoising Autoencoder** (Vincent et al. 2008) proposed a modification to the basic autoencoder. The input is partially corrupted by adding noises to or masking some values of the input vector in a stochastic manner, $\\tilde{\mathbf{x}} \\sim \mathcal{M}\_\mathcal{D}(\\tilde{\mathbf{x}} \vert \mathbf{x})$. Then the model is trained to recover the original input (note: not the corrupt one).
 
-$$ \\begin{aligned} \\tilde{\\mathbf{x}}^{(i)} &\\sim \mathcal{M}\_\mathcal{D}(\\tilde{\\mathbf{x}}^{(i)} \vert \\mathbf{x}^{(i)})\\\\ L\_\text{DAE}(\\theta, \\phi) &= \\frac{1}{n} \sum\_{i=1}^n (\\mathbf{x}^{(i)} - f\_\\theta(g\_\\phi(\\tilde{\\mathbf{x}}^{(i)})))^2 \\end{aligned} $$
+$$ \begin{aligned} \\tilde{\mathbf{x}}^{(i)} &\\sim \mathcal{M}\_\mathcal{D}(\\tilde{\mathbf{x}}^{(i)} \vert \mathbf{x}^{(i)})\\ L\_\text{DAE}(\\theta, \\phi) &= \frac{1}{n} \sum\_{i=1}^n (\mathbf{x}^{(i)} - f\_\\theta(g\_\\phi(\\tilde{\mathbf{x}}^{(i)})))^2 \end{aligned} $$
 
 where $\mathcal{M}\_\mathcal{D}$ defines the mapping from the true data samples to the noisy or corrupted ones.
 
@@ -121,7 +121,7 @@ This design is motivated by the fact that humans can easily recognize an object 
 
 For high dimensional input with high redundancy, like images, the model is likely to depend on evidence gathered from a combination of many input dimensions to recover the denoised version rather than to overfit one dimension. This builds up a good foundation for learning _robust_ latent representation.
 
-The noise is controlled by a stochastic mapping $\mathcal{M}\_\mathcal{D}(\\tilde{\\mathbf{x}} \vert \\mathbf{x})$, and it is not specific to a particular type of corruption process (i.e. masking noise, Gaussian noise, salt-and-pepper noise, etc.). Naturally the corruption process can be equipped with prior knowledge
+The noise is controlled by a stochastic mapping $\mathcal{M}\_\mathcal{D}(\\tilde{\mathbf{x}} \vert \mathbf{x})$, and it is not specific to a particular type of corruption process (i.e. masking noise, Gaussian noise, salt-and-pepper noise, etc.). Naturally the corruption process can be equipped with prior knowledge
 
 In the experiment of the original DAE paper, the noise is applied in this way: a fixed proportion of input dimensions are selected at random and their values are forced to 0. Sounds a lot like dropout, right? Well, the denoising autoencoder was proposed in 2008, 4 years before the dropout paper ([Hinton, et al. 2012](https://www.cs.toronto.edu/~hinton/absps/JMLRdropout.pdf)) ;)
 
@@ -131,13 +131,13 @@ In the experiment of the original DAE paper, the noise is applied in this way: a
 
 Recall that common [activation functions](http://cs231n.github.io/neural-networks-1/#actfun) include sigmoid, tanh, relu, leaky relu, etc. A neuron is activated when the value is close to 1 and inactivate with a value close to 0.
 
-Let's say there are $s\_l$ neurons in the $l$-th hidden layer and the activation function for the $j$-th neuron in this layer is labelled as $a^{(l)}\_j(.)$, $j=1, \\dots, s\_l$. The fraction of activation of this neuron $\\hat{\rho}\_j$ is expected to be a small number $\rho$, known as _sparsity parameter_; a common config is $\rho = 0.05$.
+Let's say there are $s\_l$ neurons in the $l$-th hidden layer and the activation function for the $j$-th neuron in this layer is labelled as $a^{(l)}\_j(.)$, $j=1, \dots, s\_l$. The fraction of activation of this neuron $\\hat{\rho}\_j$ is expected to be a small number $\rho$, known as _sparsity parameter_; a common config is $\rho = 0.05$.
 
-$$ \\hat{\rho}\_j^{(l)} = \\frac{1}{n} \sum\_{i=1}^n \[a_j^{(l)}(\\mathbf{x}^{(i)})\] \\approx \rho $$
+$$ \\hat{\rho}\_j^{(l)} = \frac{1}{n} \sum\_{i=1}^n \[a_j^{(l)}(\mathbf{x}^{(i)})\] \\approx \rho $$
 
 This constraint is achieved by adding a penalty term into the loss function. The KL-divergence $D\_\text{KL}$ measures the difference between two Bernoulli distributions, one with mean $\rho$ and the other with mean $\\hat{\rho}\_j^{(l)}$. The hyperparameter $\\beta$ controls how strong the penalty we want to apply on the sparsity loss.
 
-$$ \\begin{aligned} L\_\text{SAE}(\\theta) &= L(\\theta) + \\beta \sum\_{l=1}^L \sum\_{j=1}^{s_l} D\_\text{KL}(\rho \\| \\hat{\rho}\_j^{(l)}) \\\\ &= L(\\theta) + \\beta \sum\_{l=1}^L \sum\_{j=1}^{s_l} \rho\\log\\frac{\rho}{\\hat{\rho}\_j^{(l)}} + (1-\rho)\\log\\frac{1-\rho}{1-\\hat{\rho}\_j^{(l)}} \\end{aligned} $$
+$$ \begin{aligned} L\_\text{SAE}(\\theta) &= L(\\theta) + \\beta \sum\_{l=1}^L \sum\_{j=1}^{s_l} D\_\text{KL}(\rho \\| \\hat{\rho}\_j^{(l)}) \\ &= L(\\theta) + \\beta \sum\_{l=1}^L \sum\_{j=1}^{s_l} \rho\\log\frac{\rho}{\\hat{\rho}\_j^{(l)}} + (1-\rho)\\log\frac{1-\rho}{1-\\hat{\rho}\_j^{(l)}} \end{aligned} $$
 
 ![](kl-metric-sparse-autoencoder.png)
 
@@ -145,7 +145,7 @@ Fig. 4. The KL divergence between a Bernoulli distribution with mean $\rho=0.25$
 
 **$k$-Sparse Autoencoder**
 
-In $k$-Sparse Autoencoder ([Makhzani and Frey, 2013](https://arxiv.org/abs/1312.5663)), the sparsity is enforced by only keeping the top k highest activations in the bottleneck layer with linear activation function. First we run feedforward through the encoder network to get the compressed code: $\\mathbf{z} = g(\\mathbf{x})$. Sort the values in the code vector $\\mathbf{z}$. Only the k largest values are kept while other neurons are set to 0. This can be done in a ReLU layer with an adjustable threshold too. Now we have a sparsified code: $\\mathbf{z}' = \text{Sparsify}(\\mathbf{z})$. Compute the output and the loss from the sparsified code, $L = |\\mathbf{x} - f(\\mathbf{z}') |\_2^2$. And, the back-propagation only goes through the top k activated hidden units!
+In $k$-Sparse Autoencoder ([Makhzani and Frey, 2013](https://arxiv.org/abs/1312.5663)), the sparsity is enforced by only keeping the top k highest activations in the bottleneck layer with linear activation function. First we run feedforward through the encoder network to get the compressed code: $\mathbf{z} = g(\mathbf{x})$. Sort the values in the code vector $\mathbf{z}$. Only the k largest values are kept while other neurons are set to 0. This can be done in a ReLU layer with an adjustable threshold too. Now we have a sparsified code: $\mathbf{z}' = \text{Sparsify}(\mathbf{z})$. Compute the output and the loss from the sparsified code, $L = |\mathbf{x} - f(\mathbf{z}') |\_2^2$. And, the back-propagation only goes through the top k activated hidden units!
 
 ![](k-sparse-autoencoder.png)
 
@@ -157,9 +157,9 @@ Similar to sparse autoencoder, **Contractive Autoencoder** ([Rifai, et al, 2011]
 
 It adds a term in the loss function to penalize the representation being too sensitive to the input, and thus improve the robustness to small perturbations around the training data points. The sensitivity is measured by the Frobenius norm of the Jacobian matrix of the encoder activations with respect to the input:
 
-$$ \\|J_f(\\mathbf{x})\\|\_F^2 = \sum\_{ij} \\Big( \\frac{\\partial h_j(\\mathbf{x})}{\\partial x_i} \\Big)^2 $$
+$$ \\|J_f(\mathbf{x})\\|\_F^2 = \sum\_{ij} \\Big( \frac{\\partial h_j(\mathbf{x})}{\\partial x_i} \\Big)^2 $$
 
-where $h\_j$ is one unit output in the compressed code $\\mathbf{z} = f(x)$.
+where $h\_j$ is one unit output in the compressed code $\mathbf{z} = f(x)$.
 
 This penalty term is the sum of squares of all partial derivatives of the learned encoding with respect to input dimensions. The authors claimed that empirically this penalty was found to carve a representation that corresponds to a lower-dimensional non-linear manifold, while staying more invariant to majority directions orthogonal to the manifold.
 
@@ -167,45 +167,45 @@ This penalty term is the sum of squares of all partial derivatives of the learne
 
 The idea of **Variational Autoencoder** ([Kingma & Welling, 2014](https://arxiv.org/abs/1312.6114)), short for **VAE**, is actually less similar to all the autoencoder models above, but deeply rooted in the methods of variational bayesian and graphical model.
 
-Instead of mapping the input into a _fixed_ vector, we want to map it into a distribution. Let's label this distribution as $p\_\\theta$, parameterized by $\\theta$. The relationship between the data input $\\mathbf{x}$ and the latent encoding vector $\\mathbf{z}$ can be fully defined by:
+Instead of mapping the input into a _fixed_ vector, we want to map it into a distribution. Let's label this distribution as $p\_\\theta$, parameterized by $\\theta$. The relationship between the data input $\mathbf{x}$ and the latent encoding vector $\mathbf{z}$ can be fully defined by:
 
-- Prior $p\_\\theta(\\mathbf{z})$
-- Likelihood $p\_\\theta(\\mathbf{x}\vert\\mathbf{z})$
-- Posterior $p\_\\theta(\\mathbf{z}\vert\\mathbf{x})$
+- Prior $p\_\\theta(\mathbf{z})$
+- Likelihood $p\_\\theta(\mathbf{x}\vert\mathbf{z})$
+- Posterior $p\_\\theta(\mathbf{z}\vert\mathbf{x})$
 
-Assuming that we know the real parameter $\\theta^{\*}$ for this distribution. In order to generate a sample that looks like a real data point $\\mathbf{x}^{(i)}$, we follow these steps:
+Assuming that we know the real parameter $\\theta^{\*}$ for this distribution. In order to generate a sample that looks like a real data point $\mathbf{x}^{(i)}$, we follow these steps:
 
-1.  First, sample a $\\mathbf{z}^{(i)}$ from a prior distribution $p\_{\\theta^\*}(\\mathbf{z})$.
-2.  Then a value $\\mathbf{x}^{(i)}$ is generated from a conditional distribution $p\_{\\theta^\*}(\\mathbf{x} \vert \\mathbf{z} = \\mathbf{z}^{(i)})$.
+1.  First, sample a $\mathbf{z}^{(i)}$ from a prior distribution $p\_{\\theta^\*}(\mathbf{z})$.
+2.  Then a value $\mathbf{x}^{(i)}$ is generated from a conditional distribution $p\_{\\theta^\*}(\mathbf{x} \vert \mathbf{z} = \mathbf{z}^{(i)})$.
 
 The optimal parameter $\\theta^{\*}$ is the one that maximizes the probability of generating real data samples:
 
-$$ \\theta^{\*} = \\arg\\max\_\\theta \\prod\_{i=1}^n p\_\\theta(\\mathbf{x}^{(i)}) $$
+$$ \\theta^{\*} = \arg\max\_\\theta \\prod\_{i=1}^n p\_\\theta(\mathbf{x}^{(i)}) $$
 
 Commonly we use the log probabilities to convert the product on RHS to a sum:
 
-$$ \\theta^{\*} = \\arg\\max\_\\theta \sum\_{i=1}^n \\log p\_\\theta(\\mathbf{x}^{(i)}) $$
+$$ \\theta^{\*} = \arg\max\_\\theta \sum\_{i=1}^n \\log p\_\\theta(\mathbf{x}^{(i)}) $$
 
 Now let's update the equation to better demonstrate the data generation process so as to involve the encoding vector:
 
-$$ p\_\\theta(\\mathbf{x}^{(i)}) = \int p\_\\theta(\\mathbf{x}^{(i)}\vert\\mathbf{z}) p\_\\theta(\\mathbf{z}) d\\mathbf{z} $$
+$$ p\_\\theta(\mathbf{x}^{(i)}) = \int p\_\\theta(\mathbf{x}^{(i)}\vert\mathbf{z}) p\_\\theta(\mathbf{z}) d\mathbf{z} $$
 
-Unfortunately it is not easy to compute $p\_\\theta(\\mathbf{x}^{(i)})$ in this way, as it is very expensive to check all the possible values of $\\mathbf{z}$ and sum them up. To narrow down the value space to facilitate faster search, we would like to introduce a new approximation function to output what is a likely code given an input $\\mathbf{x}$, $q\_\\phi(\\mathbf{z}\vert\\mathbf{x})$, parameterized by $\\phi$.
+Unfortunately it is not easy to compute $p\_\\theta(\mathbf{x}^{(i)})$ in this way, as it is very expensive to check all the possible values of $\mathbf{z}$ and sum them up. To narrow down the value space to facilitate faster search, we would like to introduce a new approximation function to output what is a likely code given an input $\mathbf{x}$, $q\_\\phi(\mathbf{z}\vert\mathbf{x})$, parameterized by $\\phi$.
 
 ![](VAE-graphical-model.png)
 
-Fig. 6. The graphical model involved in Variational Autoencoder. Solid lines denote the generative distribution $p\\\_\\theta(.)$ and dashed lines denote the distribution $q\\\_\\phi (\\mathbf{z}\vert\\mathbf{x})$ to approximate the intractable posterior $p\\\_\\theta (\\mathbf{z}\vert\\mathbf{x})$.
+Fig. 6. The graphical model involved in Variational Autoencoder. Solid lines denote the generative distribution $p\\\_\\theta(.)$ and dashed lines denote the distribution $q\\\_\\phi (\mathbf{z}\vert\mathbf{x})$ to approximate the intractable posterior $p\\\_\\theta (\mathbf{z}\vert\mathbf{x})$.
 
 Now the structure looks a lot like an autoencoder:
 
-- The conditional probability $p\_\\theta(\\mathbf{x} \vert \\mathbf{z})$ defines a generative model, similar to the decoder $f\_\\theta(\\mathbf{x} \vert \\mathbf{z})$ introduced above. $p\_\\theta(\\mathbf{x} \vert \\mathbf{z})$ is also known as _probabilistic decoder_.
-- The approximation function $q\_\\phi(\\mathbf{z} \vert \\mathbf{x})$ is the _probabilistic encoder_, playing a similar role as $g\_\\phi(\\mathbf{z} \vert \\mathbf{x})$ above.
+- The conditional probability $p\_\\theta(\mathbf{x} \vert \mathbf{z})$ defines a generative model, similar to the decoder $f\_\\theta(\mathbf{x} \vert \mathbf{z})$ introduced above. $p\_\\theta(\mathbf{x} \vert \mathbf{z})$ is also known as _probabilistic decoder_.
+- The approximation function $q\_\\phi(\mathbf{z} \vert \mathbf{x})$ is the _probabilistic encoder_, playing a similar role as $g\_\\phi(\mathbf{z} \vert \mathbf{x})$ above.
 
 ## Loss Function: ELBO[#](#loss-function-elbo)
 
-The estimated posterior $q\_\\phi(\\mathbf{z}\vert\\mathbf{x})$ should be very close to the real one $p\_\\theta(\\mathbf{z}\vert\\mathbf{x})$. We can use [Kullback-Leibler divergence](https://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence) to quantify the distance between these two distributions. KL divergence $D\_\text{KL}(X|Y)$ measures how much information is lost if the distribution Y is used to represent X.
+The estimated posterior $q\_\\phi(\mathbf{z}\vert\mathbf{x})$ should be very close to the real one $p\_\\theta(\mathbf{z}\vert\mathbf{x})$. We can use [Kullback-Leibler divergence](https://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence) to quantify the distance between these two distributions. KL divergence $D\_\text{KL}(X|Y)$ measures how much information is lost if the distribution Y is used to represent X.
 
-In our case we want to minimize $D\_\text{KL}( q\_\\phi(\\mathbf{z}\vert\\mathbf{x}) | p\_\\theta(\\mathbf{z}\vert\\mathbf{x}) )$ with respect to $\\phi$.
+In our case we want to minimize $D\_\text{KL}( q\_\\phi(\mathbf{z}\vert\mathbf{x}) | p\_\\theta(\mathbf{z}\vert\mathbf{x}) )$ with respect to $\\phi$.
 
 But why use $D\_\text{KL}(q\_\\phi | p\_\\theta)$ (reversed KL) instead of $D\_\text{KL}(p\_\\theta | q\_\\phi)$ (forward KL)? Eric Jang has a great explanation in his [post](https://blog.evjang.com/2016/08/variational-bayes.html) on Bayesian Variational methods. As a quick recap:
 
@@ -213,46 +213,46 @@ But why use $D\_\text{KL}(q\_\\phi | p\_\\theta)$ (reversed KL) instead of $D\_\
 
 Fig. 7. Forward and reversed KL divergence have different demands on how to match two distributions. (Image source: [blog.evjang.com/2016/08/variational-bayes.html](https://blog.evjang.com/2016/08/variational-bayes.html))
 
-- Forward KL divergence: $D\_\text{KL}(P|Q) = \\mathbb{E}\_{z\\sim P(z)} \\log\\frac{P(z)}{Q(z)}$; we have to ensure that Q(z)>0 wherever P(z)>0. The optimized variational distribution $q(z)$ has to cover over the entire $p(z)$.
-- Reversed KL divergence: $D\_\text{KL}(Q|P) = \\mathbb{E}\_{z\\sim Q(z)} \\log\\frac{Q(z)}{P(z)}$; minimizing the reversed KL divergence squeezes the $Q(z)$ under $P(z)$.
+- Forward KL divergence: $D\_\text{KL}(P|Q) = \mathbb{E}\_{z\\sim P(z)} \\log\frac{P(z)}{Q(z)}$; we have to ensure that Q(z)>0 wherever P(z)>0. The optimized variational distribution $q(z)$ has to cover over the entire $p(z)$.
+- Reversed KL divergence: $D\_\text{KL}(Q|P) = \mathbb{E}\_{z\\sim Q(z)} \\log\frac{Q(z)}{P(z)}$; minimizing the reversed KL divergence squeezes the $Q(z)$ under $P(z)$.
 
 Let's now expand the equation:
 
-$$ \\begin{aligned} & D\_\text{KL}( q\_\\phi(\\mathbf{z}\vert\\mathbf{x}) \\| p\_\\theta(\\mathbf{z}\vert\\mathbf{x}) ) & \\\\ &=\int q\_\\phi(\\mathbf{z} \vert \\mathbf{x}) \\log\\frac{q\_\\phi(\\mathbf{z} \vert \\mathbf{x})}{p\_\\theta(\\mathbf{z} \vert \\mathbf{x})} d\\mathbf{z} & \\\\ &=\int q\_\\phi(\\mathbf{z} \vert \\mathbf{x}) \\log\\frac{q\_\\phi(\\mathbf{z} \vert \\mathbf{x})p\_\\theta(\\mathbf{x})}{p\_\\theta(\\mathbf{z}, \\mathbf{x})} d\\mathbf{z} & \\scriptstyle{\text{; Because }p(z \vert x) = p(z, x) / p(x)} \\\\ &=\int q\_\\phi(\\mathbf{z} \vert \\mathbf{x}) \\big( \\log p\_\\theta(\\mathbf{x}) + \\log\\frac{q\_\\phi(\\mathbf{z} \vert \\mathbf{x})}{p\_\\theta(\\mathbf{z}, \\mathbf{x})} \\big) d\\mathbf{z} & \\\\ &=\\log p\_\\theta(\\mathbf{x}) + \int q\_\\phi(\\mathbf{z} \vert \\mathbf{x})\\log\\frac{q\_\\phi(\\mathbf{z} \vert \\mathbf{x})}{p\_\\theta(\\mathbf{z}, \\mathbf{x})} d\\mathbf{z} & \\scriptstyle{\text{; Because }\int q(z \vert x) dz = 1}\\\\ &=\\log p\_\\theta(\\mathbf{x}) + \int q\_\\phi(\\mathbf{z} \vert \\mathbf{x})\\log\\frac{q\_\\phi(\\mathbf{z} \vert \\mathbf{x})}{p\_\\theta(\\mathbf{x}\vert\\mathbf{z})p\_\\theta(\\mathbf{z})} d\\mathbf{z} & \\scriptstyle{\text{; Because }p(z, x) = p(x \vert z) p(z)} \\\\ &=\\log p\_\\theta(\\mathbf{x}) + \\mathbb{E}\_{\\mathbf{z}\\sim q\_\\phi(\\mathbf{z} \vert \\mathbf{x})}\[\\log \\frac{q\_\\phi(\\mathbf{z} \vert \\mathbf{x})}{p\_\\theta(\\mathbf{z})} - \\log p\_\\theta(\\mathbf{x} \vert \\mathbf{z})\] &\\\\ &=\\log p\_\\theta(\\mathbf{x}) + D\_\text{KL}(q\_\\phi(\\mathbf{z}\vert\\mathbf{x}) \\| p\_\\theta(\\mathbf{z})) - \\mathbb{E}\_{\\mathbf{z}\\sim q\_\\phi(\\mathbf{z}\vert\\mathbf{x})}\\log p\_\\theta(\\mathbf{x}\vert\\mathbf{z}) & \\end{aligned} $$
+$$ \begin{aligned} & D\_\text{KL}( q\_\\phi(\mathbf{z}\vert\mathbf{x}) \\| p\_\\theta(\mathbf{z}\vert\mathbf{x}) ) & \\ &=\int q\_\\phi(\mathbf{z} \vert \mathbf{x}) \\log\frac{q\_\\phi(\mathbf{z} \vert \mathbf{x})}{p\_\\theta(\mathbf{z} \vert \mathbf{x})} d\mathbf{z} & \\ &=\int q\_\\phi(\mathbf{z} \vert \mathbf{x}) \\log\frac{q\_\\phi(\mathbf{z} \vert \mathbf{x})p\_\\theta(\mathbf{x})}{p\_\\theta(\mathbf{z}, \mathbf{x})} d\mathbf{z} & \\scriptstyle{\text{; Because }p(z \vert x) = p(z, x) / p(x)} \\ &=\int q\_\\phi(\mathbf{z} \vert \mathbf{x}) \\big( \\log p\_\\theta(\mathbf{x}) + \\log\frac{q\_\\phi(\mathbf{z} \vert \mathbf{x})}{p\_\\theta(\mathbf{z}, \mathbf{x})} \\big) d\mathbf{z} & \\ &=\\log p\_\\theta(\mathbf{x}) + \int q\_\\phi(\mathbf{z} \vert \mathbf{x})\\log\frac{q\_\\phi(\mathbf{z} \vert \mathbf{x})}{p\_\\theta(\mathbf{z}, \mathbf{x})} d\mathbf{z} & \\scriptstyle{\text{; Because }\int q(z \vert x) dz = 1}\\ &=\\log p\_\\theta(\mathbf{x}) + \int q\_\\phi(\mathbf{z} \vert \mathbf{x})\\log\frac{q\_\\phi(\mathbf{z} \vert \mathbf{x})}{p\_\\theta(\mathbf{x}\vert\mathbf{z})p\_\\theta(\mathbf{z})} d\mathbf{z} & \\scriptstyle{\text{; Because }p(z, x) = p(x \vert z) p(z)} \\ &=\\log p\_\\theta(\mathbf{x}) + \mathbb{E}\_{\mathbf{z}\\sim q\_\\phi(\mathbf{z} \vert \mathbf{x})}\[\\log \frac{q\_\\phi(\mathbf{z} \vert \mathbf{x})}{p\_\\theta(\mathbf{z})} - \\log p\_\\theta(\mathbf{x} \vert \mathbf{z})\] &\\ &=\\log p\_\\theta(\mathbf{x}) + D\_\text{KL}(q\_\\phi(\mathbf{z}\vert\mathbf{x}) \\| p\_\\theta(\mathbf{z})) - \mathbb{E}\_{\mathbf{z}\\sim q\_\\phi(\mathbf{z}\vert\mathbf{x})}\\log p\_\\theta(\mathbf{x}\vert\mathbf{z}) & \end{aligned} $$
 
 So we have:
 
-$$ D\_\text{KL}( q\_\\phi(\\mathbf{z}\vert\\mathbf{x}) \\| p\_\\theta(\\mathbf{z}\vert\\mathbf{x}) ) =\\log p\_\\theta(\\mathbf{x}) + D\_\text{KL}(q\_\\phi(\\mathbf{z}\vert\\mathbf{x}) \\| p\_\\theta(\\mathbf{z})) - \\mathbb{E}\_{\\mathbf{z}\\sim q\_\\phi(\\mathbf{z}\vert\\mathbf{x})}\\log p\_\\theta(\\mathbf{x}\vert\\mathbf{z}) $$
+$$ D\_\text{KL}( q\_\\phi(\mathbf{z}\vert\mathbf{x}) \\| p\_\\theta(\mathbf{z}\vert\mathbf{x}) ) =\\log p\_\\theta(\mathbf{x}) + D\_\text{KL}(q\_\\phi(\mathbf{z}\vert\mathbf{x}) \\| p\_\\theta(\mathbf{z})) - \mathbb{E}\_{\mathbf{z}\\sim q\_\\phi(\mathbf{z}\vert\mathbf{x})}\\log p\_\\theta(\mathbf{x}\vert\mathbf{z}) $$
 
 Once rearrange the left and right hand side of the equation,
 
-$$ \\log p\_\\theta(\\mathbf{x}) - D\_\text{KL}( q\_\\phi(\\mathbf{z}\vert\\mathbf{x}) \\| p\_\\theta(\\mathbf{z}\vert\\mathbf{x}) ) = \\mathbb{E}\_{\\mathbf{z}\\sim q\_\\phi(\\mathbf{z}\vert\\mathbf{x})}\\log p\_\\theta(\\mathbf{x}\vert\\mathbf{z}) - D\_\text{KL}(q\_\\phi(\\mathbf{z}\vert\\mathbf{x}) \\| p\_\\theta(\\mathbf{z})) $$
+$$ \\log p\_\\theta(\mathbf{x}) - D\_\text{KL}( q\_\\phi(\mathbf{z}\vert\mathbf{x}) \\| p\_\\theta(\mathbf{z}\vert\mathbf{x}) ) = \mathbb{E}\_{\mathbf{z}\\sim q\_\\phi(\mathbf{z}\vert\mathbf{x})}\\log p\_\\theta(\mathbf{x}\vert\mathbf{z}) - D\_\text{KL}(q\_\\phi(\mathbf{z}\vert\mathbf{x}) \\| p\_\\theta(\mathbf{z})) $$
 
-The LHS of the equation is exactly what we want to maximize when learning the true distributions: we want to maximize the (log-)likelihood of generating real data (that is $\\log p\_\\theta(\\mathbf{x})$) and also minimize the difference between the real and estimated posterior distributions (the term $D\_\text{KL}$ works like a regularizer). Note that $p\_\\theta(\\mathbf{x})$ is fixed with respect to $q\_\\phi$.
+The LHS of the equation is exactly what we want to maximize when learning the true distributions: we want to maximize the (log-)likelihood of generating real data (that is $\\log p\_\\theta(\mathbf{x})$) and also minimize the difference between the real and estimated posterior distributions (the term $D\_\text{KL}$ works like a regularizer). Note that $p\_\\theta(\mathbf{x})$ is fixed with respect to $q\_\\phi$.
 
 The negation of the above defines our loss function:
 
-$$ \\begin{aligned} L\_\text{VAE}(\\theta, \\phi) &= -\\log p\_\\theta(\\mathbf{x}) + D\_\text{KL}( q\_\\phi(\\mathbf{z}\vert\\mathbf{x}) \\| p\_\\theta(\\mathbf{z}\vert\\mathbf{x}) )\\\\ &= - \\mathbb{E}\_{\\mathbf{z} \\sim q\_\\phi(\\mathbf{z}\vert\\mathbf{x})} \\log p\_\\theta(\\mathbf{x}\vert\\mathbf{z}) + D\_\text{KL}( q\_\\phi(\\mathbf{z}\vert\\mathbf{x}) \\| p\_\\theta(\\mathbf{z}) ) \\\\ \\theta^{\*}, \\phi^{\*} &= \\arg\\min\_{\\theta, \\phi} L\_\text{VAE} \\end{aligned} $$
+$$ \begin{aligned} L\_\text{VAE}(\\theta, \\phi) &= -\\log p\_\\theta(\mathbf{x}) + D\_\text{KL}( q\_\\phi(\mathbf{z}\vert\mathbf{x}) \\| p\_\\theta(\mathbf{z}\vert\mathbf{x}) )\\ &= - \mathbb{E}\_{\mathbf{z} \\sim q\_\\phi(\mathbf{z}\vert\mathbf{x})} \\log p\_\\theta(\mathbf{x}\vert\mathbf{z}) + D\_\text{KL}( q\_\\phi(\mathbf{z}\vert\mathbf{x}) \\| p\_\\theta(\mathbf{z}) ) \\ \\theta^{\*}, \\phi^{\*} &= \arg\min\_{\\theta, \\phi} L\_\text{VAE} \end{aligned} $$
 
-In Variational Bayesian methods, this loss function is known as the _variational lower bound_, or _evidence lower bound_. The “lower bound” part in the name comes from the fact that KL divergence is always non-negative and thus $-L\_\text{VAE}$ is the lower bound of $\\log p\_\\theta (\\mathbf{x})$.
+In Variational Bayesian methods, this loss function is known as the _variational lower bound_, or _evidence lower bound_. The “lower bound” part in the name comes from the fact that KL divergence is always non-negative and thus $-L\_\text{VAE}$ is the lower bound of $\\log p\_\\theta (\mathbf{x})$.
 
-$$ -L\_\text{VAE} = \\log p\_\\theta(\\mathbf{x}) - D\_\text{KL}( q\_\\phi(\\mathbf{z}\vert\\mathbf{x}) \\| p\_\\theta(\\mathbf{z}\vert\\mathbf{x}) ) \\leq \\log p\_\\theta(\\mathbf{x}) $$
+$$ -L\_\text{VAE} = \\log p\_\\theta(\mathbf{x}) - D\_\text{KL}( q\_\\phi(\mathbf{z}\vert\mathbf{x}) \\| p\_\\theta(\mathbf{z}\vert\mathbf{x}) ) \\leq \\log p\_\\theta(\mathbf{x}) $$
 
 Therefore by minimizing the loss, we are maximizing the lower bound of the probability of generating real data samples.
 
 ## Reparameterization Trick[#](#reparameterization-trick)
 
-The expectation term in the loss function invokes generating samples from $\\mathbf{z} \\sim q\_\\phi(\\mathbf{z}\vert\\mathbf{x})$. Sampling is a stochastic process and therefore we cannot backpropagate the gradient. To make it trainable, the reparameterization trick is introduced: It is often possible to express the random variable $\\mathbf{z}$ as a deterministic variable $\\mathbf{z} = \mathcal{T}\_\\phi(\\mathbf{x}, \\boldsymbol{\\epsilon})$, where $\\boldsymbol{\\epsilon}$ is an auxiliary independent random variable, and the transformation function $\mathcal{T}\_\\phi$ parameterized by $\\phi$ converts $\\boldsymbol{\\epsilon}$ to $\\mathbf{z}$.
+The expectation term in the loss function invokes generating samples from $\mathbf{z} \\sim q\_\\phi(\mathbf{z}\vert\mathbf{x})$. Sampling is a stochastic process and therefore we cannot backpropagate the gradient. To make it trainable, the reparameterization trick is introduced: It is often possible to express the random variable $\mathbf{z}$ as a deterministic variable $\mathbf{z} = \mathcal{T}\_\\phi(\mathbf{x}, \\boldsymbol{\\epsilon})$, where $\\boldsymbol{\\epsilon}$ is an auxiliary independent random variable, and the transformation function $\mathcal{T}\_\\phi$ parameterized by $\\phi$ converts $\\boldsymbol{\\epsilon}$ to $\mathbf{z}$.
 
-For example, a common choice of the form of $q\_\\phi(\\mathbf{z}\vert\\mathbf{x})$ is a multivariate Gaussian with a diagonal covariance structure:
+For example, a common choice of the form of $q\_\\phi(\mathbf{z}\vert\mathbf{x})$ is a multivariate Gaussian with a diagonal covariance structure:
 
-$$ \\begin{aligned} \\mathbf{z} &\\sim q\_\\phi(\\mathbf{z}\vert\\mathbf{x}^{(i)}) = \mathcal{N}(\\mathbf{z}; \\boldsymbol{\\mu}^{(i)}, \\boldsymbol{\\sigma}^{2(i)}\\boldsymbol{I}) & \\\\ \\mathbf{z} &= \\boldsymbol{\\mu} + \\boldsymbol{\\sigma} \\odot \\boldsymbol{\\epsilon} \text{, where } \\boldsymbol{\\epsilon} \\sim \mathcal{N}(0, \\boldsymbol{I}) & \\scriptstyle{\text{; Reparameterization trick.}} \\end{aligned} $$
+$$ \begin{aligned} \mathbf{z} &\\sim q\_\\phi(\mathbf{z}\vert\mathbf{x}^{(i)}) = \mathcal{N}(\mathbf{z}; \\boldsymbol{\\mu}^{(i)}, \\boldsymbol{\\sigma}^{2(i)}\\boldsymbol{I}) & \\ \mathbf{z} &= \\boldsymbol{\\mu} + \\boldsymbol{\\sigma} \\odot \\boldsymbol{\\epsilon} \text{, where } \\boldsymbol{\\epsilon} \\sim \mathcal{N}(0, \\boldsymbol{I}) & \\scriptstyle{\text{; Reparameterization trick.}} \end{aligned} $$
 
 where $\\odot$ refers to element-wise product.
 
 ![](reparameterization-trick.png)
 
-Fig. 8. Illustration of how the reparameterization trick makes the $\\mathbf{z}$ sampling process trainable.(Image source: Slide 12 in Kingma's NIPS 2015 workshop [talk](http://dpkingma.com/wordpress/wp-content/uploads/2015/12/talk_nips_workshop_2015.pdf))
+Fig. 8. Illustration of how the reparameterization trick makes the $\mathbf{z}$ sampling process trainable.(Image source: Slide 12 in Kingma's NIPS 2015 workshop [talk](http://dpkingma.com/wordpress/wp-content/uploads/2015/12/talk_nips_workshop_2015.pdf))
 
 The reparameterization trick works for other types of distributions too, not only Gaussian. In the multivariate Gaussian case, we make the model trainable by learning the mean and variance of the distribution, $\\mu$ and $\\sigma$, explicitly using the reparameterization trick, while the stochasticity remains in the random variable $\\boldsymbol{\\epsilon} \\sim \mathcal{N}(0, \\boldsymbol{I})$.
 
@@ -262,27 +262,27 @@ Fig. 9. Illustration of variational autoencoder model with the multivariate Gaus
 
 # Beta-VAE[#](#beta-vae)
 
-If each variable in the inferred latent representation $\\mathbf{z}$ is only sensitive to one single generative factor and relatively invariant to other factors, we will say this representation is disentangled or factorized. One benefit that often comes with disentangled representation is _good interpretability_ and easy generalization to a variety of tasks.
+If each variable in the inferred latent representation $\mathbf{z}$ is only sensitive to one single generative factor and relatively invariant to other factors, we will say this representation is disentangled or factorized. One benefit that often comes with disentangled representation is _good interpretability_ and easy generalization to a variety of tasks.
 
 For example, a model trained on photos of human faces might capture the gentle, skin color, hair color, hair length, emotion, whether wearing a pair of glasses and many other relatively independent factors in separate dimensions. Such a disentangled representation is very beneficial to facial image generation.
 
 β-VAE ([Higgins et al., 2017](https://openreview.net/forum?id=Sy2fzU9gl)) is a modification of Variational Autoencoder with a special emphasis to discover disentangled latent factors. Following the same incentive in VAE, we want to maximize the probability of generating real data, while keeping the distance between the real and estimated posterior distributions small (say, under a small constant $\\delta$):
 
-$$ \\begin{aligned} &\\max\_{\\phi, \\theta} \\mathbb{E}\_{\\mathbf{x}\\sim\mathcal{D}}\[\\mathbb{E}\_{\\mathbf{z} \\sim q\_\\phi(\\mathbf{z}\vert\\mathbf{x})} \\log p\_\\theta(\\mathbf{x}\vert\\mathbf{z})\]\\\\ &\text{subject to } D\_\text{KL}(q\_\\phi(\\mathbf{z}\vert\\mathbf{x})\\|p\_\\theta(\\mathbf{z})) < \\delta \\end{aligned} $$
+$$ \begin{aligned} &\max\_{\\phi, \\theta} \mathbb{E}\_{\mathbf{x}\\sim\mathcal{D}}\[\mathbb{E}\_{\mathbf{z} \\sim q\_\\phi(\mathbf{z}\vert\mathbf{x})} \\log p\_\\theta(\mathbf{x}\vert\mathbf{z})\]\\ &\text{subject to } D\_\text{KL}(q\_\\phi(\mathbf{z}\vert\mathbf{x})\\|p\_\\theta(\mathbf{z})) < \\delta \end{aligned} $$
 
 We can rewrite it as a Lagrangian with a Lagrangian multiplier $\\beta$ under the [KKT condition](https://www.cs.cmu.edu/~ggordon/10725-F12/slides/16-kkt.pdf). The above optimization problem with only one inequality constraint is equivalent to maximizing the following equation $\mathcal{F}(\\theta, \\phi, \\beta)$:
 
-$$ \\begin{aligned} \mathcal{F}(\\theta, \\phi, \\beta) &= \\mathbb{E}\_{\\mathbf{z} \\sim q\_\\phi(\\mathbf{z}\vert\\mathbf{x})} \\log p\_\\theta(\\mathbf{x}\vert\\mathbf{z}) - \\beta(D\_\text{KL}(q\_\\phi(\\mathbf{z}\vert\\mathbf{x})\\|p\_\\theta(\\mathbf{z})) - \\delta) & \\\\ & = \\mathbb{E}\_{\\mathbf{z} \\sim q\_\\phi(\\mathbf{z}\vert\\mathbf{x})} \\log p\_\\theta(\\mathbf{x}\vert\\mathbf{z}) - \\beta D\_\text{KL}(q\_\\phi(\\mathbf{z}\vert\\mathbf{x})\\|p\_\\theta(\\mathbf{z})) + \\beta \\delta & \\\\ & \\geq \\mathbb{E}\_{\\mathbf{z} \\sim q\_\\phi(\\mathbf{z}\vert\\mathbf{x})} \\log p\_\\theta(\\mathbf{x}\vert\\mathbf{z}) - \\beta D\_\text{KL}(q\_\\phi(\\mathbf{z}\vert\\mathbf{x})\\|p\_\\theta(\\mathbf{z})) & \\scriptstyle{\text{; Because }\\beta,\\delta\\geq 0} \\end{aligned} $$
+$$ \begin{aligned} \mathcal{F}(\\theta, \\phi, \\beta) &= \mathbb{E}\_{\mathbf{z} \\sim q\_\\phi(\mathbf{z}\vert\mathbf{x})} \\log p\_\\theta(\mathbf{x}\vert\mathbf{z}) - \\beta(D\_\text{KL}(q\_\\phi(\mathbf{z}\vert\mathbf{x})\\|p\_\\theta(\mathbf{z})) - \\delta) & \\ & = \mathbb{E}\_{\mathbf{z} \\sim q\_\\phi(\mathbf{z}\vert\mathbf{x})} \\log p\_\\theta(\mathbf{x}\vert\mathbf{z}) - \\beta D\_\text{KL}(q\_\\phi(\mathbf{z}\vert\mathbf{x})\\|p\_\\theta(\mathbf{z})) + \\beta \\delta & \\ & \\geq \mathbb{E}\_{\mathbf{z} \\sim q\_\\phi(\mathbf{z}\vert\mathbf{x})} \\log p\_\\theta(\mathbf{x}\vert\mathbf{z}) - \\beta D\_\text{KL}(q\_\\phi(\mathbf{z}\vert\mathbf{x})\\|p\_\\theta(\mathbf{z})) & \\scriptstyle{\text{; Because }\\beta,\\delta\\geq 0} \end{aligned} $$
 
 The loss function of $\\beta$-VAE is defined as:
 
-$$ L\_\text{BETA}(\\phi, \\beta) = - \\mathbb{E}\_{\\mathbf{z} \\sim q\_\\phi(\\mathbf{z}\vert\\mathbf{x})} \\log p\_\\theta(\\mathbf{x}\vert\\mathbf{z}) + \\beta D\_\text{KL}(q\_\\phi(\\mathbf{z}\vert\\mathbf{x})\\|p\_\\theta(\\mathbf{z})) $$
+$$ L\_\text{BETA}(\\phi, \\beta) = - \mathbb{E}\_{\mathbf{z} \\sim q\_\\phi(\mathbf{z}\vert\mathbf{x})} \\log p\_\\theta(\mathbf{x}\vert\mathbf{z}) + \\beta D\_\text{KL}(q\_\\phi(\mathbf{z}\vert\mathbf{x})\\|p\_\\theta(\mathbf{z})) $$
 
 where the Lagrangian multiplier $\\beta$ is considered as a hyperparameter.
 
 Since the negation of $L\_\text{BETA}(\\phi, \\beta)$ is the lower bound of the Lagrangian $\mathcal{F}(\\theta, \\phi, \\beta)$. Minimizing the loss is equivalent to maximizing the Lagrangian and thus works for our initial optimization problem.
 
-When $\\beta=1$, it is same as VAE. When $\\beta > 1$, it applies a stronger constraint on the latent bottleneck and limits the representation capacity of $\\mathbf{z}$. For some conditionally independent generative factors, keeping them disentangled is the most efficient representation. Therefore a higher $\\beta$ encourages more efficient latent encoding and further encourages the disentanglement. Meanwhile, a higher $\\beta$ may create a trade-off between reconstruction quality and the extent of disentanglement.
+When $\\beta=1$, it is same as VAE. When $\\beta > 1$, it applies a stronger constraint on the latent bottleneck and limits the representation capacity of $\mathbf{z}$. For some conditionally independent generative factors, keeping them disentangled is the most efficient representation. Therefore a higher $\\beta$ encourages more efficient latent encoding and further encourages the disentanglement. Meanwhile, a higher $\\beta$ may create a trade-off between reconstruction quality and the extent of disentanglement.
 
 [Burgess, et al. (2017)](https://arxiv.org/pdf/1804.03599.pdf) discussed the distentangling in $\\beta$-VAE in depth with an inspiration by the [information bottleneck theory](https://lilianweng.github.io/posts/2017-09-28-information-bottleneck/) and further proposed a modification to $\\beta$-VAE to better control the encoding representation capacity.
 
@@ -292,11 +292,11 @@ The **VQ-VAE** (“Vector Quantised-Variational AutoEncoder”; [van den Oord, e
 
 Vector quantisation (VQ) is a method to map $K$-dimensional vectors into a finite set of “code” vectors. The process is very much similar to [KNN](https://en.wikipedia.org/wiki/K-nearest_neighbors_algorithm) algorithm. The optimal centroid code vector that a sample should be mapped to is the one with minimum euclidean distance.
 
-Let $\\mathbf{e} \in \\mathbb{R}^{K \\times D}, i=1, \\dots, K$ be the latent embedding space (also known as “codebook”) in VQ-VAE, where $K$ is the number of latent variable categories and $D$ is the embedding size. An individual embedding vector is $\\mathbf{e}\_i \in \\mathbb{R}^{D}, i=1, \\dots, K$.
+Let $\mathbf{e} \in \mathbb{R}^{K \\times D}, i=1, \dots, K$ be the latent embedding space (also known as “codebook”) in VQ-VAE, where $K$ is the number of latent variable categories and $D$ is the embedding size. An individual embedding vector is $\mathbf{e}\_i \in \mathbb{R}^{D}, i=1, \dots, K$.
 
-The encoder output $E(\\mathbf{x}) = \\mathbf{z}\_e$ goes through a nearest-neighbor lookup to match to one of $K$ embedding vectors and then this matched code vector becomes the input for the decoder $D(.)$:
+The encoder output $E(\mathbf{x}) = \mathbf{z}\_e$ goes through a nearest-neighbor lookup to match to one of $K$ embedding vectors and then this matched code vector becomes the input for the decoder $D(.)$:
 
-$$ \\mathbf{z}\_q(\\mathbf{x}) = \text{Quantize}(E(\\mathbf{x})) = \\mathbf{e}\_k \text{ where } k = \\arg\\min_i \\|E(\\mathbf{x}) - \\mathbf{e}\_i \\|\_2 $$
+$$ \mathbf{z}\_q(\mathbf{x}) = \text{Quantize}(E(\mathbf{x})) = \mathbf{e}\_k \text{ where } k = \arg\min_i \\|E(\mathbf{x}) - \mathbf{e}\_i \\|\_2 $$
 
 Note that the discrete latent variables can have different shapes in differnet applications; for example, 1D for speech, 2D for image and 3D for video.
 
@@ -304,20 +304,20 @@ Note that the discrete latent variables can have different shapes in differnet a
 
 Fig. 10. The architecture of VQ-VAE (Image source: [van den Oord, et al. 2017](http://papers.nips.cc/paper/7210-neural-discrete-representation-learning.pdf))
 
-Because argmin() is non-differentiable on a discrete space, the gradients $\\nabla\_z L$ from decoder input $\\mathbf{z}\_q$ is copied to the encoder output $\\mathbf{z}\_e$. Other than reconstruction loss, VQ-VAE also optimizes:
+Because argmin() is non-differentiable on a discrete space, the gradients $\\nabla\_z L$ from decoder input $\mathbf{z}\_q$ is copied to the encoder output $\mathbf{z}\_e$. Other than reconstruction loss, VQ-VAE also optimizes:
 
 - _VQ loss_: The L2 error between the embedding space and the encoder outputs.
 - _Commitment loss_: A measure to encourage the encoder output to stay close to the embedding space and to prevent it from fluctuating too frequently from one code vector to another.
 
-$$ L = \\underbrace{\\|\\mathbf{x} - D(\\mathbf{e}\_k)\\|\_2^2}\_{\textrm{reconstruction loss}} + \\underbrace{\\|\text{sg}\[E(\\mathbf{x})\] - \\mathbf{e}\_k\\|\_2^2}\_{\textrm{VQ loss}} + \\underbrace{\\beta \\|E(\\mathbf{x}) - \text{sg}\[\\mathbf{e}\_k\]\\|\_2^2}\_{\textrm{commitment loss}} $$
+$$ L = \\underbrace{\\|\mathbf{x} - D(\mathbf{e}\_k)\\|\_2^2}\_{\textrm{reconstruction loss}} + \\underbrace{\\|\text{sg}\[E(\mathbf{x})\] - \mathbf{e}\_k\\|\_2^2}\_{\textrm{VQ loss}} + \\underbrace{\\beta \\|E(\mathbf{x}) - \text{sg}\[\mathbf{e}\_k\]\\|\_2^2}\_{\textrm{commitment loss}} $$
 
 where $\text{sq}\[.\]$ is the `stop_gradient` operator.
 
-The embedding vectors in the codebook is updated through EMA (exponential moving average). Given a code vector $\\mathbf{e}\_i$, say we have $n\_i$ encoder output vectors, $\{\\mathbf{z}\_{i,j}\}\_{j=1}^{n\_i}$, that are quantized to $\\mathbf{e}\_i$:
+The embedding vectors in the codebook is updated through EMA (exponential moving average). Given a code vector $\mathbf{e}\_i$, say we have $n\_i$ encoder output vectors, $\{\mathbf{z}\_{i,j}\}\_{j=1}^{n\_i}$, that are quantized to $\mathbf{e}\_i$:
 
-$$ N_i^{(t)} = \\gamma N_i^{(t-1)} + (1-\\gamma)n_i^{(t)}\\;\\;\\; \\mathbf{m}\_i^{(t)} = \\gamma \\mathbf{m}\_i^{(t-1)} + (1-\\gamma)\sum\_{j=1}^{n_i^{(t)}}\\mathbf{z}\_{i,j}^{(t)}\\;\\;\\; \\mathbf{e}\_i^{(t)} = \\mathbf{m}\_i^{(t)} / N_i^{(t)} $$
+$$ N_i^{(t)} = \\gamma N_i^{(t-1)} + (1-\\gamma)n_i^{(t)}\\;\\;\\; \mathbf{m}\_i^{(t)} = \\gamma \mathbf{m}\_i^{(t-1)} + (1-\\gamma)\sum\_{j=1}^{n_i^{(t)}}\mathbf{z}\_{i,j}^{(t)}\\;\\;\\; \mathbf{e}\_i^{(t)} = \mathbf{m}\_i^{(t)} / N_i^{(t)} $$
 
-where $(t)$ refers to batch sequence in time. $N\_i$ and $\\mathbf{m}\_i$ are accumulated vector count and volume, respectively.
+where $(t)$ refers to batch sequence in time. $N\_i$ and $\mathbf{m}\_i$ are accumulated vector count and volume, respectively.
 
 VQ-VAE-2 ([Ali Razavi, et al. 2019](https://arxiv.org/abs/1906.00446)) is a two-level hierarchical VQ-VAE combined with self-attention autoregressive model.
 
@@ -343,25 +343,25 @@ Fig. 12. The VQ-VAE-2 algorithm. (Image source: [Ali Razavi, et al. 2019](https:
 Fig. 13. State-space model as a Markov Chain model.
 
 **1\. State-Space Models**  
-In (latent) state-space models, a sequence of unobserved hidden states $\\mathbf{z} = (z\_1, \\dots, z\_T)$ determine the observation states $\\mathbf{x} = (x\_1, \\dots, x\_T)$. Each time step in the Markov chain model in Fig. 13 can be trained in a similar manner as in Fig. 6, where the intractable posterior $p(z \vert x)$ is approximated by a function $q(z \vert x)$.
+In (latent) state-space models, a sequence of unobserved hidden states $\mathbf{z} = (z\_1, \dots, z\_T)$ determine the observation states $\mathbf{x} = (x\_1, \dots, x\_T)$. Each time step in the Markov chain model in Fig. 13 can be trained in a similar manner as in Fig. 6, where the intractable posterior $p(z \vert x)$ is approximated by a function $q(z \vert x)$.
 
 **2\. Belief State**  
-An agent should learn to encode all the past states to reason about the future, named as _belief state_, $b\_t = belief(x\_1, \\dots, x\_t) = belief(b\_{t-1}, x\_t)$. Given this, the distribution of future states conditioned on the past can be written as $p(x\_{t+1}, \\dots, x\_T \vert x\_1, \\dots, x\_t) \\approx p(x\_{t+1}, \\dots, x\_T \vert b\_t)$. The hidden states in a recurrent policy are used as the agent's belief state in TD-VAE. Thus we have $b\_t = \text{RNN}(b\_{t-1}, x\_t)$.
+An agent should learn to encode all the past states to reason about the future, named as _belief state_, $b\_t = belief(x\_1, \dots, x\_t) = belief(b\_{t-1}, x\_t)$. Given this, the distribution of future states conditioned on the past can be written as $p(x\_{t+1}, \dots, x\_T \vert x\_1, \dots, x\_t) \\approx p(x\_{t+1}, \dots, x\_T \vert b\_t)$. The hidden states in a recurrent policy are used as the agent's belief state in TD-VAE. Thus we have $b\_t = \text{RNN}(b\_{t-1}, x\_t)$.
 
 **3\. Jumpy Prediction**  
 Further, an agent is expected to imagine distant futures based on all the information gathered so far, suggesting the capability of making jumpy predictions, that is, predicting states several steps further into the future.
 
 Recall what we have learned from the variance lower bound [above](#loss-function-elbo):
 
-$$ \\begin{aligned} \\log p(x) &\\geq \\log p(x) - D\_\text{KL}(q(z|x)\\|p(z|x)) \\\\ &= \\mathbb{E}\_{z\\sim q} \\log p(x|z) - D\_\text{KL}(q(z|x)\\|p(z)) \\\\ &= \\mathbb{E}\_{z \\sim q} \\log p(x|z) - \\mathbb{E}\_{z \\sim q} \\log \\frac{q(z|x)}{p(z)} \\\\ &= \\mathbb{E}\_{z \\sim q}\[\\log p(x|z) -\\log q(z|x) + \\log p(z)\] \\\\ &= \\mathbb{E}\_{z \\sim q}\[\\log p(x, z) -\\log q(z|x)\] \\\\ \\log p(x) &\\geq \\mathbb{E}\_{z \\sim q}\[\\log p(x, z) -\\log q(z|x)\] \\end{aligned} $$
+$$ \begin{aligned} \\log p(x) &\\geq \\log p(x) - D\_\text{KL}(q(z|x)\\|p(z|x)) \\ &= \mathbb{E}\_{z\\sim q} \\log p(x|z) - D\_\text{KL}(q(z|x)\\|p(z)) \\ &= \mathbb{E}\_{z \\sim q} \\log p(x|z) - \mathbb{E}\_{z \\sim q} \\log \frac{q(z|x)}{p(z)} \\ &= \mathbb{E}\_{z \\sim q}\[\\log p(x|z) -\\log q(z|x) + \\log p(z)\] \\ &= \mathbb{E}\_{z \\sim q}\[\\log p(x, z) -\\log q(z|x)\] \\ \\log p(x) &\\geq \mathbb{E}\_{z \\sim q}\[\\log p(x, z) -\\log q(z|x)\] \end{aligned} $$
 
 Now let's model the distribution of the state $x\_t$ as a probability function conditioned on all the past states $x\_{<t}$ and two latent variables, $z\_t$ and $z\_{t-1}$, at current time step and one step back:
 
-$$ \\log p(x_t|x\_{<{t}}) \\geq \\mathbb{E}\_{(z\_{t-1}, z_t) \\sim q}\[\\log p(x_t, z\_{t-1}, z\_{t}|x\_{<{t}}) -\\log q(z\_{t-1}, z_t|x\_{\\leq t})\] $$
+$$ \\log p(x_t|x\_{<{t}}) \\geq \mathbb{E}\_{(z\_{t-1}, z_t) \\sim q}\[\\log p(x_t, z\_{t-1}, z\_{t}|x\_{<{t}}) -\\log q(z\_{t-1}, z_t|x\_{\\leq t})\] $$
 
 Continue expanding the equation:
 
-$$ \\begin{aligned} & \\log p(x_t|x\_{<{t}}) \\\\ &\\geq \\mathbb{E}\_{(z\_{t-1}, z_t) \\sim q}\[\\log p(x_t, z\_{t-1}, z\_{t}|x\_{<{t}}) -\\log q(z\_{t-1}, z_t|x\_{\\leq t})\] \\\\ &\\geq \\mathbb{E}\_{(z\_{t-1}, z_t) \\sim q}\[\\log p(x_t|\\color{red}{z\_{t-1}}, z\_{t}, \\color{red}{x\_{<{t}}}) + \\color{blue}{\\log p(z\_{t-1}, z\_{t}|x\_{<{t}})} -\\log q(z\_{t-1}, z_t|x\_{\\leq t})\] \\\\ &\\geq \\mathbb{E}\_{(z\_{t-1}, z_t) \\sim q}\[\\log p(x_t|z\_{t}) + \\color{blue}{\\log p(z\_{t-1}|x\_{<{t}})} + \\color{blue}{\\log p(z\_{t}|z\_{t-1})} - \\color{green}{\\log q(z\_{t-1}, z_t|x\_{\\leq t})}\] \\\\ &\\geq \\mathbb{E}\_{(z\_{t-1}, z_t) \\sim q}\[\\log p(x_t|z\_{t}) + \\log p(z\_{t-1}|x\_{<{t}}) + \\log p(z\_{t}|z\_{t-1}) - \\color{green}{\\log q(z_t|x\_{\\leq t})} - \\color{green}{\\log q(z\_{t-1}|z_t, x\_{\\leq t})}\] \\end{aligned} $$
+$$ \begin{aligned} & \\log p(x_t|x\_{<{t}}) \\ &\\geq \mathbb{E}\_{(z\_{t-1}, z_t) \\sim q}\[\\log p(x_t, z\_{t-1}, z\_{t}|x\_{<{t}}) -\\log q(z\_{t-1}, z_t|x\_{\\leq t})\] \\ &\\geq \mathbb{E}\_{(z\_{t-1}, z_t) \\sim q}\[\\log p(x_t|\\color{red}{z\_{t-1}}, z\_{t}, \\color{red}{x\_{<{t}}}) + \\color{blue}{\\log p(z\_{t-1}, z\_{t}|x\_{<{t}})} -\\log q(z\_{t-1}, z_t|x\_{\\leq t})\] \\ &\\geq \mathbb{E}\_{(z\_{t-1}, z_t) \\sim q}\[\\log p(x_t|z\_{t}) + \\color{blue}{\\log p(z\_{t-1}|x\_{<{t}})} + \\color{blue}{\\log p(z\_{t}|z\_{t-1})} - \\color{green}{\\log q(z\_{t-1}, z_t|x\_{\\leq t})}\] \\ &\\geq \mathbb{E}\_{(z\_{t-1}, z_t) \\sim q}\[\\log p(x_t|z\_{t}) + \\log p(z\_{t-1}|x\_{<{t}}) + \\log p(z\_{t}|z\_{t-1}) - \\color{green}{\\log q(z_t|x\_{\\leq t})} - \\color{green}{\\log q(z\_{t-1}|z_t, x\_{\\leq t})}\] \end{aligned} $$
 
 Notice two things:
 
@@ -374,27 +374,27 @@ Precisely, there are four types of distributions to learn:
 1.  $p\_D(.)$ is the **decoder** distribution:
 
 - $p(x\_t \mid z\_t)$ is the encoder by the common definition;
-- $p(x\_t \mid z\_t) \\to p\_D(x\_t \mid z\_t)$;
+- $p(x\_t \mid z\_t) \to p\_D(x\_t \mid z\_t)$;
 
 2.  $p\_T(.)$ is the **transition** distribution:
 
 - $p(z\_t \mid z\_{t-1})$ captures the sequential dependency between latent variables;
-- $p(z\_t \mid z\_{t-1}) \\to p\_T(z\_t \mid z\_{t-1})$;
+- $p(z\_t \mid z\_{t-1}) \to p\_T(z\_t \mid z\_{t-1})$;
 
 3.  $p\_B(.)$ is the **belief** distribution:
 
 - Both $p(z\_{t-1} \mid x\_{<t})$ and $q(z\_t \mid x\_{\\leq t})$ can use the belief states to predict the latent variables;
-- $p(z\_{t-1} \mid x\_{<t}) \\to p\_B(z\_{t-1} \mid b\_{t-1})$;
-- $q(z\_{t} \mid x\_{\\leq t}) \\to p\_B(z\_t \mid b\_t)$;
+- $p(z\_{t-1} \mid x\_{<t}) \to p\_B(z\_{t-1} \mid b\_{t-1})$;
+- $q(z\_{t} \mid x\_{\\leq t}) \to p\_B(z\_t \mid b\_t)$;
 
 4.  $p\_S(.)$ is the **smoothing** distribution:
 
 - The back-to-past smoothing term $q(z\_{t-1} \mid z\_t, x\_{\\leq t})$ can be rewritten to be dependent of belief states too;
-- $q(z\_{t-1} \mid z\_t, x\_{\\leq t}) \\to p\_S(z\_{t-1} \mid z\_t, b\_{t-1}, b\_t)$;
+- $q(z\_{t-1} \mid z\_t, x\_{\\leq t}) \to p\_S(z\_{t-1} \mid z\_t, b\_{t-1}, b\_t)$;
 
 To incorporate the idea of jumpy prediction, the sequential ELBO has to not only work on $t, t+1$, but also two distant timestamp $t\_1 < t\_2$. Here is the final TD-VAE objective function to maximize:
 
-$$ J\_{t_1, t_2} = \\mathbb{E}\[ \\log p_D(x\_{t_2}|z\_{t_2}) + \\log p_B(z\_{t_1}|b\_{t_1}) + \\log p_T(z\_{t_2}|z\_{t_1}) - \\log p_B(z\_{t_2}|b\_{t_2}) - \\log p_S(z\_{t_1}|z\_{t_2}, b\_{t_1}, b\_{t_2})\] $$
+$$ J\_{t_1, t_2} = \mathbb{E}\[ \\log p_D(x\_{t_2}|z\_{t_2}) + \\log p_B(z\_{t_1}|b\_{t_1}) + \\log p_T(z\_{t_2}|z\_{t_1}) - \\log p_B(z\_{t_2}|b\_{t_2}) - \\log p_S(z\_{t_1}|z\_{t_2}, b\_{t_1}, b\_{t_2})\] $$
 
 ![](TD-VAE.png)
 

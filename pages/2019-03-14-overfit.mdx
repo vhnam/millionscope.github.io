@@ -68,9 +68,9 @@ The fundamental idea in MDL is to _view learning as data compression_. By compre
 
 Meanwhile, MDL considers the model description as part of the compression delivery, so the model cannot be arbitrarily large.
 
-A _two-part version_ of MDL principle states that: Let $\mathcal{H}^{(1)}, \mathcal{H}^{(2)}, \\dots$ be a list of models that can explain the dataset $\mathcal{D}$. The best hypothesis among them should be the one that minimizes the sum:
+A _two-part version_ of MDL principle states that: Let $\mathcal{H}^{(1)}, \mathcal{H}^{(2)}, \dots$ be a list of models that can explain the dataset $\mathcal{D}$. The best hypothesis among them should be the one that minimizes the sum:
 
-$$ \mathcal{H}^\text{best} = \\arg\\min\_\mathcal{H} \[L(\mathcal{H}) + L(\mathcal{D}\vert\mathcal{H})\] $$
+$$ \mathcal{H}^\text{best} = \arg\min\_\mathcal{H} \[L(\mathcal{H}) + L(\mathcal{D}\vert\mathcal{H})\] $$
 
 - $L(\mathcal{H})$ is the length of the description of model $\mathcal{H}$ in bits.
 - $L(\mathcal{D}\vert\mathcal{H})$ is the length of the description of the data $\mathcal{D}$ in bits when encoded with $\mathcal{H}$.
@@ -85,7 +85,7 @@ Kolmogorov Complexity relies on the concept of modern computers to define the al
 
 The formal definition of Kolmogorov Complexity states that: Given a universal computer $\mathcal{U}$ and a program $p$, let's denote $\mathcal{U}(p)$ as the output of the computer processing the program and $L(p)$ as the descriptive length of the program. Then Kolmogorov Complexity $K\_\mathcal{U}$ of a string $s$ with respect to a universal computer $\mathcal{U}$ is:
 
-$$ K\_\mathcal{U}(s) = \\min\_{p: \mathcal{U}(p)=s} L(p) $$
+$$ K\_\mathcal{U}(s) = \min\_{p: \mathcal{U}(p)=s} L(p) $$
 
 Note that a universal computer is one that can mimic the actions of any other computers. All modern computers are universal as they can all be reduced to Turing machines. The definition is universal no matter which computers we are using, because another universal computer can always be programmed to clone the behavior of $\mathcal{U}$, while encoding this clone program is just a constant.
 
@@ -103,7 +103,7 @@ However, having numerous parameters is _necessary_ for a neural network to obtai
 
 ## Universal Approximation Theorem[#](#universal-approximation-theorem)
 
-The _Universal Approximation Theorem_ states that a feedforward network with: 1) a linear output layer, 2) at least one hidden layer containing a finite number of neurons and 3) some activation function can approximate **any** continuous functions on a compact subset of $\\mathbb{R}^n$ to arbitrary accuracy. The theorem was first proved for sigmoid activation function ([Cybenko, 1989](https://pdfs.semanticscholar.org/05ce/b32839c26c8d2cb38d5529cf7720a68c3fab.pdf)). Later it was shown that the universal approximation property is not specific to the choice of activation ([Hornik, 1991](http://zmjones.com/static/statistical-learning/hornik-nn-1991.pdf)) but the multilayer feedforward architecture.
+The _Universal Approximation Theorem_ states that a feedforward network with: 1) a linear output layer, 2) at least one hidden layer containing a finite number of neurons and 3) some activation function can approximate **any** continuous functions on a compact subset of $\mathbb{R}^n$ to arbitrary accuracy. The theorem was first proved for sigmoid activation function ([Cybenko, 1989](https://pdfs.semanticscholar.org/05ce/b32839c26c8d2cb38d5529cf7720a68c3fab.pdf)). Later it was shown that the universal approximation property is not specific to the choice of activation ([Hornik, 1991](http://zmjones.com/static/statistical-learning/hornik-nn-1991.pdf)) but the multilayer feedforward architecture.
 
 Although a feedforward network with a single layer is sufficient to represent any function, the width has to be exponentially large. The universal approximation theorem does not guarantee whether the model can be learned or generalized properly. Often, adding more layers helps to reduce the number of hidden neurons needed in a shallow network.
 
@@ -113,37 +113,37 @@ To take advantage of the universal approximation theorem, we can always find a n
 
 The Universal Approximation Theorem we have discussed so far does not consider a finite sample set. [Zhang, et al. (2017)](https://arxiv.org/abs/1611.03530) provided a neat proof on the finite-sample expressivity of two-layer neural networks.
 
-A neural network $C$ can represent any function given a sample size $n$ in $d$ dimensions if: For every finite sample set $S \\subseteq \\mathbb{R}^d$ with $\vert S \vert = n$ and every function defined on this sample set: $f: S \\mapsto \\mathbb{R}$, we can find a set of weight configuration for $C$ so that $C(\\boldsymbol{x}) = f(\\boldsymbol{x}), \\forall \\boldsymbol{x} \in S$.
+A neural network $C$ can represent any function given a sample size $n$ in $d$ dimensions if: For every finite sample set $S \\subseteq \mathbb{R}^d$ with $\vert S \vert = n$ and every function defined on this sample set: $f: S \\mapsto \mathbb{R}$, we can find a set of weight configuration for $C$ so that $C(\\boldsymbol{x}) = f(\\boldsymbol{x}), \\forall \\boldsymbol{x} \in S$.
 
 The paper proposed a theorem:
 
 > There exists a two-layer neural network with ReLU activations and $2n + d$ weights that can represent any function on a sample of size $n$ in $d$ dimensions.
 
-_Proof._ First we would like to construct a two-layer neural network $C: \\mathbb{R}^d \\mapsto \\mathbb{R}$. The input is a $d$-dimensional vector, $\\boldsymbol{x} \in \\mathbb{R}^d$. The hidden layer has $h$ hidden units, associated with a weight matrix $\\mathbf{W} \in \\mathbb{R}^{d\\times h}$, a bias vector $-\\mathbf{b} \in \\mathbb{R}^h$ and ReLU activation function. The second layer outputs a scalar value with weight vector $\\boldsymbol{v} \in \\mathbb{R}^h$ and zero biases.
+_Proof._ First we would like to construct a two-layer neural network $C: \mathbb{R}^d \\mapsto \mathbb{R}$. The input is a $d$-dimensional vector, $\\boldsymbol{x} \in \mathbb{R}^d$. The hidden layer has $h$ hidden units, associated with a weight matrix $\mathbf{W} \in \mathbb{R}^{d\\times h}$, a bias vector $-\mathbf{b} \in \mathbb{R}^h$ and ReLU activation function. The second layer outputs a scalar value with weight vector $\\boldsymbol{v} \in \mathbb{R}^h$ and zero biases.
 
 The output of network $C$ for a input vector $\\boldsymbol{x}$ can be represented as follows:
 
-$$ C(\\boldsymbol{x}) = \\boldsymbol{v} \\max\{ \\boldsymbol{x}\\mathbf{W} - \\boldsymbol{b}, 0\}^\\top = \sum\_{i=1}^h v_i \\max\{\\boldsymbol{x}\\boldsymbol{W}\_{(:,i)} - b_i, 0\} $$
+$$ C(\\boldsymbol{x}) = \\boldsymbol{v} \max\{ \\boldsymbol{x}\mathbf{W} - \\boldsymbol{b}, 0\}^\top = \sum\_{i=1}^h v_i \max\{\\boldsymbol{x}\\boldsymbol{W}\_{(:,i)} - b_i, 0\} $$
 
 where $\\boldsymbol{W}\_{(:,i)}$ is the $i$-th column in the $d \\times h$ matrix.
 
-Given a sample set $S = \{\\boldsymbol{x}\_1, \\dots, \\boldsymbol{x}\_n\}$ and target values $\\boldsymbol{y} = \{y\_1, \\dots, y\_n \}$, we would like to find proper weights $\\mathbf{W} \in \\mathbb{R}^{d\\times h}$, $\\boldsymbol{b}, \\boldsymbol{v} \in \\mathbb{R}^h$ so that $C(\\boldsymbol{x}\_i) = y\_i, \\forall i=1,\\dots,n$.
+Given a sample set $S = \{\\boldsymbol{x}\_1, \dots, \\boldsymbol{x}\_n\}$ and target values $\\boldsymbol{y} = \{y\_1, \dots, y\_n \}$, we would like to find proper weights $\mathbf{W} \in \mathbb{R}^{d\\times h}$, $\\boldsymbol{b}, \\boldsymbol{v} \in \mathbb{R}^h$ so that $C(\\boldsymbol{x}\_i) = y\_i, \\forall i=1,\dots,n$.
 
-Let's combine all sample points into one batch as one input matrix $\\mathbf{X} \in \\mathbb{R}^{n \\times d}$. If set $h=n$, $\\mathbf{X}\\mathbf{W} - \\boldsymbol{b}$ would be a square matrix of size $n \\times n$.
+Let's combine all sample points into one batch as one input matrix $\mathbf{X} \in \mathbb{R}^{n \\times d}$. If set $h=n$, $\mathbf{X}\mathbf{W} - \\boldsymbol{b}$ would be a square matrix of size $n \\times n$.
 
-$$ \\mathbf{M}\_\text{ReLU} = \\max\{\\mathbf{X}\\mathbf{W} - \\boldsymbol{b}, 0 \} = \\begin{bmatrix} \\boldsymbol{x}\_1\\mathbf{W} - \\boldsymbol{b} \\\\ \\dots \\\\ \\boldsymbol{x}\_n\\mathbf{W} - \\boldsymbol{b} \\\\ \\end{bmatrix} = \[\\boldsymbol{x}\_i\\boldsymbol{W}\_{(:,j)} - b_j\]\_{i \\times j} $$
+$$ \mathbf{M}\_\text{ReLU} = \max\{\mathbf{X}\mathbf{W} - \\boldsymbol{b}, 0 \} = \begin{bmatrix} \\boldsymbol{x}\_1\mathbf{W} - \\boldsymbol{b} \\ \dots \\ \\boldsymbol{x}\_n\mathbf{W} - \\boldsymbol{b} \\ \end{bmatrix} = \[\\boldsymbol{x}\_i\\boldsymbol{W}\_{(:,j)} - b_j\]\_{i \\times j} $$
 
-We can simplify $\\mathbf{W}$ to have the same column vectors across all the columns:
+We can simplify $\mathbf{W}$ to have the same column vectors across all the columns:
 
-$$ \\mathbf{W}\_{(:,j)} = \\boldsymbol{w} \in \\mathbb{R}^{d}, \\forall j = 1, \\dots, n $$
+$$ \mathbf{W}\_{(:,j)} = \\boldsymbol{w} \in \mathbb{R}^{d}, \\forall j = 1, \dots, n $$
 
 ![](nn-expressivity-proof.png)
 
-Let $a\_i = \\boldsymbol{x}\_i \\boldsymbol{w}$, we would like to find a suitable $\\boldsymbol{w}$ and $\\boldsymbol{b}$ such that $b\_1 < a\_1 < b\_2 < a\_2 < \\dots < b\_n < a\_n$. This is always achievable because we try to solve $n+d$ unknown variables with $n$ constraints and $\\boldsymbol{x}\_i$ are independent (i.e. pick a random $\\boldsymbol{w}$, sort $\\boldsymbol{x}\_i \\boldsymbol{w}$ and then set $b\_j$'s as values in between). Then $\\mathbf{M}\_\text{ReLU}$ becomes a lower triangular matrix:
+Let $a\_i = \\boldsymbol{x}\_i \\boldsymbol{w}$, we would like to find a suitable $\\boldsymbol{w}$ and $\\boldsymbol{b}$ such that $b\_1 < a\_1 < b\_2 < a\_2 < \dots < b\_n < a\_n$. This is always achievable because we try to solve $n+d$ unknown variables with $n$ constraints and $\\boldsymbol{x}\_i$ are independent (i.e. pick a random $\\boldsymbol{w}$, sort $\\boldsymbol{x}\_i \\boldsymbol{w}$ and then set $b\_j$'s as values in between). Then $\mathbf{M}\_\text{ReLU}$ becomes a lower triangular matrix:
 
-$$ \\mathbf{M}\_\text{ReLU} = \[a_i - b_j\]\_{i \\times j} = \\begin{bmatrix} a_1 - b_1 & 0 & 0 & \\dots & 0 \\\\ \\vdots & \\ddots & & & \\vdots \\\\ a_i - b_1 & \\dots & a_i - b_i & \\dots & 0\\\\ \\vdots & & & \\ddots & \\vdots \\\\ a_n - b_1 & a_n - b_2 & \\dots & \\dots & a_n - b_n \\\\ \\end{bmatrix} $$
+$$ \mathbf{M}\_\text{ReLU} = \[a_i - b_j\]\_{i \\times j} = \begin{bmatrix} a_1 - b_1 & 0 & 0 & \dots & 0 \\ \\vdots & \\ddots & & & \\vdots \\ a_i - b_1 & \dots & a_i - b_i & \dots & 0\\ \\vdots & & & \\ddots & \\vdots \\ a_n - b_1 & a_n - b_2 & \dots & \dots & a_n - b_n \\ \end{bmatrix} $$
 
-It is a nonsingular square matrix as $\\det(\\mathbf{M}\_\text{ReLU}) \\neq 0$, so we can always find suitable $\\boldsymbol{v}$ to solve $\\boldsymbol{v}\\mathbf{M}\_\text{ReLU}=\\boldsymbol{y}$ (In other words, the column space of $\\mathbf{M}\_\text{ReLU}$ is all of $\\mathbb{R}^n$ and we can find a linear combination of column vectors to obtain any $\\boldsymbol{y}$).
+It is a nonsingular square matrix as $\\det(\mathbf{M}\_\text{ReLU}) \\neq 0$, so we can always find suitable $\\boldsymbol{v}$ to solve $\\boldsymbol{v}\mathbf{M}\_\text{ReLU}=\\boldsymbol{y}$ (In other words, the column space of $\mathbf{M}\_\text{ReLU}$ is all of $\mathbb{R}^n$ and we can find a linear combination of column vectors to obtain any $\\boldsymbol{y}$).
 
 ## Deep NN can Learn Random Noise[#](#deep-nn-can-learn-random-noise)
 
@@ -220,11 +220,11 @@ Fig. 7. Illustration of parameter vectors for direct optimization when $D=3$. (I
 
 The gradient update formula looks like the follows:
 
-$$ \\theta^{(D)} = \\theta_0^{(D)} + \\mathbf{P} \\theta^{(d)} $$
+$$ \\theta^{(D)} = \\theta_0^{(D)} + \mathbf{P} \\theta^{(d)} $$
 
-where $\\theta\_0^{(D)}$ are the initialization values and $\\mathbf{P}$ is a $D \\times d$ projection matrix that is randomly sampled before training. Both $\\theta\_0^{(D)}$ and $\\mathbf{P}$ are not trainable and fixed during training. $\\theta^{(d)}$ is initialized as all zeros.
+where $\\theta\_0^{(D)}$ are the initialization values and $\mathbf{P}$ is a $D \\times d$ projection matrix that is randomly sampled before training. Both $\\theta\_0^{(D)}$ and $\mathbf{P}$ are not trainable and fixed during training. $\\theta^{(d)}$ is initialized as all zeros.
 
-By searching through the value of $d = 1, 2, \\dots, D$, the corresponding $d$ when the solution emerges is defined as the _intrinsic dimension_.
+By searching through the value of $d = 1, 2, \dots, D$, the corresponding $d$ when the solution emerges is defined as the _intrinsic dimension_.
 
 It turns out many problems have much smaller intrinsic dimensions than the number of parameters. For example, on CIFAR10 image classification, a fully-connected network with 650k+ parameters has only 9k intrinsic dimension and a convolutional network containing 62k parameters has an even lower intrinsic dimension of 2.9k.
 
@@ -238,7 +238,7 @@ The measurement of intrinsic dimensions suggests that deep learning models are s
 
 [Zhang et al. (2019)](https://arxiv.org/abs/1902.01996) investigated the role of parameters in different layers. The fundamental question raised by the paper is: _“are all layers created equal?"_ The short answer is: No. The model is more sensitive to changes in some layers but not others.
 
-The paper proposed two types of operations that can be applied to parameters of the $\ell$-th layer, $\ell = 1, \\dots, L$, at time $t$, $\\theta^{(\ell)}\_t$ to test their impacts on model robustness:
+The paper proposed two types of operations that can be applied to parameters of the $\ell$-th layer, $\ell = 1, \dots, L$, at time $t$, $\\theta^{(\ell)}\_t$ to test their impacts on model robustness:
 
 - **Re-initialization**: Reset the parameters to the initial values, $\\theta^{(\ell)}\_t \\leftarrow \\theta^{(\ell)}\_0$. The performance of a network in which layer $\ell$ was re-initialized is referred to as the _re-initialization robustness_ of layer $\ell$.
 - **Re-randomization**: Re-sampling the layer's parameters at random, $\\theta^{(\ell)}\_t \\leftarrow \\tilde{\\theta}^{(\ell)} \\sim \mathcal{P}^{(\ell)}$. The corresponding network performance is called the _re-randomization robustness_ of layer $\ell$.
@@ -316,7 +316,7 @@ In the second experiment, I used a four-layer fc networks with 128 units in each
 
 **Intrinsic Dimension Measurement**
 
-To correctly map the $d$-dimensional subspace to the full parameter space, the projection matrix $\\mathbf{P}$ should have orthogonal columns. Because the production $\\mathbf{P}\\theta^{(d)}$ is the sum of columns of $\\mathbf{P}$ scaled by corresponding scalar values in the $d$-dim vector, $\sum\_{i=1}^d \\theta^{(d)}\_i \\mathbf{P}^\\top\_{(:,i)}$, it is better to fully utilize the subspace with orthogonal columns in $\\mathbf{P}$.
+To correctly map the $d$-dimensional subspace to the full parameter space, the projection matrix $\mathbf{P}$ should have orthogonal columns. Because the production $\mathbf{P}\\theta^{(d)}$ is the sum of columns of $\mathbf{P}$ scaled by corresponding scalar values in the $d$-dim vector, $\sum\_{i=1}^d \\theta^{(d)}\_i \mathbf{P}^\top\_{(:,i)}$, it is better to fully utilize the subspace with orthogonal columns in $\mathbf{P}$.
 
 My implementation follows a naive approach by sampling a large matrix with independent entries from a standard normal distribution. The columns are expected to be independent in a high dimension space and thus to be orthogonal. This works when the dimension is not too large. When exploring with a large $d$, there are methods for creating sparse projection matrices, which is what the intrinsic dimension paper suggested.
 

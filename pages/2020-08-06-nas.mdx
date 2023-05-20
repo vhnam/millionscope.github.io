@@ -69,9 +69,9 @@ To make sure the generated architecture is valid, additional rules might be need
 - If one layer has many input layers, then all input layers are concatenated in the depth dimension;
 - If input layers to be concatenated have different sizes, we pad the small layers with zeros so that the concatenated layers have the same sizes.
 
-The skip connection can be predicted as well, using an [attention](https://lilianweng.github.io/posts/2018-06-24-attention/)\-style mechanism. At layer $i$ , an anchor point is added with $i−1$ content-based sigmoids to indicate which of the previous layers to be connected. Each sigmoid takes as input the hidden states of the current node $h\_i$ and $i-1$ previous nodes $h\_j, j=1, \\dots, i-1$ .
+The skip connection can be predicted as well, using an [attention](https://lilianweng.github.io/posts/2018-06-24-attention/)\-style mechanism. At layer $i$ , an anchor point is added with $i−1$ content-based sigmoids to indicate which of the previous layers to be connected. Each sigmoid takes as input the hidden states of the current node $h\_i$ and $i-1$ previous nodes $h\_j, j=1, \dots, i-1$ .
 
-$$ P(\text{Layer j is an input to layer i}) = \text{sigmoid}(v^\\top \\tanh(\\mathbf{W}\_\text{prev} h_j + \\mathbf{W}\_\text{curr} h_i)) $$
+$$ P(\text{Layer j is an input to layer i}) = \text{sigmoid}(v^\top \\tanh(\mathbf{W}\_\text{prev} h_j + \mathbf{W}\_\text{curr} h_i)) $$
 
 The sequential search space has a lot of representation power, but it is very large and consumes a ton of computation resources to exhaustively cover the search space. In the experiments by [Zoph & Le 2017](https://arxiv.org/abs/1611.01578), they were running 800 GPUs in parallel for 28 days and [Baker et al. 2017](https://arxiv.org/abs/1611.02167) restricted the search space to contain at most 2 `FC` layers.
 
@@ -106,9 +106,9 @@ During the experiments, they discovered that a modified version of [_DropPath_](
 
 To take advantage of already discovered well-designed network [motifs](https://en.wikipedia.org/wiki/Network_motif), the NAS search space can be constrained as a hierarchical structure, as in _Hierarchical NAS_ (**HNAS**; ([Liu et al 2017](https://arxiv.org/abs/1711.00436))). It starts with a small set of primitives, including individual operations like convolution operation, pooling, identity, etc. Then small sub-graphs (or “motifs”) that consist of primitive operations are recursively used to form higher-level computation graphs.
 
-A computation motif at level $\ell=1, \\dots, L$ can be represented by $(G^{(\ell)}, \mathcal{O}^{(\ell)})$, where:
+A computation motif at level $\ell=1, \dots, L$ can be represented by $(G^{(\ell)}, \mathcal{O}^{(\ell)})$, where:
 
-- $\mathcal{O}^{(\ell)}$ is a set of operations, $\mathcal{O}^{(\ell)} = \{ o^{(\ell)}\_1, o^{(\ell)}\_2, \\dots \}$
+- $\mathcal{O}^{(\ell)}$ is a set of operations, $\mathcal{O}^{(\ell)} = \{ o^{(\ell)}\_1, o^{(\ell)}\_2, \dots \}$
 - $G^{(\ell)}$ is an adjacency matrix, where the entry $G\_{ij}=k$ indicates that operation $o^{(\ell)}\_k$ is placed between node $i$ and $j$. The node indices follow [topological ordering](https://en.wikipedia.org/wiki/Topological_sorting) in DAG, where the index $1$ is the source and the maximal index is the sink node.
 
 ![](hierarchical-NAS-search-space.png)
@@ -119,11 +119,11 @@ To build a network according to the hierarchical structure, we start from the lo
 
 $$ o^{(\ell)}\_m = \text{assemble}\\Big( G_m^{(\ell)}, \mathcal{O}^{(\ell-1)} \\Big) $$
 
-A hierarchical representation becomes $\\Big( \\big\{ \{ G\_m^{(\ell)} \}\_{m=1}^{M\_\ell} \\big\}\_{\ell=2}^L, \mathcal{O}^{(1)} \\Big), \\forall \ell=2, \\dots, L$, where $\mathcal{O}^{(1)}$ contains a set of primitive operations.
+A hierarchical representation becomes $\\Big( \\big\{ \{ G\_m^{(\ell)} \}\_{m=1}^{M\_\ell} \\big\}\_{\ell=2}^L, \mathcal{O}^{(1)} \\Big), \\forall \ell=2, \dots, L$, where $\mathcal{O}^{(1)}$ contains a set of primitive operations.
 
 The $\text{assemble}()$ process is equivalent to sequentially compute the feature map of node $i$ by aggregating all the feature maps of its predecessor node $j$ following the topological ordering:
 
-$$ x_i = \text{merge} \\big\[ \{ o^{(\ell)}\_{G^{(\ell)}\_{ij}}(x_j) \}\_{j < i} \\big\], i = 2, \\dots, \vert G^{(\ell)} \vert $$
+$$ x_i = \text{merge} \\big\[ \{ o^{(\ell)}\_{G^{(\ell)}\_{ij}}(x_j) \}\_{j < i} \\big\], i = 2, \dots, \vert G^{(\ell)} \vert $$
 
 where $\text{merge}\[\]$ is implemented as depth-wise concatenation in the [paper](https://arxiv.org/abs/1711.00436).
 
@@ -165,11 +165,11 @@ The controller is trained as a _RL task_ using [REINFORCE](https://lilianweng.gi
 - **Reward**: The accuracy of a child network that can be achieved at convergence is the reward for training the controller, $R$.
 - **Loss**: NAS optimizes the controller parameters $\\theta$ with a REINFORCE loss. We want to maximize the expected reward (high accuracy) with the gradient as follows. The nice thing here with policy gradient is that it works even when the reward is non-differentiable.
 
-$$ \\nabla\_{\\theta} J(\\theta) = \sum\_{t=1}^T \\mathbb{E}\[\\nabla\_{\\theta} \\log P(a_t \vert a\_{1:(t-1)}; \\theta) R \] $$
+$$ \\nabla\_{\\theta} J(\\theta) = \sum\_{t=1}^T \mathbb{E}\[\\nabla\_{\\theta} \\log P(a_t \vert a\_{1:(t-1)}; \\theta) R \] $$
 
 **MetaQNN** ([Baker et al. 2017](https://arxiv.org/abs/1611.02167)) trains an agent to sequentially choose CNN layers using [_Q-learning_](https://lilianweng.github.io/posts/2018-02-19-rl-overview/#q-learning-off-policy-td-control) with an [$\\epsilon$-greedy](https://lilianweng.github.io/posts/2018-01-23-multi-armed-bandit/#%CE%B5-greedy-algorithm) exploration strategy and experience replay. The reward is the validation accuracy as well.
 
-$$ Q^{(t+1)}(s_t, a_t) = (1 - \\alpha)Q^{(t)}(s_t, a_t) + \\alpha (R_t + \\gamma \\max\_{a \in \mathcal{A}} Q^{(t)}(s\_{t+1}, a')) $$
+$$ Q^{(t+1)}(s_t, a_t) = (1 - \\alpha)Q^{(t)}(s_t, a_t) + \\alpha (R_t + \\gamma \max\_{a \in \mathcal{A}} Q^{(t)}(s\_{t+1}, a')) $$
 
 where a state $s\_t$ is a tuple of layer operation and related parameters. An action $a$ determines the connectivity between operations. The Q-value is proportional to how confident we are in two connected operations leading to high accuracy.
 
@@ -273,7 +273,7 @@ Fig. 15. (Left) The graph represents the entire search space for a 4-node recurr
 
 ENAS alternates between training the shared model weights $\\omega$ and training the controller $\\theta$:
 
-1.  The parameters of the controller LSTM $\\theta$ are trained with [REINFORCE](https://lilianweng.github.io/posts/2018-04-08-policy-gradient/#reinforce), where the reward $R(\\mathbf{m}, \\omega)$ is computed on the validation set.
+1.  The parameters of the controller LSTM $\\theta$ are trained with [REINFORCE](https://lilianweng.github.io/posts/2018-04-08-policy-gradient/#reinforce), where the reward $R(\mathbf{m}, \\omega)$ is computed on the validation set.
 2.  The shared parameters of the child models $\\omega$ are trained with standard supervised learning loss. Note that different operators associated with the same node in the supergraph would have their own distinct parameters.
 
 ## Prediction-Based[#](#prediction-based)
@@ -324,13 +324,13 @@ $$ x_i = \sum\_{j < i} o^{(i,j)}(x_j) $$
 
 To make the search space continuous, DARTS relaxes the categorical choice of a particular operation as a softmax over all the operations and the task of architecture search is reduced to learn a set of mixing probabilities $\\alpha = \{ \\alpha^{(i,j)} \}$.
 
-$$ \\bar{o}^{(i,j)}(x) = \sum\_{o\in\mathcal{O}} \\frac{\\exp(\\alpha\_{ij}^o)}{\sum\_{o'\in\mathcal{O}} \\exp(\\alpha^{o'}\_{ij})} o(x) $$
+$$ \\bar{o}^{(i,j)}(x) = \sum\_{o\in\mathcal{O}} \frac{\\exp(\\alpha\_{ij}^o)}{\sum\_{o'\in\mathcal{O}} \\exp(\\alpha^{o'}\_{ij})} o(x) $$
 
 where $\\alpha\_{ij}$ is a vector of dimension $\vert \mathcal{O} \vert$, containing weights between nodes $i$ and $j$ over different operations.
 
 The bilevel optimization exists as we want to optimize both the network weights $w$ and the architecture representation $\\alpha$:
 
-$$ \\begin{aligned} \\min\_\\alpha & \mathcal{L}\_\text{validate} (w^\*(\\alpha), \\alpha) \\\\ \text{s.t.} & w^\*(\\alpha) = \\arg\\min_w \mathcal{L}\_\text{train} (w, \\alpha) \\end{aligned} $$
+$$ \begin{aligned} \min\_\\alpha & \mathcal{L}\_\text{validate} (w^\*(\\alpha), \\alpha) \\ \text{s.t.} & w^\*(\\alpha) = \arg\min_w \mathcal{L}\_\text{train} (w, \\alpha) \end{aligned} $$
 
 At step $k$, given the current architecture parameters $\\alpha\_{k−1}$, we first optimize weights $w\_k$ by moving $w\_{k−1}$ in the direction of minimizing the training loss $\mathcal{L}\_\text{train}(w\_{k−1}, \\alpha\_{k−1})$ with a learning rate $\\xi$. Next, while keeping the newly updated weights $w\_k$ fixed, we update the mixing probabilities so as to minimize the validation loss _after a single step of gradient descent w.r.t. the weights_:
 
@@ -344,7 +344,7 @@ The motivation here is that we want to find an architecture with a low validatio
 
 Fig. 20. An illustration of how DARTS applies continuous relaxation on edges in DAG supergraph and identifies the final model. (Image source: [Liu et al 2019](https://arxiv.org/abs/1806.09055))
 
-$$ \\begin{aligned} \text{Let }w'\_k &= w_k - \\xi \\nabla_w \mathcal{L}\_\text{train}(w_k, \\alpha\_{k-1}) & \\\\ J\_\\alpha &= \mathcal{L}\_\text{val}(w_k - \\xi \\nabla_w \mathcal{L}\_\text{train}(w_k, \\alpha\_{k-1}), \\alpha\_{k-1}) = \mathcal{L}\_\text{val}(w'\_k, \\alpha\_{k-1}) & \\\\ \\nabla\_\\alpha J\_\\alpha &= \\nabla\_{\\alpha\_{k-1}} \mathcal{L}\_\text{val}(w'\_k, \\alpha\_{k-1}) \\nabla\_\\alpha \\alpha\_{k-1} + \\nabla\_{w'\_k} \mathcal{L}\_\text{val}(w'\_k, \\alpha\_{k-1})\\nabla\_\\alpha w'\_k & \\\\& \text{; multivariable chain rule}\\\\ &= \\nabla\_{\\alpha\_{k-1}} \mathcal{L}\_\text{val}(w'\_k, \\alpha\_{k-1}) + \\nabla\_{w'\_k} \mathcal{L}\_\text{val}(w'\_k, \\alpha\_{k-1}) \\big( - \\xi \\color{red}{\\nabla^2\_{\\alpha, w} \mathcal{L}\_\text{train}(w_k, \\alpha\_{k-1})} \\big) & \\\\ &\\approx \\nabla\_{\\alpha\_{k-1}} \mathcal{L}\_\text{val}(w'\_k, \\alpha\_{k-1}) - \\xi \\nabla\_{w'\_k} \mathcal{L}\_\text{val}(w'\_k, \\alpha\_{k-1}) \\color{red}{\\frac{\\nabla\_\\alpha \mathcal{L}\_\text{train}(w_k^+, \\alpha\_{k-1}) - \\nabla\_\\alpha \mathcal{L}\_\text{train}(w_k^-, \\alpha\_{k-1}) }{2\\epsilon}} & \\\\ & \text{; apply numerical differentiation approximation} \\end{aligned} $$
+$$ \begin{aligned} \text{Let }w'\_k &= w_k - \\xi \\nabla_w \mathcal{L}\_\text{train}(w_k, \\alpha\_{k-1}) & \\ J\_\\alpha &= \mathcal{L}\_\text{val}(w_k - \\xi \\nabla_w \mathcal{L}\_\text{train}(w_k, \\alpha\_{k-1}), \\alpha\_{k-1}) = \mathcal{L}\_\text{val}(w'\_k, \\alpha\_{k-1}) & \\ \\nabla\_\\alpha J\_\\alpha &= \\nabla\_{\\alpha\_{k-1}} \mathcal{L}\_\text{val}(w'\_k, \\alpha\_{k-1}) \\nabla\_\\alpha \\alpha\_{k-1} + \\nabla\_{w'\_k} \mathcal{L}\_\text{val}(w'\_k, \\alpha\_{k-1})\\nabla\_\\alpha w'\_k & \\& \text{; multivariable chain rule}\\ &= \\nabla\_{\\alpha\_{k-1}} \mathcal{L}\_\text{val}(w'\_k, \\alpha\_{k-1}) + \\nabla\_{w'\_k} \mathcal{L}\_\text{val}(w'\_k, \\alpha\_{k-1}) \\big( - \\xi \\color{red}{\\nabla^2\_{\\alpha, w} \mathcal{L}\_\text{train}(w_k, \\alpha\_{k-1})} \\big) & \\ &\\approx \\nabla\_{\\alpha\_{k-1}} \mathcal{L}\_\text{val}(w'\_k, \\alpha\_{k-1}) - \\xi \\nabla\_{w'\_k} \mathcal{L}\_\text{val}(w'\_k, \\alpha\_{k-1}) \\color{red}{\frac{\\nabla\_\\alpha \mathcal{L}\_\text{train}(w_k^+, \\alpha\_{k-1}) - \\nabla\_\\alpha \mathcal{L}\_\text{train}(w_k^-, \\alpha\_{k-1}) }{2\\epsilon}} & \\ & \text{; apply numerical differentiation approximation} \end{aligned} $$
 
 where the red part is using numerical differentiation approximation where $w\_k^+ = w\_k + \\epsilon \\nabla\_{w'\_k} \mathcal{L}\_\text{val}(w'\_k, \\alpha\_{k-1})$ and $w\_k^- = w\_k - \\epsilon \\nabla\_{w'\_k} \mathcal{L}\_\text{val}(w'\_k, \\alpha\_{k-1})$.
 
@@ -358,11 +358,11 @@ DARTS is able to greatly reduce the cost of GPU hours. Their experiments for sea
 
 To constrain the GPU memory consumption, **ProxylessNAS** ([Cai et al., 2019](https://arxiv.org/abs/1812.00332)) views NAS as a path-level pruning process in DAG and binarizes the architecture parameters to force only one path to be active between two nodes at a time. The probabilities for an edge being either masked out or not are then learned by sampling a few binarized architectures and using _BinaryConnect_ ([Courbariaux et al., 2015](https://arxiv.org/abs/1511.00363)) to update the corresponding probabilities. ProxylessNAS demonstrates a strong connection between NAS and model compression. By using path-level compression, it is able to save memory consumption by one order of magnitude.
 
-Let's continue with the graph representation. In a DAG adjacency matrix $G$ where $G\_{ij}$ represents an edge between node $i$ and $j$ and its value can be chosen from the set of $\vert \mathcal{O} \vert$ candidate primitive operations, $\mathcal{O} = \{ o\_1, \\dots \}$. The One-Shot model, DARTS and ProxylessNAS all consider each edge as a mixture of operations, $m\_\mathcal{O}$, but with different tweaks.
+Let's continue with the graph representation. In a DAG adjacency matrix $G$ where $G\_{ij}$ represents an edge between node $i$ and $j$ and its value can be chosen from the set of $\vert \mathcal{O} \vert$ candidate primitive operations, $\mathcal{O} = \{ o\_1, \dots \}$. The One-Shot model, DARTS and ProxylessNAS all consider each edge as a mixture of operations, $m\_\mathcal{O}$, but with different tweaks.
 
 In One-Shot, $m\_\mathcal{O}(x)$ is the sum of all the operations. In DARTS, it is a weighted sum where weights are softmax over a real-valued architecture weighting vector $\\alpha$ of length $\vert \mathcal{O} \vert$. ProxylessNAS transforms the softmax probabilities of $\\alpha$ into a binary gate and uses the binary gate to keep only one operation active at a time.
 
-$$ \\begin{aligned} m^\text{one-shot}\_\mathcal{O}(x) &= \sum\_{i=1}^{\vert \mathcal{O} \vert} o_i(x) \\\\ m^\text{DARTS}\_\mathcal{O}(x) &= \sum\_{i=1}^{\vert \mathcal{O} \vert} p_i o_i(x) = \sum\_{i=1}^{\vert \mathcal{O} \vert} \\frac{\\exp(\\alpha_i)}{\sum_j \\exp(\\alpha_j)} o_i(x) \\\\ m^\text{binary}\_\mathcal{O}(x) &= \sum\_{i=1}^{\vert \mathcal{O} \vert} g_i o_i(x) = \\begin{cases} o_1(x) & \text{with probability }p_1, \\\\ \\dots &\\\\ o\_{\vert \mathcal{O} \vert}(x) & \text{with probability }p\_{\vert \mathcal{O} \vert} \\end{cases} \\\\ \text{ where } g &= \text{binarize}(p_1, \\dots, p_N) = \\begin{cases} \[1, 0, \\dots, 0\] & \text{with probability }p_1, \\\\ \\dots & \\\\ \[0, 0, \\dots, 1\] & \text{with probability }p_N. \\\\ \\end{cases} \\end{aligned} $$
+$$ \begin{aligned} m^\text{one-shot}\_\mathcal{O}(x) &= \sum\_{i=1}^{\vert \mathcal{O} \vert} o_i(x) \\ m^\text{DARTS}\_\mathcal{O}(x) &= \sum\_{i=1}^{\vert \mathcal{O} \vert} p_i o_i(x) = \sum\_{i=1}^{\vert \mathcal{O} \vert} \frac{\\exp(\\alpha_i)}{\sum_j \\exp(\\alpha_j)} o_i(x) \\ m^\text{binary}\_\mathcal{O}(x) &= \sum\_{i=1}^{\vert \mathcal{O} \vert} g_i o_i(x) = \begin{cases} o_1(x) & \text{with probability }p_1, \\ \dots &\\ o\_{\vert \mathcal{O} \vert}(x) & \text{with probability }p\_{\vert \mathcal{O} \vert} \end{cases} \\ \text{ where } g &= \text{binarize}(p_1, \dots, p_N) = \begin{cases} \[1, 0, \dots, 0\] & \text{with probability }p_1, \\ \dots & \\ \[0, 0, \dots, 1\] & \text{with probability }p_N. \\ \end{cases} \end{aligned} $$
 
 ![](proxylessNAS-training.png)
 
@@ -373,13 +373,13 @@ ProxylessNAS runs two training steps alternatively:
 1.  When training weight parameters $w$, it freezes the architecture parameters $\\alpha$ and stochastically samples binary gates $g$ according to the above $m^\text{binary}\_\mathcal{O}(x)$. The weight parameters can be updated with standard gradient descent.
 2.  When training architecture parameters $\\alpha$, it freezes $w$, resets the binary gates and then updates $\\alpha$ on the validation set. Following the idea of _BinaryConnect_, the gradient w.r.t. architecture parameters can be approximately estimated using $\\partial \mathcal{L} / \\partial g\_i$ in replacement for $\\partial \mathcal{L} / \\partial p\_i$:
 
-$$ \\begin{aligned} \\frac{\\partial \mathcal{L}}{\\partial \\alpha_i} &= \sum\_{j=1}^{\vert \mathcal{O} \vert} \\frac{\\partial \mathcal{L}}{\\partial p_j} \\frac{\\partial p_j}{\\partial \\alpha_i} \\approx \sum\_{j=1}^{\vert \mathcal{O} \vert} \\frac{\\partial \mathcal{L}}{\\partial g_j} \\frac{\\partial p_j}{\\partial \\alpha_i} = \sum\_{j=1}^{\vert \mathcal{O} \vert} \\frac{\\partial \mathcal{L}}{\\partial g_j} \\frac{\\partial \\frac{e^{\\alpha_j}}{\sum_k e^{\\alpha_k}}}{\\partial \\alpha_i} \\\\ &= \sum\_{j=1}^{\vert \mathcal{O} \vert} \\frac{\\partial \mathcal{L}}{\\partial g_j} \\frac{\sum_k e^{\\alpha_k} (\\mathbf{1}\_{i=j} e^{\\alpha_j}) - e^{\\alpha_j} e^{\\alpha_i} }{(\sum_k e^{\\alpha_k})^2} = \sum\_{j=1}^{\vert \mathcal{O} \vert} \\frac{\\partial \mathcal{L}}{\\partial g_j} p_j (\\mathbf{1}\_{i=j} -p_i) \\end{aligned} $$
+$$ \begin{aligned} \frac{\\partial \mathcal{L}}{\\partial \\alpha_i} &= \sum\_{j=1}^{\vert \mathcal{O} \vert} \frac{\\partial \mathcal{L}}{\\partial p_j} \frac{\\partial p_j}{\\partial \\alpha_i} \\approx \sum\_{j=1}^{\vert \mathcal{O} \vert} \frac{\\partial \mathcal{L}}{\\partial g_j} \frac{\\partial p_j}{\\partial \\alpha_i} = \sum\_{j=1}^{\vert \mathcal{O} \vert} \frac{\\partial \mathcal{L}}{\\partial g_j} \frac{\\partial \frac{e^{\\alpha_j}}{\sum_k e^{\\alpha_k}}}{\\partial \\alpha_i} \\ &= \sum\_{j=1}^{\vert \mathcal{O} \vert} \frac{\\partial \mathcal{L}}{\\partial g_j} \frac{\sum_k e^{\\alpha_k} (\mathbf{1}\_{i=j} e^{\\alpha_j}) - e^{\\alpha_j} e^{\\alpha_i} }{(\sum_k e^{\\alpha_k})^2} = \sum\_{j=1}^{\vert \mathcal{O} \vert} \frac{\\partial \mathcal{L}}{\\partial g_j} p_j (\mathbf{1}\_{i=j} -p_i) \end{aligned} $$
 
 Instead of BinaryConnect, REINFORCE can also be used for parameter updates with the goal for maximizing the reward, while no RNN meta-controller is involved.
 
 Computing $\\partial \mathcal{L} / \\partial g\_i$ needs to calculate and store $o\_i(x)$, which requires $\vert \mathcal{O} \vert$ times GPU memory. To resolve this issue, they factorize the task of choosing one path out of $N$ into multiple binary selection tasks (Intuition: “if a path is the best choice, it should be better than any other path”). At every update step, only two paths are sampled while others are masked. These two selected paths are updated according to the above equation and then scaled properly so that other path weights are unchanged. After this process, one of the sampled paths is enhanced (path weight increases) and the other is attenuated (path weight decreases), while all other paths stay unaltered.
 
-Besides accuracy, ProxylessNAS also considers _latency_ as an important metric to optimize, as different devices might have very different requirements on inference time latency (e.g. GPU, CPU, mobile). To make latency differentiable, they model latency as a continuous function of the network dimensions. The expected latency of a mixed operation can be written as $\\mathbb{E}\[\text{latency}\] = \sum\_j p\_j F(o\_j)$, where $F(.)$ is a latency prediction model:
+Besides accuracy, ProxylessNAS also considers _latency_ as an important metric to optimize, as different devices might have very different requirements on inference time latency (e.g. GPU, CPU, mobile). To make latency differentiable, they model latency as a continuous function of the network dimensions. The expected latency of a mixed operation can be written as $\mathbb{E}\[\text{latency}\] = \sum\_j p\_j F(o\_j)$, where $F(.)$ is a latency prediction model:
 
 ![](proxylessNAS-latency.png)
 

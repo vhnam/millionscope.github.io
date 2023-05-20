@@ -83,9 +83,9 @@ Distillation[#](#distillation)
 
 Fig. 1. The generic framework of teacher-student knowledge distillation training. (Image source: [Gou et al. 2020](”https://arxiv.org/abs/2006.05525”))
 
-Given a dataset, a student model is trained to mimic outputs of a teacher via distillation loss. Usually a neural network has a softmax layer; For example, a LLM outputs a probability distribution over tokens. Let's denote the logits layer right before softmax as $\\mathbf{z}\_t$ and $\\mathbf{z}\_s$ for teacher and student models, respectively. The _distillation loss_ minimizes the difference between two softmax outputs with a high temperature $T$. When ground truth labels $\\mathbf{y}$ are known, we can combine it with a _supervised_ learning objective between ground truth and the student's soft logits using e.g. cross-entropy.
+Given a dataset, a student model is trained to mimic outputs of a teacher via distillation loss. Usually a neural network has a softmax layer; For example, a LLM outputs a probability distribution over tokens. Let's denote the logits layer right before softmax as $\mathbf{z}\_t$ and $\mathbf{z}\_s$ for teacher and student models, respectively. The _distillation loss_ minimizes the difference between two softmax outputs with a high temperature $T$. When ground truth labels $\mathbf{y}$ are known, we can combine it with a _supervised_ learning objective between ground truth and the student's soft logits using e.g. cross-entropy.
 
-$$ \mathcal{L}\_\text{KD} = \mathcal{L}\_\text{distll}(\text{softmax}(\\mathbf{z}\_t, T), \text{softmax}(\\mathbf{z}\_s, T)) + \\lambda\mathcal{L}\_\text{CE}(\\mathbf{y}, \\mathbf{z}\_s) $$
+$$ \mathcal{L}\_\text{KD} = \mathcal{L}\_\text{distll}(\text{softmax}(\mathbf{z}\_t, T), \text{softmax}(\mathbf{z}\_s, T)) + \\lambda\mathcal{L}\_\text{CE}(\mathbf{y}, \mathbf{z}\_s) $$
 
 where $\\lambda$ is a hyperparameter to balance between soft and hard learning objectives. A common choice for $\mathcal{L}\_\text{distll}$ is KL divergence / cross entropy.
 
@@ -158,11 +158,11 @@ _Per-embedding group (PEG)_ activation quantization was motivated by the observa
 
 Q-BERT ([Shen, Dong & Ye, et al. 2020](https://arxiv.org/abs/1909.05840)) developed Hessian AWare Quantization (HAWQ) for its mixed-precision quantization. The motivation is that parameters with higher Hessian spectrum (i.e., larger top eigenvalues) are more sensitive to quantization and thus require higher precision. It is essentially a way to identify outliers.
 
-In another viewpoint, the problem of quantization is an optimization problem. Given a weight matrix $\\mathbf{W}$ and an input matrix $\\mathbf{X}$ , we want to find a quantized weight matrix $\\hat{\\mathbf{W}}$ to minimize the MSE:
+In another viewpoint, the problem of quantization is an optimization problem. Given a weight matrix $\mathbf{W}$ and an input matrix $\mathbf{X}$ , we want to find a quantized weight matrix $\\hat{\mathbf{W}}$ to minimize the MSE:
 
-$$ \\hat{\\mathbf{W}}^\* = {\\arg\\min}\_{\\hat{\\mathbf{W}}} | \\mathbf{W}\\mathbf{X} - \\hat{\\mathbf{W}}\\mathbf{X}| $$
+$$ \\hat{\mathbf{W}}^\* = {\arg\min}\_{\\hat{\mathbf{W}}} | \mathbf{W}\mathbf{X} - \\hat{\mathbf{W}}\mathbf{X}| $$
 
-**GPTQ** ([Frantar et al. 2022](https://arxiv.org/abs/2210.17323)) treats the weight matrix $\\mathbf{W}$ as a collection of row vectors ${\\mathbf{w}}$ and applies quantization to each row independently. GPTQ iteratively quantizes more weights that are selected greedily to minimize the quantization error. The update on selected weights has a closed-form formula, utilizing Hessian matrices. Read more details in the paper and the OBQ (Optimal Brain Quantization; [Frantar & Alistarh 2022](https://arxiv.org/abs/2208.11580)) method if interested. GPTQ can reduce the bitwidth of weights in OPT-175B down to 3 or 4 bits without much performance loss, but it only applies to model weights not activation.
+**GPTQ** ([Frantar et al. 2022](https://arxiv.org/abs/2210.17323)) treats the weight matrix $\mathbf{W}$ as a collection of row vectors ${\mathbf{w}}$ and applies quantization to each row independently. GPTQ iteratively quantizes more weights that are selected greedily to minimize the quantization error. The update on selected weights has a closed-form formula, utilizing Hessian matrices. Read more details in the paper and the OBQ (Optimal Brain Quantization; [Frantar & Alistarh 2022](https://arxiv.org/abs/2208.11580)) method if interested. GPTQ can reduce the bitwidth of weights in OPT-175B down to 3 or 4 bits without much performance loss, but it only applies to model weights not activation.
 
 ### Outlier smoothing[#](#outlier-smoothing)
 
@@ -172,11 +172,11 @@ It is known that activations are harder to quantize than weights in transformer 
 
 Fig. 6. SmoothQuant migrates the scale variance from activations to weights offline to reduce the difficulty of activation quantization. Both the resulting new weight and activation matrices are easy to quantize. (Image source: [Xiao & Lin 2022](https://arxiv.org/abs/2211.10438))
 
-Considering a per-channel smooth factor $\\mathbf{s}$, SmoothQuant scales the weights according to:
+Considering a per-channel smooth factor $\mathbf{s}$, SmoothQuant scales the weights according to:
 
-$$ \\mathbf{Y} = (\\mathbf{X} \text{diag}(\\mathbf{s})^{-1}) \\cdot (\text{diag}(\\mathbf{s})\\mathbf{W}) = \\hat{\\mathbf{X}}\\hat{\\mathbf{W}} $$
+$$ \mathbf{Y} = (\mathbf{X} \text{diag}(\mathbf{s})^{-1}) \cdot (\text{diag}(\mathbf{s})\mathbf{W}) = \\hat{\mathbf{X}}\\hat{\mathbf{W}} $$
 
-The smoothing factor can be easily fused into previous layers' parameters offline. A hyperparameter $\\alpha$ controls how much we migrate the quantization difficulty from activations to weights: $\\mathbf{s} = \\max (\vert \\mathbf{X}\_j \vert)^\\alpha / \\max( \vert \\mathbf{W}\_j \vert )^{1-\\alpha}$. The paper found that $\\alpha=0.5$ is a sweet spot for many LLMs in the experiments. For models with more significant outliers in activation, $\\alpha$ can be adjusted to be larger.
+The smoothing factor can be easily fused into previous layers' parameters offline. A hyperparameter $\\alpha$ controls how much we migrate the quantization difficulty from activations to weights: $\mathbf{s} = \max (\vert \mathbf{X}\_j \vert)^\\alpha / \max( \vert \mathbf{W}\_j \vert )^{1-\\alpha}$. The paper found that $\\alpha=0.5$ is a sweet spot for many LLMs in the experiments. For models with more significant outliers in activation, $\\alpha$ can be adjusted to be larger.
 
 Quantization-aware training (QAT)[#](#quantization-aware-training-qat)
 ----------------------------------------------------------------------
@@ -242,17 +242,17 @@ To sparsify a dense neural network to follow a N:M structured sparsity pattern, 
 
 Permuting columns can provide more options in the pruning process to maintain parameters of large magnitude or to satisfy a special restriction like N:M sparsity ([Pool & Yu 2021](https://proceedings.neurips.cc/paper/2021/hash/6e8404c3b93a9527c8db241a1846599a-Abstract.html)). As long as paired axes of two matrices are permuted in the same order, the results of matrix multiplication would not change. For example,
 
-(1) Within the self-attention module, if the same permutation order is applied on the axis 1 of query embedding matrix $\\mathbf{Q}$ and the axis 0 of key embedding matrix $\\mathbf{K}^\\top$, the final result of matrix multiplication of $\\mathbf{Q}\\mathbf{K}^\\top$ would stay the same.
+(1) Within the self-attention module, if the same permutation order is applied on the axis 1 of query embedding matrix $\mathbf{Q}$ and the axis 0 of key embedding matrix $\mathbf{K}^\top$, the final result of matrix multiplication of $\mathbf{Q}\mathbf{K}^\top$ would stay the same.
 
 ![](permutation-QK.png)
 
-Fig. 8. Illustration of same permutation on $\\mathbf{Q}$ (axis 1) and $\\mathbf{K}^\\top$ (axis 0) to keep the results of a self-attention module unchanged.
+Fig. 8. Illustration of same permutation on $\mathbf{Q}$ (axis 1) and $\mathbf{K}^\top$ (axis 0) to keep the results of a self-attention module unchanged.
 
-(2) Within the FFN layer that contains two MLP layers and one ReLU non-linear layer, we can permute the first linear weight matrix $\\mathbf{W}\_1$ along the axis 1 and the second linear weight matrix $\\mathbf{W}\_2$ along the axis 0 in the same order.
+(2) Within the FFN layer that contains two MLP layers and one ReLU non-linear layer, we can permute the first linear weight matrix $\mathbf{W}\_1$ along the axis 1 and the second linear weight matrix $\mathbf{W}\_2$ along the axis 0 in the same order.
 
 ![](permutation-FFN.png)
 
-Fig. 9. Illustration of the same permutation on $\\mathbf{W}\_1$ (axis 1) and $\\mathbf{W}\_2$ (axis 0) to keep the FFN layer's output unchanged. For simplicity, the bias terms are skipped but the same permutation should be applied on them too.
+Fig. 9. Illustration of the same permutation on $\mathbf{W}\_1$ (axis 1) and $\mathbf{W}\_2$ (axis 0) to keep the FFN layer's output unchanged. For simplicity, the bias terms are skipped but the same permutation should be applied on them too.
 
 To enforce N:M structured sparsity, let's split the columns of one matrix into multiple slides of $M$ columns (named “stripe”) and we can easily observe that both the order of columns within each stripe and the order of stripes have no effect on the N:M sparsity restriction.
 
@@ -271,11 +271,11 @@ To train a model with N:M sparsity from scratch, [Zhou & Ma, et al. (2021)](http
 
 STE computes the gradients of dense parameters wrt the pruned network $\\widetilde{W}$, $\\partial \mathcal{L}/\\partial \\widetilde{W}$, and applies that to the dense network $W$ as an approximation:
 
-$$ W\_{t+1} \\gets W\_t - \\gamma \\frac{\\partial\mathcal{L}}{\\partial\\widetilde{W}} $$
+$$ W\_{t+1} \\gets W\_t - \\gamma \frac{\\partial\mathcal{L}}{\\partial\\widetilde{W}} $$
 
 The extended version, **SR-STE** (Sparse-refined STE), updates the dense weights $W$ by:
 
-$$ W\_{t+1} \\gets W\_t - \\gamma \\frac{\\partial\mathcal{L}}{\\partial\\widetilde{W}} + \\lambda\_W (\\bar{\mathcal{E}} \\odot W\_t) $$ where $\\bar{\mathcal{E}}$ is the mask matrix for $\\widetilde{W}$ and $\\odot$ is element-wise multiplication. SR-STE is proposed to prevent large change in the binary mask by (1) restricting the values of weights pruned in $\\widetilde{W}\_t$, and (2) promoting the non-pruned weights in $\\widetilde{W}\_t$.
+$$ W\_{t+1} \\gets W\_t - \\gamma \frac{\\partial\mathcal{L}}{\\partial\\widetilde{W}} + \\lambda\_W (\\bar{\mathcal{E}} \\odot W\_t) $$ where $\\bar{\mathcal{E}}$ is the mask matrix for $\\widetilde{W}$ and $\\odot$ is element-wise multiplication. SR-STE is proposed to prevent large change in the binary mask by (1) restricting the values of weights pruned in $\\widetilde{W}\_t$, and (2) promoting the non-pruned weights in $\\widetilde{W}\_t$.
 
 ![](SR-STE.png)
 
@@ -287,13 +287,13 @@ At one training step $t$, Top-KAST processes as follows:
 
 1.  _Sparse forward pass_: Select a subset of parameters $A^t \\subset \\Theta$, containing top-$K$ parameters by magnitude by each layer, restricted to top $D$-proportion of weights. The parameterization $\\alpha^t$ at time $t$ has parameters zeroed out if it is not in $A^t$ (active weights).
 
-$$ \\alpha^t\_i = \\begin{cases} \\theta^t\_i & \text{ if } i \in A^t = \{i \mid \\theta^t\_i \in \text{TopK}(\\theta^t, D) \}\\\\ 0 & \text{ otherwise} \\end{cases} $$
+$$ \\alpha^t\_i = \begin{cases} \\theta^t\_i & \text{ if } i \in A^t = \{i \mid \\theta^t\_i \in \text{TopK}(\\theta^t, D) \}\\ 0 & \text{ otherwise} \end{cases} $$
 
 where $\text{TopK}(\\theta, x)$ selected top $x$ proportion of weights from $\\theta$ based on magnitude.
 
 2.  _Sparse backward pass_: Then apply gradients to a larger parameter subset $B \\subset \\Theta$ where $B$ contains $(D+M)$-proportion of weights and $A \\subset B$. Updating a larger proportion of weights enables more effective exploration of different pruning masks, making it more likely to cause permutations in the top $D$-proportion active weights.
 
-$$ \\Delta\_{\\theta^t\_i} = \\begin{cases} -\\eta \\nabla\_{\\alpha\_t} \mathcal{L}(y, x, \\alpha^t)\_i & \text{ if } i\in B^t = \{i \mid \\theta^t\_i \in \text{TopK}(\\theta^t, D+M) \} \\\\ 0 & \text{ otherwise } \\end{cases} $$
+$$ \\Delta\_{\\theta^t\_i} = \begin{cases} -\\eta \\nabla\_{\\alpha\_t} \mathcal{L}(y, x, \\alpha^t)\_i & \text{ if } i\in B^t = \{i \mid \\theta^t\_i \in \text{TopK}(\\theta^t, D+M) \} \\ 0 & \text{ otherwise } \end{cases} $$
 
 Training is split into two stages and the additional coordinates in the set $B \\setminus A$ controls how much exploration is brought in. The amount of exploration is expected to diminish gradually through the training process and the mask eventually stabilizes.
 
@@ -303,7 +303,7 @@ Fig. 12. The pruning mask of Top-KAST stabilizes in time. (Image source: [Jayaku
 
 To prevent rich-get-richer phenomenon, Top-KAST penalizes the magnitude of active weights via a L2 regularization loss to encourage more exploration of new items. Parameters in $B \\setminus A$ are penalized more than $A$ for a higher selection bar during updates to stabilize the mask.
 
-$$ L\_\text{penalty}(\\alpha^t\_i) = \\begin{cases} \vert \\theta^t\_i\vert & \text{ if } i \in A^t \\\\ \vert \\theta^t\_i\vert / D & \text{ if } i \in B^t \\setminus A^t \\\\ 0 & \text{ otherwise} \\end{cases} $$
+$$ L\_\text{penalty}(\\alpha^t\_i) = \begin{cases} \vert \\theta^t\_i\vert & \text{ if } i \in A^t \\ \vert \\theta^t\_i\vert / D & \text{ if } i \in B^t \\setminus A^t \\ 0 & \text{ otherwise} \end{cases} $$
 
 Sparsified Transformer[#](#sparsified-transformer)
 --------------------------------------------------
@@ -316,21 +316,21 @@ Fig. 13. The speed of decoding a single token (unbatched inference) by a transfo
 
 **Sparse FFN layer**: Each FFN layer contains 2 MLP and one ReLU in-between. Because ReLU will introduce a lot of zeros, they implement a fixed structure on activations to enforce only 1 non-zero value in one block of $N$ elements. The sparsity pattern is dynamic, different for each token.
 
-$$ \\begin{aligned} Y\_\text{sparse} &= \\max(0, xW\_1 + b\_1) \\odot \text{Controller}(x) \\\\ \text{SparseFFN}(x) &= Y\_\text{sparse} W\_2 + b\_2 \\\\ \text{Controller}(x) &= \\arg\\max(\text{Reshape}(x C\_1 C\_2, (-1, N))) \\end{aligned} $$
+$$ \begin{aligned} Y\_\text{sparse} &= \max(0, xW\_1 + b\_1) \\odot \text{Controller}(x) \\ \text{SparseFFN}(x) &= Y\_\text{sparse} W\_2 + b\_2 \\ \text{Controller}(x) &= \arg\max(\text{Reshape}(x C\_1 C\_2, (-1, N))) \end{aligned} $$
 
-where each activation in $Y\_\text{sparse}$ corresponds to one column in $W\_1$ and one row in $W\_2$. The controller is implemented as a low-rank bottleneck dense layer, $C\_1 \in \\mathbb{R}^{d\_\text{model} \\times d\_\text{lowrank}}, C\_2 \in \\mathbb{R}^{d\_\text{lowrank} \\times d\_\text{ff}}$ and $d\_\text{lowrank} = d\_\text{model} / N$. It uses $\\arg\\max$ for inference to select which columns should be non-zero and Gumbel-softmax trick ([Jang et al. 2016](https://arxiv.org/abs/1611.01144)) during training. Because we can compute $\text{Controller}(x)$ before loading FFN weight matrices, we know which columns will be zeroed out and thus choose _not to load_ them into memory for inference speedup.
+where each activation in $Y\_\text{sparse}$ corresponds to one column in $W\_1$ and one row in $W\_2$. The controller is implemented as a low-rank bottleneck dense layer, $C\_1 \in \mathbb{R}^{d\_\text{model} \\times d\_\text{lowrank}}, C\_2 \in \mathbb{R}^{d\_\text{lowrank} \\times d\_\text{ff}}$ and $d\_\text{lowrank} = d\_\text{model} / N$. It uses $\arg\max$ for inference to select which columns should be non-zero and Gumbel-softmax trick ([Jang et al. 2016](https://arxiv.org/abs/1611.01144)) during training. Because we can compute $\text{Controller}(x)$ before loading FFN weight matrices, we know which columns will be zeroed out and thus choose _not to load_ them into memory for inference speedup.
 
 ![](sparse-FFN.png)
 
-Fig. 14. (a) Sparse FFN layer; columns in red are not loaded in memory for faster inference. (b) Sparse FFN controller for 1:4 sparsity. (Image source: [Jaszczur et al. 2021](https://arxiv.org/abs/2111.12763)) \*Lilian's side note\*: Fig (a) in the illustration from the paper is actually $Y\_\text{sparse} = \\max\\big(0, (xW\_1 + b\_1) \\odot \text{Controller}(x)\\big)$, but it doesn't change the results.
+Fig. 14. (a) Sparse FFN layer; columns in red are not loaded in memory for faster inference. (b) Sparse FFN controller for 1:4 sparsity. (Image source: [Jaszczur et al. 2021](https://arxiv.org/abs/2111.12763)) \*Lilian's side note\*: Fig (a) in the illustration from the paper is actually $Y\_\text{sparse} = \max\\big(0, (xW\_1 + b\_1) \\odot \text{Controller}(x)\\big)$, but it doesn't change the results.
 
 **Sparse QKV (attention) layer**: In the attention layer, the dimensionality $d\_\text{model}$ is divided into $S$ modules, each of size $M=d\_\text{model} /S$. To make sure each subdivision can access any part of the embedding, Scaling Transformer introduces a multiplicative layer (i.e., a multiplication layer multiplies inputs from multiple neural network layers element-wise) which can represent arbitrary permutation but contains fewer parameters than a dense layer.
 
-Given an input vector $x \in \\mathbb{R}^{d\_\text{model}}$, the multiplicative layer outputs $y \in \\mathbb{R}^{S \\times M}$:
+Given an input vector $x \in \mathbb{R}^{d\_\text{model}}$, the multiplicative layer outputs $y \in \mathbb{R}^{S \\times M}$:
 
-$$ y\_{s,m} = \sum\_i x\_i D\_{i,s} E\_{i,m} \quad\text{where }D \in \\mathbb{R}^{d\_\text{model} \\times S}, D \in \\mathbb{R}^{d\_\text{model} \\times M} $$
+$$ y\_{s,m} = \sum\_i x\_i D\_{i,s} E\_{i,m} \quad\text{where }D \in \mathbb{R}^{d\_\text{model} \\times S}, D \in \mathbb{R}^{d\_\text{model} \\times M} $$
 
-The output of the multiplicative layer is a tensor of size $\in \\mathbb{R}^{\text{batch size}\\times \text{length} \\times S \\times M}$. It then gets processed by a two-dimensional convolutional layer, where $\text{length}$ and $S$ are treated as the height and width of an image. Such a convolution layer further reduces the parameter count and computation time of attention layer.
+The output of the multiplicative layer is a tensor of size $\in \mathbb{R}^{\text{batch size}\\times \text{length} \\times S \\times M}$. It then gets processed by a two-dimensional convolutional layer, where $\text{length}$ and $S$ are treated as the height and width of an image. Such a convolution layer further reduces the parameter count and computation time of attention layer.
 
 ![](sparse-QKV.png)
 
@@ -345,7 +345,7 @@ Mixture-of-experts (MoE) models depend on a collection of “expert” networks 
 
 With MoE architecture, only partial parameters are utilized at decoding time and therefore it saves inference cost. The capacity of each expert can be adjusted with a hyperparameter, capacity factor $C$, and the expert capacity is defined as:
 
-$$ \text{Expert capacity} = \text{round}(C \\cdot k \\cdot \\frac{\text{total # tokens in one batch}}{\text{# experts}}) $$
+$$ \text{Expert capacity} = \text{round}(C \cdot k \cdot \frac{\text{total # tokens in one batch}}{\text{# experts}}) $$
 
 where top-$k$ experts are selected per token. Larger $C$ leads to higher expert capacity and improved performance but more expensive computationally. When $C>1$, a slack capacity is added; otherwise, when $C<1$, the routing network needs to ignore some tokens.
 
@@ -430,7 +430,7 @@ Memory Saving Designs[#](#memory-saving-designs)
 
 Memory saving designs refer to changes of the architecture to use less memory.
 
-*   [Linformer](https://lilianweng.github.io/posts/2023-01-27-the-transformer-family-v2/#low-rank-attention) projects the length dimension of keys and values to a lower-dimensional representation ($N \\to k$) and thus the memory complexity is reduced from $N \\times N$ to $N \\times k$.
+*   [Linformer](https://lilianweng.github.io/posts/2023-01-27-the-transformer-family-v2/#low-rank-attention) projects the length dimension of keys and values to a lower-dimensional representation ($N \to k$) and thus the memory complexity is reduced from $N \\times N$ to $N \\times k$.
 *   [Shazeer (2019)](https://arxiv.org/abs/1911.02150) proposed _multi-query attention_ which has the keys and values shared across different attention “heads”, greatly reducing the size of these tensors and the memory cost.
 *   [Random feature attention and Performer](https://lilianweng.github.io/posts/2023-01-27-the-transformer-family-v2/#low-rank-attention) use [kernel methods]((https://lilianweng.github.io/posts/2022-09-08-ntk/#kernel--kernel-methods)) to achieve a cheaper mathematical format of the self-attention mechanism.
 
