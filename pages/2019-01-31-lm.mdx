@@ -219,7 +219,7 @@ ULMFiT follows three steps to achieve good transfer learning results on downstre
 1.  _General LM pre-training_: on Wikipedia text.
 2.  _Target task LM fine-tuning_: ULMFiT proposed two training techniques for stabilizing the fine-tuning process. See below.
 
-- **Discriminative fine-tuning** is motivated by the fact that different layers of LM capture different types of information (see [discussion](#elmo-representations) above). ULMFiT proposed to tune each layer with different learning rates, $\{\\eta^1, \dots, \\eta^\ell, \dots, \\eta^L\}$, where $\\eta$ is the base learning rate for the first layer, $\\eta^\ell$ is for the $\ell$-th layer and there are $L$ layers in total.
+- **Discriminative fine-tuning** is motivated by the fact that different layers of LM capture different types of information (see [discussion](#elmo-representations) above). ULMFiT proposed to tune each layer with different learning rates, $\{\eta^1, \dots, \eta^\ell, \dots, \eta^L\}$, where $\eta$ is the base learning rate for the first layer, $\eta^\ell$ is for the $\ell$-th layer and there are $L$ layers in total.
 - **Slanted triangular learning rates (STLR)** refer to a special learning rate scheduling that first linearly increases the learning rate and then linearly decays it. The increase stage is short so that the model can converge to a parameter space suitable for the task fast, while the decay period is long allowing for better fine-tuning.
 
 3.  _Target task classifier fine-tuning_: The pretrained LM is augmented with two standard feed-forward layers and a softmax normalization at the end to predict a target label distribution.

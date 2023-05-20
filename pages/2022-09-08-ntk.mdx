@@ -240,7 +240,7 @@ Later, [Arora et al. (2019)](https://arxiv.org/abs/1904.11955) provided a proof 
 
 From the [previous section](#neural-tangent-kernel), according to the derivative chain rule, we have known that the gradient update on the output of an infinite width network is as follows; For brevity, we omit the inputs in the following analysis:
 
-$$ \begin{aligned} \frac{df(\theta)}{dt} &= -\\eta\\nabla_\theta f(\theta)^\top \\nabla_\theta f(\theta) \\nabla_f \mathcal{L} & \\ &= -\\eta\\nabla_\theta f(\theta)^\top \\nabla_\theta f(\theta) \\nabla_f \mathcal{L} & \\ &= -\\eta K(\theta) \\nabla_f \mathcal{L} \\ &= \color{cyan}{-\\eta K_\infty \\nabla_f \mathcal{L}} & \text{; for infinite width network}\\ \end{aligned} $$
+$$ \begin{aligned} \frac{df(\theta)}{dt} &= -\eta\\nabla_\theta f(\theta)^\top \\nabla_\theta f(\theta) \\nabla_f \mathcal{L} & \\ &= -\eta\\nabla_\theta f(\theta)^\top \\nabla_\theta f(\theta) \\nabla_f \mathcal{L} & \\ &= -\eta K(\theta) \\nabla_f \mathcal{L} \\ &= \color{cyan}{-\eta K_\infty \\nabla_f \mathcal{L}} & \text{; for infinite width network}\\ \end{aligned} $$
 
 To track the evolution of $\theta$ in time, let's consider it as a function of time step $t$. With Taylor expansion, the network learning dynamics can be simplified as:
 
@@ -248,17 +248,17 @@ $$ f(\theta(t)) \approx f^\text{lin}(\theta(t)) = f(\theta(0)) + \underbrace{\\n
 
 Such formation is commonly referred to as the _linearized_ model, given $\theta(0)$, $f(\theta(0))$, and $\\nabla_\theta f(\theta(0))$ are all constants. Assuming that the incremental time step $t$ is extremely small and the parameter is updated by gradient descent:
 
-$$ \begin{aligned} \theta(t) - \theta(0) &= - \\eta \\nabla_\theta \mathcal{L}(\theta) = - \\eta \\nabla_\theta f(\theta)^\top \\nabla_f \mathcal{L} \\ f^\text{lin}(\theta(t)) - f(\theta(0)) &= - \\eta\\nabla_\theta f(\theta(0))^\top \\nabla_\theta f(\mathcal{X};\theta(0)) \\nabla_f \mathcal{L} \\ \frac{df(\theta(t))}{dt} &= - \\eta K(\theta(0)) \\nabla_f \mathcal{L} \\ \frac{df(\theta(t))}{dt} &= \color{cyan}{- \\eta K_\infty \\nabla_f \mathcal{L}} & \text{; for infinite width network}\\ \end{aligned} $$
+$$ \begin{aligned} \theta(t) - \theta(0) &= - \eta \\nabla_\theta \mathcal{L}(\theta) = - \eta \\nabla_\theta f(\theta)^\top \\nabla_f \mathcal{L} \\ f^\text{lin}(\theta(t)) - f(\theta(0)) &= - \eta\\nabla_\theta f(\theta(0))^\top \\nabla_\theta f(\mathcal{X};\theta(0)) \\nabla_f \mathcal{L} \\ \frac{df(\theta(t))}{dt} &= - \eta K(\theta(0)) \\nabla_f \mathcal{L} \\ \frac{df(\theta(t))}{dt} &= \color{cyan}{- \eta K_\infty \\nabla_f \mathcal{L}} & \text{; for infinite width network}\\ \end{aligned} $$
 
 Eventually we get the same learning dynamics, which implies that a neural network with infinite width can be considerably simplified as governed by the above linearized model ([Lee & Xiao, et al. 2019](https://arxiv.org/abs/1902.06720)).
 
 In a simple case when the empirical loss is an MSE loss, $\\nabla_\theta \mathcal{L}(\theta) = f(\mathcal{X}; \theta) - \mathcal{Y}$, the dynamics of the network becomes a simple linear ODE and it can be solved in a closed form:
 
-$$ \begin{aligned} \frac{df(\theta)}{dt} =& -\\eta K_\infty (f(\theta) - \mathcal{Y}) & \\ \frac{dg(\theta)}{dt} =& -\\eta K_\infty g(\theta) & \text{; let }g(\theta)=f(\theta) - \mathcal{Y} \\ \int \frac{dg(\theta)}{g(\theta)} =& -\\eta \int K_\infty dt & \\ g(\theta) &= C e^{-\\eta K_\infty t} & \end{aligned} $$
+$$ \begin{aligned} \frac{df(\theta)}{dt} =& -\eta K_\infty (f(\theta) - \mathcal{Y}) & \\ \frac{dg(\theta)}{dt} =& -\eta K_\infty g(\theta) & \text{; let }g(\theta)=f(\theta) - \mathcal{Y} \\ \int \frac{dg(\theta)}{g(\theta)} =& -\eta \int K_\infty dt & \\ g(\theta) &= C e^{-\eta K_\infty t} & \end{aligned} $$
 
 When $t=0$, we have $C=f(\theta(0)) - \mathcal{Y}$ and therefore,
 
-$$ f(\theta) = (f(\theta(0)) - \mathcal{Y})e^{-\\eta K_\infty t} + \mathcal{Y} \\ = f(\theta(0))e^{-K_\infty t} + (I - e^{-\\eta K_\infty t})\mathcal{Y} $$
+$$ f(\theta) = (f(\theta(0)) - \mathcal{Y})e^{-\eta K_\infty t} + \mathcal{Y} \\ = f(\theta(0))e^{-K_\infty t} + (I - e^{-\eta K_\infty t})\mathcal{Y} $$
 
 ## Lazy Training[#](#lazy-training)
 

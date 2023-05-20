@@ -279,7 +279,7 @@ where $\text{TopK}(\theta, x)$ selected top $x$ proportion of weights from $\the
 
 2.  _Sparse backward pass_: Then apply gradients to a larger parameter subset $B \subset \Theta$ where $B$ contains $(D+M)$-proportion of weights and $A \subset B$. Updating a larger proportion of weights enables more effective exploration of different pruning masks, making it more likely to cause permutations in the top $D$-proportion active weights.
 
-$$ \\Delta*{\theta^t_i} = \begin{cases} -\\eta \\nabla*{\alpha_t} \mathcal{L}(y, x, \alpha^t)\_i & \text{ if } i\in B^t = \{i \mid \theta^t_i \in \text{TopK}(\theta^t, D+M) \} \\ 0 & \text{ otherwise } \end{cases} $$
+$$ \\Delta*{\theta^t_i} = \begin{cases} -\eta \\nabla*{\alpha_t} \mathcal{L}(y, x, \alpha^t)\_i & \text{ if } i\in B^t = \{i \mid \theta^t_i \in \text{TopK}(\theta^t, D+M) \} \\ 0 & \text{ otherwise } \end{cases} $$
 
 Training is split into two stages and the additional coordinates in the set $B \\setminus A$ controls how much exploration is brought in. The amount of exploration is expected to diminish gradually through the training process and the mask eventually stabilizes.
 

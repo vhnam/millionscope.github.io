@@ -351,14 +351,14 @@ They pair the BERT model with different types of context, including adversarial 
 
 **RAG** (“Retrieval-Augmented Generation”; [Lewis et al., 2020](https://arxiv.org/abs/2005.11401)) combines pre-trained parametric (language model) and non-parametric memory (external knowledge index) together for language generation. RAG can be fine-tuned on any seq2seq task, whereby both the retriever and the sequence generator are jointly learned. They found that unconstrained generation outperforms previous extractive approaches.
 
-RAG consists of a retriever model $p_\\eta(z \vert x)$ and a generator model $p_\theta(y_i \vert x, z, y_{1:i-1})$:
+RAG consists of a retriever model $p_\eta(z \vert x)$ and a generator model $p_\theta(y_i \vert x, z, y_{1:i-1})$:
 
-- The retriever uses the input sequence $x$ to retrieve text passages $z$, implemented as a [DPR](#DPR) retriever. $\log p_\\eta(z \vert x) \\propto E_z(z)^\top E_x(x)$.
+- The retriever uses the input sequence $x$ to retrieve text passages $z$, implemented as a [DPR](#DPR) retriever. $\log p_\eta(z \vert x) \\propto E_z(z)^\top E_x(x)$.
 - The generator uses $z$ as additional context when generating the target sequence $y$, where the context and the question are simply concatenated.
 
 Depending on whether using the same or different retrieved documents for each token generation, there are two versions of RAG:
 
-$$ \begin{aligned} p_\text{RAG-seq}(y \vert x) &= \sum_{z \in \text{TOP}_k(p_\\eta(.\vert x))} p_\\eta(z \vert x) \prod_i^N p_\theta(y_i \vert x, z, y_{1:i-1}) \\ p_\text{RAG-token}(y \vert x) &= \prod_i^N \sum_{z \in \text{TOP}_k(p_\\eta(.\vert x))} p_\\eta(z_i\vert x) p_\theta(y_i \vert x, z_i, y_{1:i-1}) \end{aligned} $$
+$$ \begin{aligned} p_\text{RAG-seq}(y \vert x) &= \sum_{z \in \text{TOP}_k(p_\eta(.\vert x))} p_\eta(z \vert x) \prod_i^N p_\theta(y_i \vert x, z, y_{1:i-1}) \\ p_\text{RAG-token}(y \vert x) &= \prod_i^N \sum_{z \in \text{TOP}_k(p_\eta(.\vert x))} p_\eta(z_i\vert x) p_\theta(y_i \vert x, z_i, y_{1:i-1}) \end{aligned} $$
 
 The retriever + generator in RAG is jointly trained to minimize the NLL loss, $\mathcal{L}_\text{RAG} = \sum_j -\log p(y_j \vert x_j)$. Updating the passage encoder $E_z(.)$ is expensive as it requires the model to re-index the documents for fast MIPS. RAG does not find fine-tuning $E_z(.)$ necessary (like in [ORQA](#ORQA)) and only updates the query encoder + generator.
 

@@ -307,14 +307,14 @@ $$ \begin{aligned} \min_{\theta_T} &\mathcal{L}_s(\theta^\text{PL}_S(\theta_T)) 
 
 However, it is not trivial to optimize the above equation. Borrowing the idea of [MAML](https://arxiv.org/abs/1703.03400), it approximates the multi-step $\arg\min_{\theta_S}$ with the one-step gradient update of $\theta_S$,
 
-$$ \begin{aligned} \theta^\text{PL}_S(\theta_T) &\approx \theta_S - \\eta_S \cdot \\nabla_{\theta_S} \mathcal{L}_u(\theta_T, \theta_S) \\ \min_{\theta_T} \mathcal{L}_s (\theta^\text{PL}_S(\theta_T)) &\approx \min_{\theta_T} \mathcal{L}_s \big( \theta_S - \\eta_S \cdot \\nabla_{\theta_S} \mathcal{L}_u(\theta_T, \theta_S) \big) \end{aligned} $$
+$$ \begin{aligned} \theta^\text{PL}_S(\theta_T) &\approx \theta_S - \eta_S \cdot \\nabla_{\theta_S} \mathcal{L}_u(\theta_T, \theta_S) \\ \min_{\theta_T} \mathcal{L}_s (\theta^\text{PL}_S(\theta_T)) &\approx \min_{\theta_T} \mathcal{L}_s \big( \theta_S - \eta_S \cdot \\nabla_{\theta_S} \mathcal{L}_u(\theta_T, \theta_S) \big) \end{aligned} $$
 
 With soft pseudo labels, the above objective is differentiable. But if using hard pseudo labels, it is not differentiable and thus we need to use RL, e.g. REINFORCE.
 
 The optimization procedure is alternative between training two models:
 
-- _Student model update_: Given a batch of unlabeled samples $\{ \mathbf{u} \}$, we generate pseudo labels by $f_{\theta_T}(\mathbf{u})$ and optimize $\theta_S$ with one step SGD: $\theta'_S = \color{green}{\theta_S - \\eta_S \cdot \\nabla_{\theta_S} \mathcal{L}_u(\theta_T, \theta_S)}$.
-- _Teacher model update_: Given a batch of labeled samples $\{(\mathbf{x}^l, y)\}$, we reuse the student's update to optimize $\theta_T$: $\theta'_T = \theta_T - \\eta_T \cdot \\nabla_{\theta_T} \mathcal{L}_s ( \color{green}{\theta_S - \\eta_S \cdot \\nabla_{\theta_S} \mathcal{L}_u(\theta_T, \theta_S)} )$. In addition, the UDA objective is applied to the teacher model to incorporate consistency regularization.
+- _Student model update_: Given a batch of unlabeled samples $\{ \mathbf{u} \}$, we generate pseudo labels by $f_{\theta_T}(\mathbf{u})$ and optimize $\theta_S$ with one step SGD: $\theta'_S = \color{green}{\theta_S - \eta_S \cdot \\nabla_{\theta_S} \mathcal{L}_u(\theta_T, \theta_S)}$.
+- _Teacher model update_: Given a batch of labeled samples $\{(\mathbf{x}^l, y)\}$, we reuse the student's update to optimize $\theta_T$: $\theta'_T = \theta_T - \eta_T \cdot \\nabla_{\theta_T} \mathcal{L}_s ( \color{green}{\theta_S - \eta_S \cdot \\nabla_{\theta_S} \mathcal{L}_u(\theta_T, \theta_S)} )$. In addition, the UDA objective is applied to the teacher model to incorporate consistency regularization.
 
 ![](MPL-results.png)
 

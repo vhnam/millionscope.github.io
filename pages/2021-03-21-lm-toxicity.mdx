@@ -302,9 +302,9 @@ The encoder-decoder model is trained with the loss:
 
 $$ \mathcal{L} = \lambda_\text{DAE} \mathcal{L}_\text{DAE} + \lambda_\text{cycle} \mathcal{L}_\text{cycle} $$
 
-- The denoising auto-encoder loss is the loss for denoising auto-encoders, where $\\eta$ is a [masking](https://lilianweng.github.io/posts/2019-01-31-lm/#pre-training-tasks) function same as in BERT training:
+- The denoising auto-encoder loss is the loss for denoising auto-encoders, where $\eta$ is a [masking](https://lilianweng.github.io/posts/2019-01-31-lm/#pre-training-tasks) function same as in BERT training:
 
-$$ \mathcal{L}_\text{DAE} = \mathbb{E}_{\mathbf{x} \sim \mathcal{X}} \[−\log p_\theta(\mathbf{x} \mid \\eta(\mathbf{x}), s)\] $$
+$$ \mathcal{L}_\text{DAE} = \mathbb{E}_{\mathbf{x} \sim \mathcal{X}} \[−\log p_\theta(\mathbf{x} \mid \eta(\mathbf{x}), s)\] $$
 
 - The cycle consistency loss ([Zhu et al. 2017](https://arxiv.org/abs/1703.10593)) has $\tilde{\theta}$ to produce a non-differentiable pseudo-prediction $\hat{\mathbf{y}}$ and it does not take gradient backpropagation.
 
