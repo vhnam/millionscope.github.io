@@ -626,7 +626,7 @@ They transform the mean value of the sentence vectors to 0 and the covariance ma
 
 $$\begin{aligned} \mu &= \frac{1}{N}\sum_{i=1}^N \mathbf{x}_i \quad \sigma = \frac{1}{N}\sum_{i=1}^N (\mathbf{x}_i - \mu)^\top (\mathbf{x}_i - \mu) \\ \tilde{\mathbf{x}}_i &= (\mathbf{x}_i - \mu)W \quad \tilde{\sigma} = W^\top\sigma W = I \text{ thus } \sigma = (W^{-1})^\top W^{-1} \end{aligned}$$
 
-If we get [SVD](https://en.wikipedia.org/wiki/Singular_value_decomposition) decomposition of $\sigma = U\\Lambda U^\top$, we will have $W^{-1}=\sqrt{\\Lambda} U^\top$ and $W=U\sqrt{\\Lambda^{-1}}$. Note that within SVD, $U$ is an orthogonal matrix with column vectors as eigenvectors and $\\Lambda$ is a diagonal matrix with all positive elements as sorted eigenvalues.
+If we get [SVD](https://en.wikipedia.org/wiki/Singular_value_decomposition) decomposition of $\sigma = U\Lambda U^\top$, we will have $W^{-1}=\sqrt{\Lambda} U^\top$ and $W=U\sqrt{\Lambda^{-1}}$. Note that within SVD, $U$ is an orthogonal matrix with column vectors as eigenvectors and $\Lambda$ is a diagonal matrix with all positive elements as sorted eigenvalues.
 
 A dimensionality reduction strategy can be applied by only taking the first $k$ columns of $W$, named `Whitening`\-$k$.
 
@@ -685,7 +685,7 @@ Cited as:
 
 Or
 
-```
+```bibtex
     @article{weng2021contrastive,
       title   = "Contrastive Representation Learning",
       author  = "Weng, Lilian",

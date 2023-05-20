@@ -55,7 +55,7 @@ A general form of a linear regression model is:
 
 $$y = w_0 + w_1 x_1 + w_2 x_2 + … + w_n x_n$$
 
-The coefficients describe the change of the response triggered by one unit increase of the independent variables. The coefficients are not comparable directly unless the features have been standardized (check sklearn.preprocessing.[StandardScalar](http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html#sklearn.preprocessing.StandardScaler) and [RobustScaler](http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.RobustScaler.html#sklearn.preprocessing.RobustScaler)), since one unit of different features can refer to very different things. Without standardization, the product $w_i \\dot x_i$ can be used to quantify one feature's contribution to the response.
+The coefficients describe the change of the response triggered by one unit increase of the independent variables. The coefficients are not comparable directly unless the features have been standardized (check sklearn.preprocessing.[StandardScalar](http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html#sklearn.preprocessing.StandardScaler) and [RobustScaler](http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.RobustScaler.html#sklearn.preprocessing.RobustScaler)), since one unit of different features can refer to very different things. Without standardization, the product $w_i \dot x_i$ can be used to quantify one feature's contribution to the response.
 
 ## Naive Bayes[#](#naive-bayes)
 

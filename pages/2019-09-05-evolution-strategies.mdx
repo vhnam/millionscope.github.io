@@ -70,12 +70,12 @@ $$\theta = (\mu, \sigma),\\;p_\theta(x) \sim \mathcal{N}(\mathbf{\mu}, \sigma^2 
 The process of Simple-Gaussian-ES, given $x \in \mathcal{R}^n$:
 
 1.  Initialize $\theta = \theta^{(0)}$ and the generation counter $t=0$
-2.  Generate the offspring population of size $\\Lambda$ by sampling from the Gaussian distribution:
-    $D^{(t+1)}=\{ x^{(t+1)}_i \mid x^{(t+1)}_i = \mu^{(t)} + \sigma^{(t)} y^{(t+1)}_i \text{ where } y^{(t+1)}_i \sim \mathcal{N}(x \vert 0, \mathbf{I}),;i = 1, \dots, \\Lambda\}$  
+2.  Generate the offspring population of size $\Lambda$ by sampling from the Gaussian distribution:
+    $D^{(t+1)}=\{ x^{(t+1)}_i \mid x^{(t+1)}_i = \mu^{(t)} + \sigma^{(t)} y^{(t+1)}_i \text{ where } y^{(t+1)}_i \sim \mathcal{N}(x \vert 0, \mathbf{I}),;i = 1, \dots, \Lambda\}$  
     .
 3.  Select a top subset of $\lambda$ samples with optimal $f(x_i)$ and this subset is called **elite** set. Without loss of generality, we may consider the first $k$ samples in $D^{(t+1)}$ to belong to the elite group — Let's label them as
 
-$$D^{(t+1)}\\_\text{elite} = \\\{x^{(t+1)}\\_i \mid x^{(t+1)}\\_i \in D^{(t+1)}, i=1,\dots, \lambda, \lambda\leq \\Lambda\\\}$$
+$$D^{(t+1)}\\_\text{elite} = \\\{x^{(t+1)}\\_i \mid x^{(t+1)}\\_i \in D^{(t+1)}, i=1,\dots, \lambda, \lambda\leq \Lambda\\\}$$
 
 4.  Then we estimate the new mean and std for the next generation using the elite set:
 
@@ -445,7 +445,7 @@ As shown in Fig. 11, WANN results are evaluated with both random weights and sha
 
 Cited as:
 
-```
+```bibtex
     @article{weng2019ES,
       title   = "Evolution Strategies",
       author  = "Weng, Lilian",

@@ -82,7 +82,7 @@ $$f(x) \approx f(a) + (x - a)\nabla*x f(x)\vert*{x=a}$$
 
 A [_kernel_](https://en.wikipedia.org/wiki/Kernel_method) is essentially a similarity function between two data points, $K: \mathcal{X} \times \mathcal{X} \to \mathbb{R}$. It describes how sensitive the prediction for one data sample is to the prediction for the other; or in other words, how similar two data points are. The kernel should be symmetric, $K(x, x') = K(x', x)$.
 
-Depending on the problem structure, some kernels can be decomposed into two feature maps, one corresponding to one data point, and the kernel value is an inner product of these two features: $K(x, x') = \langle \\varphi(x), \\varphi(x') \rangle$.
+Depending on the problem structure, some kernels can be decomposed into two feature maps, one corresponding to one data point, and the kernel value is an inner product of these two features: $K(x, x') = \langle \varphi(x), \varphi(x') \rangle$.
 
 _Kernel methods_ are a type of non-parametric, instance-based machine learning algorithms. Assuming we have known all the labels of training samples $\{x^{(i)}, y^{(i)}\}$, the label for a new input $x$ is predicted by a weighted sum $\sum_{i} K(x^{(i)}, x)y^{(i)}$.
 
@@ -138,7 +138,7 @@ where each entry in the output matrix at location $(m, n), 1 \leq m, n \leq n_L$
 
 $$K*{m,n}(\mathbf{x}, \mathbf{x}'; \theta) = \sum*{p=1}^P \frac{\partial f_m(\mathbf{x};\theta)}{\partial \theta_p} \frac{\partial f_n(\mathbf{x}';\theta)}{\partial \theta_p}$$
 
-The "feature map" form of one input $\mathbf{x}$ is $\\varphi(\mathbf{x}) = \nabla_\theta f(\mathbf{x};\theta)$.
+The "feature map" form of one input $\mathbf{x}$ is $\varphi(\mathbf{x}) = \nabla_\theta f(\mathbf{x};\theta)$.
 
 # Infinite Width Networks[#](#infinite-width-networks)
 
@@ -178,7 +178,7 @@ $$\begin{aligned} \sigma^{(l+1)}(\mathbf{x}, \mathbf{x}') &= \mathbb{E}\[\tilde{
 
 When $n_l \to \infty$, according to central limit theorem,
 
-$$\sigma^{(l+1)}(\mathbf{x}, \mathbf{x}') \to \mathbb{E}\_{f \sim \mathcal{N}(0, \\Lambda^{(l)})}\[\sigma(f(\mathbf{x}))^\top \sigma(f(\mathbf{x}'))\] + \beta^2$$
+$$\sigma^{(l+1)}(\mathbf{x}, \mathbf{x}') \to \mathbb{E}\_{f \sim \mathcal{N}(0, \Lambda^{(l)})}\[\sigma(f(\mathbf{x}))^\top \sigma(f(\mathbf{x}'))\] + \beta^2$$
 
 The form of Gaussian processes in the above process is referred to as the _Neural Network Gaussian Process (NNGP)_ ([Lee & Bahri et al. (2018)](https://arxiv.org/abs/1711.00165)).
 
@@ -211,19 +211,27 @@ $$f(\mathbf{x};\theta) = \tilde{A}^{(l+1)}(\mathbf{x};\theta) = \frac{1}{\sqrt{n
 
 And we know its derivative with respect to different sets of parameters; let denote $\tilde{A}^{(l)} = \tilde{A}^{(l)}(\mathbf{x})$ for brevity in the following equation:
 
-$$\begin{aligned} \nabla*{\color{blue}{\mathbf{w}^{(l)}}} f(\mathbf{x};\theta) &= \color{blue}{ \frac{1}{\sqrt{n_l}} \sigma\big(\tilde{A}^{(l)}\big)^\top } \color{black}{\quad \in \mathbb{R}^{1 \times n_l}} \\ \nabla*{\color{green}{\mathbf{b}^{(l)}}} f(\mathbf{x};\theta) &= \color{green}{ \beta } \\ \nabla*{\color{red}{\tilde{\theta}}} f(\mathbf{x};\theta) &= \frac{1}{\sqrt{n_l}} \nabla*\tilde{\theta}\sigma(\tilde{A}^{(l)}) \mathbf{w}^{(l)} \\ &= \color{red}{ \frac{1}{\sqrt{n*l}} \begin{bmatrix} \\dot{\sigma}(\tilde{A}\_1^{(l)})\frac{\partial \tilde{A}\_1^{(l)}}{\partial \tilde{\theta}\_1} & \dots & \\dot{\sigma}(\tilde{A}*{n*l}^{(l)})\frac{\partial \tilde{A}*{n*l}^{(l)}}{\partial \tilde{\theta}\_1} \\ \vdots \\ \\dot{\sigma}(\tilde{A}\_1^{(l)})\frac{\partial \tilde{A}\_1^{(l)}}{\partial \tilde{\theta}*\tilde{P}} & \dots & \\dot{\sigma}(\tilde{A}_{n_l}^{(l)})\frac{\partial \tilde{A}_{n*l}^{(l)}}{\partial \tilde{\theta}*\tilde{P}}\\ \end{bmatrix} \mathbf{w}^{(l)} \color{black}{\quad \in \mathbb{R}^{\tilde{P} \times n\_{l+1}}} } \end{aligned}$$
+$$\begin{aligned} \nabla*{\color{blue}{\mathbf{w}^{(l)}}} f(\mathbf{x};\theta) &= \color{blue}{ \frac{1}{\sqrt{n_l}} \sigma\big(\tilde{A}^{(l)}\big)^\top } \color{black}{\quad \in \mathbb{R}^{1 \times n_l}} \\ \nabla*{\color{green}{\mathbf{b}^{(l)}}} f(\mathbf{x};\theta) &= \color{green}{ \beta } \\ \nabla*{\color{red}{\tilde{\theta}}} f(\mathbf{x};\theta) &= \frac{1}{\sqrt{n_l}} \nabla*\tilde{\theta}\sigma(\tilde{A}^{(l)}) \mathbf{w}^{(l)} \\ &= \color{red}{ \frac{1}{\sqrt{n*l}} \begin{bmatrix} \dot{\sigma}(\tilde{A}\_1^{(l)})\frac{\partial \tilde{A}\_1^{(l)}}{\partial \tilde{\theta}\_1} & \dots & \dot{\sigma}(\tilde{A}*{n*l}^{(l)})\frac{\partial \tilde{A}*{n*l}^{(l)}}{\partial \tilde{\theta}\_1} \\ \vdots \\ \dot{\sigma}(\tilde{A}\_1^{(l)})\frac{\partial \tilde{A}\_1^{(l)}}{\partial \tilde{\theta}*\tilde{P}} & \dots & \dot{\sigma}(\tilde{A}_{n_l}^{(l)})\frac{\partial \tilde{A}_{n*l}^{(l)}}{\partial \tilde{\theta}*\tilde{P}}\\ \end{bmatrix} \mathbf{w}^{(l)} \color{black}{\quad \in \mathbb{R}^{\tilde{P} \times n\_{l+1}}} } \end{aligned}$$
 
-where $\\dot{\sigma}$ is the derivative of $\sigma$ and each entry at location $(p, m), 1 \leq p \leq \tilde{P}, 1 \leq m \leq n_{l+1}$ in the matrix $\nabla_{\tilde{\theta}} f(\mathbf{x};\theta)$ can be written as
+where $\dot{\sigma}$ is the derivative of $\sigma$ and each entry at location $(p, m), 1 \leq p \leq \tilde{P}, 1 \leq m \leq n_{l+1}$ in the matrix $\nabla_{\tilde{\theta}} f(\mathbf{x};\theta)$ can be written as
 
-$$\frac{\partial f*m(\mathbf{x};\theta)}{\partial \tilde{\theta}\_p} = \sum*{i=1}^{n*l} w^{(l)}*{im} \\dot{\sigma}\big(\tilde{A}_i^{(l)} \big) \nabla_{\tilde{\theta}\_p} \tilde{A}\_i^{(l)}$$
+$$\frac{\partial f*m(\mathbf{x};\theta)}{\partial \tilde{\theta}\_p} = \sum*{i=1}^{n*l} w^{(l)}*{im} \dot{\sigma}\big(\tilde{A}_i^{(l)} \big) \nabla_{\tilde{\theta}\_p} \tilde{A}\_i^{(l)}$$
 
 The NTK for this $(l+1)$-layer network can be defined accordingly:
 
-$$\begin{aligned} & K^{(l+1)}(\mathbf{x}, \mathbf{x}'; \theta) \\ =& \nabla*{\theta} f(\mathbf{x};\theta)^\top \nabla*{\theta} f(\mathbf{x};\theta) \\ =& \color{blue}{\nabla*{\mathbf{w}^{(l)}} f(\mathbf{x};\theta)^\top \nabla*{\mathbf{w}^{(l)}} f(\mathbf{x};\theta)} + \color{green}{\nabla*{\mathbf{b}^{(l)}} f(\mathbf{x};\theta)^\top \nabla*{\mathbf{b}^{(l)}} f(\mathbf{x};\theta)} + \color{red}{\nabla*{\tilde{\theta}} f(\mathbf{x};\theta)^\top \nabla*{\tilde{\theta}} f(\mathbf{x};\theta)} \\ =& \frac{1}{n*l} \Big\[ \color{blue}{\sigma(\tilde{A}^{(l)})\sigma(\tilde{A}^{(l)})^\top} + \color{green}{\beta^2} \\ &+ \color{red}{ {\mathbf{w}^{(l)}}^\top \begin{bmatrix} \\dot{\sigma}(\tilde{A}\_1^{(l)})\\dot{\sigma}(\tilde{A}\_1^{(l)})\sum*{p=1}^\tilde{P} \frac{\partial \tilde{A}_1^{(l)}}{\partial \tilde{\theta}\_p}\frac{\partial \tilde{A}\_1^{(l)}}{\partial \tilde{\theta}\_p} & \dots & \\dot{\sigma}(\tilde{A}\_1^{(l)})\\dot{\sigma}(\tilde{A}_{n*l}^{(l)})\sum*{p=1}^\tilde{P} \frac{\partial \tilde{A}_1^{(l)}}{\partial \tilde{\theta}\_p}\frac{\partial \tilde{A}_{n*l}^{(l)}}{\partial \tilde{\theta}\_p} \\ \vdots \\ \\dot{\sigma}(\tilde{A}*{n*l}^{(l)})\\dot{\sigma}(\tilde{A}\_1^{(l)})\sum*{p=1}^\tilde{P} \frac{\partial \tilde{A}_{n_l}^{(l)}}{\partial \tilde{\theta}\_p}\frac{\partial \tilde{A}\_1^{(l)}}{\partial \tilde{\theta}\_p} & \dots & \\dot{\sigma}(\tilde{A}_{n*l}^{(l)})\\dot{\sigma}(\tilde{A}*{n*l}^{(l)})\sum*{p=1}^\tilde{P} \frac{\partial \tilde{A}_{n_l}^{(l)}}{\partial \tilde{\theta}\_p}\frac{\partial \tilde{A}_{n*l}^{(l)}}{\partial \tilde{\theta}\_p} \\ \end{bmatrix} \mathbf{w}^{(l)} } \color{black}{\Big\]} \\ =& \frac{1}{n_l} \Big\[ \color{blue}{\sigma(\tilde{A}^{(l)})\sigma(\tilde{A}^{(l)})^\top} + \color{green}{\beta^2} \\ &+ \color{red}{ {\mathbf{w}^{(l)}}^\top \begin{bmatrix} \\dot{\sigma}(\tilde{A}\_1^{(l)})\\dot{\sigma}(\tilde{A}\_1^{(l)})K^{(l)}*{11} & \dots & \\dot{\sigma}(\tilde{A}_1^{(l)})\\dot{\sigma}(\tilde{A}_{n*l}^{(l)})K^{(l)}*{1n*l} \\ \vdots \\ \\dot{\sigma}(\tilde{A}*{n*l}^{(l)})\\dot{\sigma}(\tilde{A}\_1^{(l)})K^{(l)}*{n*l1} & \dots & \\dot{\sigma}(\tilde{A}*{n*l}^{(l)})\\dot{\sigma}(\tilde{A}*{n*l}^{(l)})K^{(l)}*{n_ln_l} \\ \end{bmatrix} \mathbf{w}^{(l)} } \color{black}{\Big\]} \end{aligned}$$
+$$
+\begin{aligned}
+& K^{(l+1)}(\mathbf{x}, \mathbf{x}'; \theta) \\ 
+=& \nabla*{\theta} f(\mathbf{x};\theta)^\top \nabla*{\theta} f(\mathbf{x};\theta) \\
+=& \color{blue}{\nabla*{\mathbf{w}^{(l)}} f(\mathbf{x};\theta)^\top \nabla*{\mathbf{w}^{(l)}} f(\mathbf{x};\theta)} + \color{green}{\nabla*{\mathbf{b}^{(l)}} f(\mathbf{x};\theta)^\top \nabla*{\mathbf{b}^{(l)}} f(\mathbf{x};\theta)} + \color{red}{\nabla*{\tilde{\theta}} f(\mathbf{x};\theta)^\top \nabla*{\tilde{\theta}} f(\mathbf{x};\theta)} \\
+=& \frac{1}{n*l} \Big\[ \color{blue}{\sigma(\tilde{A}^{(l)})\sigma(\tilde{A}^{(l)})^\top} + \color{green}{\beta^2} \\ &+ \color{red}{ {\mathbf{w}^{(l)}}^\top \begin{bmatrix} \dot{\sigma}(\tilde{A}\_1^{(l)})\dot{\sigma}(\tilde{A}\_1^{(l)})\sum*{p=1}^\tilde{P} \frac{\partial \tilde{A}_1^{(l)}}{\partial \tilde{\theta}\_p}\frac{\partial \tilde{A}\_1^{(l)}}{\partial \tilde{\theta}\_p} & \dots & \dot{\sigma}(\tilde{A}\_1^{(l)})\dot{\sigma}(\tilde{A}_{n*l}^{(l)})\sum*{p=1}^\tilde{P} \frac{\partial \tilde{A}_1^{(l)}}{\partial \tilde{\theta}\_p}\frac{\partial \tilde{A}_{n*l}^{(l)}}{\partial \tilde{\theta}\_p} \\ \vdots \\ \dot{\sigma}(\tilde{A}*{n*l}^{(l)})\dot{\sigma}(\tilde{A}\_1^{(l)})\sum*{p=1}^\tilde{P} \frac{\partial \tilde{A}_{n_l}^{(l)}}{\partial \tilde{\theta}\_p}\frac{\partial \tilde{A}\_1^{(l)}}{\partial \tilde{\theta}\_p} & \dots & \dot{\sigma}(\tilde{A}_{n*l}^{(l)})\dot{\sigma}(\tilde{A}*{n*l}^{(l)})\sum*{p=1}^\tilde{P} \frac{\partial \tilde{A}_{n_l}^{(l)}}{\partial \tilde{\theta}\_p}\frac{\partial \tilde{A}_{n*l}^{(l)}}{\partial \tilde{\theta}\_p} \\ \end{bmatrix} \mathbf{w}^{(l)} } \color{black}{\Big\]} \\
+=& \frac{1}{n_l} \Big\[ \color{blue}{\sigma(\tilde{A}^{(l)})\sigma(\tilde{A}^{(l)})^\top} + \color{green}{\beta^2} \\ &+ \color{red}{ {\mathbf{w}^{(l)}}^\top \begin{bmatrix} \dot{\sigma}(\tilde{A}\_1^{(l)})\dot{\sigma}(\tilde{A}\_1^{(l)})K^{(l)}*{11} & \dots & \dot{\sigma}(\tilde{A}_1^{(l)})\dot{\sigma}(\tilde{A}_{n*l}^{(l)})K^{(l)}*{1n*l} \\ \vdots \\ \dot{\sigma}(\tilde{A}*{n*l}^{(l)})\dot{\sigma}(\tilde{A}\_1^{(l)})K^{(l)}*{n*l1} & \dots & \dot{\sigma}(\tilde{A}*{n*l}^{(l)})\dot{\sigma}(\tilde{A}*{n*l}^{(l)})K^{(l)}*{n_ln_l} \\ \end{bmatrix} \mathbf{w}^{(l)} } \color{black}{ \Big \] }
+\end{aligned}
+$$
 
 where each individual entry at location $(m, n), 1 \leq m, n \leq n_{l+1}$ of the matrix $K^{(l+1)}$ can be written as:
 
-$$\begin{aligned} K^{(l+1)}_{mn} =& \frac{1}{n_l}\Big\[ \color{blue}{\sigma(\tilde{A}\_m^{(l)})\sigma(\tilde{A}\_n^{(l)})} + \color{green}{\beta^2} + \color{red}{ \sum_{i=1}^{n*l} \sum*{j=1}^{n*l} w^{(l)}*{im} w^{(l)}_{in} \\dot{\sigma}(\tilde{A}\_i^{(l)}) \\dot{\sigma}(\tilde{A}_{j}^{(l)}) K\_{ij}^{(l)} } \Big\] \end{aligned}$$
+$$\begin{aligned} K^{(l+1)}_{mn} =& \frac{1}{n_l}\Big\[ \color{blue}{\sigma(\tilde{A}\_m^{(l)})\sigma(\tilde{A}\_n^{(l)})} + \color{green}{\beta^2} + \color{red}{ \sum_{i=1}^{n*l} \sum*{j=1}^{n*l} w^{(l)}*{im} w^{(l)}_{in} \dot{\sigma}(\tilde{A}\_i^{(l)}) \dot{\sigma}(\tilde{A}_{j}^{(l)}) K\_{ij}^{(l)} } \Big\] \end{aligned}$$
 
 When $n_l \to \infty$, the section in blue and green has the limit (See the proof in the [previous section](#connection-with-gaussian-processes)):
 
@@ -231,7 +239,7 @@ $$\frac{1}{n_l}\sigma(\tilde{A}^{(l)})\sigma(\tilde{A}^{(l)}) + \beta^2\to \sigm
 
 and the red section has the limit:
 
-$$\sum*{i=1}^{n_l} \sum*{j=1}^{n*l} w^{(l)}*{im} w^{(l)}_{in} \\dot{\sigma}(\tilde{A}\_i^{(l)}) \\dot{\sigma}(\tilde{A}_{j}^{(l)}) K*{ij}^{(l)} \to \sum*{i=1}^{n*l} \sum*{j=1}^{n*l} w^{(l)}*{im} w^{(l)}_{in} \\dot{\sigma}(\tilde{A}\_i^{(l)}) \\dot{\sigma}(\tilde{A}_{j}^{(l)}) K\_{\infty,ij}^{(l)}$$
+$$\sum*{i=1}^{n_l} \sum*{j=1}^{n*l} w^{(l)}*{im} w^{(l)}_{in} \dot{\sigma}(\tilde{A}\_i^{(l)}) \dot{\sigma}(\tilde{A}_{j}^{(l)}) K*{ij}^{(l)} \to \sum*{i=1}^{n*l} \sum*{j=1}^{n*l} w^{(l)}*{im} w^{(l)}_{in} \dot{\sigma}(\tilde{A}\_i^{(l)}) \dot{\sigma}(\tilde{A}_{j}^{(l)}) K\_{\infty,ij}^{(l)}$$
 
 Later, [Arora et al. (2019)](https://arxiv.org/abs/1904.11955) provided a proof with a weaker limit, that does not require all the hidden layers to be infinitely wide, but only requires the minimum width to be sufficiently large.
 
@@ -284,7 +292,7 @@ Cited as:
 > Weng, Lilian. (Sep 2022). Some math behind neural tangent kernel. Lil'Log. https://lilianweng.github.io/posts/2022-09-08-ntk/.
 
 Or
-
+```bibtex
     @article{weng2022ntk,
       title   = "Some Math behind Neural Tangent Kernel",
       author  = "Weng, Lilian",
@@ -293,7 +301,7 @@ Or
       month   = "Sep",
       url     = "https://lilianweng.github.io/posts/2022-09-08-ntk/"
     }
-
+```
 # References[#](#references)
 
 \[1\] Jacot et al. ["Neural Tangent Kernel: Convergence and Generalization in Neural Networks."](https://arxiv.org/abs/1806.07572) NeuriPS 2018.
