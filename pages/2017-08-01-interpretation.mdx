@@ -63,11 +63,11 @@ Naive Bayes is named as “Naive” because it works on a very simplified assump
 
 Given a feature vector $\mathbf{x} = \[x_1, x_2, \dots, x_n\]$ and a class label $c \in \{1, 2, \dots, C\}$, the probability of this data point belonging to this class is:
 
-$$ \begin{aligned} p(c | x_1, x_2, \dots, x_n) &\\propto p(c, x_1, x_2, \dots, x_n)\\ &\\propto p(c) p(x_1 | c) p(x_2 | c) \dots p(x_n | c)\\ &\\propto p(c) \\prod_{i=1}^n p(x_i | c). \end{aligned} $$
+$$ \begin{aligned} p(c | x_1, x_2, \dots, x_n) &\\propto p(c, x_1, x_2, \dots, x_n)\\ &\\propto p(c) p(x_1 | c) p(x_2 | c) \dots p(x_n | c)\\ &\\propto p(c) \prod_{i=1}^n p(x_i | c). \end{aligned} $$
 
 The Naive Bayes classifier is then defined as:
 
-$$ \hat{y} = \arg\max_{c \in 1, \dots, C} p(c) \\prod_{i=1}^n p(x_i | c) $$
+$$ \hat{y} = \arg\max_{c \in 1, \dots, C} p(c) \prod_{i=1}^n p(x_i | c) $$
 
 Because the model has learned the prior $p(x_i \vert c)$ during the training, the contribution of an individual feature value can be easily measured by the posterior, $p(c \vert x_i) = p(c)p(x_i \vert c) / p(x_i)$.
 

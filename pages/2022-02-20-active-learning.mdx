@@ -73,11 +73,11 @@ $U(\mathbf{x})$
 
 Scoring function for active learning selection.
 
-$P_\\theta(y \vert \mathbf{x})$
+$P_\theta(y \vert \mathbf{x})$
 
-A softmax classifier parameterized by $\\theta$.
+A softmax classifier parameterized by $\theta$.
 
-$\hat{y} = \arg\max_{y \in \mathcal{Y}} P_\\theta(y \vert \mathbf{x})$
+$\hat{y} = \arg\max_{y \in \mathcal{Y}} P_\theta(y \vert \mathbf{x})$
 
 The most confident prediction by the classifier.
 
@@ -97,7 +97,7 @@ Given an unlabeled dataset $\mathcal{U}$ and a fixed amount of labeling cost $B$
 
 Fig. 1. Illustration of a cyclic workflow of active learning, producing better models more efficiently by smartly choosing which samples to label.
 
-To simplify the discussion, we assume that the task is a $K$-class classification problem in all the following sections. The model with parameters $\\theta$ outputs a probability distribution over the label candidates, which may or may not be calibrated, $P_\\theta(y \vert \mathbf{x})$ and the most likely prediction is $\hat{y} = \arg\max_{y \in \mathcal{Y}} P_\\theta(y \vert \mathbf{x})$.
+To simplify the discussion, we assume that the task is a $K$-class classification problem in all the following sections. The model with parameters $\theta$ outputs a probability distribution over the label candidates, which may or may not be calibrated, $P_\theta(y \vert \mathbf{x})$ and the most likely prediction is $\hat{y} = \arg\max_{y \in \mathcal{Y}} P_\theta(y \vert \mathbf{x})$.
 
 # Acquisition Function[#](#acquisition-function)
 
@@ -109,15 +109,15 @@ Here is a list of basic sampling strategies.
 
 **Uncertainty sampling** selects examples for which the model produces most uncertain predictions. Given a single model, uncertainty can be estimated by the predicted probabilities, although one common complaint is that deep learning model predictions are often not calibrated and not correlated with true uncertainty well. In fact, deep learning models are often overconfident.
 
-- _Least confident score_, also known as _variation ratio_: $U(\mathbf{x}) = 1 - P_\\theta(\hat{y} \vert \mathbf{x})$.
-- _Margin score_: $U(\mathbf{x}) = P_\\theta(\hat{y}_1 \vert \mathbf{x}) - P_\\theta(\hat{y}_2 \vert \mathbf{x})$, where $\hat{y}_1$ and $\hat{y}_2$ are the most likely and the second likely predicted labels.
-- _Entropy_: $U(\mathbf{x}) = \mathcal{H}(P_\\theta(y \vert \mathbf{x})) = - \sum_{y \in \mathcal{Y}} P_\\theta(y \vert \mathbf{x}) \log P_\\theta(y \vert \mathbf{x})$.
+- _Least confident score_, also known as _variation ratio_: $U(\mathbf{x}) = 1 - P_\theta(\hat{y} \vert \mathbf{x})$.
+- _Margin score_: $U(\mathbf{x}) = P_\theta(\hat{y}_1 \vert \mathbf{x}) - P_\theta(\hat{y}_2 \vert \mathbf{x})$, where $\hat{y}_1$ and $\hat{y}_2$ are the most likely and the second likely predicted labels.
+- _Entropy_: $U(\mathbf{x}) = \mathcal{H}(P_\theta(y \vert \mathbf{x})) = - \sum_{y \in \mathcal{Y}} P_\theta(y \vert \mathbf{x}) \log P_\theta(y \vert \mathbf{x})$.
 
-Another way to quantify uncertainty is to rely on a committee of expert models, known as Query-By-Committee (QBC). QBC measures uncertainty based on a pool of opinions and thus it is critical to keep a level of disagreement among committee members. Given $C$ models in the committee pool, each parameterized by $\\theta_1, \dots, \\theta_C$.
+Another way to quantify uncertainty is to rely on a committee of expert models, known as Query-By-Committee (QBC). QBC measures uncertainty based on a pool of opinions and thus it is critical to keep a level of disagreement among committee members. Given $C$ models in the committee pool, each parameterized by $\theta_1, \dots, \theta_C$.
 
 - _Voter entropy_: $U(\mathbf{x}) = \mathcal{H}(\frac{V(y)}{C})$, where $V(y)$ counts the number of votes from the committee on the label $y$.
 - _Consensus entropy_: $U(\mathbf{x}) = \mathcal{H}(P_\mathcal{C})$, where $P_\mathcal{C}$ is the prediction averaging across the committee.
-- _KL divergence_: $U(\mathbf{x}) = \frac{1}{C} \sum_{c=1}^C D_\text{KL} (P_{\\theta_c} | P_\mathcal{C})$
+- _KL divergence_: $U(\mathbf{x}) = \frac{1}{C} \sum_{c=1}^C D_\text{KL} (P_{\theta_c} | P_\mathcal{C})$
 
 ## Diversity Sampling[#](#diversity-sampling)
 
@@ -164,19 +164,19 @@ Unfortunately all the cheap implicit ensemble options above perform worse than n
 
 ### Uncertainty in Parameter Space[#](#uncertainty-in-parameter-space)
 
-**Bayes-by-backprop** ([Blundell et al. 2015](https://arxiv.org/abs/1505.05424)) measures weight uncertainty in neural networks directly. The method maintains a probability distribution over the weights $\mathbf{w}$, which is modeled as a variational distribution $q(\mathbf{w} \vert \\theta)$ since the true posterior $p(\mathbf{w} \vert \mathcal{D})$ is not tractable directly. The loss is to minimize the KL divergence between $q(\mathbf{w} \vert \\theta)$ and $p(\mathbf{w} \vert \mathcal{D})$,
+**Bayes-by-backprop** ([Blundell et al. 2015](https://arxiv.org/abs/1505.05424)) measures weight uncertainty in neural networks directly. The method maintains a probability distribution over the weights $\mathbf{w}$, which is modeled as a variational distribution $q(\mathbf{w} \vert \theta)$ since the true posterior $p(\mathbf{w} \vert \mathcal{D})$ is not tractable directly. The loss is to minimize the KL divergence between $q(\mathbf{w} \vert \theta)$ and $p(\mathbf{w} \vert \mathcal{D})$,
 
-$$ \begin{aligned} \mathcal{L}(\\theta) &= \text{KL}\[q(\mathbf{w}\vert\\theta) \| p(\mathbf{w} \vert \mathcal{D})\] \\ &= \int q(\mathbf{w}\vert\\theta) \log \frac{q(\mathbf{w}\vert\\theta)}{p(\mathbf{w}) p(\mathcal{D}\vert \mathbf{w})} d\mathbf{w} \\ &= \text{KL}\[q(\mathbf{w}\vert\\theta) \| p(w)\] - \mathbb{E}_{q(\mathbf{w}\vert\\theta)} \[\log p(\mathcal{D} \vert \mathbf{w})\] \\ &\approx \log q(\mathbf{w} \vert \\theta) - \log p(\mathbf{w}) p(\mathcal{D}\vert \mathbf{w}) & \text{; monte carlo sampling; }q(\mathbf{w} \vert \\theta)\text{ & }p(\mathbf{w})\text{ are close.} \end{aligned} $$
+$$ \begin{aligned} \mathcal{L}(\theta) &= \text{KL}\[q(\mathbf{w}\vert\theta) \| p(\mathbf{w} \vert \mathcal{D})\] \\ &= \int q(\mathbf{w}\vert\theta) \log \frac{q(\mathbf{w}\vert\theta)}{p(\mathbf{w}) p(\mathcal{D}\vert \mathbf{w})} d\mathbf{w} \\ &= \text{KL}\[q(\mathbf{w}\vert\theta) \| p(w)\] - \mathbb{E}_{q(\mathbf{w}\vert\theta)} \[\log p(\mathcal{D} \vert \mathbf{w})\] \\ &\approx \log q(\mathbf{w} \vert \theta) - \log p(\mathbf{w}) p(\mathcal{D}\vert \mathbf{w}) & \text{; monte carlo sampling; }q(\mathbf{w} \vert \theta)\text{ & }p(\mathbf{w})\text{ are close.} \end{aligned} $$
 
-The variational distribution $q$ is typically a Gaussian with diagonal covariance and each weight is sampled from $\mathcal{N}(\\mu_i, \sigma_i^2)$. To ensure non-negativity of $\sigma_i$, it is further parameterized via softplus, $\sigma_i = \log(1 + \exp(\rho_i))$ where the variational parameters are $\\theta = \{\\mu_i , \rho_i\}^d_{i=1}$.
+The variational distribution $q$ is typically a Gaussian with diagonal covariance and each weight is sampled from $\mathcal{N}(\mu_i, \sigma_i^2)$. To ensure non-negativity of $\sigma_i$, it is further parameterized via softplus, $\sigma_i = \log(1 + \exp(\rho_i))$ where the variational parameters are $\theta = \{\mu_i , \rho_i\}^d_{i=1}$.
 
 The process of Bayes-by-backprop can be summarized as:
 
 1.  Sample $\\epsilon \sim \mathcal{N}(0, I)$
-2.  Let $\mathbf{w} = \\mu + \log(1+ \exp(\rho)) \\circ \\epsilon$
-3.  Let $\\theta = (\\mu, \rho)$
-4.  Let $f(\mathbf{w}, \\theta) = \log q(\mathbf{w} \vert \\theta) - \log p(\mathbf{w})p(\mathcal{D}\vert \mathbf{w})$
-5.  Calculate the gradient of $f(\mathbf{w}, \\theta)$ w.r.t. to $\\mu$ and $\rho$ and then update $\\theta$.
+2.  Let $\mathbf{w} = \mu + \log(1+ \exp(\rho)) \circ \\epsilon$
+3.  Let $\theta = (\mu, \rho)$
+4.  Let $f(\mathbf{w}, \theta) = \log q(\mathbf{w} \vert \theta) - \log p(\mathbf{w})p(\mathcal{D}\vert \mathbf{w})$
+5.  Calculate the gradient of $f(\mathbf{w}, \theta)$ w.r.t. to $\mu$ and $\rho$ and then update $\theta$.
 6.  Uncertainty is measured by sampling different model weights during inference.
 
 ### Loss Prediction[#](#loss-prediction)
@@ -207,14 +207,14 @@ Fig. 4. Active learning results of loss prediction module based selection, in co
 
 Fig. 5. Illustration of VAAL (Variational adversarial active learning). (Image source: [Sinha et al. 2019](https://arxiv.org/abs/1904.00370))
 
-- The $\\beta$-VAE learns a latent feature space $\mathbf{z}^l \cup \mathbf{z}^u$, for labeled and unlabeled data respectively, aiming to _trick_ the discriminator $D(.)$ that all the data points are from the labeled pool;
+- The $\beta$-VAE learns a latent feature space $\mathbf{z}^l \cup \mathbf{z}^u$, for labeled and unlabeled data respectively, aiming to _trick_ the discriminator $D(.)$ that all the data points are from the labeled pool;
 - The discriminator $D(.)$ predicts whether a sample is labeled (1) or not (0) based on a latent representation $\mathbf{z}$. VAAL selects unlabeled samples with low discriminator scores, which indicates that those samples are sufficiently different from previously labeled ones.
 
 The loss for VAE representation learning in VAAL contains both a reconstruction part (minimizing the ELBO of given samples) and an adversarial part (labeled and unlabeled data is drawn from the same probability distribution $q_\phi$):
 
-$$ \begin{aligned} \mathcal{L}_\text{VAE} &= \\lambda_1 \mathcal{L}^\text{rec}_\text{VAE} + \\lambda_2 \mathcal{L}^\text{adv}_\text{VAE} \\ \mathcal{L}^\text{rec}_\text{VAE} &= \mathbb{E}\[\log p_\\theta(\mathbf{x}^l \vert \mathbf{z}^l)\] - \\beta \text{KL}(q_\phi(\mathbf{z}^l \vert \mathbf{x}^l) \| p(\mathbf{\\tilde{z}})) + \mathbb{E}\[\log p_\\theta(\mathbf{u} \vert \mathbf{z}^u)\] - \\beta \text{KL}(q_\phi(\mathbf{z}^u \vert \mathbf{u}) \| p(\mathbf{\\tilde{z}})) \\ \mathcal{L}^\text{adv}_\text{VAE} &= - \mathbb{E}\[\log D(q_\phi (\mathbf{z}^l \vert \mathbf{x}^l))\] - \mathbb{E}\[\log D(q_\phi(\mathbf{z}^u \vert \mathbf{u}))\] \end{aligned} $$
+$$ \begin{aligned} \mathcal{L}_\text{VAE} &= \lambda_1 \mathcal{L}^\text{rec}_\text{VAE} + \lambda_2 \mathcal{L}^\text{adv}_\text{VAE} \\ \mathcal{L}^\text{rec}_\text{VAE} &= \mathbb{E}\[\log p_\theta(\mathbf{x}^l \vert \mathbf{z}^l)\] - \beta \text{KL}(q_\phi(\mathbf{z}^l \vert \mathbf{x}^l) \| p(\mathbf{\tilde{z}})) + \mathbb{E}\[\log p_\theta(\mathbf{u} \vert \mathbf{z}^u)\] - \beta \text{KL}(q_\phi(\mathbf{z}^u \vert \mathbf{u}) \| p(\mathbf{\tilde{z}})) \\ \mathcal{L}^\text{adv}_\text{VAE} &= - \mathbb{E}\[\log D(q_\phi (\mathbf{z}^l \vert \mathbf{x}^l))\] - \mathbb{E}\[\log D(q_\phi(\mathbf{z}^u \vert \mathbf{u}))\] \end{aligned} $$
 
-where $p(\mathbf{\\tilde{z}})$ is a unit Gaussian as a predefined prior and $\\beta$ is the Lagrangian parameter.
+where $p(\mathbf{\tilde{z}})$ is a unit Gaussian as a predefined prior and $\beta$ is the Lagrangian parameter.
 
 The discriminator loss is:
 
@@ -240,7 +240,7 @@ $$ \mathcal{L}_\text{CE} = -\mathbb{E}_{(\mathbf{x}^l, y) \sim \mathcal{X}} \sum
 
 (2) When training on the unlabeled examples, MAL relies on a _minimax_ game setup
 
-$$ \begin{aligned} \mathcal{L}_\text{Ent} &= -\sum^K_{k=1} p(y=k \vert \mathbf{u}) \log p(y=k\vert \mathbf{u}) \\ \\theta^\*_F, \\theta^\*_C &= \min_F\max_C \mathcal{L}_\text{Ent} \\ \\theta_F &\\gets \\theta_F - \\alpha_1 \\nabla \mathcal{L}_\text{Ent} \\ \\theta_C &\\gets \\theta_C + \\alpha_2 \\nabla \mathcal{L}_\text{Ent} \end{aligned} $$
+$$ \begin{aligned} \mathcal{L}_\text{Ent} &= -\sum^K_{k=1} p(y=k \vert \mathbf{u}) \log p(y=k\vert \mathbf{u}) \\ \theta^\*_F, \theta^\*_C &= \min_F\max_C \mathcal{L}_\text{Ent} \\ \theta_F &\gets \theta_F - \alpha_1 \\nabla \mathcal{L}_\text{Ent} \\ \theta_C &\gets \theta_C + \alpha_2 \\nabla \mathcal{L}_\text{Ent} \end{aligned} $$
 
 where,
 
@@ -266,7 +266,7 @@ $$ d(\phi(\mathbf{x}_i), \phi(\mathbf{x}_j)) < \\epsilon \quad\text{and}\quad \t
 
 Given an unlabeled sample $\mathbf{x}$, CAL runs the following process:
 
-1.  Select the top $k$ nearest neighbors in the model feature space among the labeled samples, $\{(\mathbf{x}^l_i, y_i\}_{i=1}^M \\subset \mathcal{X}$.
+1.  Select the top $k$ nearest neighbors in the model feature space among the labeled samples, $\{(\mathbf{x}^l_i, y_i\}_{i=1}^M \subset \mathcal{X}$.
 2.  Compute the KL divergence between the model output probabilities of $\mathbf{x}$ and each in $\{\mathbf{x}^l\}$. The contrastive score of $\mathbf{x}$ is the average of these KL divergence values: $s(\mathbf{x}) = \frac{1}{M} \sum_{i=1}^M \text{KL}(p(y \vert \mathbf{x}^l_i | p(y \vert \mathbf{x}))$.
 3.  Samples with _high contrastive scores_ are selected for active learning.
 
@@ -313,15 +313,15 @@ Fig. 10. Algorithm of BADGE (batch active learning by diverse gradient embedding
 
 [Settles et al. (2008)](https://papers.nips.cc/paper/2007/hash/a1519de5b5d44b31a01de013b9b51a80-Abstract.html) introduced an active learning query strategy, named **EGL** (Expected Gradient Length). The motivation is to find samples that can trigger the greatest update on the model if their labels are known.
 
-Let $\\nabla \mathcal{L}(\\theta)$ be the gradient of the loss function with respect to the model parameters. Specifically, given an unlabeled sample $\mathbf{x}_i$, we need to calculate the gradient assuming the label is $y \in \mathcal{Y}$, $\\nabla \mathcal{L}^{(y)}(\\theta)$. Because the true label $y_i$ is unknown, EGL relies on the current model belief to compute the expected gradient change:
+Let $\\nabla \mathcal{L}(\theta)$ be the gradient of the loss function with respect to the model parameters. Specifically, given an unlabeled sample $\mathbf{x}_i$, we need to calculate the gradient assuming the label is $y \in \mathcal{Y}$, $\\nabla \mathcal{L}^{(y)}(\theta)$. Because the true label $y_i$ is unknown, EGL relies on the current model belief to compute the expected gradient change:
 
-$$ \text{EGL}(\mathbf{x}_i) = \sum_{y_i \in \mathcal{Y}} p(y=y_i \vert \mathbf{x}) \|\\nabla \mathcal{L}^{(y_i)}(\\theta)\| $$
+$$ \text{EGL}(\mathbf{x}_i) = \sum_{y_i \in \mathcal{Y}} p(y=y_i \vert \mathbf{x}) \|\\nabla \mathcal{L}^{(y_i)}(\theta)\| $$
 
 **BALD** (Bayesian Active Learning by Disagreement; [Houlsby et al. 2011](https://arxiv.org/abs/1112.5745)) aims to identify samples to maximize the information gain about the model weights, that is equivalent to maximize the decrease in expected posterior entropy.
 
-$$ \begin{aligned} I\[\\boldsymbol{\\theta}, y \vert x,\mathcal{D}\] &= H(\\boldsymbol{\\theta} \vert \mathcal{D}) - \mathbb{E}_{y \sim p(y \vert \\boldsymbol{x}, \mathcal{D})} \big\[ H(\\boldsymbol{\\theta} \vert y, \\boldsymbol{x}, \mathcal{D}) \big\] & \text{; Decrease in expected posterior entropy}\\ &= H(y \vert \\boldsymbol{x}, \mathcal{D}) - \mathbb{E}_{\\boldsymbol{\\theta} \sim p(\\boldsymbol{\\theta} \vert \mathcal{D})} \big\[ H(y \vert \\boldsymbol{x}, \mathcal{\\theta}) \big\] \end{aligned} $$
+$$ \begin{aligned} I\[\boldsymbol{\theta}, y \vert x,\mathcal{D}\] &= H(\boldsymbol{\theta} \vert \mathcal{D}) - \mathbb{E}_{y \sim p(y \vert \boldsymbol{x}, \mathcal{D})} \big\[ H(\boldsymbol{\theta} \vert y, \boldsymbol{x}, \mathcal{D}) \big\] & \text{; Decrease in expected posterior entropy}\\ &= H(y \vert \boldsymbol{x}, \mathcal{D}) - \mathbb{E}_{\boldsymbol{\theta} \sim p(\boldsymbol{\theta} \vert \mathcal{D})} \big\[ H(y \vert \boldsymbol{x}, \mathcal{\theta}) \big\] \end{aligned} $$
 
-The underlying interpretation is to “seek $\mathbf{x}$ for which the model is marginally most uncertain about $y$ (high $H(y \vert \mathbf{x}, \mathcal{D})$), but for which individual settings of the parameters are confident (low $H(y \vert \mathbf{x}, \\boldsymbol{\\theta})$).” In other words, each individual posterior draw is confident but a collection of draws carry diverse opinions.
+The underlying interpretation is to “seek $\mathbf{x}$ for which the model is marginally most uncertain about $y$ (high $H(y \vert \mathbf{x}, \mathcal{D})$), but for which individual settings of the parameters are confident (low $H(y \vert \mathbf{x}, \boldsymbol{\theta})$).” In other words, each individual posterior draw is confident but a collection of draws carry diverse opinions.
 
 BALD was originally proposed for an individual sample and [Kirsch et al. (2019)](https://arxiv.org/abs/1906.08158) extended it to work in batch mode.
 
@@ -350,12 +350,12 @@ Fig. 11. Label dispersion is correlated with network uncertainty. On the x-axis,
 
 When running active learning in batch mode, it is important to control diversity within a batch. **Suggestive Annotation** (**SA**; [Yang et al. 2017](https://arxiv.org/abs/1706.04737)) is a two-step hybrid strategy, aiming to select both high uncertainty & highly representative labeled samples. It uses uncertainty obtained from an ensemble of models trained on the labeled data and core-sets for choosing representative data samples.
 
-1.  First, SA selects top $K$ images with high uncertainty scores to form a candidate pool $\mathcal{S}_c \\subseteq \mathcal{S}_U$. The uncertainty is measured as disagreement between multiple models training with bootstrapping.
-2.  The next step is to find a subset $\mathcal{S}_a \\subseteq \mathcal{S}_c$ with highest representativeness. The cosine similarity between feature vectors of two inputs approximates how similar they are. The representativeness of $\mathcal{S}_a$ for $\mathcal{S}_U$ reflects how well $\mathcal{S}_a$ can represent all the samples in $\mathcal{S}_u$, defined as:
+1.  First, SA selects top $K$ images with high uncertainty scores to form a candidate pool $\mathcal{S}_c \subseteq \mathcal{S}_U$. The uncertainty is measured as disagreement between multiple models training with bootstrapping.
+2.  The next step is to find a subset $\mathcal{S}_a \subseteq \mathcal{S}_c$ with highest representativeness. The cosine similarity between feature vectors of two inputs approximates how similar they are. The representativeness of $\mathcal{S}_a$ for $\mathcal{S}_U$ reflects how well $\mathcal{S}_a$ can represent all the samples in $\mathcal{S}_u$, defined as:
 
 $$ F(\mathcal{S}_a, \mathcal{S}_u) = \sum_{\mathbf{x}_j \in \mathcal{S}_u} f(\mathcal{S}_a, \mathbf{x}_j) = \sum_{\mathbf{x}_j \in \mathcal{S}_u} \max_{\mathbf{x}_i \in \mathcal{S}_a} \text{sim}(\mathbf{x}_i, \mathbf{x}_j) $$
 
-Formulating $\mathcal{S}_a \\subseteq \mathcal{S}_c$ with $k$ data points that maximizes $F(\mathcal{S}_a, \mathcal{S}_u)$ is a generalized version of the maximum set cover problem. It is NP-hard and its best possible polynomial time approximation algorithm is a simple greedy method.
+Formulating $\mathcal{S}_a \subseteq \mathcal{S}_c$ with $k$ data points that maximizes $F(\mathcal{S}_a, \mathcal{S}_u)$ is a generalized version of the maximum set cover problem. It is NP-hard and its best possible polynomial time approximation algorithm is a simple greedy method.
 
 1.  Initially, $\mathcal{S}_a = \emptyset$ and $F(\mathcal{S}_a, \mathcal{S}_u) = 0$.
 2.  Then, iteratively add $\mathbf{x}_i \in \mathcal{S}_c$ that maximizes $F(\mathcal{S}_a \cup I_i, \mathcal{S}_u)$ over $\mathcal{S}_a$, until $\mathcal{S}_s$ contains $k$ images.
@@ -364,14 +364,14 @@ Formulating $\mathcal{S}_a \\subseteq \mathcal{S}_c$ with $k$ data points that m
 
 1.  Train a classifier on the labeled data;
 2.  Measure informativeness of every unlabeled example (e.g. using uncertainty metrics);
-3.  Prefilter top $\\beta b \\geq b$ most informative examples;
-4.  Cluster $\\beta b$ examples into $B$ clusters;
+3.  Prefilter top $\beta b \\geq b$ most informative examples;
+4.  Cluster $\beta b$ examples into $B$ clusters;
 5.  Select $b$ different examples closest to the cluster centers for this round of active learning.
 
 Active learning can be further combined with [semi-supervised learning](https://lilianweng.github.io/posts/2021-12-05-semi-supervised/) to save the budget. **CEAL** (Cost-Effective Active Learning; [Yang et al. 2017](https://arxiv.org/abs/1701.03551)) runs two things in parallel:
 
 1.  Select uncertain samples via active learning and get them labeled;
-2.  Select samples with the most confident prediction and assign them [pseudo labels](https://lilianweng.github.io/posts/2021-12-05-semi-supervised/#pseudo-labeling). The confidence prediction is judged by whether the prediction entropy is below a threshold $\\delta$. As the model is getting better in time, the threshold $\\delta$ decays in time as well.
+2.  Select samples with the most confident prediction and assign them [pseudo labels](https://lilianweng.github.io/posts/2021-12-05-semi-supervised/#pseudo-labeling). The confidence prediction is judged by whether the prediction entropy is below a threshold $\delta$. As the model is getting better in time, the threshold $\delta$ decays in time as well.
 
 ![](CEAL.png)
 

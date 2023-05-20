@@ -115,11 +115,11 @@ Among early epochs, the mean values are three magnitudes larger than the standar
 
 The generalization bounds defined by the classic learning theory is:
 
-$$ \\epsilon^2 < \frac{\log|H_\\epsilon| + \log{1/\\delta}}{2m} $$
+$$ \\epsilon^2 < \frac{\log|H_\\epsilon| + \log{1/\delta}}{2m} $$
 
 - $\\epsilon$: The difference between the training error and the generalization error. The generalization error measures how accurate the prediction of an algorithm is for previously unseen data.
 - $H_\\epsilon$: $\\epsilon$-cover of the hypothesis class. Typically we assume the size $\vert H_\\epsilon \vert \sim (1/\\epsilon)^d$.
-- $\\delta$: Confidence.
+- $\delta$: Confidence.
 - $m$: The number of training samples.
 - $d$: The VC dimension of the hypothesis.
 
@@ -137,7 +137,7 @@ $$ |H_\\epsilon| \sim 2^{|X|} \to 2^{|T_\\epsilon|} $$
 
 When $X$ is large, the size of $X$ is approximately $2^{H(X)}$. Each cell in the $\\epsilon$-partition is of size $2^{H(X \vert T_\\epsilon)}$. Therefore we have $\vert T_\\epsilon \vert \sim \frac{2^{H(X)}}{2^{H(X \vert T_\\epsilon)}} = 2^{I(T_\\epsilon; X)}$. Then the input compression bound becomes:
 
-$$ \\epsilon^2 < \frac{2^{I(T_\\epsilon; X)} + \log{1/\\delta}}{2m} $$
+$$ \\epsilon^2 < \frac{2^{I(T_\\epsilon; X)} + \log{1/\delta}}{2m} $$
 
 ![](ib-bound.png)
 

@@ -58,22 +58,22 @@ Now let's give it a scientific definition.
 
 A Bernoulli multi-armed bandit can be described as a tuple of $\langle \mathcal{A}, \mathcal{R} \rangle$, where:
 
-- We have $K$ machines with reward probabilities, $\{ \\theta_1, \dots, \\theta_K \}$.
+- We have $K$ machines with reward probabilities, $\{ \theta_1, \dots, \theta_K \}$.
 - At each time step t, we take an action a on one slot machine and receive a reward r.
-- $\mathcal{A}$ is a set of actions, each referring to the interaction with one slot machine. The value of action a is the expected reward, $Q(a) = \mathbb{E} \[r \vert a\] = \\theta$. If action $a_t$ at the time step t is on the i-th machine, then $Q(a_t) = \\theta_i$.
+- $\mathcal{A}$ is a set of actions, each referring to the interaction with one slot machine. The value of action a is the expected reward, $Q(a) = \mathbb{E} \[r \vert a\] = \theta$. If action $a_t$ at the time step t is on the i-th machine, then $Q(a_t) = \theta_i$.
 - $\mathcal{R}$ is a reward function. In the case of Bernoulli bandit, we observe a reward r in a _stochastic_ fashion. At the time step t, $r_t = \mathcal{R}(a_t)$ may return reward 1 with a probability $Q(a_t)$ or 0 otherwise.
 
 It is a simplified version of [Markov decision process](https://en.wikipedia.org/wiki/Markov_decision_process), as there is no state $\mathcal{S}$.
 
 The goal is to maximize the cumulative reward $\sum_{t=1}^T r_t$. If we know the optimal action with the best reward, then the goal is same as to minimize the potential [regret](<https://en.wikipedia.org/wiki/Regret_(decision_theory)>) or loss by not picking the optimal action.
 
-The optimal reward probability $\\theta^{\*}$ of the optimal action $a^{\*}$ is:
+The optimal reward probability $\theta^{\*}$ of the optimal action $a^{\*}$ is:
 
-$$ \\theta^{\*}=Q(a^{\*})=\max_{a \in \mathcal{A}} Q(a) = \max_{1 \leq i \leq K} \\theta_i $$
+$$ \theta^{\*}=Q(a^{\*})=\max_{a \in \mathcal{A}} Q(a) = \max_{1 \leq i \leq K} \theta_i $$
 
 Our loss function is the total regret we might have by not selecting the optimal action up to the time step T:
 
-$$ \mathcal{L}_T = \mathbb{E} \Big\[ \sum_{t=1}^T \big( \\theta^{\*} - Q(a_t) \big) \Big\] $$
+$$ \mathcal{L}_T = \mathbb{E} \Big\[ \sum_{t=1}^T \big( \theta^{\*} - Q(a_t) \big) \Big\] $$
 
 ## Bandit Strategies[#](#bandit-strategies)
 
@@ -111,9 +111,9 @@ Now, the question is _how to estimate the upper confidence bound_.
 
 If we do not want to assign any prior knowledge on how the distribution looks like, we can get help from [“Hoeffding's Inequality”](http://cs229.stanford.edu/extra-notes/hoeffding.pdf) — a theorem applicable to any bounded distribution.
 
-Let $X_1, \dots, X_t$ be i.i.d. (independent and identically distributed) random variables and they are all bounded by the interval \[0, 1\]. The sample mean is $\\overline{X}_t = \frac{1}{t}\sum_{\tau=1}^t X_\tau$. Then for u > 0, we have:
+Let $X_1, \dots, X_t$ be i.i.d. (independent and identically distributed) random variables and they are all bounded by the interval \[0, 1\]. The sample mean is $\overline{X}_t = \frac{1}{t}\sum_{\tau=1}^t X_\tau$. Then for u > 0, we have:
 
-$$ \mathbb{P} \[ \mathbb{E}\[X\] > \\overline{X}_t + u\] \leq e^{-2tu^2} $$
+$$ \mathbb{P} \[ \mathbb{E}\[X\] > \overline{X}_t + u\] \leq e^{-2tu^2} $$
 
 Given one target action a, let us consider:
 
@@ -158,22 +158,22 @@ Fig. 4. Oops, I guess not this Thompson? (Credit goes to [Ben Taborsky](https://
 
 At each time step, we want to select action a according to the probability that a is **optimal**:
 
-$$ \begin{aligned} \pi(a \\; \vert \\; h_t) &= \mathbb{P} \[ Q(a) > Q(a'), \\forall a' \\neq a \\; \vert \\; h_t\] \\ &= \mathbb{E}_{\mathcal{R} \vert h_t} \[ \mathbb{1}(a = \arg\max_{a \in \mathcal{A}} Q(a)) \] \end{aligned} $$
+$$ \begin{aligned} \pi(a \\; \vert \\; h_t) &= \mathbb{P} \[ Q(a) > Q(a'), \forall a' \\neq a \\; \vert \\; h_t\] \\ &= \mathbb{E}_{\mathcal{R} \vert h_t} \[ \mathbb{1}(a = \arg\max_{a \in \mathcal{A}} Q(a)) \] \end{aligned} $$
 
 where $\pi(a ; \vert ; h_t)$ is the probability of taking action a given the history $h_t$.
 
-For the Bernoulli bandit, it is natural to assume that $Q(a)$ follows a [Beta](https://en.wikipedia.org/wiki/Beta_distribution) distribution, as $Q(a)$ is essentially the success probability θ in [Bernoulli](https://en.wikipedia.org/wiki/Bernoulli_distribution) distribution. The value of $\text{Beta}(\\alpha, \\beta)$ is within the interval \[0, 1\]; α and β correspond to the counts when we **succeeded** or **failed** to get a reward respectively.
+For the Bernoulli bandit, it is natural to assume that $Q(a)$ follows a [Beta](https://en.wikipedia.org/wiki/Beta_distribution) distribution, as $Q(a)$ is essentially the success probability θ in [Bernoulli](https://en.wikipedia.org/wiki/Bernoulli_distribution) distribution. The value of $\text{Beta}(\alpha, \beta)$ is within the interval \[0, 1\]; α and β correspond to the counts when we **succeeded** or **failed** to get a reward respectively.
 
 First, let us initialize the Beta parameters α and β based on some prior knowledge or belief for every action. For example,
 
 - α = 1 and β = 1; we expect the reward probability to be 50% but we are not very confident.
 - α = 1000 and β = 9000; we strongly believe that the reward probability is 10%.
 
-At each time t, we sample an expected reward, $\\tilde{Q}(a)$, from the prior distribution $\text{Beta}(\\alpha_i, \\beta_i)$ for every action. The best action is selected among samples: $a^{TS}_t = \arg\max_{a \in \mathcal{A}} \\tilde{Q}(a)$. After the true reward is observed, we can update the Beta distribution accordingly, which is essentially doing Bayesian inference to compute the posterior with the known prior and the likelihood of getting the sampled data.
+At each time t, we sample an expected reward, $\tilde{Q}(a)$, from the prior distribution $\text{Beta}(\alpha_i, \beta_i)$ for every action. The best action is selected among samples: $a^{TS}_t = \arg\max_{a \in \mathcal{A}} \tilde{Q}(a)$. After the true reward is observed, we can update the Beta distribution accordingly, which is essentially doing Bayesian inference to compute the posterior with the known prior and the likelihood of getting the sampled data.
 
-$$ \begin{aligned} \\alpha_i & \\leftarrow \\alpha_i + r_t \mathbb{1}\[a^{TS}_t = a_i\] \\ \\beta_i & \\leftarrow \\beta_i + (1-r_t) \mathbb{1}\[a^{TS}_t = a_i\] \end{aligned} $$
+$$ \begin{aligned} \alpha_i & \\leftarrow \alpha_i + r_t \mathbb{1}\[a^{TS}_t = a_i\] \\ \beta_i & \\leftarrow \beta_i + (1-r_t) \mathbb{1}\[a^{TS}_t = a_i\] \end{aligned} $$
 
-Thompson sampling implements the idea of [probability matching](https://en.wikipedia.org/wiki/Probability_matching). Because its reward estimations $\\tilde{Q}$ are sampled from posterior distributions, each of these probabilities is equivalent to the probability that the corresponding action is optimal, conditioned on observed history.
+Thompson sampling implements the idea of [probability matching](https://en.wikipedia.org/wiki/Probability_matching). Because its reward estimations $\tilde{Q}$ are sampled from posterior distributions, each of these probabilities is equivalent to the probability that the corresponding action is optimal, conditioned on observed history.
 
 However, for many practical and complex problems, it can be computationally intractable to estimate the posterior distributions with observed true rewards using Bayesian inference. Thompson sampling still can work out if we are able to approximate the posterior distributions using methods like Gibbs sampling, Laplace approximate, and the bootstraps. This [tutorial](https://arxiv.org/pdf/1707.02038.pdf) presents a comprehensive review; strongly recommend it if you want to learn more about Thompson sampling.
 

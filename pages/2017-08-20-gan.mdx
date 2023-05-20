@@ -115,13 +115,13 @@ $$ L(G, D) = \int_x \bigg( p_{r}(x) \log(D(x)) + p_g (x) \log(1 - D(x)) \bigg) d
 
 Since we are interested in what is the best value of $D(x)$ to maximize $L(G, D)$, let us label
 
-$$ \\tilde{x} = D(x), A=p_{r}(x), B=p_g(x) $$
+$$ \tilde{x} = D(x), A=p_{r}(x), B=p_g(x) $$
 
 And then what is inside the integral (we can safely ignore the integral because $x$ is sampled over all the possible values) is:
 
-$$ \begin{aligned} f(\\tilde{x}) & = A log\\tilde{x} + B log(1-\\tilde{x}) \\ \frac{d f(\\tilde{x})}{d \\tilde{x}} & = A \frac{1}{ln10} \frac{1}{\\tilde{x}} - B \frac{1}{ln10} \frac{1}{1 - \\tilde{x}} \\ & = \frac{1}{ln10} (\frac{A}{\\tilde{x}} - \frac{B}{1-\\tilde{x}}) \\ & = \frac{1}{ln10} \frac{A - (A + B)\\tilde{x}}{\\tilde{x} (1 - \\tilde{x})} \\ \end{aligned} $$
+$$ \begin{aligned} f(\tilde{x}) & = A log\tilde{x} + B log(1-\tilde{x}) \\ \frac{d f(\tilde{x})}{d \tilde{x}} & = A \frac{1}{ln10} \frac{1}{\tilde{x}} - B \frac{1}{ln10} \frac{1}{1 - \tilde{x}} \\ & = \frac{1}{ln10} (\frac{A}{\tilde{x}} - \frac{B}{1-\tilde{x}}) \\ & = \frac{1}{ln10} \frac{A - (A + B)\tilde{x}}{\tilde{x} (1 - \tilde{x})} \\ \end{aligned} $$
 
-Thus, set $\frac{d f(\\tilde{x})}{d \\tilde{x}} = 0$, we get the best value of the discriminator: $D^\*(x) = \\tilde{x}^\* = \frac{A}{A + B} = \frac{p_{r}(x)}{p_{r}(x) + p_g(x)} \in \[0, 1\]$.
+Thus, set $\frac{d f(\tilde{x})}{d \tilde{x}} = 0$, we get the best value of the discriminator: $D^\*(x) = \tilde{x}^\* = \frac{A}{A + B} = \frac{p_{r}(x)}{p_{r}(x) + p_g(x)} \in \[0, 1\]$.
 
 Once the generator is trained to its optimal, $p_g$ gets very close to $p_{r}$. When $p_g = p_{r}$, $D^\*(x)$ becomes $1/2$.
 
@@ -191,7 +191,7 @@ Fig. 4. Low dimensional manifolds in high dimension space can hardly have overla
 
 ## Vanishing gradient[#](#vanishing-gradient)
 
-When the discriminator is perfect, we are guaranteed with $D(x) = 1, \\forall x \in p_r$ and $D(x) = 0, \\forall x \in p_g$. Therefore the loss function $L$ falls to zero and we end up with no gradient to update the loss during learning iterations. Fig. 5 demonstrates an experiment when the discriminator gets better, the gradient vanishes fast.
+When the discriminator is perfect, we are guaranteed with $D(x) = 1, \forall x \in p_r$ and $D(x) = 0, \forall x \in p_g$. Therefore the loss function $L$ falls to zero and we end up with no gradient to update the loss during learning iterations. Fig. 5 demonstrates an experiment when the discriminator gets better, the gradient vanishes fast.
 
 ![](GAN_vanishing_gradient.png)
 
@@ -234,7 +234,7 @@ In one minibatch, we approximate the closeness between every pair of samples, $c
 
 (3) **Historical Averaging**
 
-For both models, add $ | \\Theta - \frac{1}{t} \sum_{i=1}^t \\Theta_i |^2 $ into the loss function, where $\\Theta$ is the model parameter and $\\Theta_i$ is how the parameter is configured at the past training time $i$. This addition piece penalizes the training speed when $\\Theta$ is changing too dramatically in time.
+For both models, add $ | \Theta - \frac{1}{t} \sum_{i=1}^t \Theta_i |^2 $ into the loss function, where $\Theta$ is the model parameter and $\Theta_i$ is how the parameter is configured at the past training time $i$. This addition piece penalizes the training speed when $\Theta$ is changing too dramatically in time.
 
 (4) **One-sided Label Smoothing**
 
@@ -272,11 +272,11 @@ In order to change $P$ to look like $Q$, as illustrated in Fig. 7, we:
 - Then move 2 shovelfuls from $P_2$ to $P_3$ => $(P_2, Q_2)$ match up.
 - Finally move 1 shovelfuls from $Q_3$ to $Q_4$ => $(P_3, Q_3)$ and $(P_4, Q_4)$ match up.
 
-If we label the cost to pay to make $P_i$ and $Q_i$ match as $\\delta_i$, we would have $\\delta_{i+1} = \\delta_i + P_i - Q_i$ and in the example:
+If we label the cost to pay to make $P_i$ and $Q_i$ match as $\delta_i$, we would have $\delta_{i+1} = \delta_i + P_i - Q_i$ and in the example:
 
-$$ \begin{aligned} \\delta_0 &= 0\\ \\delta_1 &= 0 + 3 - 1 = 2\\ \\delta_2 &= 2 + 2 - 2 = 2\\ \\delta_3 &= 2 + 1 - 4 = -1\\ \\delta_4 &= -1 + 4 - 3 = 0 \end{aligned} $$
+$$ \begin{aligned} \delta_0 &= 0\\ \delta_1 &= 0 + 3 - 1 = 2\\ \delta_2 &= 2 + 2 - 2 = 2\\ \delta_3 &= 2 + 1 - 4 = -1\\ \delta_4 &= -1 + 4 - 3 = 0 \end{aligned} $$
 
-Finally the Earth Mover's distance is $W = \sum \vert \\delta_i \vert = 5$.
+Finally the Earth Mover's distance is $W = \sum \vert \delta_i \vert = 5$.
 
 ![](EM_distance_discrete.png)
 
@@ -302,21 +302,21 @@ The WGAN paper exemplified the idea with a simple example.
 
 Suppose we have two probability distributions, $P$ and $Q$:
 
-$$ \\forall (x, y) \in P, x = 0 \text{ and } y \sim U(0, 1)\\ \\forall (x, y) \in Q, x = \\theta, 0 \leq \\theta \leq 1 \text{ and } y \sim U(0, 1)\\ $$
+$$ \forall (x, y) \in P, x = 0 \text{ and } y \sim U(0, 1)\\ \forall (x, y) \in Q, x = \theta, 0 \leq \theta \leq 1 \text{ and } y \sim U(0, 1)\\ $$
 
 ![](wasserstein_simple_example.png)
 
-Fig. 8. There is no overlap between $P$ and $Q$ when $\\theta \\neq 0$.
+Fig. 8. There is no overlap between $P$ and $Q$ when $\theta \\neq 0$.
 
-When $\\theta \\neq 0$:
+When $\theta \\neq 0$:
 
-$$ \begin{aligned} D_{KL}(P \| Q) &= \sum_{x=0, y \sim U(0, 1)} 1 \cdot \log\frac{1}{0} = +\infty \\ D_{KL}(Q \| P) &= \sum_{x=\\theta, y \sim U(0, 1)} 1 \cdot \log\frac{1}{0} = +\infty \\ D_{JS}(P, Q) &= \frac{1}{2}(\sum_{x=0, y \sim U(0, 1)} 1 \cdot \log\frac{1}{1/2} + \sum_{x=0, y \sim U(0, 1)} 1 \cdot \log\frac{1}{1/2}) = \log 2\\ W(P, Q) &= |\\theta| \end{aligned} $$
+$$ \begin{aligned} D_{KL}(P \| Q) &= \sum_{x=0, y \sim U(0, 1)} 1 \cdot \log\frac{1}{0} = +\infty \\ D_{KL}(Q \| P) &= \sum_{x=\theta, y \sim U(0, 1)} 1 \cdot \log\frac{1}{0} = +\infty \\ D_{JS}(P, Q) &= \frac{1}{2}(\sum_{x=0, y \sim U(0, 1)} 1 \cdot \log\frac{1}{1/2} + \sum_{x=0, y \sim U(0, 1)} 1 \cdot \log\frac{1}{1/2}) = \log 2\\ W(P, Q) &= |\theta| \end{aligned} $$
 
-But when $\\theta = 0$, two distributions are fully overlapped:
+But when $\theta = 0$, two distributions are fully overlapped:
 
-$$ \begin{aligned} D_{KL}(P \| Q) &= D_{KL}(Q \| P) = D_{JS}(P, Q) = 0\\ W(P, Q) &= 0 = \\lvert \\theta \\rvert \end{aligned} $$
+$$ \begin{aligned} D_{KL}(P \| Q) &= D_{KL}(Q \| P) = D_{JS}(P, Q) = 0\\ W(P, Q) &= 0 = \\lvert \theta \\rvert \end{aligned} $$
 
-$D_{KL}$ gives us inifity when two distributions are disjoint. The value of $D_{JS}$ has sudden jump, not differentiable at $\\theta = 0$. Only Wasserstein metric provides a smooth measure, which is super helpful for a stable learning process using gradient descents.
+$D_{KL}$ gives us inifity when two distributions are disjoint. The value of $D_{JS}$ has sudden jump, not differentiable at $\theta = 0$. Only Wasserstein metric provides a smooth measure, which is super helpful for a stable learning process using gradient descents.
 
 ## Use Wasserstein distance as GAN loss function[#](#use-wasserstein-distance-as-gan-loss-function)
 
@@ -340,7 +340,7 @@ Explaining how the transformation happens on the Wasserstein distance formula is
 
 Suppose this function $f$ comes from a family of K-Lipschitz continuous functions, $\{ f_w \}_{w \in W}$, parameterized by $w$. In the modified Wasserstein-GAN, the “discriminator” model is used to learn $w$ to find a good $f_w$ and the loss function is configured as measuring the Wasserstein distance between $p_r$ and $p_g$.
 
-$$ L(p_r, p_g) = W(p_r, p_g) = \max_{w \in W} \mathbb{E}_{x \sim p_r}\[f_w(x)\] - \mathbb{E}_{z \sim p_r(z)}\[f_w(g_\\theta(z))\] $$
+$$ L(p_r, p_g) = W(p_r, p_g) = \max_{w \in W} \mathbb{E}_{x \sim p_r}\[f_w(x)\] - \mathbb{E}_{z \sim p_r(z)}\[f_w(g_\theta(z))\] $$
 
 Thus the “discriminator” is not a direct critic of telling the fake samples apart from the real ones anymore. Instead, it is trained to learn a $K$-Lipschitz continuous function to help compute Wasserstein distance. As the loss function decreases in the training, the Wasserstein distance gets smaller and the generator model's output grows closer to the real data distribution.
 

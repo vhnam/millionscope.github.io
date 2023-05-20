@@ -197,7 +197,7 @@ Fig. 13. Switch transformer. The sparse switch FFN layer is in the blue boxes. (
 To improve training stability, switch transformer incorporates the following designs:
 
 - _Selective precision_. They showed that selectively casting only a local part of the model to FP32 precision improves stability, while avoiding the expensive communication cost of FP32 tensors. The FP32 precision is only used within the body of the router function and the results are recast to FP16.
-- _Smaller initialization_. The initialization of weight matrices is sampled from a truncated normal distribution with mean $\\mu=0$ and stdev $\sigma = \sqrt{s/n}$. They also recommended reducing the transformer initialization scale parameter $s=1$ to $s=0.1$.
+- _Smaller initialization_. The initialization of weight matrices is sampled from a truncated normal distribution with mean $\mu=0$ and stdev $\sigma = \sqrt{s/n}$. They also recommended reducing the transformer initialization scale parameter $s=1$ to $s=0.1$.
 - _Use higher expert dropout_. Fine-tuning often works with a small dataset. To avoid overfitting, the dropout rate within each expert is increased by a significant amount. Interestingly they found that increasing dropout across all layers lead to poor performance. In the paper, they used a dropout rate 0.1 at non-expert layers but 0.4 within expert FF layers.
 
 The switch transformer paper summarized different data and model parallelism strategies for training large models with a nice illustration:
@@ -216,7 +216,7 @@ A token-to-expert assignment is represented by three matrices, $I, G \in \mathbb
 
 One regularization that export choice routing explored is to limit the maximum number of experts per token.
 
-$$ \begin{aligned} & \max_A \langle S^\top, A\rangle + \\lambda H(A) \\ \text{s.t.} & \\forall i: \sum_{j'} A\[i, j'\] = k,\quad \\forall j: \sum_{i'} A\[i', j\] \leq b,\quad \\forall i,j: 0 \leq A\[i,j\] \leq 1 \end{aligned} $$
+$$ \begin{aligned} & \max_A \langle S^\top, A\rangle + \lambda H(A) \\ \text{s.t.} & \forall i: \sum_{j'} A\[i, j'\] = k,\quad \forall j: \sum_{i'} A\[i', j\] \leq b,\quad \forall i,j: 0 \leq A\[i,j\] \leq 1 \end{aligned} $$
 
 where each entry $A\[i,j\]$ in $A \in \mathbb{R}^{e \times n}$ marks whether the $i$-the expert selects the $j$-th token. Solving this is non-trivial. The paper used [Dykstra's algorithm](https://projecteuclid.org/journals/annals-of-probability/volume-13/issue-3/An-Iterative-Procedure-for-Obtaining-I-Projections-onto-the-Intersection/10.1214/aop/1176992918.full) that runs a sequence of multiple iterative computation steps. Capped expert choice results in a slight decrease in the fine-tuning performance in the experiments.
 
@@ -236,7 +236,7 @@ When the GPU memory is full, one option is to offload temporarily unused data to
 
 Let's say, we evenly divide an $\ell$-layer network into $d$ partitions. Only activations at partition boundaries are saved and communicated between workers. Intermediate activations at intra-partition layers are still needed for computing gradients so they are recomputed during backward passes. With activation recomputation, the memory cost for training $M(\ell)$ is:
 
-$$ M(\ell) =\max_{i=1,\dots,k} \\underbrace{\text{cost-of-one-partition}(i)}_\text{cost of back-propagation on the i-th partition} + \\underbrace{O(d)}_\text{store intermediate outputs} = O(\frac{\ell}{d}) + O(d) $$
+$$ M(\ell) =\max_{i=1,\dots,k} \underbrace{\text{cost-of-one-partition}(i)}_\text{cost of back-propagation on the i-th partition} + \underbrace{O(d)}_\text{store intermediate outputs} = O(\frac{\ell}{d}) + O(d) $$
 
 The minimum cost is $O(\sqrt{\ell})$ at $d=\sqrt{\ell}$.
 

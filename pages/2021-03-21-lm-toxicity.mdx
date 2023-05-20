@@ -212,13 +212,13 @@ $$ \\Delta(w, \mathbf{x}, s) = p_M(w\vert\mathbf{x}) - p_M(w\vert\text{sdb}(\mat
 
 Because $\text{sdb}(.)$ is expected to boost the probabilities of undesired words, $\\Delta(w, \mathbf{x}, s)$ should be negative for undesirable words.
 
-In self-diasing decoding, a scaling function of the probability difference $\\alpha(\\Delta(w, \mathbf{x}, s)): \mathbb{R}\to\[0,1\]$ is used to alter the true sampling distribution,
+In self-diasing decoding, a scaling function of the probability difference $\alpha(\\Delta(w, \mathbf{x}, s)): \mathbb{R}\to\[0,1\]$ is used to alter the true sampling distribution,
 
-$$ \\tilde{p}_M(w\vert\mathbf{x}) \\propto \\alpha(\\Delta(w, \mathbf{x}, s)) p_M(w\vert\mathbf{x}) $$
+$$ \tilde{p}_M(w\vert\mathbf{x}) \\propto \alpha(\\Delta(w, \mathbf{x}, s)) p_M(w\vert\mathbf{x}) $$
 
 In the paper, they used a soft variant where the probabilities of the words with negative $\\Delta$ are reduced w.r.t. the magnitude of $\\Delta(w, \mathbf{x}, s)$:
 
-$$ \\alpha(x)=\begin{cases} 1 & \text{ if } x\\geq 0 \\ e^{\\lambda\cdot x} & \text{ otherwise} \end{cases} $$
+$$ \alpha(x)=\begin{cases} 1 & \text{ if } x\\geq 0 \\ e^{\lambda\cdot x} & \text{ otherwise} \end{cases} $$
 
 ![](self-debiasing-decoding.png)
 
@@ -267,9 +267,9 @@ $$ \mathcal{L}_\text{class} = \mathbb{E}_{\hat{\mathbf{x}}^{i\to j}_k \sim \hat{
 
 The final training objective is as follows and the encoder, decoder and classifier are jointly trained:
 
-$$ \mathcal{L}(\\theta_E, \\theta_G, \\theta_C) = \min_{E, G, C} \mathcal{L}_\text{self} + \mathcal{L}_\text{style_fwd} + \mathcal{L}_\text{cycle} + \mathcal{L}_\text{style_back}+ \mathcal{L}_\text{class} $$
+$$ \mathcal{L}(\theta_E, \theta_G, \theta_C) = \min_{E, G, C} \mathcal{L}_\text{self} + \mathcal{L}_\text{style_fwd} + \mathcal{L}_\text{cycle} + \mathcal{L}_\text{style_back}+ \mathcal{L}_\text{class} $$
 
-**Style Transformer** ([Dai et al. 2019](https://arxiv.org/abs/1905.05621)) also aims to learn unsupervised text style transfer. Different from the encoder-decoder model in [Santos et al. 2018](https://arxiv.org/abs/1805.07685), it learns a Transformer-based style transfer function $f_\\theta(\mathbf{x}, s)$ for a given input sample $\mathbf{x}$ and a desired style control variable $s$.
+**Style Transformer** ([Dai et al. 2019](https://arxiv.org/abs/1905.05621)) also aims to learn unsupervised text style transfer. Different from the encoder-decoder model in [Santos et al. 2018](https://arxiv.org/abs/1805.07685), it learns a Transformer-based style transfer function $f_\theta(\mathbf{x}, s)$ for a given input sample $\mathbf{x}$ and a desired style control variable $s$.
 
 ![](style-transformer.png)
 
@@ -279,16 +279,16 @@ Without access to the parallel corpus, the style transformer adopts a discrimina
 
 Let $s$ and $\hat{s}$ be two mutually exclusive style variables and $\mathbf{x}$ is a sample of style $s$, style transformer computes several losses:
 
-- Self reconstruction loss: $\mathcal{L}_\text{self} = - p_\\theta (\mathbf{x} \vert \mathbf{x}, s)$
-- Cycle-consistency loss: $\mathcal{L}_\text{cycle} = - p_\\theta (\mathbf{x} \vert f_\\theta(\mathbf{x}, \hat{s}), s)$
+- Self reconstruction loss: $\mathcal{L}_\text{self} = - p_\theta (\mathbf{x} \vert \mathbf{x}, s)$
+- Cycle-consistency loss: $\mathcal{L}_\text{cycle} = - p_\theta (\mathbf{x} \vert f_\theta(\mathbf{x}, \hat{s}), s)$
 - Style controlling loss: This is necessary because otherwise the model would simply learn to copy the input over.
 
-$$ \mathcal{L}_\text{style} = - p_\phi(\text{class} = 1 \vert f_\\theta(\mathbf{x}, \hat{s}), \hat{s}) $$
+$$ \mathcal{L}_\text{style} = - p_\phi(\text{class} = 1 \vert f_\theta(\mathbf{x}, \hat{s}), \hat{s}) $$
 
 , where the discriminator is a simple binary classifier trained to optimize the negative log-likelihood of the correct style. The discriminator is trained by labelling
 
-- $\{(\mathbf{x}, s), (f_\\theta(\mathbf{x}, s), s), (f_\\theta(\mathbf{x}, \hat{s}), \hat{s})\}$ as positive class 1
-- $\{(\mathbf{x}, \hat{s}), (f_\\theta(\mathbf{x}, s), \hat{s}), (f_\\theta(\mathbf{x}, \hat{s}), s)\}$ as negative class 0.
+- $\{(\mathbf{x}, s), (f_\theta(\mathbf{x}, s), s), (f_\theta(\mathbf{x}, \hat{s}), \hat{s})\}$ as positive class 1
+- $\{(\mathbf{x}, \hat{s}), (f_\theta(\mathbf{x}, s), \hat{s}), (f_\theta(\mathbf{x}, \hat{s}), s)\}$ as negative class 0.
 
 ![](style-transformer-training.png)
 
@@ -296,19 +296,19 @@ Fig. 11. The training process of Style Transformer. (Image source: [Dai et al. 2
 
 Driven by the research question “Can we fine-tune a pre-trained language model to suggest civil rephrasings of rude comments using a dataset solely annotated in toxicity?”, [Laugier et al. (2021)](https://arxiv.org/abs/2102.05456) fine-tuned a pretrained text-to-text transformer with a denoising and cyclic auto-encoder loss.
 
-Let $s$ be the attribute of $\mathbf{x}$ (e.g. “civil”) and $\\bar{s}$ be the other opposite attribute (e.g. “toxic”). These two attributes are mutually exclusive. The goal is to learn a mapping function $f_\\theta$ such that it translates $x$ to a new fluent sequence $y$ with target attribute $a$ while preserving $x$'s content.
+Let $s$ be the attribute of $\mathbf{x}$ (e.g. “civil”) and $\bar{s}$ be the other opposite attribute (e.g. “toxic”). These two attributes are mutually exclusive. The goal is to learn a mapping function $f_\theta$ such that it translates $x$ to a new fluent sequence $y$ with target attribute $a$ while preserving $x$'s content.
 
 The encoder-decoder model is trained with the loss:
 
-$$ \mathcal{L} = \\lambda_\text{DAE} \mathcal{L}_\text{DAE} + \\lambda_\text{cycle} \mathcal{L}_\text{cycle} $$
+$$ \mathcal{L} = \lambda_\text{DAE} \mathcal{L}_\text{DAE} + \lambda_\text{cycle} \mathcal{L}_\text{cycle} $$
 
 - The denoising auto-encoder loss is the loss for denoising auto-encoders, where $\\eta$ is a [masking](https://lilianweng.github.io/posts/2019-01-31-lm/#pre-training-tasks) function same as in BERT training:
 
-$$ \mathcal{L}_\text{DAE} = \mathbb{E}_{\mathbf{x} \sim \mathcal{X}} \[−\log p_\\theta(\mathbf{x} \mid \\eta(\mathbf{x}), s)\] $$
+$$ \mathcal{L}_\text{DAE} = \mathbb{E}_{\mathbf{x} \sim \mathcal{X}} \[−\log p_\theta(\mathbf{x} \mid \\eta(\mathbf{x}), s)\] $$
 
-- The cycle consistency loss ([Zhu et al. 2017](https://arxiv.org/abs/1703.10593)) has $\\tilde{\\theta}$ to produce a non-differentiable pseudo-prediction $\hat{\mathbf{y}}$ and it does not take gradient backpropagation.
+- The cycle consistency loss ([Zhu et al. 2017](https://arxiv.org/abs/1703.10593)) has $\tilde{\theta}$ to produce a non-differentiable pseudo-prediction $\hat{\mathbf{y}}$ and it does not take gradient backpropagation.
 
-$$ \mathcal{L}_\text{cycle} = \mathbb{E}_{\mathbf{x} \sim \mathcal{X}} \[−\log p_\\theta(\mathbf{x} \mid f_{\\tilde{\\theta}}(\mathbf{x}, \\bar{s}), s)\] $$
+$$ \mathcal{L}_\text{cycle} = \mathbb{E}_{\mathbf{x} \sim \mathcal{X}} \[−\log p_\theta(\mathbf{x} \mid f_{\tilde{\theta}}(\mathbf{x}, \bar{s}), s)\] $$
 
 They used the above loss to fine-tune a T5 model, resulting in a model named **CAE-T5**. The conditioning is implemented like CTRL via control code (“civil” or “toxic”) prepended to the start of a sequence.
 

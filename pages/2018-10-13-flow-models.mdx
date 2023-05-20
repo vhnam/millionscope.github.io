@@ -54,9 +54,9 @@ We should understand two key concepts before getting into the flow-based generat
 
 ## Jacobian Matrix and Determinant[#](#jacobian-matrix-and-determinant)
 
-Given a function of mapping a $n$-dimensional input vector $\mathbf{x}$ to a $m$-dimensional output vector, $\mathbf{f}: \mathbb{R}^n \\mapsto \mathbb{R}^m$, the matrix of all first-order partial derivatives of this function is called the **Jacobian matrix**, $\mathbf{J}$ where one entry on the i-th row and j-th column is $\mathbf{J}_{ij} = \frac{\\partial f_i}{\\partial x_j}$.
+Given a function of mapping a $n$-dimensional input vector $\mathbf{x}$ to a $m$-dimensional output vector, $\mathbf{f}: \mathbb{R}^n \mapsto \mathbb{R}^m$, the matrix of all first-order partial derivatives of this function is called the **Jacobian matrix**, $\mathbf{J}$ where one entry on the i-th row and j-th column is $\mathbf{J}_{ij} = \frac{\\partial f_i}{\\partial x_j}$.
 
-$$ \mathbf{J} = \begin{bmatrix} \frac{\\partial f_1}{\\partial x_1} & \dots & \frac{\\partial f_1}{\\partial x_n} \\\[6pt\] \vdots & \\ddots & \vdots \\\[6pt\] \frac{\\partial f_m}{\\partial x_1} & \dots & \frac{\\partial f_m}{\\partial x_n} \\\[6pt\] \end{bmatrix} $$
+$$ \mathbf{J} = \begin{bmatrix} \frac{\\partial f_1}{\\partial x_1} & \dots & \frac{\\partial f_1}{\\partial x_n} \\\[6pt\] \vdots & \ddots & \vdots \\\[6pt\] \frac{\\partial f_m}{\\partial x_1} & \dots & \frac{\\partial f_m}{\\partial x_n} \\\[6pt\] \end{bmatrix} $$
 
 The determinant is one real number computed as a function of all the elements in a squared matrix. Note that the determinant _only exists for **square** matrices_. The absolute value of the determinant can be thought of as a measure of _“how much multiplication by the matrix expands or contracts space”._
 
@@ -112,7 +112,7 @@ $$ \\dfrac{df^{-1}(y)}{dy} = \\dfrac{dx}{dy} = (\\dfrac{dy}{dx})^{-1} = (\\dfrac
 
 Given such a chain of probability density functions, we know the relationship between each pair of consecutive variables. We can expand the equation of the output $\mathbf{x}$ step by step until tracing back to the initial distribution $\mathbf{z}_0$.
 
-$$ \begin{aligned} \mathbf{x} = \mathbf{z}_K &= f_K \\circ f_{K-1} \\circ \dots \\circ f_1 (\mathbf{z}_0) \\ \log p(\mathbf{x}) = \log \pi_K(\mathbf{z}_K) &= \log \pi_{K-1}(\mathbf{z}_{K-1}) - \log\\left\vert\\det\\dfrac{d f_K}{d \mathbf{z}_{K-1}}\\right\vert \\ &= \log \pi_{K-2}(\mathbf{z}_{K-2}) - \log\\left\vert\\det\\dfrac{d f_{K-1}}{d\mathbf{z}_{K-2}}\\right\vert - \log\\left\vert\\det\\dfrac{d f_K}{d\mathbf{z}_{K-1}}\\right\vert \\ &= \dots \\ &= \log \pi_0(\mathbf{z}_0) - \sum_{i=1}^K \log\\left\vert\\det\\dfrac{d f_i}{d\mathbf{z}_{i-1}}\\right\vert \end{aligned} $$
+$$ \begin{aligned} \mathbf{x} = \mathbf{z}_K &= f_K \circ f_{K-1} \circ \dots \circ f_1 (\mathbf{z}_0) \\ \log p(\mathbf{x}) = \log \pi_K(\mathbf{z}_K) &= \log \pi_{K-1}(\mathbf{z}_{K-1}) - \log\\left\vert\\det\\dfrac{d f_K}{d \mathbf{z}_{K-1}}\\right\vert \\ &= \log \pi_{K-2}(\mathbf{z}_{K-2}) - \log\\left\vert\\det\\dfrac{d f_{K-1}}{d\mathbf{z}_{K-2}}\\right\vert - \log\\left\vert\\det\\dfrac{d f_K}{d\mathbf{z}_{K-1}}\\right\vert \\ &= \dots \\ &= \log \pi_0(\mathbf{z}_0) - \sum_{i=1}^K \log\\left\vert\\det\\dfrac{d f_i}{d\mathbf{z}_{i-1}}\\right\vert \end{aligned} $$
 
 The path traversed by the random variables $\mathbf{z}_i = f_i(\mathbf{z}_{i-1})$ is the **flow** and the full chain formed by the successive distributions $\pi_i$ is called a **normalizing flow**. Required by the computation in the equation, a transformation function $f_i$ should satisfy two properties:
 
@@ -127,14 +127,14 @@ $$ \mathcal{L}(\mathcal{D}) = - \frac{1}{\vert\mathcal{D}\vert}\sum_{\mathbf{x} 
 
 ## RealNVP[#](#realnvp)
 
-The **RealNVP** (Real-valued Non-Volume Preserving; [Dinh et al., 2017](https://arxiv.org/abs/1605.08803)) model implements a normalizing flow by stacking a sequence of invertible bijective transformation functions. In each bijection $f: \mathbf{x} \\mapsto \mathbf{y}$, known as _affine coupling layer_, the input dimensions are split into two parts:
+The **RealNVP** (Real-valued Non-Volume Preserving; [Dinh et al., 2017](https://arxiv.org/abs/1605.08803)) model implements a normalizing flow by stacking a sequence of invertible bijective transformation functions. In each bijection $f: \mathbf{x} \mapsto \mathbf{y}$, known as _affine coupling layer_, the input dimensions are split into two parts:
 
 - The first $d$ dimensions stay same;
 - The second part, $d+1$ to $D$ dimensions, undergo an affine transformation (“scale-and-shift”) and both the scale and shift parameters are functions of the first $d$ dimensions.
 
 $$ \begin{aligned} \mathbf{y}_{1:d} &= \mathbf{x}_{1:d} \\ \mathbf{y}_{d+1:D} &= \mathbf{x}_{d+1:D} \odot \exp({s(\mathbf{x}_{1:d})}) + t(\mathbf{x}_{1:d}) \end{aligned} $$
 
-where $s(.)$ and $t(.)$ are _scale_ and _translation_ functions and both map $\mathbb{R}^d \\mapsto \mathbb{R}^{D-d}$. The $\odot$ operation is the element-wise product.
+where $s(.)$ and $t(.)$ are _scale_ and _translation_ functions and both map $\mathbb{R}^d \mapsto \mathbb{R}^{D-d}$. The $\odot$ operation is the element-wise product.
 
 Now let's check whether this transformation satisfy two basic properties for a flow transformation.
 
@@ -152,7 +152,7 @@ $$ \mathbf{J} = \begin{bmatrix} \mathbb{I}_d & \mathbf{0}_{d\times(D-d)} \\\[5pt
 
 Hence the determinant is simply the product of terms on the diagonal.
 
-$$ \\det(\mathbf{J}) = \\prod_{j=1}^{D-d}\exp(s(\mathbf{x}_{1:d}))_j = \exp(\sum_{j=1}^{D-d} s(\mathbf{x}_{1:d})_j) $$
+$$ \\det(\mathbf{J}) = \prod_{j=1}^{D-d}\exp(s(\mathbf{x}_{1:d}))_j = \exp(\sum_{j=1}^{D-d} s(\mathbf{x}_{1:d})_j) $$
 
 So far, the affine coupling layer looks perfect for constructing a normalizing flow :)
 
@@ -206,7 +206,7 @@ Fig. 4. Three substeps in one step of flow in Glow. (Image source: [Kingma and D
 
 The **autoregressive** constraint is a way to model sequential data, $\mathbf{x} = \[x_1, \dots, x_D\]$: each output only depends on the data observed in the past, but not on the future ones. In other words, the probability of observing $x_i$ is conditioned on $x_1, \dots, x_{i-1}$ and the product of these conditional probabilities gives us the probability of observing the full sequence:
 
-$$ p(\mathbf{x}) = \\prod_{i=1}^{D} p(x_i\vert x_1, \dots, x_{i-1}) = \\prod_{i=1}^{D} p(x_i\vert x_{1:i-1}) $$
+$$ p(\mathbf{x}) = \prod_{i=1}^{D} p(x_i\vert x_1, \dots, x_{i-1}) = \prod_{i=1}^{D} p(x_i\vert x_{1:i-1}) $$
 
 How to model the conditional density is of your choice. It can be a univariate Gaussian with mean and standard deviation computed as a function of $x_{1:i-1}$, or a multilayer neural network with $x_{1:i-1}$ as the input.
 
@@ -257,9 +257,9 @@ One implementation that could capture the entire context is the _Diagonal BiLSTM
 
 Fig. 7. (a) PixelRNN with diagonal BiLSTM. (b) Skewing operation that offsets each row in the feature map by one with regards to the row above. (Image source: [Oord et al, 2016](https://arxiv.org/abs/1601.06759))
 
-$$ \begin{aligned} \\lbrack \mathbf{o}_i, \mathbf{f}_i, \mathbf{i}_i, \mathbf{g}_i \\rbrack &= \sigma(\mathbf{K}^{ss} \\circledast \mathbf{h}_{i-1} + \mathbf{K}^{is} \\circledast \mathbf{x}_i) & \\scriptstyle{\text{; }\sigma\\scriptstyle{\text{ is tanh for g, but otherwise sigmoid; }}\\circledast\\scriptstyle{\text{ is convolution operation.}}} \\ \mathbf{c}_i &= \mathbf{f}_i \odot \mathbf{c}_{i-1} + \mathbf{i}_i \odot \mathbf{g}_i & \\scriptstyle{\text{; }}\odot\\scriptstyle{\text{ is elementwise product.}}\\ \mathbf{h}_i &= \mathbf{o}_i \odot \tanh(\mathbf{c}_i) \end{aligned} $$
+$$ \begin{aligned} \\lbrack \mathbf{o}_i, \mathbf{f}_i, \mathbf{i}_i, \mathbf{g}_i \\rbrack &= \sigma(\mathbf{K}^{ss} \circledast \mathbf{h}_{i-1} + \mathbf{K}^{is} \circledast \mathbf{x}_i) & \\scriptstyle{\text{; }\sigma\\scriptstyle{\text{ is tanh for g, but otherwise sigmoid; }}\circledast\\scriptstyle{\text{ is convolution operation.}}} \\ \mathbf{c}_i &= \mathbf{f}_i \odot \mathbf{c}_{i-1} + \mathbf{i}_i \odot \mathbf{g}_i & \\scriptstyle{\text{; }}\odot\\scriptstyle{\text{ is elementwise product.}}\\ \mathbf{h}_i &= \mathbf{o}_i \odot \tanh(\mathbf{c}_i) \end{aligned} $$
 
-where $\\circledast$ denotes the convolution operation and $\odot$ is the element-wise multiplication. The input-to-state component $\mathbf{K}^{is}$ is a 1x1 convolution, while the state-to-state recurrent component is computed with a column-wise convolution $\mathbf{K}^{ss}$ with a kernel of size 2x1.
+where $\circledast$ denotes the convolution operation and $\odot$ is the element-wise multiplication. The input-to-state component $\mathbf{K}^{is}$ is a 1x1 convolution, while the state-to-state recurrent component is computed with a column-wise convolution $\mathbf{K}^{ss}$ with a kernel of size 2x1.
 
 The diagonal BiLSTM layers are capable of processing an unbounded context field, but expensive to compute due to the sequential dependency between states. A faster implementation uses multiple convolutional layers without pooling to define a bounded context box. The convolution kernel is masked so that the future context is not seen, similar to [MADE](#MADE). This convolution version is called **PixelCNN**.
 
@@ -279,7 +279,7 @@ Fig. 9. Visualization of WaveNet models with a stack of (top) causal convolution
 
 WaveNet uses the gated activation unit as the non-linear layer, as it is found to work significantly better than ReLU for modeling 1-D audio data. The residual connection is applied after the gated activation.
 
-$$ \mathbf{z} = \tanh(\mathbf{W}_{f,k}\\circledast\mathbf{x})\odot\sigma(\mathbf{W}_{g,k}\\circledast\mathbf{x}) $$
+$$ \mathbf{z} = \tanh(\mathbf{W}_{f,k}\circledast\mathbf{x})\odot\sigma(\mathbf{W}_{g,k}\circledast\mathbf{x}) $$
 
 where $\mathbf{W}_{f,k}$ and $\mathbf{W}_{g,k}$ are convolution filter and gate weight matrix of the $k$-th layer, respectively; both are learnable.
 
@@ -293,11 +293,11 @@ Precisely the conditional probability is an affine transformation of $\mathbf{z}
 
 - Data generation, producing a new $\mathbf{x}$:
 
-$x_i \sim p(x_i\vert\mathbf{x}_{1:i-1}) = z_i \odot \sigma_i(\mathbf{x}_{1:i-1}) + \\mu_i(\mathbf{x}_{1:i-1})\text{, where }\mathbf{z} \sim \pi(\mathbf{z})$
+$x_i \sim p(x_i\vert\mathbf{x}_{1:i-1}) = z_i \odot \sigma_i(\mathbf{x}_{1:i-1}) + \mu_i(\mathbf{x}_{1:i-1})\text{, where }\mathbf{z} \sim \pi(\mathbf{z})$
 
 - Density estimation, given a known $\mathbf{x}$:
 
-$p(\mathbf{x}) = \\prod_{i=1}^D p(x_i\vert\mathbf{x}_{1:i-1})$
+$p(\mathbf{x}) = \prod_{i=1}^D p(x_i\vert\mathbf{x}_{1:i-1})$
 
 The generation procedure is sequential, so it is slow by design. While density estimation only needs one pass the network using architecture like [MADE](#MADE). The transformation function is trivial to inverse and the Jacobian determinant is easy to compute too.
 
@@ -307,23 +307,23 @@ Similar to MAF, **Inverse autoregressive flow** (**IAF**; [Kingma et al., 2016](
 
 First, let's reverse the affine transformation in MAF:
 
-$$ z_i = \frac{x_i - \\mu_i(\mathbf{x}_{1:i-1})}{\sigma_i(\mathbf{x}_{1:i-1})} = -\frac{\\mu_i(\mathbf{x}_{1:i-1})}{\sigma_i(\mathbf{x}_{1:i-1})} + x_i \odot \frac{1}{\sigma_i(\mathbf{x}_{1:i-1})} $$
+$$ z_i = \frac{x_i - \mu_i(\mathbf{x}_{1:i-1})}{\sigma_i(\mathbf{x}_{1:i-1})} = -\frac{\mu_i(\mathbf{x}_{1:i-1})}{\sigma_i(\mathbf{x}_{1:i-1})} + x_i \odot \frac{1}{\sigma_i(\mathbf{x}_{1:i-1})} $$
 
 If let:
 
-$$ \begin{aligned} & \\tilde{\mathbf{x}} = \mathbf{z}\text{, }\\tilde{p}(.) = \pi(.)\text{, }\\tilde{\mathbf{x}} \sim \\tilde{p}(\\tilde{\mathbf{x}}) \\ & \\tilde{\mathbf{z}} = \mathbf{x} \text{, }\\tilde{\pi}(.) = p(.)\text{, }\\tilde{\mathbf{z}} \sim \\tilde{\pi}(\\tilde{\mathbf{z}})\\ & \\tilde{\\mu}_i(\\tilde{\mathbf{z}}_{1:i-1}) = \\tilde{\\mu}_i(\mathbf{x}_{1:i-1}) = -\frac{\\mu_i(\mathbf{x}_{1:i-1})}{\sigma_i(\mathbf{x}_{1:i-1})} \\ & \\tilde{\sigma}(\\tilde{\mathbf{z}}_{1:i-1}) = \\tilde{\sigma}(\mathbf{x}_{1:i-1}) = \frac{1}{\sigma_i(\mathbf{x}_{1:i-1})} \end{aligned} $$
+$$ \begin{aligned} & \tilde{\mathbf{x}} = \mathbf{z}\text{, }\tilde{p}(.) = \pi(.)\text{, }\tilde{\mathbf{x}} \sim \tilde{p}(\tilde{\mathbf{x}}) \\ & \tilde{\mathbf{z}} = \mathbf{x} \text{, }\tilde{\pi}(.) = p(.)\text{, }\tilde{\mathbf{z}} \sim \tilde{\pi}(\tilde{\mathbf{z}})\\ & \tilde{\mu}_i(\tilde{\mathbf{z}}_{1:i-1}) = \tilde{\mu}_i(\mathbf{x}_{1:i-1}) = -\frac{\mu_i(\mathbf{x}_{1:i-1})}{\sigma_i(\mathbf{x}_{1:i-1})} \\ & \tilde{\sigma}(\tilde{\mathbf{z}}_{1:i-1}) = \tilde{\sigma}(\mathbf{x}_{1:i-1}) = \frac{1}{\sigma_i(\mathbf{x}_{1:i-1})} \end{aligned} $$
 
 Then we would have,
 
-$$ \\tilde{x}_i \sim p(\\tilde{x}_i\vert\\tilde{\mathbf{z}}_{1:i}) = \\tilde{z}_i \odot \\tilde{\sigma}_i(\\tilde{\mathbf{z}}_{1:i-1}) + \\tilde{\\mu}_i(\\tilde{\mathbf{z}}_{1:i-1}) \text{, where }\\tilde{\mathbf{z}} \sim \\tilde{\pi}(\\tilde{\mathbf{z}}) $$
+$$ \tilde{x}_i \sim p(\tilde{x}_i\vert\tilde{\mathbf{z}}_{1:i}) = \tilde{z}_i \odot \tilde{\sigma}_i(\tilde{\mathbf{z}}_{1:i-1}) + \tilde{\mu}_i(\tilde{\mathbf{z}}_{1:i-1}) \text{, where }\tilde{\mathbf{z}} \sim \tilde{\pi}(\tilde{\mathbf{z}}) $$
 
-IAF intends to estimate the probability density function of $\\tilde{\mathbf{x}}$ given that $\\tilde{\pi}(\\tilde{\mathbf{z}})$ is already known. The inverse flow is an autoregressive affine transformation too, same as in MAF, but the scale and shift terms are autoregressive functions of observed variables from the known distribution $\\tilde{\pi}(\\tilde{\mathbf{z}})$. See the comparison between MAF and IAF in Fig. 10.
+IAF intends to estimate the probability density function of $\tilde{\mathbf{x}}$ given that $\tilde{\pi}(\tilde{\mathbf{z}})$ is already known. The inverse flow is an autoregressive affine transformation too, same as in MAF, but the scale and shift terms are autoregressive functions of observed variables from the known distribution $\tilde{\pi}(\tilde{\mathbf{z}})$. See the comparison between MAF and IAF in Fig. 10.
 
 ![](MAF-vs-IAF.png)
 
 Fig. 10. Comparison of MAF and IAF. The variable with known density is in green while the unknown one is in red.
 
-Computations of the individual elements $\\tilde{x}_i$ do not depend on each other, so they are easily parallelizable (only one pass using MADE). The density estimation for a known $\\tilde{\mathbf{x}}$ is not efficient, because we have to recover the value of $\\tilde{z}_i$ in a sequential order, $\\tilde{z}_i = (\\tilde{x}_i - \\tilde{\\mu}_i(\\tilde{\mathbf{z}}_{1:i-1})) / \\tilde{\sigma}_i(\\tilde{\mathbf{z}}_{1:i-1})$, thus D times in total.
+Computations of the individual elements $\tilde{x}_i$ do not depend on each other, so they are easily parallelizable (only one pass using MADE). The density estimation for a known $\tilde{\mathbf{x}}$ is not efficient, because we have to recover the value of $\tilde{z}_i$ in a sequential order, $\tilde{z}_i = (\tilde{x}_i - \tilde{\mu}_i(\tilde{\mathbf{z}}_{1:i-1})) / \tilde{\sigma}_i(\tilde{\mathbf{z}}_{1:i-1})$, thus D times in total.
 
 Base distribution
 
@@ -341,7 +341,7 @@ $\mathbf{z}\sim\pi(\mathbf{z})$
 
 $\mathbf{x}\sim p(\mathbf{x})$
 
-$x_i = z_i \odot \sigma_i(\mathbf{x}_{1:i-1}) + \\mu_i(\mathbf{x}_{1:i-1})$
+$x_i = z_i \odot \sigma_i(\mathbf{x}_{1:i-1}) + \mu_i(\mathbf{x}_{1:i-1})$
 
 Sequential; slow
 
@@ -349,11 +349,11 @@ One pass; fast
 
 IAF
 
-$\\tilde{\mathbf{z}}\sim\\tilde{\pi}(\\tilde{\mathbf{z}})$
+$\tilde{\mathbf{z}}\sim\tilde{\pi}(\tilde{\mathbf{z}})$
 
-$\\tilde{\mathbf{x}}\sim\\tilde{p}(\\tilde{\mathbf{x}})$
+$\tilde{\mathbf{x}}\sim\tilde{p}(\tilde{\mathbf{x}})$
 
-$\\tilde{x}_i = \\tilde{z}_i \odot \\tilde{\sigma}_i(\\tilde{\mathbf{z}}_{1:i-1}) + \\tilde{\\mu}_i(\\tilde{\mathbf{z}}_{1:i-1})$
+$\tilde{x}_i = \tilde{z}_i \odot \tilde{\sigma}_i(\tilde{\mathbf{z}}_{1:i-1}) + \tilde{\mu}_i(\tilde{\mathbf{z}}_{1:i-1})$
 
 One pass; fast
 
@@ -373,7 +373,7 @@ Sequential; slow
 
 # VAE + Flows[#](#vae--flows)
 
-In [Variational Autoencoder](https://lilianweng.github.io/posts/2018-08-12-vae/#vae-variational-autoencoder), if we want to model the posterior $p(\mathbf{z}\vert\mathbf{x})$ as a more complicated distribution rather than simple Gaussian. Intuitively we can use normalizing flow to transform the base Gaussian for better density approximation. The encoder then would predict a set of scale and shift terms $(\\mu_i, \sigma_i)$ which are all functions of input $\mathbf{x}$. Read the [paper](https://arxiv.org/abs/1809.05861) for more details if interested.
+In [Variational Autoencoder](https://lilianweng.github.io/posts/2018-08-12-vae/#vae-variational-autoencoder), if we want to model the posterior $p(\mathbf{z}\vert\mathbf{x})$ as a more complicated distribution rather than simple Gaussian. Intuitively we can use normalizing flow to transform the base Gaussian for better density approximation. The encoder then would predict a set of scale and shift terms $(\mu_i, \sigma_i)$ which are all functions of input $\mathbf{x}$. Read the [paper](https://arxiv.org/abs/1809.05861) for more details if interested.
 
 ---
 

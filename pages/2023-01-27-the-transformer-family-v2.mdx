@@ -49,10 +49,7 @@ Many new Transformer architecture improvements have been proposed since my last 
 
 Symbol
 
-Meaning
-
-$d$
-
+Meaning $d$ 
 The model size / hidden state dimension / positional encoding size.
 
 $h$
@@ -173,9 +170,9 @@ Because self-attention operation is permutation invariant, it is important to us
 
 ### Sinusoidal Positional Encoding[#](#sinusoidal-positional-encoding)
 
-Sinusoidal positional encoding is defined as follows, given the token position $i=1,\dots,L$ and the dimension $\\delta=1,\dots,d$:
+Sinusoidal positional encoding is defined as follows, given the token position $i=1,\dots,L$ and the dimension $\delta=1,\dots,d$:
 
-$$\text{PE}(i,\\delta) = \begin{cases} \sin(\frac{i}{10000^{2\\delta'/d}}) & \text{if } \\delta = 2\\delta'\\ \cos(\frac{i}{10000^{2\\delta'/d}}) & \text{if } \\delta = 2\\delta' + 1\\ \end{cases}$$
+$$\text{PE}(i,\delta) = \begin{cases} \sin(\frac{i}{10000^{2\delta'/d}}) & \text{if } \delta = 2\delta'\\ \cos(\frac{i}{10000^{2\delta'/d}}) & \text{if } \delta = 2\delta' + 1\\ \end{cases}$$
 
 In this way each dimension of the positional encoding corresponds to a sinusoid of different wavelengths in different dimensions, from $2\pi$ to $10000 \cdot 2\pi$.
 
@@ -201,7 +198,7 @@ $$\begin{aligned} a_{ij} &= \mathbf{q}_i {\mathbf{k}_j}^\top = (\mathbf{x}_i + \
 
 Transformer-XL reparameterizes the above four terms as follows:
 
-$$ a_{ij}^\text{rel} = \\underbrace{ \mathbf{x}_i\mathbf{W}^q \color{blue}{ {\mathbf{W}_E^k}^\top } \mathbf{x}_j^\top }_\text{content-based addressing} + \\underbrace{ \mathbf{x}_i\mathbf{W}^q \color{blue}{ {\mathbf{W}_R^k}^\top } \color{green}{\mathbf{r}_{i-j}^\top} }_\text{content-dependent positional bias} + \\underbrace{ \color{red}{\mathbf{u}} \color{blue}{ {\mathbf{W}_E^k}^\top } \mathbf{x}_j^\top }_\text{global content bias} + \\underbrace{ \color{red}{\mathbf{v}} \color{blue}{ {\mathbf{W}_R^k}^\top } \color{green}{\mathbf{r}_{i-j}^\top} }_\text{global positional bias}$$
+$$ a_{ij}^\text{rel} = \underbrace{ \mathbf{x}_i\mathbf{W}^q \color{blue}{ {\mathbf{W}_E^k}^\top } \mathbf{x}_j^\top }_\text{content-based addressing} + \underbrace{ \mathbf{x}_i\mathbf{W}^q \color{blue}{ {\mathbf{W}_R^k}^\top } \color{green}{\mathbf{r}_{i-j}^\top} }_\text{content-dependent positional bias} + \underbrace{ \color{red}{\mathbf{u}} \color{blue}{ {\mathbf{W}_E^k}^\top } \mathbf{x}_j^\top }_\text{global content bias} + \underbrace{ \color{red}{\mathbf{v}} \color{blue}{ {\mathbf{W}_R^k}^\top } \color{green}{\mathbf{r}_{i-j}^\top} }_\text{global positional bias}$$
 
 - Replace $\mathbf{p}_j$ with relative positional encoding $\mathbf{r}_{i-j} \in \mathbf{R}^{d}$;
 - Replace $\mathbf{p}_i\mathbf{W}^q$ with two trainable parameters $\mathbf{u}$ (for content) and $\mathbf{v}$ (for location) in two different terms;
@@ -213,19 +210,19 @@ Rotary position embedding (_RoPE_; [Su et al. 2021](https://arxiv.org/abs/2104.0
 
 When encoding relative positional information into the inner product of the $i$-th key and the $j$-th query, we would like to formulate the function in a way that the inner product is only about the relative position $i-j$. Rotary Position Embedding (RoPE) makes use of the rotation operation in Euclidean space and frames the relative position embedding as simply rotating feature matrix by an angle proportional to its position index.
 
-Given a vector $\mathbf{z}$, if we want to rotate it counterclockwise by $\\theta$, we can multiply it by a rotation matrix to get $R\mathbf{z}$ where the rotation matrix $R$ is defined as:
+Given a vector $\mathbf{z}$, if we want to rotate it counterclockwise by $\theta$, we can multiply it by a rotation matrix to get $R\mathbf{z}$ where the rotation matrix $R$ is defined as:
 
-$$ R = \begin{bmatrix} \cos\\theta & -\sin\\theta \\ \sin\\theta & \cos\\theta \end{bmatrix}$$
+$$ R = \begin{bmatrix} \cos\theta & -\sin\theta \\ \sin\theta & \cos\theta \end{bmatrix}$$
 
 When generalizing to higher dimensional space, RoPE divide the $d$-dimensional space into $d/2$ subspaces and constructs a rotation matrix $R$ of size $d \times d$ for token at position $i$:
 
-$$ R^d_{\\Theta, i} = \begin{bmatrix} \cos i\\theta_1 & -\sin i\\theta_1 & 0 & 0 & \dots & 0 & 0 \\ \sin i\\theta_1 & \cos i\\theta_1 & 0 & 0 & \dots & 0 & 0 \\ 0 & 0 & \cos i\\theta_2 & -\sin i\\theta_2 & \dots & 0 & 0 \\ 0 & 0 & \sin i\\theta_1 & \cos i\\theta_1 & \dots & 0 & 0 \\ \vdots & \vdots & \vdots & \vdots & \\ddots & \vdots & \vdots \\ 0 & 0 & 0 & 0 & \dots & \cos i\\theta_{d/2} & -\sin i\\theta_{d/2} \\ 0 & 0 & 0 & 0 & \dots & \sin i\\theta_{d/2} & \cos i\\theta_{d/2} \\ \end{bmatrix}$$
+$$ R^d_{\Theta, i} = \begin{bmatrix} \cos i\theta_1 & -\sin i\theta_1 & 0 & 0 & \dots & 0 & 0 \\ \sin i\theta_1 & \cos i\theta_1 & 0 & 0 & \dots & 0 & 0 \\ 0 & 0 & \cos i\theta_2 & -\sin i\theta_2 & \dots & 0 & 0 \\ 0 & 0 & \sin i\theta_1 & \cos i\theta_1 & \dots & 0 & 0 \\ \vdots & \vdots & \vdots & \vdots & \ddots & \vdots & \vdots \\ 0 & 0 & 0 & 0 & \dots & \cos i\theta_{d/2} & -\sin i\theta_{d/2} \\ 0 & 0 & 0 & 0 & \dots & \sin i\theta_{d/2} & \cos i\theta_{d/2} \\ \end{bmatrix}$$
 
-where in the paper we have $\\Theta = {\\theta_i = 10000^{-2(i-1)/d}, i \in \[1, 2, …, d/2\]}$. Note that this is essentially equivalent to sinusoidal positional encoding but formulated as a rotation matrix.
+where in the paper we have $\Theta = {\theta_i = 10000^{-2(i-1)/d}, i \in \[1, 2, …, d/2\]}$. Note that this is essentially equivalent to sinusoidal positional encoding but formulated as a rotation matrix.
 
 Then both key and query matrices incorporates the positional information by multiplying with this rotation matrix:
 
-$$\begin{aligned} & \mathbf{q}_i^\top \mathbf{k}_j = (R^d_{\\Theta, i} \mathbf{W}^q\mathbf{x}_i)^\top (R^d_{\\Theta, j} \mathbf{W}^k\mathbf{x}_j) = \mathbf{x}_i^\top\mathbf{W}^q R^d_{\\Theta, j-i}\mathbf{W}^k\mathbf{x}_j \\ & \text{ where } R^d_{\\Theta, j-i} = (R^d_{\\Theta, i})^\top R^d_{\\Theta, j} \end{aligned}$$
+$$\begin{aligned} & \mathbf{q}_i^\top \mathbf{k}_j = (R^d_{\Theta, i} \mathbf{W}^q\mathbf{x}_i)^\top (R^d_{\Theta, j} \mathbf{W}^k\mathbf{x}_j) = \mathbf{x}_i^\top\mathbf{W}^q R^d_{\Theta, j-i}\mathbf{W}^k\mathbf{x}_j \\ & \text{ where } R^d_{\Theta, j-i} = (R^d_{\Theta, i})^\top R^d_{\Theta, j} \end{aligned}$$
 
 ![](assets/images/2023-01-27-the-transformer-family-v2/RoPE.png)
 
@@ -253,9 +250,9 @@ Fig. 5. A comparison between the training phrase of vanilla Transformer & Transf
 
 Let's label the hidden state of the $n$-th layer for the $(\tau + 1)$-th segment in the model as $\mathbf{h}_{\tau+1}^{(n)} \in \mathbb{R}^{L \times d}$. In addition to the hidden state of the last layer for the same segment $\mathbf{h}_{\tau+1}^{(n-1)}$, it also depends on the hidden state of the same layer for the previous segment $\mathbf{h}_{\tau}^{(n)}$. By incorporating information from the previous hidden states, the model extends the attention span much longer in the past, over multiple segments.
 
-$$\begin{aligned} \color{red}{\\widetilde{\mathbf{h}}_{\tau+1}^{(n-1)}} &= \[\text{stop-gradient}(\mathbf{h}_{\tau}^{(n-1)}) \\circ \mathbf{h}_{\tau+1}^{(n-1)}\] \\ \mathbf{Q}_{\tau+1}^{(n)} &= \mathbf{h}_{\tau+1}^{(n-1)}\mathbf{W}^q \\ \mathbf{K}_{\tau+1}^{(n)} &= \color{red}{\\widetilde{\mathbf{h}}_{\tau+1}^{(n-1)}} \mathbf{W}^k \\ \mathbf{V}_{\tau+1}^{(n)} &= \color{red}{\\widetilde{\mathbf{h}}_{\tau+1}^{(n-1)}} \mathbf{W}^v \\ \mathbf{h}_{\tau+1}^{(n)} &= \text{transformer-layer}(\mathbf{Q}_{\tau+1}^{(n)}, \mathbf{K}_{\tau+1}^{(n)}, \mathbf{V}_{\tau+1}^{(n)}) \end{aligned}$$
+$$\begin{aligned} \color{red}{\widetilde{\mathbf{h}}_{\tau+1}^{(n-1)}} &= \[\text{stop-gradient}(\mathbf{h}_{\tau}^{(n-1)}) \circ \mathbf{h}_{\tau+1}^{(n-1)}\] \\ \mathbf{Q}_{\tau+1}^{(n)} &= \mathbf{h}_{\tau+1}^{(n-1)}\mathbf{W}^q \\ \mathbf{K}_{\tau+1}^{(n)} &= \color{red}{\widetilde{\mathbf{h}}_{\tau+1}^{(n-1)}} \mathbf{W}^k \\ \mathbf{V}_{\tau+1}^{(n)} &= \color{red}{\widetilde{\mathbf{h}}_{\tau+1}^{(n-1)}} \mathbf{W}^v \\ \mathbf{h}_{\tau+1}^{(n)} &= \text{transformer-layer}(\mathbf{Q}_{\tau+1}^{(n)}, \mathbf{K}_{\tau+1}^{(n)}, \mathbf{V}_{\tau+1}^{(n)}) \end{aligned}$$
 
-Note that both keys and values rely on extended hidden states, while queries only consume hidden states at the current step. The concatenation operation $\[. \\circ .\]$ is along the sequence length dimension. And Transformer-XL needs to use [relative positional encoding](#transformer-xl-encoding) because previous and current segments would be assigned with the same encoding if we encode absolute positions, which is undesired.
+Note that both keys and values rely on extended hidden states, while queries only consume hidden states at the current step. The concatenation operation $\[. \circ .\]$ is along the sequence length dimension. And Transformer-XL needs to use [relative positional encoding](#transformer-xl-encoding) because previous and current segments would be assigned with the same encoding if we encode absolute positions, which is undesired.
 
 **Compressive Transformer** ([Rae et al. 2019](https://arxiv.org/abs/1911.05507)) extends Transformer-XL by compressing past memories to support longer sequences. It explicitly adds _memory_ slots of size $m_m$ per layer for storing past activations of this layer to preserve long context. When some past activations become old enough, they are compressed and saved in an additional _compressed memory_ of size $m_{cm}$ per layer.
 
@@ -296,11 +293,11 @@ Fig. 7. Attention weights with one standard deviation as error bars versus memor
 
 At inference time, the next token probability is a weighted sum of two predictions:
 
-$$\begin{aligned} p(y \vert \mathbf{x}) &= \\lambda \\; p_\text{kNN}(y \vert \mathbf{x}) + (1- \\lambda) \\; p_\text{LM}(y \vert \mathbf{x}) \\ p_\text{kNN}(y \vert \mathbf{x}) &\\propto \sum_{(k_i, w_i) \in \mathcal{N}} \mathbb{1}\[y = w_i\] \exp(-d(k_i, f(\mathbf{x}))) \end{aligned}$$
+$$\begin{aligned} p(y \vert \mathbf{x}) &= \lambda \\; p_\text{kNN}(y \vert \mathbf{x}) + (1- \lambda) \\; p_\text{LM}(y \vert \mathbf{x}) \\ p_\text{kNN}(y \vert \mathbf{x}) &\\propto \sum_{(k_i, w_i) \in \mathcal{N}} \mathbb{1}\[y = w_i\] \exp(-d(k_i, f(\mathbf{x}))) \end{aligned}$$
 
 where $\mathcal{N}$ contains a set of nearest neighbor data points retrieved by $k$NN; $d(., .)$ is a distance function such as L2 distance.
 
-According to the experiments, larger datastore size or larger $k$ is correlated with better perplexity. The weighting scalar $\\lambda$ should be tuned, but in general it is expected to be larger for out-of-domain data compared to in-domain data and larger datastore can afford a larger $\\lambda$.
+According to the experiments, larger datastore size or larger $k$ is correlated with better perplexity. The weighting scalar $\lambda$ should be tuned, but in general it is expected to be larger for out-of-domain data compared to in-domain data and larger datastore can afford a larger $\lambda$.
 
 **SPALM** (_Adaptive semiparametric language models_; [Yogatama et al. 2021](https://arxiv.org/abs/2102.02557)) incorporates both (1) Transformer-XL style memory for hidden states from external context as short-term memory and (2) $k$NN-LM style key-value store as long memory.
 
@@ -339,11 +336,11 @@ Note that the default positional encoding in vanilla Transformer only adds posit
 
 _DA-Transformer_ ([Wu, et al. 2021](https://aclanthology.org/2021.naacl-main.166)) multiplies attention scores at each layer by a learnable bias that is formulated as a function of the distance between key and query. Different attention heads use different parameters to distinguish diverse preferences to short-term vs long-term context. Given two positions, $i, j$, DA-Transformer uses the following weighting function to alter the self-attention score:
 
-$$\begin{aligned} \mathbf{R}^{(i)} &= \\alpha_i \mathbf{R} \quad \text{where }R_{ij} = \vert i-j \vert\\ f(\mathbf{R}^{(i)}; \\beta_i) &= \frac{1 + \exp(\\beta_i)}{1 + \exp(\\beta_i - \mathbf{R}^{(i)})} \\ \text{attn}(\mathbf{Q}^{(i)}, \mathbf{K}^{(i)}, \mathbf{V}^{(i)}) &= \text{row-softmax}\Big(\frac{\text{ReLU}(\mathbf{Q}^{(i)}\mathbf{K}^{(i)\top})f(\mathbf{R}^{(i)})}{\sqrt{d}}\Big) \mathbf{V}^{(i)} \end{aligned}$$
+$$\begin{aligned} \mathbf{R}^{(i)} &= \alpha_i \mathbf{R} \quad \text{where }R_{ij} = \vert i-j \vert\\ f(\mathbf{R}^{(i)}; \beta_i) &= \frac{1 + \exp(\beta_i)}{1 + \exp(\beta_i - \mathbf{R}^{(i)})} \\ \text{attn}(\mathbf{Q}^{(i)}, \mathbf{K}^{(i)}, \mathbf{V}^{(i)}) &= \text{row-softmax}\Big(\frac{\text{ReLU}(\mathbf{Q}^{(i)}\mathbf{K}^{(i)\top})f(\mathbf{R}^{(i)})}{\sqrt{d}}\Big) \mathbf{V}^{(i)} \end{aligned}$$
 
-where $\\alpha_i$ is a learnable parameters to weight relative distance differently per head where the head is indexed by superscript $^{(i)}$; $\\beta_i$ is a learnable parameter to control the upper bound and ascending slope wrt the distance for the $i$-th attention head. The weighting function $f(.)$ is designed in a way that: (1) $f(0)=1$; (2) $f(\mathbf{R}^{(i)}) = 0$ when $\mathbf{R}^{(i)} \to -\infty$; (3) $f(\mathbf{R}^{(i)})$ is bounded when $\mathbf{R}^{(i)} \to +\infty$; (4) the scale is tunable; (5) and the function is monotonic. The extra time complexity brought by $f(\mathbf{R}^{(i)})$ is $\mathcal{O}(L^2)$ and it is small relative to the self attention time complexity $\mathcal{O}(L^2 d)$. The extra memory consumption is minimal, ~$\mathcal{O}(2h)$.
+where $\alpha_i$ is a learnable parameters to weight relative distance differently per head where the head is indexed by superscript $^{(i)}$; $\beta_i$ is a learnable parameter to control the upper bound and ascending slope wrt the distance for the $i$-th attention head. The weighting function $f(.)$ is designed in a way that: (1) $f(0)=1$; (2) $f(\mathbf{R}^{(i)}) = 0$ when $\mathbf{R}^{(i)} \to -\infty$; (3) $f(\mathbf{R}^{(i)})$ is bounded when $\mathbf{R}^{(i)} \to +\infty$; (4) the scale is tunable; (5) and the function is monotonic. The extra time complexity brought by $f(\mathbf{R}^{(i)})$ is $\mathcal{O}(L^2)$ and it is small relative to the self attention time complexity $\mathcal{O}(L^2 d)$. The extra memory consumption is minimal, ~$\mathcal{O}(2h)$.
 
-Instead of multipliers, _ALiBi_ ([Press et al. 2022](https://arxiv.org/abs/2108.12409)) adds a constant bias term on query-key attention scores, proportional to pairwise distances. The bias introduces a strong recency preference and penalizes keys that are too far away. The penalties are increased at different rates within different heads. $$\text{softmax}(\mathbf{q}_i \mathbf{K}^\top + \\alpha_i \cdot \[0, -1, -2, \dots, -(i-1)\])$$ where $\\alpha_i$ is a head-specific weighting scalar. Different from DA-transformer, $\\alpha_i$ is not learned but fixed as a geometric sequence; for example, for 8 heads, ${\\alpha_i} = {\frac{1}{2}, \frac{1}{2^2}, \dots, \frac{1}{2^8}}$. The overall idea is very much similar to what relative positional encoding aims to solve.
+Instead of multipliers, _ALiBi_ ([Press et al. 2022](https://arxiv.org/abs/2108.12409)) adds a constant bias term on query-key attention scores, proportional to pairwise distances. The bias introduces a strong recency preference and penalizes keys that are too far away. The penalties are increased at different rates within different heads. $$\text{softmax}(\mathbf{q}_i \mathbf{K}^\top + \alpha_i \cdot \[0, -1, -2, \dots, -(i-1)\])$$ where $\alpha_i$ is a head-specific weighting scalar. Different from DA-transformer, $\alpha_i$ is not learned but fixed as a geometric sequence; for example, for 8 heads, ${\alpha_i} = {\frac{1}{2}, \frac{1}{2^2}, \dots, \frac{1}{2^8}}$. The overall idea is very much similar to what relative positional encoding aims to solve.
 
 ![](assets/images/2023-01-27-the-transformer-family-v2/ALiBi-bias.png)
 
@@ -373,7 +370,7 @@ where $\text{Transition}(.)$ is either a [separable convolution](https://arxiv.o
 
 The positional encoding $\mathbf{P}^t$ uses [sinusoidal position signal](#sinusoidal-positional-encoding) but with an additional time dimension:
 
-$$\text{PE}(i, t, \\delta) = \begin{cases} \sin(\frac{i}{10000^{2\\delta'/d}}) \\oplus \sin(\frac{t}{10000^{2\\delta'/d}}) & \text{if } \\delta = 2\\delta'\\ \cos(\frac{i}{10000^{2\\delta'/d}}) \\oplus \cos(\frac{t}{10000^{2\\delta'/d}}) & \text{if } \\delta = 2\\delta' + 1\\ \end{cases}$$
+$$\text{PE}(i, t, \delta) = \begin{cases} \sin(\frac{i}{10000^{2\delta'/d}}) \oplus \sin(\frac{t}{10000^{2\delta'/d}}) & \text{if } \delta = 2\delta'\\ \cos(\frac{i}{10000^{2\delta'/d}}) \oplus \cos(\frac{t}{10000^{2\delta'/d}}) & \text{if } \delta = 2\delta' + 1\\ \end{cases}$$
 
 ![](assets/images/2023-01-27-the-transformer-family-v2/universal-transformer.png)
 
@@ -436,19 +433,19 @@ Adaptive depth classifiers outputs a parametric distribution $q_t$. It is traine
 Fig. 16. Illustration of three types of adaptive depth classifiers.  
 (Image source: [Elabyad et al. 2020](https://arxiv.org/abs/1910.10073)).
 
-1.  _Sequence-specific depth classifier_: All tokens of the same sequence share the same exit block. It depends on the average of the encoder representation of the sequence. Given an input sequence $\mathbf{x}$ of length $L$, the classifier takes $\\bar{\mathbf{x}} = \frac{1}{L} \sum_{t=1}^L \mathbf{x}_t$ as input and outputs a multinomial distribution of $N$ dimensions, corresponding to $N$ layers.
+1.  _Sequence-specific depth classifier_: All tokens of the same sequence share the same exit block. It depends on the average of the encoder representation of the sequence. Given an input sequence $\mathbf{x}$ of length $L$, the classifier takes $\bar{\mathbf{x}} = \frac{1}{L} \sum_{t=1}^L \mathbf{x}_t$ as input and outputs a multinomial distribution of $N$ dimensions, corresponding to $N$ layers.
 
-    $$\begin{aligned} q(n \vert \mathbf{x}) &=\text{softmax}(\mathbf{W}_n \\bar{\mathbf{x}} + b_n) \in \mathbb{R}^N \\ q_\text{lik}^\*(\mathbf{x}, \mathbf{y}) &= \\delta(\arg\max_n \text{LL}^n - \\lambda n) \\ \text{or }q_\text{corr}^\*(\mathbf{x}, \mathbf{y}) &= \\delta(\arg\max_n C^n - \\lambda n) \text{ where }C^n = \vert\{t \vert y_t = \arg\max_y p(y \vert \mathbf{h}^n_{t-1})\}\vert \\ \end{aligned}$$
+    $$\begin{aligned} q(n \vert \mathbf{x}) &=\text{softmax}(\mathbf{W}_n \bar{\mathbf{x}} + b_n) \in \mathbb{R}^N \\ q_\text{lik}^\*(\mathbf{x}, \mathbf{y}) &= \delta(\arg\max_n \text{LL}^n - \lambda n) \\ \text{or }q_\text{corr}^\*(\mathbf{x}, \mathbf{y}) &= \delta(\arg\max_n C^n - \lambda n) \text{ where }C^n = \vert\{t \vert y_t = \arg\max_y p(y \vert \mathbf{h}^n_{t-1})\}\vert \\ \end{aligned}$$
 
-    where $\\delta$ is [dirac delta](https://en.wikipedia.org/wiki/Dirac_delta_function) (unit impulse) function and $-\\lambda n$ is a regularization term to encourage lower layer exits. The ground truth $q^\*$ can be prepared in two way, based on maximum likelihood $q_\text{lik}^\*$ or correctness $q_\text{corr}^\*$.
+    where $\delta$ is [dirac delta](https://en.wikipedia.org/wiki/Dirac_delta_function) (unit impulse) function and $-\lambda n$ is a regularization term to encourage lower layer exits. The ground truth $q^\*$ can be prepared in two way, based on maximum likelihood $q_\text{lik}^\*$ or correctness $q_\text{corr}^\*$.
 
 2.  _Token-specific depth classifier (multinomial)_: Each token is decoded with different exit block, predicted conditioned on the first decoder hidden state $\mathbf{h}^1_t$:
 
     $$ q_t(n \vert \mathbf{x}, \mathbf{y}_{< t}) = \text{softmax}(\mathbf{W}_n \mathbf{h}^1_t + b_n)$$
 
-3.  _Token-specific depth classifier (geometric-like)_: A binary exit prediction distribution is made per layer per token, $\mathcal{X}^n_t$. The RBF kernel $\\kappa(t, t') = \exp(\frac{\vert t - t' \vert^2}{\sigma})$ is used to smooth the predictions to incorporate the impact of current decision on future time steps.
+3.  _Token-specific depth classifier (geometric-like)_: A binary exit prediction distribution is made per layer per token, $\mathcal{X}^n_t$. The RBF kernel $\kappa(t, t') = \exp(\frac{\vert t - t' \vert^2}{\sigma})$ is used to smooth the predictions to incorporate the impact of current decision on future time steps.
 
-    $$\begin{aligned} \mathcal{X}^n_t &= \text{sigmoid}(\mathbf{w}_n^\top \mathbf{h}^n_t + b_n)\quad \\forall n \in \[1, \dots, N-1\] \\ q_t(n \vert \mathbf{x}, \mathbf{y}_{< t}) &= \begin{cases} \mathcal{X}^n_t \\prod_{n' < n} (1 - \mathcal{X}^{n'}_t) & \text{if } n < N\\ \\prod_{n' < N} (1 - \mathcal{X}^{n'}_t) & \text{otherwise} \end{cases} \\ q_\text{lik}^\*(\mathbf{x}, \mathbf{y}) &= \\delta(\arg\max_n \\widetilde{\text{LL}}^n_t - \\lambda n) \text{ where } \\widetilde{\text{LL}}^n_t = \sum_{t'=1}^{\vert\mathbf{y}\vert}\\kappa(t, t') LL^n_{t'} \\ \text{or }q_\text{cor}^\*(\mathbf{x}, \mathbf{y}) &= \\delta(\arg\max_n \\tilde{C}_t^n - \\lambda n) \text{ where }C_t^n = \mathbb{1}\[y_t = \arg\max_y p(y \vert \mathbf{h}^n_{t-1})\],\\; \\tilde{C}^n_t = \sum_{t'=1}^{\vert\mathbf{y}\vert}\\kappa(t, t') C^n_{t'} \\ \end{aligned}$$
+    $$\begin{aligned} \mathcal{X}^n_t &= \text{sigmoid}(\mathbf{w}_n^\top \mathbf{h}^n_t + b_n)\quad \forall n \in \[1, \dots, N-1\] \\ q_t(n \vert \mathbf{x}, \mathbf{y}_{< t}) &= \begin{cases} \mathcal{X}^n_t \prod_{n' < n} (1 - \mathcal{X}^{n'}_t) & \text{if } n < N\\ \prod_{n' < N} (1 - \mathcal{X}^{n'}_t) & \text{otherwise} \end{cases} \\ q_\text{lik}^\*(\mathbf{x}, \mathbf{y}) &= \delta(\arg\max_n \widetilde{\text{LL}}^n_t - \lambda n) \text{ where } \widetilde{\text{LL}}^n_t = \sum_{t'=1}^{\vert\mathbf{y}\vert}\kappa(t, t') LL^n_{t'} \\ \text{or }q_\text{cor}^\*(\mathbf{x}, \mathbf{y}) &= \delta(\arg\max_n \tilde{C}_t^n - \lambda n) \text{ where }C_t^n = \mathbb{1}\[y_t = \arg\max_y p(y \vert \mathbf{h}^n_{t-1})\],\\; \tilde{C}^n_t = \sum_{t'=1}^{\vert\mathbf{y}\vert}\kappa(t, t') C^n_{t'} \\ \end{aligned}$$
 
 At inference time, the confidence threshold for making an exit decision needs to be calibrated. Depth-adaptive transformer finds such a threshold on a validation set via grid search. _CALM_ ([Schuster et al. 2022](https://arxiv.org/abs/2207.07061)) applied the Learn then Test (LTT) framework ([Angelopoulos et al. 2021](https://arxiv.org/abs/2110.01052)) to identify a subset of valid thresholds and chose the minimum value as the threshold for inference. Except for training per-layer exit classifier, CALM also explored other methods for adaptive depth prediction, including the softmax responses (i.e. difference between top two softmax outputs) and hidden state saturation (i.e. $\cos(\mathbf{h}^n_t, \mathbf{h}^{n+1}_t)$) as confidence scores for exit decisions. They found softmax responses result in best inference speedup.
 
@@ -492,7 +489,7 @@ In anto-regressive models, one attention span is defined as $S_i = \{j: j \leq i
 
 In factorized self-attention, the set $S_i$ is decomposed into a _tree_ of dependencies, such that for every pair of $(i, j)$ where $j \leq i$, there is a path connecting $i$ back to $j$ and $i$ can attend to $j$ either directly or indirectly.
 
-Precisely, the set $S_i$ is divided into $p$ _non-overlapping_ subsets, where the $m$-th subset is denoted as $A^{(m)}_i \\subset S_i, m = 1,\dots, p$. Therefore the path between the output position $i$ and any $j$ has a maximum length $p + 1$. For example, if $(j, a, b, c, \dots, i)$ is a path of indices between $i$ and $j$, we would have $j \in A_a^{(1)}, a \in A_b^{(2)}, b \in A_c^{(3)}, \dots$, so on and so forth.
+Precisely, the set $S_i$ is divided into $p$ _non-overlapping_ subsets, where the $m$-th subset is denoted as $A^{(m)}_i \subset S_i, m = 1,\dots, p$. Therefore the path between the output position $i$ and any $j$ has a maximum length $p + 1$. For example, if $(j, a, b, c, \dots, i)$ is a path of indices between $i$ and $j$, we would have $j \in A_a^{(1)}, a \in A_b^{(2)}, b \in A_c^{(3)}, \dots$, so on and so forth.
 
 **Sparse Factorized Attention**
 
@@ -532,13 +529,13 @@ The actual implementation of Blockwise Attention only stores QKV as block matric
 
 $$\text{Blockwise-attn}(\mathbf{Q}, \mathbf{K}, \mathbf{V}, \mathbf{M}) = \begin{bmatrix} \text{softmax}\big(\frac{\hat{\mathbf{q}}_1\hat{\mathbf{k}}_{\pi(1)}^\top}{\sqrt{d}} \Big)\hat{\mathbf{v}}_{\pi(1)} \\ \vdots \\ \text{softmax}\big(\frac{\hat{\mathbf{q}}_n\hat{\mathbf{k}}_{\pi(n)}^\top}{\sqrt{d}} \odot \Big)\hat{\mathbf{v}}_{\pi(n)} \\ \end{bmatrix}$$
 
-where $\hat{\mathbf{q}}_i$, $\hat{\mathbf{k}}_i$ and $\hat{\mathbf{v}}_i$ are the $i$-the row in the QKV block matrix respectively. Each $\mathbf{q}_i\mathbf{k}_{\pi(i)}^\top, \\forall i = 1, \dots, n$ is of size $\frac{N}{n}\times\frac{N}{n}$ and therefore Blockwise Attention is able to reduce the memory complexity of attention matrix from $\mathcal{O}(L^2)$ to $\mathcal{O}(\frac{L}{n}\times\frac{L}{n} \times n) = \mathcal{O}(L^2/n)$.
+where $\hat{\mathbf{q}}_i$, $\hat{\mathbf{k}}_i$ and $\hat{\mathbf{v}}_i$ are the $i$-the row in the QKV block matrix respectively. Each $\mathbf{q}_i\mathbf{k}_{\pi(i)}^\top, \forall i = 1, \dots, n$ is of size $\frac{N}{n}\times\frac{N}{n}$ and therefore Blockwise Attention is able to reduce the memory complexity of attention matrix from $\mathcal{O}(L^2)$ to $\mathcal{O}(\frac{L}{n}\times\frac{L}{n} \times n) = \mathcal{O}(L^2/n)$.
 
 ### Combination of Local and Global Context[#](#combination-of-local-and-global-context)
 
 **ETC** (_Extended Transformer Construction_; [Ainslie et al. 2019](https://aclanthology.org/2020.emnlp-main.19/)), **Longformer** ([Beltagy et al. 2020](https://arxiv.org/abs/2004/05150)) and **Big Bird** ([Zaheer et al. 2020](https://arxiv.org/abs/2007.14062)) models combine both local and global context when building an attention matrix. All these models can be initialized from existing pretrained models.
 
-**Global-Local Attention** of _ETC_ ([Ainslie et al. 2019](https://aclanthology.org/2020.emnlp-main.19/)) takes two inputs, (1) the long input $\mathbf{x}^l$ of size $n_l$ which is the regular input sequence and (2) the global input $\mathbf{x}^g$ of size $n_g$ which contains a smaller number of auxiliary tokens, $n_g \\ll n_l$. Attention is thus split into four components based on directional attention across these two inputs: g2g, g2l, l2g and l2l. Because the l2l attention piece can be very large, it is restricted to a fixed size attention span of radius $w$ (i.e. local attention span) and the l2l matrix can be reshaped to $n_l \times (2w+1)$.
+**Global-Local Attention** of _ETC_ ([Ainslie et al. 2019](https://aclanthology.org/2020.emnlp-main.19/)) takes two inputs, (1) the long input $\mathbf{x}^l$ of size $n_l$ which is the regular input sequence and (2) the global input $\mathbf{x}^g$ of size $n_g$ which contains a smaller number of auxiliary tokens, $n_g \ll n_l$. Attention is thus split into four components based on directional attention across these two inputs: g2g, g2l, l2g and l2l. Because the l2l attention piece can be very large, it is restricted to a fixed size attention span of radius $w$ (i.e. local attention span) and the l2l matrix can be reshaped to $n_l \times (2w+1)$.
 
 ETC utilizes four binary matrices to handle structured inputs, $\mathbf{M}^{g2g}$, $\mathbf{M}^{g2l}$, $\mathbf{M}^{l2g}$ and $\mathbf{M}^{l2l}$. For example, each element $z^g_i \in \mathbb{R}^d$ in the attention output $z^g = (z^g_1, \dots, z^g_{n_g})$ for g2g attention piece is formatted as:
 
@@ -581,7 +578,7 @@ Reformer proposed two main changes:
 
 In $\mathbf{Q} \mathbf{K}^\top$ part of the [attention formula](#attention-and-self-attention), we are only interested in the largest elements as only large elements contribute a lot after softmax. For each query $\mathbf{q}_i \in \mathbf{Q}$, we are looking for row vectors in $\mathbf{K}$ closest to $\mathbf{q}_i$. In order to find nearest neighbors quickly in high-dimensional space, Reformer incorporates [Locality-Sensitive Hashing (LSH)](https://en.wikipedia.org/wiki/Locality-sensitive_hashing) into its attention mechanism.
 
-A hashing scheme $x \\mapsto h(x)$ is _locality-sensitive_ if it preserves the distancing information between data points, such that close vectors obtain similar hashes while distant vectors have very different ones. The Reformer adopts a hashing scheme as such, given a fixed random matrix $\mathbf{R} \in \mathbb{R}^{d \times b/2}$ (where $b$ is a hyperparam), the hash function is $h(x) = \arg\max(\[xR; -xR\])$.
+A hashing scheme $x \mapsto h(x)$ is _locality-sensitive_ if it preserves the distancing information between data points, such that close vectors obtain similar hashes while distant vectors have very different ones. The Reformer adopts a hashing scheme as such, given a fixed random matrix $\mathbf{R} \in \mathbb{R}^{d \times b/2}$ (where $b$ is a hyperparam), the hash function is $h(x) = \arg\max(\[xR; -xR\])$.
 
 ![](assets/images/2023-01-27-the-transformer-family-v2/LSH-attention-matrix.png)
 
@@ -602,7 +599,7 @@ Fig. 21. The LSH attention consists of 4 steps: bucketing, sorting, chunking, an
 
 Another improvement by Reformer is to use _reversible residual layers_ ([Gomez et al. 2017](https://arxiv.org/abs/1707.04585)). The motivation for reversible residual network is to design the architecture in a way that activations at any given layer can be recovered from the activations at the following layer, using only the model parameters. Hence, we can save memory by recomputing the activation during backprop rather than storing all the activations.
 
-Given a layer $x \\mapsto y$, the normal residual layer does $y = x + F(x)$, but the reversible layer splits both input and output into pairs $(x_1, x_2) \\mapsto (y_1, y_2)$ and then executes the following:
+Given a layer $x \mapsto y$, the normal residual layer does $y = x + F(x)$, but the reversible layer splits both input and output into pairs $(x_1, x_2) \mapsto (y_1, y_2)$ and then executes the following:
 
 $$ y_1 = x_1 + F(x_2),\\; y_2 = x_2 + G(y_1)$$
 
@@ -622,15 +619,15 @@ The resulting reversible Transformer does not need to store activation in every 
 
 **Routing Transformer** ([Roy et al. 2021](https://arxiv.org/abs/2003.05997)) is also built on content-based clustering of keys and queries. Instead of using a static hashing function like LSH, it utilizes online $k$-means clustering and combines it with local, temporal sparse attention to reduce the attention complexity from $O(L^2)$ to $O(L^{1.5})$.
 
-Within routing attention, both keys and queries are clustered with $k$-means clustering method and the same set of centroids $\\boldsymbol{\\mu} = (\\mu_1, \dots, \\mu_k) \in \mathbb{R}^{k \times d}$. Queries are routed to keys that get assigned to the same centroid. The total complexity is $O(Lkd + L^2d/k)$, where $O(Lkd)$ is for running clustering assignments and $O(L^2d/k)$ is for attention computation. The cluster centroids are updated by EMA (exponential moving average) using all associated keys and queries.
+Within routing attention, both keys and queries are clustered with $k$-means clustering method and the same set of centroids $\boldsymbol{\mu} = (\mu_1, \dots, \mu_k) \in \mathbb{R}^{k \times d}$. Queries are routed to keys that get assigned to the same centroid. The total complexity is $O(Lkd + L^2d/k)$, where $O(Lkd)$ is for running clustering assignments and $O(L^2d/k)$ is for attention computation. The cluster centroids are updated by EMA (exponential moving average) using all associated keys and queries.
 
 In the experiments for Routing Transformer, some best config only has routing attention enabled in the last two layers of the model and half of the attention heads, while the other half utilizing local attention. They also observed that local attention is a pretty strong baseline and larger attention window always leads to better results.
 
 ## Low-Rank Attention[#](#low-rank-attention)
 
-**Linformer** ([Wang et al. 2020](https://arxiv.org/abs/2006.04768)) approximates the full attention matrix with a _low rank_ matrix, reducing the time & space complexity to be _linear_. Instead of using expensive SVD to identify low rank decomposition, Linformer adds two linear projections $\mathbf{E}_i, \mathbf{F}_i \in \mathbb{R}^{L \times k}$ for key and value matrices, respectively, reducing their dimensions from $L \times d$ to $k \times d$. As long as $k \\ll L$, the attention memory can be greatly reduced.
+**Linformer** ([Wang et al. 2020](https://arxiv.org/abs/2006.04768)) approximates the full attention matrix with a _low rank_ matrix, reducing the time & space complexity to be _linear_. Instead of using expensive SVD to identify low rank decomposition, Linformer adds two linear projections $\mathbf{E}_i, \mathbf{F}_i \in \mathbb{R}^{L \times k}$ for key and value matrices, respectively, reducing their dimensions from $L \times d$ to $k \times d$. As long as $k \ll L$, the attention memory can be greatly reduced.
 
-$$\begin{aligned} \\overline{\text{head}}_i &= \text{attn}(\mathbf{X}_q\mathbf{W}^q_i, \mathbf{E}_i\mathbf{X}_k\mathbf{W}^k_i, \mathbf{F}_i\mathbf{X}_v\mathbf{W}^v_i) \\ &= \\underbrace{\text{softmax}\Big( \frac{\mathbf{X}_q\mathbf{W}^q_i (\mathbf{E}_i \mathbf{X}_k\mathbf{W}^k_i)^\top}{\sqrt{d}} \Big)}_{\text{low rank attention matrix }\\bar{A} \in \mathbb{R}^{k \times d}} \mathbf{F}_i \mathbf{X}_v\mathbf{W}^v_i \end{aligned}$$
+$$\begin{aligned} \overline{\text{head}}_i &= \text{attn}(\mathbf{X}_q\mathbf{W}^q_i, \mathbf{E}_i\mathbf{X}_k\mathbf{W}^k_i, \mathbf{F}_i\mathbf{X}_v\mathbf{W}^v_i) \\ &= \underbrace{\text{softmax}\Big( \frac{\mathbf{X}_q\mathbf{W}^q_i (\mathbf{E}_i \mathbf{X}_k\mathbf{W}^k_i)^\top}{\sqrt{d}} \Big)}_{\text{low rank attention matrix }\bar{A} \in \mathbb{R}^{k \times d}} \mathbf{F}_i \mathbf{X}_v\mathbf{W}^v_i \end{aligned}$$
 
 Additional techniques can be applied to further improve efficiency of Linformer:
 

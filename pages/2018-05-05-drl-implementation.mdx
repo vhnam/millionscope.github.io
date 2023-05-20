@@ -103,7 +103,7 @@ We interact with the env through two major api calls:
 
 [Q-learning](https://lilianweng.github.io/posts/2018-02-19-rl-overview/#q-learning-off-policy-td-control) (Watkins & Dayan, 1992) learns the action value (“Q-value”) and update it according to the [Bellman equation](https://lilianweng.github.io/posts/2018-02-19-rl-overview/#bellman-equations). The key point is while estimating what is the next action, it does not follow the current policy but rather adopt the best Q value (the part in red) independently.
 
-$$ Q(s, a) \\leftarrow (1 - \\alpha) Q(s, a) + \\alpha (r + \\gamma \color{red}{\max_{a' \in \mathcal{A}} Q(s', a')}) $$
+$$ Q(s, a) \\leftarrow (1 - \alpha) Q(s, a) + \alpha (r + \\gamma \color{red}{\max_{a' \in \mathcal{A}} Q(s', a')}) $$
 
 In a naive implementation, the Q value for all (s, a) pairs can be simply tracked in a dict. No complicated machine learning model is involved yet.
 
@@ -199,7 +199,7 @@ Often we start with a high `epsilon` and gradually decrease it during the traini
 
 The main loss function looks like the following,
 
-$$ \begin{aligned} & Y(s, a, r, s') = r + \\gamma \max_{a'} Q_{\\theta^{-}}(s', a') \\ & \mathcal{L}(\\theta) = \mathbb{E}_{(s, a, r, s') \sim U(D)} \Big\[ \big( Y(s, a, r, s') - Q_\\theta(s, a) \big)^2 \Big\] \end{aligned} $$
+$$ \begin{aligned} & Y(s, a, r, s') = r + \\gamma \max_{a'} Q_{\theta^{-}}(s', a') \\ & \mathcal{L}(\theta) = \mathbb{E}_{(s, a, r, s') \sim U(D)} \Big\[ \big( Y(s, a, r, s') - Q_\theta(s, a) \big)^2 \Big\] \end{aligned} $$
 
 The Q network can be a multi-layer dense neural network, a convolutional network, or a recurrent network, depending on the problem. In the [full implementation](https://github.com/lilianweng/deep-reinforcement-learning-gym/blob/master/playground/policies/dqn.py) of the DQN policy, it is determined by the `model_type` parameter, one of (“dense”, “conv”, “lstm”).
 
@@ -282,13 +282,13 @@ The target network is updated by copying the primary Q network parameters over e
 
 ## Double Q-Learning[#](#double-q-learning)
 
-If we look into the standard form of the Q value target, $Y(s, a) = r + \\gamma \max_{a' \in \mathcal{A}} Q_\\theta (s', a')$, it is easy to notice that we use $Q_\\theta$ to select the best next action at state s' and then apply the action value predicted by the same $Q_\\theta$. This two-step reinforcing procedure could potentially lead to overestimation of an (already) overestimated value, further leading to training instability. The solution proposed by double Q-learning ([Hasselt, 2010](http://papers.nips.cc/paper/3964-double-q-learning.pdf)) is to decouple the action selection and action value estimation by using two Q networks, $Q_1$ and $Q_2$: when $Q_1$ is being updated, $Q_2$ decides the best next action, and vice versa.
+If we look into the standard form of the Q value target, $Y(s, a) = r + \\gamma \max_{a' \in \mathcal{A}} Q_\theta (s', a')$, it is easy to notice that we use $Q_\theta$ to select the best next action at state s' and then apply the action value predicted by the same $Q_\theta$. This two-step reinforcing procedure could potentially lead to overestimation of an (already) overestimated value, further leading to training instability. The solution proposed by double Q-learning ([Hasselt, 2010](http://papers.nips.cc/paper/3964-double-q-learning.pdf)) is to decouple the action selection and action value estimation by using two Q networks, $Q_1$ and $Q_2$: when $Q_1$ is being updated, $Q_2$ decides the best next action, and vice versa.
 
 $$ Y_1(s, a, r, s') = r + \\gamma Q_1 (s', \arg\max_{a' \in \mathcal{A}}Q_2(s', a'))\\ Y_2(s, a, r, s') = r + \\gamma Q_2 (s', \arg\max_{a' \in \mathcal{A}}Q_1(s', a')) $$
 
 To incorporate double Q-learning into DQN, the minimum modification ([Hasselt, Guez, & Silver, 2016](https://arxiv.org/pdf/1509.06461.pdf)) is to use the primary Q network to select the action while the action value is estimated by the target network:
 
-$$ Y(s, a, r, s') = r + \\gamma Q_{\\theta^{-}}(s', \arg\max_{a' \in \mathcal{A}} Q_\\theta(s', a')) $$
+$$ Y(s, a, r, s') = r + \\gamma Q_{\theta^{-}}(s', \arg\max_{a' \in \mathcal{A}} Q_\theta(s', a')) $$
 
 In the code, we add a new tensor for getting the action selected by the primary Q network as the input and a tensor operation for selecting this action.
 
@@ -410,9 +410,9 @@ The [actor-critic](https://lilianweng.github.io/posts/2018-04-08-policy-gradient
 
 1.  Initialize the actor network, $\pi(a \vert s)$ and the critic, $V(s)$
 2.  Collect a new transition (s, a, r, s'): Sample the action $a \sim \pi(a \vert s)$ for the current state s, and get the reward r and the next state s'.
-3.  Compute the TD target during episode rollout, $G_t = r + \\gamma V(s')$ and TD error, $\\delta_t = r + \\gamma V(s') - V(s)$.
+3.  Compute the TD target during episode rollout, $G_t = r + \\gamma V(s')$ and TD error, $\delta_t = r + \\gamma V(s') - V(s)$.
 4.  Update the critic network by minimizing the critic loss: $L_c = (V(s) - G_t)$.
-5.  Update the actor network by minimizing the actor loss: $L_a = - \\delta_t \log \pi(a \vert s)$.
+5.  Update the actor network by minimizing the actor loss: $L_a = - \delta_t \log \pi(a \vert s)$.
 6.  Set s' = s and repeat step 2.-5.
 
 Overall the implementation looks pretty similar to REINFORCE with an extra critic network. The full implementation is here.

@@ -201,12 +201,12 @@ Fig. 13. Performance of VC-GPT on the MS COCO test set, in comparison with other
 
 **MERLOT** ([Zellers, et al. 2021](https://arxiv.org/abs/2106.02636)) is trained with 6 millions of YouTube videos with transcribed speech ([YT-Temporal-180M](https://rowanzellers.com/merlot/#data)) to learn both spatial (frame-level) and temporal (video-level) objectives and demonstrated strong performance on VQA and visual reasoning tasks when fine-tuned.
 
-Each video $\mathcal{V}$ is split into multiple segments $\{ \\boldsymbol{s}_t \}$, each segment $\\boldsymbol{s}_t$ containing an image frame $\mathbf{I}_t$ extracted from the middle timestep and $L=32$ tokens of words associated. Images are encoded by a learned image encoder and words are encoded using a learned embedding. Then both are encoded together within a joint vision-language transformer.
+Each video $\mathcal{V}$ is split into multiple segments $\{ \boldsymbol{s}_t \}$, each segment $\boldsymbol{s}_t$ containing an image frame $\mathbf{I}_t$ extracted from the middle timestep and $L=32$ tokens of words associated. Images are encoded by a learned image encoder and words are encoded using a learned embedding. Then both are encoded together within a joint vision-language transformer.
 
 There are 3 learning objectives in MERLOT:
 
 1.  _Masked language modeling_ (MLM) is useful especially because in videos, people tend to ramble, resulting in many repeated keywords or filler words.
-2.  _Contrastive frame-caption matching_ uses the language-only part from the joint vision-language transformer. Matched representations for each frame $\mathbf{I}_t$ and caption $\\boldsymbol{w}_t$ are treated as positive examples, while the negative examples come from all other frame-caption pairs in the minibatch.
+2.  _Contrastive frame-caption matching_ uses the language-only part from the joint vision-language transformer. Matched representations for each frame $\mathbf{I}_t$ and caption $\boldsymbol{w}_t$ are treated as positive examples, while the negative examples come from all other frame-caption pairs in the minibatch.
 3.  _Temporal reordering_ learns temporal reasoning: scramble random $i$ frames and replace the segment-level position embeddings with a random and unique position embedding. The random position embeddings are learned, allowing the model to unshuffle these “‘shuffled'” frames conditioned on correctly-ordered ones. The loss is to predict whether $t_i < t_j$ or $t_j < t_i$ for each frame-frame pair.
 
 ![](MERLOT.png)
@@ -263,7 +263,7 @@ Fig. 19. Overview of CoCa training framework.
 
 CoCa is pretrained from _scratch_, using web-scale alt-text data [ALIGN](#pair-image-text-datasets) and annotated images by treating all labels as texts in [JTB-3B](#pair-image-text-datasets).
 
-There are two major training components in CoCa. The final loss is a weighted sum of the following two losses, with weight scalars $\\lambda_\text{cap}=2.0, \\lambda_\text{con} = 1.0$.:
+There are two major training components in CoCa. The final loss is a weighted sum of the following two losses, with weight scalars $\lambda_\text{cap}=2.0, \lambda_\text{con} = 1.0$.:
 
 1.  $\mathcal{L}_\text{con}$ - _Dual-encoder contrastive learning_ optimizes the symmetric contrastive learning loss, similar to CLIP.
 2.  $\mathcal{L}_\text{cap}$ - _Encoder-decoder captioning_ has the decoder predict the caption based on the latent encoded features from the image encoder, by optimizing an autoregressive loss. The text decoder is decoupled into two components, _unimodal_ and _multimodal_; a good balance is to split the decoder by half for these two components:
@@ -293,9 +293,9 @@ Finally it is possible to solve vision language tasks by stitching pretrained la
 
 The next token $x_t$ at a time step $t$ is selected according to the following equation. Model confidence and degeneration penalty ([Su et al. 2022](https://arxiv.org/abs/2202.06417)) are added to avoid corrupted generation from LM.
 
-$$ \begin{aligned} & x_t = \arg\max_{v \in \mathcal{V}^{(k)}} \big\{ (1-\\alpha) \\underbrace{p(v \vert \\boldsymbol{x}_{<t})}_\text{model confidence} - \\alpha \\underbrace{\max_{1 \leq j \leq t-1} { \text{cosine}(h_v, h_{x_j})}}_\text{degeneration penalty} + \\beta \\underbrace{f_\text{magic}(v \vert \mathcal{I}, \\boldsymbol{x}_{<t}, \mathcal{V}^{(k)})}_\text{magic score} \big\} \\ \text{where } & f_\text{magic} ( v \vert \mathcal{I}, \mathbf{x}_{<t}, \mathcal{V}^{(k)} ) = \frac{ \exp(\text{CLIP}(\mathcal{I}, \[\\boldsymbol{x}_{<t}:v\])) }{ \sum_{z \in \mathcal{V}^{(k)}} \exp(\text{CLIP}(\mathcal{I}, \[\\boldsymbol{x}_{<t}:z\])) } = \frac{ \exp\big({h^\text{image}(\mathcal{I})}^\top h^\text{text}(\[\\boldsymbol{x}_{<t}:v\])\big) }{ \sum_{z \in \mathcal{V}^{(k)}} \exp\big({h^\text{image}(\mathcal{I})}^\top h^\text{text}(\[\\boldsymbol{x}_{<t}:z\])\big) } \end{aligned} $$
+$$ \begin{aligned} & x_t = \arg\max_{v \in \mathcal{V}^{(k)}} \big\{ (1-\alpha) \underbrace{p(v \vert \boldsymbol{x}_{<t})}_\text{model confidence} - \alpha \underbrace{\max_{1 \leq j \leq t-1} { \text{cosine}(h_v, h_{x_j})}}_\text{degeneration penalty} + \beta \underbrace{f_\text{magic}(v \vert \mathcal{I}, \boldsymbol{x}_{<t}, \mathcal{V}^{(k)})}_\text{magic score} \big\} \\ \text{where } & f_\text{magic} ( v \vert \mathcal{I}, \mathbf{x}_{<t}, \mathcal{V}^{(k)} ) = \frac{ \exp(\text{CLIP}(\mathcal{I}, \[\boldsymbol{x}_{<t}:v\])) }{ \sum_{z \in \mathcal{V}^{(k)}} \exp(\text{CLIP}(\mathcal{I}, \[\boldsymbol{x}_{<t}:z\])) } = \frac{ \exp\big({h^\text{image}(\mathcal{I})}^\top h^\text{text}(\[\boldsymbol{x}_{<t}:v\])\big) }{ \sum_{z \in \mathcal{V}^{(k)}} \exp\big({h^\text{image}(\mathcal{I})}^\top h^\text{text}(\[\boldsymbol{x}_{<t}:z\])\big) } \end{aligned} $$
 
-where $\mathcal{I}$ is the input image; $\mathcal{V}^{(k)}$ contains top-$k$ possible tokens predicted by the language model $p$; $\\boldsymbol{x}_{<t}$ refers to the past generated tokens before time step $t$; $h_v$ is the representation of the token $v$ computed by LM conditioned on the concatenation of $\\boldsymbol{x}_{<t}$ and $v$; $h^\text{image}(.)$ and $h^\text{text}(.)$ are embeddings generated by CLIP image and text encoders, respectively.
+where $\mathcal{I}$ is the input image; $\mathcal{V}^{(k)}$ contains top-$k$ possible tokens predicted by the language model $p$; $\boldsymbol{x}_{<t}$ refers to the past generated tokens before time step $t$; $h_v$ is the representation of the token $v$ computed by LM conditioned on the concatenation of $\boldsymbol{x}_{<t}$ and $v$; $h^\text{image}(.)$ and $h^\text{text}(.)$ are embeddings generated by CLIP image and text encoders, respectively.
 
 MAGiC has decent performance compared to other unsupervised approaches, but still has big gaps with supervised methods.
 
