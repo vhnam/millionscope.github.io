@@ -275,11 +275,11 @@ $$ W_{t+1} \\gets W_t - \\gamma \frac{\\partial\mathcal{L}}{\\partial\\widetilde
 
 The extended version, **SR-STE** (Sparse-refined STE), updates the dense weights $W$ by:
 
-$$ W_{t+1} \\gets W_t - \\gamma \frac{\\partial\mathcal{L}}{\\partial\\widetilde{W}} + \\lambda_W (\\bar{\mathcal{E}} \\odot W_t) $$ where $\\bar{\mathcal{E}}$ is the mask matrix for $\\widetilde{W}$ and $\\odot$ is element-wise multiplication. SR-STE is proposed to prevent large change in the binary mask by (1) restricting the values of weights pruned in $\\widetilde{W}_t$, and (2) promoting the non-pruned weights in $\\widetilde{W}_t$.
+$$ W_{t+1} \\gets W_t - \\gamma \frac{\\partial\mathcal{L}}{\\partial\\widetilde{W}} + \\lambda_W (\\bar{\mathcal{E}} \odot W_t) $$ where $\\bar{\mathcal{E}}$ is the mask matrix for $\\widetilde{W}$ and $\odot$ is element-wise multiplication. SR-STE is proposed to prevent large change in the binary mask by (1) restricting the values of weights pruned in $\\widetilde{W}_t$, and (2) promoting the non-pruned weights in $\\widetilde{W}_t$.
 
 ![](SR-STE.png)
 
-Fig. 11. Comparison of STE and SR-STE. $\\odot$ is element-wise product; $\otimes$ is matrix multiplication. (Image source: [Zhou & Ma, et al. 2021](https://arxiv.org/abs/2102.04010))
+Fig. 11. Comparison of STE and SR-STE. $\odot$ is element-wise product; $\otimes$ is matrix multiplication. (Image source: [Zhou & Ma, et al. 2021](https://arxiv.org/abs/2102.04010))
 
 Different from STE or SR-STE, the **Top-KAST** ([Jayakumar et al. 2021](https://arxiv.org/abs/2106.03517)) method can preserve constant sparsity throughout training in both the forward and backward-passes but does not require forward passes with dense parameters or dense gradients.
 
@@ -316,21 +316,21 @@ Fig. 13. The speed of decoding a single token (unbatched inference) by a transfo
 
 **Sparse FFN layer**: Each FFN layer contains 2 MLP and one ReLU in-between. Because ReLU will introduce a lot of zeros, they implement a fixed structure on activations to enforce only 1 non-zero value in one block of $N$ elements. The sparsity pattern is dynamic, different for each token.
 
-$$ \begin{aligned} Y_\text{sparse} &= \max(0, xW_1 + b_1) \\odot \text{Controller}(x) \\ \text{SparseFFN}(x) &= Y_\text{sparse} W_2 + b_2 \\ \text{Controller}(x) &= \arg\max(\text{Reshape}(x C_1 C_2, (-1, N))) \end{aligned} $$
+$$ \begin{aligned} Y_\text{sparse} &= \max(0, xW_1 + b_1) \odot \text{Controller}(x) \\ \text{SparseFFN}(x) &= Y_\text{sparse} W_2 + b_2 \\ \text{Controller}(x) &= \arg\max(\text{Reshape}(x C_1 C_2, (-1, N))) \end{aligned} $$
 
-where each activation in $Y_\text{sparse}$ corresponds to one column in $W_1$ and one row in $W_2$. The controller is implemented as a low-rank bottleneck dense layer, $C_1 \in \mathbb{R}^{d_\text{model} \\times d_\text{lowrank}}, C_2 \in \mathbb{R}^{d_\text{lowrank} \\times d_\text{ff}}$ and $d_\text{lowrank} = d_\text{model} / N$. It uses $\arg\max$ for inference to select which columns should be non-zero and Gumbel-softmax trick ([Jang et al. 2016](https://arxiv.org/abs/1611.01144)) during training. Because we can compute $\text{Controller}(x)$ before loading FFN weight matrices, we know which columns will be zeroed out and thus choose _not to load_ them into memory for inference speedup.
+where each activation in $Y_\text{sparse}$ corresponds to one column in $W_1$ and one row in $W_2$. The controller is implemented as a low-rank bottleneck dense layer, $C_1 \in \mathbb{R}^{d_\text{model} \times d_\text{lowrank}}, C_2 \in \mathbb{R}^{d_\text{lowrank} \times d_\text{ff}}$ and $d_\text{lowrank} = d_\text{model} / N$. It uses $\arg\max$ for inference to select which columns should be non-zero and Gumbel-softmax trick ([Jang et al. 2016](https://arxiv.org/abs/1611.01144)) during training. Because we can compute $\text{Controller}(x)$ before loading FFN weight matrices, we know which columns will be zeroed out and thus choose _not to load_ them into memory for inference speedup.
 
 ![](sparse-FFN.png)
 
-Fig. 14. (a) Sparse FFN layer; columns in red are not loaded in memory for faster inference. (b) Sparse FFN controller for 1:4 sparsity. (Image source: [Jaszczur et al. 2021](https://arxiv.org/abs/2111.12763)) \*Lilian's side note\*: Fig (a) in the illustration from the paper is actually $Y_\text{sparse} = \max\\big(0, (xW_1 + b_1) \\odot \text{Controller}(x)\\big)$, but it doesn't change the results.
+Fig. 14. (a) Sparse FFN layer; columns in red are not loaded in memory for faster inference. (b) Sparse FFN controller for 1:4 sparsity. (Image source: [Jaszczur et al. 2021](https://arxiv.org/abs/2111.12763)) \*Lilian's side note\*: Fig (a) in the illustration from the paper is actually $Y_\text{sparse} = \max\big(0, (xW_1 + b_1) \odot \text{Controller}(x)\big)$, but it doesn't change the results.
 
 **Sparse QKV (attention) layer**: In the attention layer, the dimensionality $d_\text{model}$ is divided into $S$ modules, each of size $M=d_\text{model} /S$. To make sure each subdivision can access any part of the embedding, Scaling Transformer introduces a multiplicative layer (i.e., a multiplication layer multiplies inputs from multiple neural network layers element-wise) which can represent arbitrary permutation but contains fewer parameters than a dense layer.
 
-Given an input vector $x \in \mathbb{R}^{d_\text{model}}$, the multiplicative layer outputs $y \in \mathbb{R}^{S \\times M}$:
+Given an input vector $x \in \mathbb{R}^{d_\text{model}}$, the multiplicative layer outputs $y \in \mathbb{R}^{S \times M}$:
 
-$$ y_{s,m} = \sum_i x_i D_{i,s} E_{i,m} \quad\text{where }D \in \mathbb{R}^{d_\text{model} \\times S}, D \in \mathbb{R}^{d_\text{model} \\times M} $$
+$$ y_{s,m} = \sum_i x_i D_{i,s} E_{i,m} \quad\text{where }D \in \mathbb{R}^{d_\text{model} \times S}, D \in \mathbb{R}^{d_\text{model} \times M} $$
 
-The output of the multiplicative layer is a tensor of size $\in \mathbb{R}^{\text{batch size}\\times \text{length} \\times S \\times M}$. It then gets processed by a two-dimensional convolutional layer, where $\text{length}$ and $S$ are treated as the height and width of an image. Such a convolution layer further reduces the parameter count and computation time of attention layer.
+The output of the multiplicative layer is a tensor of size $\in \mathbb{R}^{\text{batch size}\times \text{length} \times S \times M}$. It then gets processed by a two-dimensional convolutional layer, where $\text{length}$ and $S$ are treated as the height and width of an image. Such a convolution layer further reduces the parameter count and computation time of attention layer.
 
 ![](sparse-QKV.png)
 
@@ -430,7 +430,7 @@ Memory Saving Designs[#](#memory-saving-designs)
 
 Memory saving designs refer to changes of the architecture to use less memory.
 
-*   [Linformer](https://lilianweng.github.io/posts/2023-01-27-the-transformer-family-v2/#low-rank-attention) projects the length dimension of keys and values to a lower-dimensional representation ($N \to k$) and thus the memory complexity is reduced from $N \\times N$ to $N \\times k$.
+*   [Linformer](https://lilianweng.github.io/posts/2023-01-27-the-transformer-family-v2/#low-rank-attention) projects the length dimension of keys and values to a lower-dimensional representation ($N \to k$) and thus the memory complexity is reduced from $N \times N$ to $N \times k$.
 *   [Shazeer (2019)](https://arxiv.org/abs/1911.02150) proposed _multi-query attention_ which has the keys and values shared across different attention “heads”, greatly reducing the size of these tensors and the memory cost.
 *   [Random feature attention and Performer](https://lilianweng.github.io/posts/2023-01-27-the-transformer-family-v2/#low-rank-attention) use [kernel methods]((https://lilianweng.github.io/posts/2022-09-08-ntk/#kernel--kernel-methods)) to achieve a cheaper mathematical format of the self-attention mechanism.
 

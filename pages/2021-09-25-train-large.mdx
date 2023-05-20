@@ -159,7 +159,7 @@ Fig. 10. Illustration of a mixture-of-experts (MoE) layer. Only 2 out of $n$ exp
 
 A simple choice of $G$ is to multiply the input with a trainable weight matrix $G_g$ and then do softmax: $G_\sigma (x) = \text{softmax}(x W_g)$. However, this produces a dense control vector for gating and does not help save computation resources because we don't need to evaluate an expert only when $G^{(i)}(x)=0$. Thus the MoE layer only keeps the top $k$ values. It also adds tunable Gaussian noise into $G$ to improve load balancing. This mechanism is called _noisy top-k gating_.
 
-$$ \begin{aligned} G(x) &= \text{softmax}( \text{topk}(H(x), k)) \\ H^{(i)}(x) &= (xW_g)^{(i)} + \\epsilon \cdot \text{softplus}((xW_\text{noise})^{(i)} ); \quad \\epsilon \\sim \mathcal{N}(0, \mathbf{1}) \\ \text{topk}^{(i)}(v, k) &= \begin{cases} v^{(i)} & \text{if }v^{(i)}\text{ is in the top }k\text{ elements of }v \\ -\infty & \text{otherwise} \end{cases} \end{aligned} $$
+$$ \begin{aligned} G(x) &= \text{softmax}( \text{topk}(H(x), k)) \\ H^{(i)}(x) &= (xW_g)^{(i)} + \\epsilon \cdot \text{softplus}((xW_\text{noise})^{(i)} ); \quad \\epsilon \sim \mathcal{N}(0, \mathbf{1}) \\ \text{topk}^{(i)}(v, k) &= \begin{cases} v^{(i)} & \text{if }v^{(i)}\text{ is in the top }k\text{ elements of }v \\ -\infty & \text{otherwise} \end{cases} \end{aligned} $$
 
 where the superscript $v^{(i)}$ denotes the i-th dimension of the vector $v$. The function $\text{topk}(., k)$ selected the top $k$ dimensions with highest values by setting other dimensions to $-\infty$.
 
@@ -210,15 +210,15 @@ Both GShard top-2 and Switch Transformer top-1 depend on _token choice_, where e
 
 **Export Choice (EC)** ([Zhou et al. 2022](https://arxiv.org/abs/2202.09368)) routing instead enables each expert to select the top-$k$ tokens. In this way, each expert naturally guarantees a fixed capacity and each token may be routed to multiple experts. EC can achieve perfect load balancing and is shown to improve training convergence by 2x.
 
-Given $e$ experts and an input matrix $X \in \mathbb{R}^{n \\times d}$, the token-to-expert affinity scores are computed by: $$ S = \text{softmax}(X \cdot W_g), \text{where } W_g \in \mathbb{R}^{d \\times e}, S \in \mathbb{R}^{n \\times e} $$
+Given $e$ experts and an input matrix $X \in \mathbb{R}^{n \times d}$, the token-to-expert affinity scores are computed by: $$ S = \text{softmax}(X \cdot W_g), \text{where } W_g \in \mathbb{R}^{d \times e}, S \in \mathbb{R}^{n \times e} $$
 
-A token-to-expert assignment is represented by three matrices, $I, G \in \mathbb{R}^{e\\times k}$ and $P \in \mathbb{R}^{e \\times k \\times n}$. $I\[i,j\]$ annotates which token is the $j$-th selection by the $i$-th expert. The gating matrix $G$ stores the routing weights of selected tokens. $P$ is the one-hot version of $I$, used to produce the input matrix ($P \cdot X \in \mathbb{R}^{e \\times k \\times d}$) for the gated FFN layer. $$ G, I = \text{top-k}(S^\top, k)\quad P = \text{one-hot}(I) $$
+A token-to-expert assignment is represented by three matrices, $I, G \in \mathbb{R}^{e\times k}$ and $P \in \mathbb{R}^{e \times k \times n}$. $I\[i,j\]$ annotates which token is the $j$-th selection by the $i$-th expert. The gating matrix $G$ stores the routing weights of selected tokens. $P$ is the one-hot version of $I$, used to produce the input matrix ($P \cdot X \in \mathbb{R}^{e \times k \times d}$) for the gated FFN layer. $$ G, I = \text{top-k}(S^\top, k)\quad P = \text{one-hot}(I) $$
 
 One regularization that export choice routing explored is to limit the maximum number of experts per token.
 
 $$ \begin{aligned} & \max_A \langle S^\top, A\rangle + \\lambda H(A) \\ \text{s.t.} & \\forall i: \sum_{j'} A\[i, j'\] = k,\quad \\forall j: \sum_{i'} A\[i', j\] \leq b,\quad \\forall i,j: 0 \leq A\[i,j\] \leq 1 \end{aligned} $$
 
-where each entry $A\[i,j\]$ in $A \in \mathbb{R}^{e \\times n}$ marks whether the $i$-the expert selects the $j$-th token. Solving this is non-trivial. The paper used [Dykstra's algorithm](https://projecteuclid.org/journals/annals-of-probability/volume-13/issue-3/An-Iterative-Procedure-for-Obtaining-I-Projections-onto-the-Intersection/10.1214/aop/1176992918.full) that runs a sequence of multiple iterative computation steps. Capped expert choice results in a slight decrease in the fine-tuning performance in the experiments.
+where each entry $A\[i,j\]$ in $A \in \mathbb{R}^{e \times n}$ marks whether the $i$-the expert selects the $j$-th token. Solving this is non-trivial. The paper used [Dykstra's algorithm](https://projecteuclid.org/journals/annals-of-probability/volume-13/issue-3/An-Iterative-Procedure-for-Obtaining-I-Projections-onto-the-Intersection/10.1214/aop/1176992918.full) that runs a sequence of multiple iterative computation steps. Capped expert choice results in a slight decrease in the fine-tuning performance in the experiments.
 
 The parameter $k$ is determined by $k=nc/e$, where $n$ is the total number of tokens in one batch and $c$ is a capacity factor indicating the average number of experts used by one token. The paper used $c=2$ in most experiments, but EC with $c=1$ still outperforms the top-1 token choice gating. Interestingly, $c=0.5$ only marginally hurts the training performance.
 

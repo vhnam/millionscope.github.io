@@ -65,7 +65,7 @@ In this post, we focus on the case when each desired task is a supervised learni
 
 A good meta-learning model should be trained over a variety of learning tasks and optimized for the best performance on a distribution of tasks, including potentially unseen tasks. Each task is associated with a dataset $\mathcal{D}$, containing both feature vectors and true labels. The optimal model parameters are:
 
-$$ \\theta^\* = \arg\min_\\theta \mathbb{E}_{\mathcal{D}\\sim p(\mathcal{D})} \[\mathcal{L}_\\theta(\mathcal{D})\] $$
+$$ \\theta^\* = \arg\min_\\theta \mathbb{E}_{\mathcal{D}\sim p(\mathcal{D})} \[\mathcal{L}_\\theta(\mathcal{D})\] $$
 
 It looks very similar to a normal learning task, but _one dataset_ is considered as _one data sample_.
 
@@ -164,7 +164,7 @@ Fig. 2. The architecture of convolutional siamese neural network for few-show im
 3.  The distance is converted to a probability $p$ by a linear feedforward layer and sigmoid. It is the probability of whether two images are drawn from the same class.
 4.  Intuitively the loss is cross entropy because the label is binary.
 
-$$ \begin{aligned} p(\mathbf{x}_i, \mathbf{x}_j) &= \sigma(\mathbf{W}\vert f_\\theta(\mathbf{x}_i) - f_\\theta(\mathbf{x}_j) \vert) \\ \mathcal{L}(B) &= \sum_{(\mathbf{x}_i, \mathbf{x}_j, y_i, y_j)\in B} \mathbf{1}_{y_i=y_j}\\log p(\mathbf{x}_i, \mathbf{x}_j) + (1-\mathbf{1}_{y_i=y_j})\\log (1-p(\mathbf{x}_i, \mathbf{x}_j)) \end{aligned} $$
+$$ \begin{aligned} p(\mathbf{x}_i, \mathbf{x}_j) &= \sigma(\mathbf{W}\vert f_\\theta(\mathbf{x}_i) - f_\\theta(\mathbf{x}_j) \vert) \\ \mathcal{L}(B) &= \sum_{(\mathbf{x}_i, \mathbf{x}_j, y_i, y_j)\in B} \mathbf{1}_{y_i=y_j}\log p(\mathbf{x}_i, \mathbf{x}_j) + (1-\mathbf{1}_{y_i=y_j})\log (1-p(\mathbf{x}_i, \mathbf{x}_j)) \end{aligned} $$
 
 Images in the training batch $B$ can be augmented with distortion. Of course, you can replace the L1 distance with other distance metric, L2, cosine, etc. Just make sure they are differential and then everything else works the same.
 
@@ -243,7 +243,7 @@ $$ P(y=c\vert\mathbf{x})=\text{softmax}(-d_\\varphi(f_\\theta(\mathbf{x}), \math
 
 where $d_\\varphi$ can be any distance function as long as $\\varphi$ is differentiable. In the paper, they used the squared euclidean distance.
 
-The loss function is the negative log-likelihood: $\mathcal{L}(\\theta) = -\\log P_\\theta(y=c\vert\mathbf{x})$.
+The loss function is the negative log-likelihood: $\mathcal{L}(\\theta) = -\log P_\\theta(y=c\vert\mathbf{x})$.
 
 # Model-Based[#](#model-based)
 
@@ -259,7 +259,7 @@ As a quick recap, NTM couples a controller neural network with external memory s
 
 ![](NTM.png)
 
-Fig. 6. The architecture of Neural Turing Machine (NTM). The memory at time t, $\mathbf{M}\\_t$ is a matrix of size $N \\times M$, containing N vector rows and each has M dimensions.
+Fig. 6. The architecture of Neural Turing Machine (NTM). The memory at time t, $\mathbf{M}\\_t$ is a matrix of size $N \times M$, containing N vector rows and each has M dimensions.
 
 ### MANN for Meta-Learning[#](#mann-for-meta-learning)
 
@@ -320,7 +320,7 @@ In MetaNet, loss gradients are used as _meta information_ to populate models tha
 
 ![](combine-slow-fast-weights.png)
 
-Fig. 8. Combining slow and fast weights in a MLP. $\\bigoplus$ is element-wise sum. (Image source: [original paper](https://arxiv.org/abs/1703.00837)).
+Fig. 8. Combining slow and fast weights in a MLP. $\bigoplus$ is element-wise sum. (Image source: [original paper](https://arxiv.org/abs/1703.00837)).
 
 ### Model Components[#](#model-components)
 
@@ -350,13 +350,13 @@ Fig.9. The MetaNet architecture.
     for $t = 1, \dots, K$:
 
     - a. Compute a loss for representation learning; i.e., cross entropy for the verification task:  
-      $\mathcal{L}^\text{emb}_t = \mathbf{1}_{y'_i=y'_j} \\log P_t + (1 - \mathbf{1}_{y'_i=y'_j})\\log(1 - P_t)\text{, where }P_t = \sigma(\mathbf{W}\vert f_\\theta(\mathbf{x}_{(t,1)}) - f_\\theta(\mathbf{x}_{(t,2)})\vert)$
+      $\mathcal{L}^\text{emb}_t = \mathbf{1}_{y'_i=y'_j} \log P_t + (1 - \mathbf{1}_{y'_i=y'_j})\log(1 - P_t)\text{, where }P_t = \sigma(\mathbf{W}\vert f_\\theta(\mathbf{x}_{(t,1)}) - f_\\theta(\mathbf{x}_{(t,2)})\vert)$
 
 2.  Compute the task-level fast weights: $\\theta^+ = F_w(\\nabla_\\theta \mathcal{L}^\text{emb}_1, \dots, \mathcal{L}^\text{emb}_T)$
 3.  Next go through examples in the support set $S$ and compute the example-level fast weights. Meanwhile, update the memory with learned representations.  
     for $i=1, \dots, K$:
 
-    - a. The base learner outputs a probability distribution: $P(\hat{y}_i \vert \mathbf{x}_i) = g_\phi(\mathbf{x}_i)$ and the loss can be cross-entropy or MSE: $\mathcal{L}^\text{task}_i = y'_i \\log g_\phi(\mathbf{x}'_i) + (1- y'_i) \\log (1 - g_\phi(\mathbf{x}'_i))$
+    - a. The base learner outputs a probability distribution: $P(\hat{y}_i \vert \mathbf{x}_i) = g_\phi(\mathbf{x}_i)$ and the loss can be cross-entropy or MSE: $\mathcal{L}^\text{task}_i = y'_i \log g_\phi(\mathbf{x}'_i) + (1- y'_i) \log (1 - g_\phi(\mathbf{x}'_i))$
     - b. Extract meta information (loss gradients) of the task and compute the example-level fast weights: $\phi_i^+ = G_v(\\nabla_\phi\mathcal{L}^\text{task}_i)$
       - Then store $\phi^+_i$ into $i$-th location of the “value” memory $\mathbf{M}$.
     - d. Encode the support sample into a task-specific input representation using both slow and fast weights: $r'_i = f_{\\theta, \\theta^+}(\mathbf{x}'_i)$
@@ -398,11 +398,11 @@ $$ \\theta_t = \\theta_{t-1} - \\alpha_t \\nabla_{\\theta_{t-1}}\mathcal{L}_t $$
 
 It has the same form as the cell state update in LSTM, if we set forget gate $f_t=1$, input gate $i_t = \\alpha_t$, cell state $c_t = \\theta_t$, and new cell state $\\tilde{c}_t = -\\nabla_{\\theta_{t-1}}\mathcal{L}_t$:
 
-$$ \begin{aligned} c_t &= f_t \\odot c_{t-1} + i_t \\odot \\tilde{c}_t\\ &= \\theta_{t-1} - \\alpha_t\\nabla_{\\theta_{t-1}}\mathcal{L}_t \end{aligned} $$
+$$ \begin{aligned} c_t &= f_t \odot c_{t-1} + i_t \odot \\tilde{c}_t\\ &= \\theta_{t-1} - \\alpha_t\\nabla_{\\theta_{t-1}}\mathcal{L}_t \end{aligned} $$
 
 While fixing $f_t=1$ and $i_t=\\alpha_t$ might not be the optimal, both of them can be learnable and adaptable to different datasets.
 
-$$ \begin{aligned} f_t &= \sigma(\mathbf{W}_f \cdot \[\\nabla_{\\theta_{t-1}}\mathcal{L}_t, \mathcal{L}_t, \\theta_{t-1}, f_{t-1}\] + \mathbf{b}_f) & \\scriptstyle{\text{; how much to forget the old value of parameters.}}\\ i_t &= \sigma(\mathbf{W}_i \cdot \[\\nabla_{\\theta_{t-1}}\mathcal{L}_t, \mathcal{L}_t, \\theta_{t-1}, i_{t-1}\] + \mathbf{b}_i) & \\scriptstyle{\text{; corresponding to the learning rate at time step t.}}\\ \\tilde{\\theta}_t &= -\\nabla_{\\theta_{t-1}}\mathcal{L}_t &\\ \\theta_t &= f_t \\odot \\theta_{t-1} + i_t \\odot \\tilde{\\theta}_t &\\ \end{aligned} $$
+$$ \begin{aligned} f_t &= \sigma(\mathbf{W}_f \cdot \[\\nabla_{\\theta_{t-1}}\mathcal{L}_t, \mathcal{L}_t, \\theta_{t-1}, f_{t-1}\] + \mathbf{b}_f) & \\scriptstyle{\text{; how much to forget the old value of parameters.}}\\ i_t &= \sigma(\mathbf{W}_i \cdot \[\\nabla_{\\theta_{t-1}}\mathcal{L}_t, \mathcal{L}_t, \\theta_{t-1}, i_{t-1}\] + \mathbf{b}_i) & \\scriptstyle{\text{; corresponding to the learning rate at time step t.}}\\ \\tilde{\\theta}_t &= -\\nabla_{\\theta_{t-1}}\mathcal{L}_t &\\ \\theta_t &= f_t \odot \\theta_{t-1} + i_t \odot \\tilde{\\theta}_t &\\ \end{aligned} $$
 
 ### Model Setup[#](#model-setup)
 
@@ -435,7 +435,7 @@ Fig. 11. Diagram of MAML. (Image source: [original paper](https://arxiv.org/abs/
 
 Well, the above formula only optimizes for one task. To achieve a good generalization across a variety of tasks, we would like to find the optimal $\\theta^\*$ so that the task-specific fine-tuning is more efficient. Now, we sample a new data batch with id (1) for updating the meta-objective. The loss, denoted as $\mathcal{L}^{(1)}$, depends on the mini batch (1). The superscripts in $\mathcal{L}^{(0)}$ and $\mathcal{L}^{(1)}$ only indicate different data batches, and they refer to the same loss objective for the same task.
 
-$$ \begin{aligned} \\theta^\* &= \arg\min_\\theta \sum_{\tau_i \\sim p(\tau)} \mathcal{L}_{\tau_i}^{(1)} (f_{\\theta'_i}) = \arg\min_\\theta \sum_{\tau_i \\sim p(\tau)} \mathcal{L}_{\tau_i}^{(1)} (f_{\\theta - \\alpha\\nabla_\\theta \mathcal{L}_{\tau_i}^{(0)}(f_\\theta)}) & \\ \\theta &\\leftarrow \\theta - \\beta \\nabla_{\\theta} \sum_{\tau_i \\sim p(\tau)} \mathcal{L}_{\tau_i}^{(1)} (f_{\\theta - \\alpha\\nabla_\\theta \mathcal{L}_{\tau_i}^{(0)}(f_\\theta)}) & \\scriptstyle{\text{; updating rule}} \end{aligned} $$
+$$ \begin{aligned} \\theta^\* &= \arg\min_\\theta \sum_{\tau_i \sim p(\tau)} \mathcal{L}_{\tau_i}^{(1)} (f_{\\theta'_i}) = \arg\min_\\theta \sum_{\tau_i \sim p(\tau)} \mathcal{L}_{\tau_i}^{(1)} (f_{\\theta - \\alpha\\nabla_\\theta \mathcal{L}_{\tau_i}^{(0)}(f_\\theta)}) & \\ \\theta &\\leftarrow \\theta - \\beta \\nabla_{\\theta} \sum_{\tau_i \sim p(\tau)} \mathcal{L}_{\tau_i}^{(1)} (f_{\\theta - \\alpha\\nabla_\\theta \mathcal{L}_{\tau_i}^{(0)}(f_\\theta)}) & \\scriptstyle{\text{; updating rule}} \end{aligned} $$
 
 ![](maml-algo.png)
 
@@ -451,7 +451,7 @@ $$ \begin{aligned} \\theta_0 &= \\theta_\text{meta}\\ \\theta_1 &= \\theta_0 - \
 
 Then in the outer loop, we sample a new data batch for updating the meta-objective.
 
-$$ \begin{aligned} \\theta_\text{meta} &\\leftarrow \\theta_\text{meta} - \\beta g_\text{MAML} & \\scriptstyle{\text{; update for meta-objective}} \\\[2mm\] \text{where } g_\text{MAML} &= \\nabla_{\\theta} \mathcal{L}^{(1)}(\\theta_k) &\\\[2mm\] &= \\nabla_{\\theta_k} \mathcal{L}^{(1)}(\\theta_k) \cdot (\\nabla_{\\theta_{k-1}} \\theta_k) \dots (\\nabla_{\\theta_0} \\theta_1) \cdot (\\nabla_{\\theta} \\theta_0) & \\scriptstyle{\text{; following the chain rule}} \\ &= \\nabla_{\\theta_k} \mathcal{L}^{(1)}(\\theta_k) \cdot \\Big( \\prod_{i=1}^k \\nabla_{\\theta_{i-1}} \\theta_i \\Big) \cdot I & \\ &= \\nabla_{\\theta_k} \mathcal{L}^{(1)}(\\theta_k) \cdot \\prod_{i=1}^k \\nabla_{\\theta_{i-1}} (\\theta_{i-1} - \\alpha\\nabla_\\theta\mathcal{L}^{(0)}(\\theta_{i-1})) & \\ &= \\nabla_{\\theta_k} \mathcal{L}^{(1)}(\\theta_k) \cdot \\prod_{i=1}^k (I - \\alpha\\nabla_{\\theta_{i-1}}(\\nabla_\\theta\mathcal{L}^{(0)}(\\theta_{i-1}))) & \end{aligned} $$
+$$ \begin{aligned} \\theta_\text{meta} &\\leftarrow \\theta_\text{meta} - \\beta g_\text{MAML} & \\scriptstyle{\text{; update for meta-objective}} \\\[2mm\] \text{where } g_\text{MAML} &= \\nabla_{\\theta} \mathcal{L}^{(1)}(\\theta_k) &\\\[2mm\] &= \\nabla_{\\theta_k} \mathcal{L}^{(1)}(\\theta_k) \cdot (\\nabla_{\\theta_{k-1}} \\theta_k) \dots (\\nabla_{\\theta_0} \\theta_1) \cdot (\\nabla_{\\theta} \\theta_0) & \\scriptstyle{\text{; following the chain rule}} \\ &= \\nabla_{\\theta_k} \mathcal{L}^{(1)}(\\theta_k) \cdot \Big( \\prod_{i=1}^k \\nabla_{\\theta_{i-1}} \\theta_i \Big) \cdot I & \\ &= \\nabla_{\\theta_k} \mathcal{L}^{(1)}(\\theta_k) \cdot \\prod_{i=1}^k \\nabla_{\\theta_{i-1}} (\\theta_{i-1} - \\alpha\\nabla_\\theta\mathcal{L}^{(0)}(\\theta_{i-1})) & \\ &= \\nabla_{\\theta_k} \mathcal{L}^{(1)}(\\theta_k) \cdot \\prod_{i=1}^k (I - \\alpha\\nabla_{\\theta_{i-1}}(\\nabla_\\theta\mathcal{L}^{(0)}(\\theta_{i-1}))) & \end{aligned} $$
 
 The MAML gradient is:
 
@@ -481,9 +481,9 @@ At a glance, the algorithm looks a lot like an ordinary SGD. However, because th
 
 ### The Optimization Assumption[#](#the-optimization-assumption)
 
-Assuming that a task $\tau \\sim p(\tau)$ has a manifold of optimal network configuration, $\mathcal{W}_{\tau}^\*$. The model $f_\\theta$ achieves the best performance for task $\tau$ when $\\theta$ lays on the surface of $\mathcal{W}_{\tau}^\*$. To find a solution that is good across tasks, we would like to find a parameter close to all the optimal manifolds of all tasks:
+Assuming that a task $\tau \sim p(\tau)$ has a manifold of optimal network configuration, $\mathcal{W}_{\tau}^\*$. The model $f_\\theta$ achieves the best performance for task $\tau$ when $\\theta$ lays on the surface of $\mathcal{W}_{\tau}^\*$. To find a solution that is good across tasks, we would like to find a parameter close to all the optimal manifolds of all tasks:
 
-$$ \\theta^\* = \arg\min_\\theta \mathbb{E}_{\tau \\sim p(\tau)} \[\frac{1}{2} \text{dist}(\\theta, \mathcal{W}_\tau^\*)^2\] $$
+$$ \\theta^\* = \arg\min_\\theta \mathbb{E}_{\tau \sim p(\tau)} \[\frac{1}{2} \text{dist}(\\theta, \mathcal{W}_\tau^\*)^2\] $$
 
 ![](reptile-optim.png)
 

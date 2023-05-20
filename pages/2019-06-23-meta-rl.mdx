@@ -81,17 +81,17 @@ $\mathcal{A}$
 
 A set of actions.
 
-$P_i: \mathcal{S} \\times \mathcal{A} \\times \mathcal{S} \to \mathbb{R}_{+}$
+$P_i: \mathcal{S} \times \mathcal{A} \times \mathcal{S} \to \mathbb{R}_{+}$
 
 Transition probability function.
 
-$R_i: \mathcal{S} \\times \mathcal{A} \to \mathbb{R}$
+$R_i: \mathcal{S} \times \mathcal{A} \to \mathbb{R}$
 
 Reward function.
 
 (RL^2 paper adds an extra parameter, horizon $T$, into the MDP tuple to emphasize that each MDP should have a finite horizon.)
 
-Note that common state $\mathcal{S}$ and action space $\mathcal{A}$ are used above, so that a (stochastic) policy: $\\pi_\\theta: \mathcal{S} \\times \mathcal{A} \to \mathbb{R}_{+}$ would get inputs compatible across different tasks. The test tasks are sampled from the same distribution $\mathcal{M}$ or slightly modified version.
+Note that common state $\mathcal{S}$ and action space $\mathcal{A}$ are used above, so that a (stochastic) policy: $\pi_\\theta: \mathcal{S} \times \mathcal{A} \to \mathbb{R}_{+}$ would get inputs compatible across different tasks. The test tasks are sampled from the same distribution $\mathcal{M}$ or slightly modified version.
 
 ![](meta-RL-illustration.png)
 
@@ -101,14 +101,14 @@ Fig. 2. Illustration of meta-RL, containing two optimization loops. The outer lo
 
 The overall configure of meta-RL is very similar to an ordinary RL algorithm, except that **the last reward** $r_{t-1}$ and **the last action** $a_{t-1}$ are also incorporated into the policy observation in addition to the current state $s_t$.
 
-- In RL: $\\pi_\\theta(s_t) \to$ a distribution over $\mathcal{A}$
-- In meta-RL: $\\pi_\\theta(a_{t-1}, r_{t-1}, s_t) \to$ a distribution over $\mathcal{A}$
+- In RL: $\pi_\\theta(s_t) \to$ a distribution over $\mathcal{A}$
+- In meta-RL: $\pi_\\theta(a_{t-1}, r_{t-1}, s_t) \to$ a distribution over $\mathcal{A}$
 
 The intention of this design is to feed a history into the model so that the policy can internalize the dynamics between states, rewards, and actions in the current MDP and adjust its strategy accordingly. This is well aligned with the setup in [Hochreiter's system](#back-in-2001). Both meta-RL and RL^2 implemented an LSTM policy and the LSTM's hidden states serve as a _memory_ for tracking characteristics of the trajectories. Because the policy is recurrent, there is no need to feed the last state as inputs explicitly.
 
 The training procedure works as follows:
 
-1.  Sample a new MDP, $M_i \\sim \mathcal{M}$;
+1.  Sample a new MDP, $M_i \sim \mathcal{M}$;
 2.  **Reset the hidden state** of the model;
 3.  Collect multiple trajectories and update the model weights;
 4.  Repeat from step 1.
@@ -162,11 +162,11 @@ During training, we would like to update the policy parameters with gradients as
 
 Meanwhile, let's say we have a meta-objective function $J(\tau, \\theta, \\eta)$ as a performance measure. The training process follows the principle of online cross-validation, using a sequence of consecutive experiences:
 
-1.  Starting with parameter $\\theta$, the policy $\\pi_\\theta$ is updated on the first batch of samples $\tau$, resulting in $\\theta'$.
-2.  Then we continue running the policy $\\pi_{\\theta'}$ to collect a new set of experiences $\tau'$, just following $\tau$ consecutively in time. The performance is measured as $J(\tau', \\theta', \\bar{\\eta})$ with a fixed meta-parameter $\\bar{\\eta}$.
+1.  Starting with parameter $\\theta$, the policy $\pi_\\theta$ is updated on the first batch of samples $\tau$, resulting in $\\theta'$.
+2.  Then we continue running the policy $\pi_{\\theta'}$ to collect a new set of experiences $\tau'$, just following $\tau$ consecutively in time. The performance is measured as $J(\tau', \\theta', \\bar{\\eta})$ with a fixed meta-parameter $\\bar{\\eta}$.
 3.  The gradient of meta-objective $J(\tau', \\theta', \\bar{\\eta})$ w.r.t. $\\eta$ is used to update $\\eta$:
 
-$$ \begin{aligned} \\Delta \\eta &= -\\beta \frac{\\partial J(\tau', \\theta', \\bar{\\eta})}{\\partial \\eta} \\ &= -\\beta \frac{\\partial J(\tau', \\theta', \\bar{\\eta})}{\\partial \\theta'} \frac{d\\theta'}{d\\eta} & \\scriptstyle{\text{ ; single variable chain rule.}} \\ &= -\\beta \frac{\\partial J(\tau', \\theta', \\bar{\\eta})}{\\partial \\theta'} \frac{\\partial (\\theta + f(\tau, \\theta, \\eta))}{\\partial\\eta} \\ &= -\\beta \frac{\\partial J(\tau', \\theta', \\bar{\\eta})}{\\partial \\theta'} \\Big(\frac{d\\theta}{d\\eta} + \frac{\\partial f(\tau, \\theta, \\eta)}{\\partial\\theta}\frac{d\\theta}{d\\eta} + \frac{\\partial f(\tau, \\theta, \\eta)}{\\partial\\eta}\frac{d\\eta}{d\\eta} \\Big) & \\scriptstyle{\text{; multivariable chain rule.}}\\ &= -\\beta \frac{\\partial J(\tau', \\theta', \\bar{\\eta})}{\\partial \\theta'} \\Big( \color{red}{\\big(\mathbf{I} + \frac{\\partial f(\tau, \\theta, \\eta)}{\\partial\\theta}\\big)}\frac{d\\theta}{d\\eta} + \frac{\\partial f(\tau, \\theta, \\eta)}{\\partial\\eta}\\Big) & \\scriptstyle{\text{; secondary gradient term in red.}} \end{aligned} $$
+$$ \begin{aligned} \\Delta \\eta &= -\\beta \frac{\\partial J(\tau', \\theta', \\bar{\\eta})}{\\partial \\eta} \\ &= -\\beta \frac{\\partial J(\tau', \\theta', \\bar{\\eta})}{\\partial \\theta'} \frac{d\\theta'}{d\\eta} & \\scriptstyle{\text{ ; single variable chain rule.}} \\ &= -\\beta \frac{\\partial J(\tau', \\theta', \\bar{\\eta})}{\\partial \\theta'} \frac{\\partial (\\theta + f(\tau, \\theta, \\eta))}{\\partial\\eta} \\ &= -\\beta \frac{\\partial J(\tau', \\theta', \\bar{\\eta})}{\\partial \\theta'} \Big(\frac{d\\theta}{d\\eta} + \frac{\\partial f(\tau, \\theta, \\eta)}{\\partial\\theta}\frac{d\\theta}{d\\eta} + \frac{\\partial f(\tau, \\theta, \\eta)}{\\partial\\eta}\frac{d\\eta}{d\\eta} \Big) & \\scriptstyle{\text{; multivariable chain rule.}}\\ &= -\\beta \frac{\\partial J(\tau', \\theta', \\bar{\\eta})}{\\partial \\theta'} \Big( \color{red}{\big(\mathbf{I} + \frac{\\partial f(\tau, \\theta, \\eta)}{\\partial\\theta}\big)}\frac{d\\theta}{d\\eta} + \frac{\\partial f(\tau, \\theta, \\eta)}{\\partial\\eta}\Big) & \\scriptstyle{\text{; secondary gradient term in red.}} \end{aligned} $$
 
 where $\\beta$ is the learning rate for $\\eta$.
 
@@ -182,22 +182,22 @@ $$ \begin{aligned} J(\tau, \\theta, \\eta) &= (G^\\lambda_\\eta(\tau) - v_\\thet
 
 In policy gradient algorithms, the expected total reward is maximized by updating the policy parameters $\\theta$ in the direction of estimated gradient ([Schulman et al., 2016](https://arxiv.org/abs/1506.02438)),
 
-$$ g = \mathbb{E}\[\sum_{t=0}^\infty \\Psi_t \\nabla_\\theta \\log \\pi_\\theta (a_t \mid s_t)\] $$
+$$ g = \mathbb{E}\[\sum_{t=0}^\infty \\Psi_t \\nabla_\\theta \log \pi_\\theta (a_t \mid s_t)\] $$
 
 where the candidates for $\\Psi_t$ include the trajectory return $G_t$, the Q value $Q(s_t, a_t)$, or the advantage value $A(s_t, a_t)$. The corresponding surrogate loss function for the policy gradient can be reverse-engineered:
 
-$$ L_\text{pg} = \mathbb{E}\[\sum_{t=0}^\infty \\Psi_t \\log \\pi_\\theta (a_t \mid s_t)\] $$
+$$ L_\text{pg} = \mathbb{E}\[\sum_{t=0}^\infty \\Psi_t \log \pi_\\theta (a_t \mid s_t)\] $$
 
 This loss function is a measure over a history of trajectories, $(s_0, a_0, r_0, \dots, s_t, a_t, r_t, \dots)$. **Evolved Policy Gradient** (**EPG**; [Houthooft, et al, 2018](https://papers.nips.cc/paper/7785-evolved-policy-gradients.pdf)) takes a step further by defining the policy gradient loss function as a temporal convolution (1-D convolution) over the agent's past experience, $L_\phi$. The parameters $\phi$ of the loss function network are evolved in a way that an agent can achieve higher returns.
 
 Similar to many meta-learning algorithms, EPG has two optimization loops:
 
-- In the internal loop, an agent learns to improve its policy $\\pi_\\theta$.
+- In the internal loop, an agent learns to improve its policy $\pi_\\theta$.
 - In the outer loop, the model updates the parameters $\phi$ of the loss function $L_\phi$. Because there is no explicit way to write down a differentiable equation between the return and the loss, EPG turned to [_Evolutionary Strategies_](https://en.wikipedia.org/wiki/Evolution_strategy) (ES).
 
-A general idea is to train a population of $N$ agents, each of them is trained with the loss function $L_{\phi + \sigma \\epsilon_i}$ parameterized with $\phi$ added with a small Gaussian noise $\\epsilon_i \\sim \mathcal{N}(0, \mathbf{I})$ of standard deviation $\sigma$. During the inner loop's training, EPG tracks a history of experience and updates the policy parameters according to the loss function $L_{\phi + \sigma\\epsilon_i}$ for each agent:
+A general idea is to train a population of $N$ agents, each of them is trained with the loss function $L_{\phi + \sigma \\epsilon_i}$ parameterized with $\phi$ added with a small Gaussian noise $\\epsilon_i \sim \mathcal{N}(0, \mathbf{I})$ of standard deviation $\sigma$. During the inner loop's training, EPG tracks a history of experience and updates the policy parameters according to the loss function $L_{\phi + \sigma\\epsilon_i}$ for each agent:
 
-$$ \\theta_i \\leftarrow \\theta - \\alpha_\text{in} \\nabla_\\theta L_{\phi + \sigma \\epsilon_i} (\\pi_\\theta, \tau_{t-K, \dots, t}) $$
+$$ \\theta_i \\leftarrow \\theta - \\alpha_\text{in} \\nabla_\\theta L_{\phi + \sigma \\epsilon_i} (\pi_\\theta, \tau_{t-K, \dots, t}) $$
 
 where $\\alpha_\text{in}$ is the learning rate of the inner loop and $\tau_{t-K, \dots, t}$ is a sequence of $M$ transitions up to the current time step $t$.
 
@@ -213,13 +213,13 @@ In practice, the loss $L_\phi$ is bootstrapped with an ordinary policy gradient 
 
 The [exploitation vs exploration](https://lilianweng.github.io/posts/2018-01-23-multi-armed-bandit/#exploitation-vs-exploration) dilemma is a critical problem in RL. Common ways to do exploration include $\\epsilon$-greedy, random noise on actions, or stochastic policy with built-in randomness on the action space.
 
-**MAESN** ([Gupta et al, 2018](http://papers.nips.cc/paper/7776-meta-reinforcement-learning-of-structured-exploration-strategies.pdf)) is an algorithm to learn structured action noise from prior experience for better and more effective exploration. Simply adding random noise on actions cannot capture task-dependent or time-correlated exploration strategies. MAESN changes the policy to condition on a per-task random variable $z_i \\sim \mathcal{N}(\\mu_i, \sigma_i)$, for $i$-th task $M_i$, so we would have a policy $a \\sim \\pi_\\theta(a\mid s, z_i)$. The latent variable $z_i$ is sampled once and fixed during one episode. Intuitively, the latent variable determines one type of behavior (or skills) that should be explored more at the beginning of a rollout and the agent would adjust its actions accordingly. Both the policy parameters and latent space are optimized to maximize the total task rewards. In the meantime, the policy learns to make use of the latent variables for exploration.
+**MAESN** ([Gupta et al, 2018](http://papers.nips.cc/paper/7776-meta-reinforcement-learning-of-structured-exploration-strategies.pdf)) is an algorithm to learn structured action noise from prior experience for better and more effective exploration. Simply adding random noise on actions cannot capture task-dependent or time-correlated exploration strategies. MAESN changes the policy to condition on a per-task random variable $z_i \sim \mathcal{N}(\\mu_i, \sigma_i)$, for $i$-th task $M_i$, so we would have a policy $a \sim \pi_\\theta(a\mid s, z_i)$. The latent variable $z_i$ is sampled once and fixed during one episode. Intuitively, the latent variable determines one type of behavior (or skills) that should be explored more at the beginning of a rollout and the agent would adjust its actions accordingly. Both the policy parameters and latent space are optimized to maximize the total task rewards. In the meantime, the policy learns to make use of the latent variables for exploration.
 
 In addition, the loss function includes a KL divergence between the learned latent variable and a unit Gaussian prior, $D_\text{KL}(\mathcal{N}(\\mu_i, \sigma_i)|\mathcal{N}(0, \mathbf{I}))$. On one hand, it restricts the learned latent space not too far from a common prior. On the other hand, it creates the variational evidence lower bound ([ELBO](http://users.umiacs.umd.edu/~xyang35/files/understanding-variational-lower.pdf)) for the reward function. Interestingly the paper found that $(\\mu_i, \sigma_i)$ for each task are usually close to the prior at convergence.
 
 ![](MAESN.png)
 
-Fig. 5. The policy is conditioned on a latent variable variable $z\\_i \\sim \mathcal{N}(\\mu, \sigma)$ that is sampled once every episode. Each task has different hyperparameters for the latent variable distribution, $(\\mu\\_i, \sigma\\_i)$ and they are optimized in the outer loop. (Image source: [Gupta et al, 2018](http://papers.nips.cc/paper/7776-meta-reinforcement-learning-of-structured-exploration-strategies.pdf))
+Fig. 5. The policy is conditioned on a latent variable variable $z\\_i \sim \mathcal{N}(\\mu, \sigma)$ that is sampled once every episode. Each task has different hyperparameters for the latent variable distribution, $(\\mu\\_i, \sigma\\_i)$ and they are optimized in the outer loop. (Image source: [Gupta et al, 2018](http://papers.nips.cc/paper/7776-meta-reinforcement-learning-of-structured-exploration-strategies.pdf))
 
 ## Episodic Control[#](#episodic-control)
 
@@ -290,19 +290,19 @@ The procedure above is quite similar to [PBT](https://arxiv.org/abs/1711.09846),
 
 An MDP without a reward function $R$ is known as a _Controlled Markov process_ (CMP). Given a predefined CMP, $\langle \mathcal{S}, \mathcal{A}, P\rangle$, we can acquire a variety of tasks by generating a collection of reward functions $\mathcal{R}$ that encourage the training of an effective meta-learning policy.
 
-[Gupta et al. (2018)](https://arxiv.org/abs/1806.04640) proposed two unsupervised approaches for growing the task distribution in the context of CMP. Assuming there is an underlying latent variable $z \\sim p(z)$ associated with every task, it parameterizes/determines a reward function: $r_z(s) = \\log D(z|s)$, where a “discriminator” function $D(.)$ is used to extract the latent variable from the state. The paper described two ways to construct a discriminator function:
+[Gupta et al. (2018)](https://arxiv.org/abs/1806.04640) proposed two unsupervised approaches for growing the task distribution in the context of CMP. Assuming there is an underlying latent variable $z \sim p(z)$ associated with every task, it parameterizes/determines a reward function: $r_z(s) = \log D(z|s)$, where a “discriminator” function $D(.)$ is used to extract the latent variable from the state. The paper described two ways to construct a discriminator function:
 
 - Sample random weights $\phi_\text{rand}$ of the discriminator, $D_{\phi_\text{rand}}(z \mid s)$.
 - Learn a discriminator function to encourage diversity-driven exploration. This method is introduced in more details in another sister paper “DIAYN” ([Eysenbach et al., 2018](https://arxiv.org/abs/1802.06070)).
 
-DIAYN, short for “Diversity is all you need”, is a framework to encourage a policy to learn useful skills without a reward function. It explicitly models the latent variable $z$ as a _skill_ embedding and makes the policy conditioned on $z$ in addition to state $s$, $\\pi_\\theta(a \mid s, z)$. (Ok, this part is same as [MAESN](#meta-learning-the-exploration-strategies) unsurprisingly, as the papers are from the same group.) The design of DIAYN is motivated by a few hypotheses:
+DIAYN, short for “Diversity is all you need”, is a framework to encourage a policy to learn useful skills without a reward function. It explicitly models the latent variable $z$ as a _skill_ embedding and makes the policy conditioned on $z$ in addition to state $s$, $\pi_\\theta(a \mid s, z)$. (Ok, this part is same as [MAESN](#meta-learning-the-exploration-strategies) unsurprisingly, as the papers are from the same group.) The design of DIAYN is motivated by a few hypotheses:
 
 - Skills should be diverse and lead to visitations of different states. → maximize the mutual information between states and skills, $I(S; Z)$
 - Skills should be distinguishable by states, not actions. → minimize the mutual information between actions and skills, conditioned on states $I(A; Z \mid S)$
 
 The objective function to maximize is as follows, where the policy entropy is also added to encourage diversity:
 
-$$ \begin{aligned} \mathcal{F}(\\theta) &= I(S; Z) + H\[A \mid S\] - I(A; Z \mid S) & \\ &= (H(Z) - H(Z \mid S)) + H\[A \mid S\] - (H\[A\mid S\] - H\[A\mid S, Z\]) & \\ &= H\[A\mid S, Z\] \color{green}{- H(Z \mid S) + H(Z)} & \\ &= H\[A\mid S, Z\] + \mathbb{E}_{z\\sim p(z), s\\sim\rho(s)}\[\\log p(z \mid s)\] - \mathbb{E}_{z\\sim p(z)}\[\\log p(z)\] & \\scriptstyle{\text{; can infer skills from states & p(z) is diverse.}} \\ &\\ge H\[A\mid S, Z\] + \mathbb{E}_{z\\sim p(z), s\\sim\rho(s)}\[\color{red}{\\log D_\phi(z \mid s) - \\log p(z)}\] & \\scriptstyle{\text{; according to Jensen's inequality; "pseudo-reward" in red.}} \end{aligned} $$
+$$ \begin{aligned} \mathcal{F}(\\theta) &= I(S; Z) + H\[A \mid S\] - I(A; Z \mid S) & \\ &= (H(Z) - H(Z \mid S)) + H\[A \mid S\] - (H\[A\mid S\] - H\[A\mid S, Z\]) & \\ &= H\[A\mid S, Z\] \color{green}{- H(Z \mid S) + H(Z)} & \\ &= H\[A\mid S, Z\] + \mathbb{E}_{z\sim p(z), s\sim\rho(s)}\[\log p(z \mid s)\] - \mathbb{E}_{z\sim p(z)}\[\log p(z)\] & \\scriptstyle{\text{; can infer skills from states & p(z) is diverse.}} \\ &\\ge H\[A\mid S, Z\] + \mathbb{E}_{z\sim p(z), s\sim\rho(s)}\[\color{red}{\log D_\phi(z \mid s) - \log p(z)}\] & \\scriptstyle{\text{; according to Jensen's inequality; "pseudo-reward" in red.}} \end{aligned} $$
 
 where $I(.)$ is mutual information and $H\[.\]$ is entropy measure. We cannot integrate all states to compute $p(z \mid s)$, so approximate it with $D_\phi(z \mid s)$ — that is the diversity-driven discriminator function.
 
@@ -310,7 +310,7 @@ where $I(.)$ is mutual information and $H\[.\]$ is entropy measure. We cannot in
 
 Fig. 9. DIAYN Algorithm. (Image source: [Eysenbach et al., 2019](https://arxiv.org/abs/1802.06070))
 
-Once the discriminator function is learned, sampling a new MDP for training is strainght-forward: First, sample a latent variable, $z \\sim p(z)$ and construct a reward function $r_z(s) = \\log(D(z \vert s))$. Pairing the reward function with a predefined CMP creates a new MDP.
+Once the discriminator function is learned, sampling a new MDP for training is strainght-forward: First, sample a latent variable, $z \sim p(z)$ and construct a reward function $r_z(s) = \log(D(z \vert s))$. Pairing the reward function with a predefined CMP creates a new MDP.
 
 ---
 

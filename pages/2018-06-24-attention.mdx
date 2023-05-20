@@ -248,7 +248,7 @@ Fig. 9. How a Turing machine looks like: a tape + a head that handles the tape. 
 
 **Neural Turing Machine** (**NTM**, [Graves, Wayne & Danihelka, 2014](https://arxiv.org/abs/1410.5401)) is a model architecture for coupling a neural network with external memory storage. The memory mimics the Turing machine tape and the neural network controls the operation heads to read from or write to the tape. However, the memory in NTM is finite, and thus it probably looks more like a “Neural [von Neumann](https://en.wikipedia.org/wiki/Von_Neumann_architecture) Machine”.
 
-NTM contains two major components, a _controller_ neural network and a _memory_ bank. Controller: is in charge of executing operations on the memory. It can be any type of neural network, feed-forward or recurrent. Memory: stores processed information. It is a matrix of size $N \\times M$, containing N vector rows and each has $M$ dimensions.
+NTM contains two major components, a _controller_ neural network and a _memory_ bank. Controller: is in charge of executing operations on the memory. It can be any type of neural network, feed-forward or recurrent. Memory: stores processed information. It is a matrix of size $N \times M$, containing N vector rows and each has $M$ dimensions.
 
 In one update iteration, the controller processes the input and interacts with the memory bank accordingly to generate output. The interaction is handled by a set of parallel _read_ and _write_ heads. Both read and write operations are “blurry” by softly attending to all the memory addresses.
 
@@ -413,7 +413,7 @@ The SAGAN adopts the [non-local neural network](https://arxiv.org/pdf/1711.07971
 
 Then we apply the dot-product attention to output the self-attention feature maps:
 
-$$ \begin{aligned} \\alpha_{i,j} &= \text{softmax}(f(\mathbf{x}_i)^\top g(\mathbf{x}_j)) \\ \mathbf{o}_j &= \mathbf{W}_v \\Big( \sum_{i=1}^N \\alpha_{i,j} h(\mathbf{x}_i) \\Big) \end{aligned} $$
+$$ \begin{aligned} \\alpha_{i,j} &= \text{softmax}(f(\mathbf{x}_i)^\top g(\mathbf{x}_j)) \\ \mathbf{o}_j &= \mathbf{W}_v \Big( \sum_{i=1}^N \\alpha_{i,j} h(\mathbf{x}_i) \Big) \end{aligned} $$
 
 ![](SAGAN.png)
 

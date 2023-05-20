@@ -139,7 +139,7 @@ Fig. 3. The biLSTM base model of ELMo. (Image source: recreated based on the fig
 
 The model is trained to minimize the negative log likelihood (= maximize the log likelihood for true words) in both directions:
 
-$$ \begin{aligned} \mathcal{L} = - \sum_{i=1}^n \\Big( \\log p(x_i \mid x_1, \dots, x_{i-1}; \\Theta_e, \\overrightarrow{\\Theta}_\text{LSTM}, \\Theta_s) + \\ \\log p(x_i \mid x_{i+1}, \dots, x_n; \\Theta_e, \\overleftarrow{\\Theta}_\text{LSTM}, \\Theta_s) \\Big) \end{aligned} $$
+$$ \begin{aligned} \mathcal{L} = - \sum_{i=1}^n \Big( \log p(x_i \mid x_1, \dots, x_{i-1}; \\Theta_e, \\overrightarrow{\\Theta}_\text{LSTM}, \\Theta_s) + \\ \log p(x_i \mid x_{i+1}, \dots, x_n; \\Theta_e, \\overleftarrow{\\Theta}_\text{LSTM}, \\Theta_s) \Big) \end{aligned} $$
 
 ## ELMo Representations[#](#elmo-representations)
 
@@ -196,7 +196,7 @@ Theoretically the primary prediction module can take any form, generic or task-s
 
 In sequential tagging tasks (classification for every token) like [NER](#ner) or [POS](#pos) tagging, the predictor module contains two fully connected layers and a softmax layer on the output to produce a probability distribution over class labels. For each token $\mathbf{x}_i$, we take the corresponding hidden states in two layers, $\mathbf{h}_1^{(i)}$ and $\mathbf{h}_2^{(i)}$:
 
-$$ \begin{aligned} p_\\theta(y_i \mid \mathbf{x}_i) &= \text{NN}(\mathbf{h}^{(i)}) \\ &= \text{NN}(\[\mathbf{h}_1^{(i)}; \mathbf{h}_2^{(i)}\]) \\ &= \text{softmax} \\big( \mathbf{W}\cdot\text{ReLU}(\mathbf{W'}\cdot\[\mathbf{h}_1^{(i)}; \mathbf{h}_2^{(i)}\]) + \mathbf{b} \\big) \end{aligned} $$
+$$ \begin{aligned} p_\\theta(y_i \mid \mathbf{x}_i) &= \text{NN}(\mathbf{h}^{(i)}) \\ &= \text{NN}(\[\mathbf{h}_1^{(i)}; \mathbf{h}_2^{(i)}\]) \\ &= \text{softmax} \big( \mathbf{W}\cdot\text{ReLU}(\mathbf{W'}\cdot\[\mathbf{h}_1^{(i)}; \mathbf{h}_2^{(i)}\]) + \mathbf{b} \big) \end{aligned} $$
 
 The auxiliary tasks are only fed with forward or backward LSTM state in the first layer. Because they only observe partial context, either on the left or right, they have to learn like a language model, trying to predict the next token given the context. The `fwd` and `bwd` auxiliary tasks only take one direction. The `future` and `past` tasks take one step further in forward and backward direction, respectively.
 
@@ -250,7 +250,7 @@ Fig. 7. The transformer decoder model architecture in OpenAI GPT.
 
 The loss is the negative log-likelihood, same as [ELMo](#elmo), but without backward computation. Let's say, the context window of the size $k$ is located before the target word and the loss would look like:
 
-$$ \mathcal{L}_\text{LM} = -\sum_{i} \\log p(x_i\mid x_{i-k}, \dots, x_{i-1}) $$
+$$ \mathcal{L}_\text{LM} = -\sum_{i} \log p(x_i\mid x_{i-k}, \dots, x_{i-1}) $$
 
 ## Byte Pair Encoding[#](#byte-pair-encoding)
 
@@ -271,7 +271,7 @@ The loss is to minimize the negative log-likelihood for true labels. In addition
 - (1) it helps accelerate convergence during training and
 - (2) it is expected to improve the generalization of the supervised model.
 
-$$ \begin{aligned} \mathcal{L}_\text{cls} &= \sum_{(\mathbf{x}, y) \in \mathcal{D}} \\log P(y\mid x_1, \dots, x_n) = \sum_{(\mathbf{x}, y) \in \mathcal{D}} \\log \text{softmax}(\mathbf{h}_L^{(n)}(\mathbf{x})\mathbf{W}_y) \\ \mathcal{L}_\text{LM} &= -\sum_{i} \\log p(x_i\mid x_{i-k}, \dots, x_{i-1}) \\ \mathcal{L} &= \mathcal{L}_\text{cls} + \\lambda \mathcal{L}_\text{LM} \end{aligned} $$
+$$ \begin{aligned} \mathcal{L}_\text{cls} &= \sum_{(\mathbf{x}, y) \in \mathcal{D}} \log P(y\mid x_1, \dots, x_n) = \sum_{(\mathbf{x}, y) \in \mathcal{D}} \log \text{softmax}(\mathbf{h}_L^{(n)}(\mathbf{x})\mathbf{W}_y) \\ \mathcal{L}_\text{LM} &= -\sum_{i} \log p(x_i\mid x_{i-k}, \dots, x_{i-1}) \\ \mathcal{L} &= \mathcal{L}_\text{cls} + \\lambda \mathcal{L}_\text{LM} \end{aligned} $$
 
 With similar designs, no customized model structure is needed for other end tasks (see Fig. 7). If the task input contains multiple sentences, a special delimiter token (`$`) is added between each pair of sentences. The embedding for this delimiter token is a new parameter we need to learn, but it should be pretty minimal.
 
@@ -370,7 +370,7 @@ A summary table compares differences between fine-tuning of [OpenAI GPT](#gpt) a
 
 In BERT, the WordPiece tokenization embedding size $E$ is configured to be the same as the hidden state size $H$. That is saying, if we want to increase the model size (larger $H$), we need to learn a larger tokenization embedding too, which is expensive because it depends on the vocabulary size ($V$).
 
-Conceptually, because the tokenization embedding is expected to learn _context-independent_ representation and the hidden states are _context-dependent_, it makes sense to separate the size of the hidden layers from the size of vocabulary embedding. Using factorized embedding parameterization, the large vocabulary embedding matrix of size $V \\times H$ is decomposed into two small matrices of size $V \\times E$ and $E \\times H$. Given $H \\gt E$ or even $H \\gg E$, factorization can result in significant parameter reduction.
+Conceptually, because the tokenization embedding is expected to learn _context-independent_ representation and the hidden states are _context-dependent_, it makes sense to separate the size of the hidden layers from the size of vocabulary embedding. Using factorized embedding parameterization, the large vocabulary embedding matrix of size $V \times H$ is decomposed into two small matrices of size $V \times E$ and $E \times H$. Given $H \\gt E$ or even $H \\gg E$, factorization can result in significant parameter reduction.
 
 ## Cross-layer Parameter Sharing[#](#cross-layer-parameter-sharing)
 
@@ -460,7 +460,7 @@ The _Autoregressive (AR)_ model such as GPT and _autoencoder (AE)_ model such as
 
 **XLNet** ([Yang et al. 2019](https://arxiv.org/abs/1906.08237)) generalizes the AE method to incorporate the benefits of AR. XLNet proposed the **permutation language modeling** objective. For a text sequence, it samples a factorization order $\mathbf{z}$ and decomposes the likelihood $p_\\theta(\mathbf{x})$ according to this factorization order,
 
-$$ \begin{aligned} \mathcal{L}_\text{XLNet} &= - \mathbb{E}_{\mathbf{z} \\sim \mathcal{Z}_T} \\Big\[ \sum_{t=1}^T \\log p_\\theta (X_{z_t} = x \mid \mathbf{x}_{\mathbf{z}_{<{t}}})\\Big\] \\ &= - \mathbb{E}_{\mathbf{z} \\sim \mathcal{Z}_T} \\Big\[ \\log \frac{ \exp(e(x)^\top \color{red}{h_\\theta (\mathbf{x}_{\mathbf{z}_{<{t}}})}) }{ \sum_{x'} \exp(e(x')^\top \color{red}{h_\\theta (\mathbf{x}_{\mathbf{z}_{<{t}}})}) } \\Big\] \\ &= - \mathbb{E}_{\mathbf{z} \\sim \mathcal{Z}_T} \\Big\[ \\log \frac{ \exp(e(x)^\top \color{blue}{g_\\theta (\mathbf{x}_{\mathbf{z}_{<{t}}}, z_t)}) }{ \sum_{x'} \exp(e(x')^\top \color{blue}{g_\\theta (\mathbf{x}_{\mathbf{z}_{<{t}}}, z_t)}) } \\Big\] \end{aligned} $$
+$$ \begin{aligned} \mathcal{L}_\text{XLNet} &= - \mathbb{E}_{\mathbf{z} \sim \mathcal{Z}_T} \Big\[ \sum_{t=1}^T \log p_\\theta (X_{z_t} = x \mid \mathbf{x}_{\mathbf{z}_{<{t}}})\Big\] \\ &= - \mathbb{E}_{\mathbf{z} \sim \mathcal{Z}_T} \Big\[ \log \frac{ \exp(e(x)^\top \color{red}{h_\\theta (\mathbf{x}_{\mathbf{z}_{<{t}}})}) }{ \sum_{x'} \exp(e(x')^\top \color{red}{h_\\theta (\mathbf{x}_{\mathbf{z}_{<{t}}})}) } \Big\] \\ &= - \mathbb{E}_{\mathbf{z} \sim \mathcal{Z}_T} \Big\[ \log \frac{ \exp(e(x)^\top \color{blue}{g_\\theta (\mathbf{x}_{\mathbf{z}_{<{t}}}, z_t)}) }{ \sum_{x'} \exp(e(x')^\top \color{blue}{g_\\theta (\mathbf{x}_{\mathbf{z}_{<{t}}}, z_t)}) } \Big\] \end{aligned} $$
 
 where $\mathcal{Z}_T$ is a set of all possible permutation of length $T$; $z_t$ and $\mathbf{z}_{<t}$ denote the $t$-th element and the first $t-1$ elements of a permutation $\mathbf{z} \in \mathcal{Z}_T$.
 
@@ -521,11 +521,11 @@ Fig. 20. Illustration of ELECTRA model architecture. (Image source: [Clark et al
 
 ELECTRA proposes a new pretraining task, called “Replaced Token Detection” (RTD). Let's randomly sample $k$ positions to be masked. Each selected token in the original text is replaced by a plausible alternative predicted by a small language model, known as the generator $G$. The discriminator $D$ predicts whether each token is original or replaced.
 
-$$ \begin{aligned} \\boldsymbol{m} &= \[m_1, \dots, m_k\] \text{ where } m_i \\sim \text{unif}\{1, n\}\text{ for } i=1, \dots, k \\ \\boldsymbol{x}^\text{masked} &= \text{REPLACE}(\\boldsymbol{x}, \\boldsymbol{m}, \texttt{\[MASK\]}) \\ \\boldsymbol{x}^\text{corrupt} &= \text{REPLACE}(\\boldsymbol{x}, \\boldsymbol{m}, \\tilde{\\boldsymbol{x}}) \text{ where } \\tilde{x}_t \\sim p_G(x_i \mid \\boldsymbol{x}^\text{masked}) \text{ for } i \in \\boldsymbol{m} \\ \end{aligned} $$
+$$ \begin{aligned} \\boldsymbol{m} &= \[m_1, \dots, m_k\] \text{ where } m_i \sim \text{unif}\{1, n\}\text{ for } i=1, \dots, k \\ \\boldsymbol{x}^\text{masked} &= \text{REPLACE}(\\boldsymbol{x}, \\boldsymbol{m}, \texttt{\[MASK\]}) \\ \\boldsymbol{x}^\text{corrupt} &= \text{REPLACE}(\\boldsymbol{x}, \\boldsymbol{m}, \\tilde{\\boldsymbol{x}}) \text{ where } \\tilde{x}_t \sim p_G(x_i \mid \\boldsymbol{x}^\text{masked}) \text{ for } i \in \\boldsymbol{m} \\ \end{aligned} $$
 
 The loss for the generator is the negative log-likelihood just as in other language models. The loss for the discriminator is the cross-entropy. Note that the generator is not adversarially trained to fool the discriminator but simply to optimize the NLL, since their experiments show negative results.
 
-$$ \begin{aligned} \mathcal{L}_\text{MLM}(\mathbf{x}, \\theta_G) &= \mathbb{E}\\Big(\sum_{i \in \\boldsymbol{m}} -\\log p_G (x_i \mid \\boldsymbol{x}^\text{masked} )\\Big) \\ \mathcal{L}_\text{Disc}(\mathbf{x}, \\theta_D) &= \mathbb{E}\\Big( - \mathbb{1}\[x^\text{corrupt}_t = x_t\] \\log D(\\boldsymbol{x}^\text{corrupt}, t) - \mathbb{1}\[x^\text{corrupt}_t \\neq x_t\] \\log (1 - \\log D(\\boldsymbol{x}^\text{corrupt}, t)) \\Big) \end{aligned} $$
+$$ \begin{aligned} \mathcal{L}_\text{MLM}(\mathbf{x}, \\theta_G) &= \mathbb{E}\Big(\sum_{i \in \\boldsymbol{m}} -\log p_G (x_i \mid \\boldsymbol{x}^\text{masked} )\Big) \\ \mathcal{L}_\text{Disc}(\mathbf{x}, \\theta_D) &= \mathbb{E}\Big( - \mathbb{1}\[x^\text{corrupt}_t = x_t\] \log D(\\boldsymbol{x}^\text{corrupt}, t) - \mathbb{1}\[x^\text{corrupt}_t \\neq x_t\] \log (1 - \log D(\\boldsymbol{x}^\text{corrupt}, t)) \Big) \end{aligned} $$
 
 They found it more beneficial to only share the embeddings between generator & discriminator while using a small generator (1/4 to 1/2 the discriminator size), rather than sharing all the weights (i.e. two models have to be the same size then). In addition, joint training of the generator and discriminator works better than two-stage training of each alternatively.
 
@@ -631,15 +631,15 @@ Perplexity is often used as an intrinsic evaluation metric for gauging how well 
 
 A [perplexity](https://en.wikipedia.org/wiki/Perplexity) of a discrete proability distribution $p$ is defined as the exponentiation of the entropy:
 
-$$ 2^{H(p)} = 2^{-\sum_x p(x) \\log_2 p(x)} $$
+$$ 2^{H(p)} = 2^{-\sum_x p(x) \log_2 p(x)} $$
 
 Given a sentence with $N$ words, $s = (w_1, \dots, w_N)$, the entropy looks as follows, simply assuming that each word has the same frequency, $\frac{1}{N}$:
 
-$$ H(s) = -\sum_{i=1}^N P(w_i) \\log_2 p(w_i) = -\sum_{i=1}^N \frac{1}{N} \\log_2 p(w_i) $$
+$$ H(s) = -\sum_{i=1}^N P(w_i) \log_2 p(w_i) = -\sum_{i=1}^N \frac{1}{N} \log_2 p(w_i) $$
 
 The perplexity for the sentence becomes:
 
-$$ \begin{aligned} 2^{H(s)} &= 2^{-\frac{1}{N} \sum_{i=1}^N \\log_2 p(w_i)} = (2^{\sum_{i=1}^N \\log_2 p(w_i)})^{-\frac{1}{N}} = (p(w_1) \dots p(w_N))^{-\frac{1}{N}} \end{aligned} $$
+$$ \begin{aligned} 2^{H(s)} &= 2^{-\frac{1}{N} \sum_{i=1}^N \log_2 p(w_i)} = (2^{\sum_{i=1}^N \log_2 p(w_i)})^{-\frac{1}{N}} = (p(w_1) \dots p(w_N))^{-\frac{1}{N}} \end{aligned} $$
 
 A good language model should predict high word probabilities. Therefore, the smaller perplexity the better.
 

@@ -73,7 +73,7 @@ $$ \\theta^{\*}=Q(a^{\*})=\max_{a \in \mathcal{A}} Q(a) = \max_{1 \leq i \leq K}
 
 Our loss function is the total regret we might have by not selecting the optimal action up to the time step T:
 
-$$ \mathcal{L}_T = \mathbb{E} \\Big\[ \sum_{t=1}^T \\big( \\theta^{\*} - Q(a_t) \\big) \\Big\] $$
+$$ \mathcal{L}_T = \mathbb{E} \Big\[ \sum_{t=1}^T \big( \\theta^{\*} - Q(a_t) \big) \Big\] $$
 
 ## Bandit Strategies[#](#bandit-strategies)
 
@@ -128,13 +128,13 @@ $$ \mathbb{P} \[ Q(a) > \hat{Q}_t(a) + U_t(a)\] \leq e^{-2t{U_t(a)}^2} $$
 
 We want to pick a bound so that with high chances the true mean is blow the sample mean + the upper confidence bound. Thus $e^{-2t U_t(a)^2}$ should be a small probability. Let's say we are ok with a tiny threshold p:
 
-$$ e^{-2t U_t(a)^2} = p \text{ Thus, } U_t(a) = \sqrt{\frac{-\\log p}{2 N_t(a)}} $$
+$$ e^{-2t U_t(a)^2} = p \text{ Thus, } U_t(a) = \sqrt{\frac{-\log p}{2 N_t(a)}} $$
 
 ## UCB1[#](#ucb1)
 
 One heuristic is to reduce the threshold p in time, as we want to make more confident bound estimation with more rewards observed. Set $p=t^{-4}$ we get **UCB1** algorithm:
 
-$$ U_t(a) = \sqrt{\frac{2 \\log t}{N_t(a)}} \text{ and } a^{UCB1}_t = \arg\max_{a \in \mathcal{A}} Q(a) + \sqrt{\frac{2 \\log t}{N_t(a)}} $$
+$$ U_t(a) = \sqrt{\frac{2 \log t}{N_t(a)}} \text{ and } a^{UCB1}_t = \arg\max_{a \in \mathcal{A}} Q(a) + \sqrt{\frac{2 \log t}{N_t(a)}} $$
 
 ## Bayesian UCB[#](#bayesian-ucb)
 
@@ -158,9 +158,9 @@ Fig. 4. Oops, I guess not this Thompson? (Credit goes to [Ben Taborsky](https://
 
 At each time step, we want to select action a according to the probability that a is **optimal**:
 
-$$ \begin{aligned} \\pi(a \\; \vert \\; h_t) &= \mathbb{P} \[ Q(a) > Q(a'), \\forall a' \\neq a \\; \vert \\; h_t\] \\ &= \mathbb{E}_{\mathcal{R} \vert h_t} \[ \mathbb{1}(a = \arg\max_{a \in \mathcal{A}} Q(a)) \] \end{aligned} $$
+$$ \begin{aligned} \pi(a \\; \vert \\; h_t) &= \mathbb{P} \[ Q(a) > Q(a'), \\forall a' \\neq a \\; \vert \\; h_t\] \\ &= \mathbb{E}_{\mathcal{R} \vert h_t} \[ \mathbb{1}(a = \arg\max_{a \in \mathcal{A}} Q(a)) \] \end{aligned} $$
 
-where $\\pi(a ; \vert ; h_t)$ is the probability of taking action a given the history $h_t$.
+where $\pi(a ; \vert ; h_t)$ is the probability of taking action a given the history $h_t$.
 
 For the Bernoulli bandit, it is natural to assume that $Q(a)$ follows a [Beta](https://en.wikipedia.org/wiki/Beta_distribution) distribution, as $Q(a)$ is essentially the success probability θ in [Bernoulli](https://en.wikipedia.org/wiki/Bernoulli_distribution) distribution. The value of $\text{Beta}(\\alpha, \\beta)$ is within the interval \[0, 1\]; α and β correspond to the counts when we **succeeded** or **failed** to get a reward respectively.
 

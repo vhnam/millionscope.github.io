@@ -122,9 +122,9 @@ Given the vocabulary size $V$, we are about to learn word embedding vectors of s
 According to Fig. 1,
 
 - Both input word $w_i$ and the output word $w_j$ are one-hot encoded into binary vectors $\mathbf{x}$ and $\mathbf{y}$ of size $V$.
-- First, the multiplication of the binary vector $\mathbf{x}$ and the word embedding matrix $W$ of size $V \\times N$ gives us the embedding vector of the input word $w_i$: the i-th row of the matrix $W$.
+- First, the multiplication of the binary vector $\mathbf{x}$ and the word embedding matrix $W$ of size $V \times N$ gives us the embedding vector of the input word $w_i$: the i-th row of the matrix $W$.
 - This newly discovered embedding vector of dimension $N$ forms the hidden layer.
-- The multiplication of the hidden layer and the word context matrix $W'$ of size $N \\times V$ produces the output one-hot encoded vector $\mathbf{y}$.
+- The multiplication of the hidden layer and the word context matrix $W'$ of size $N \times V$ produces the output one-hot encoded vector $\mathbf{y}$.
 - The output context matrix $W'$ encodes the meanings of words as context, different from the embedding matrix $W$. NOTE: Despite the name, $W'$ is independent of $W$, not a transpose or inverse or whatsoever.
 
 # Context-Based: Continuous Bag-of-Words (CBOW)[#](#context-based-continuous-bag-of-words-cbow)
@@ -175,9 +175,9 @@ A good tree structure is crucial to the model performance. Several handy princip
 
 Another approach completely steers away from the softmax framework. Instead, the loss function measures the cross entropy between the predicted probabilities $p$ and the true binary labels $\mathbf{y}$.
 
-First, let's recall that the cross entropy between two distributions $p$ and $q$ is measured as $ H(p, q) = -\sum_x p(x) \\log q(x) $. In our case, the true label $y_i$ is 1 only when $w_i$ is the output word; $y_j$ is 0 otherwise. The loss function $\mathcal{L}_\\theta$ of the model with parameter config $\\theta$ aims to minimize the cross entropy between the prediction and the ground truth, as lower cross entropy indicates high similarity between two distributions.
+First, let's recall that the cross entropy between two distributions $p$ and $q$ is measured as $ H(p, q) = -\sum_x p(x) \log q(x) $. In our case, the true label $y_i$ is 1 only when $w_i$ is the output word; $y_j$ is 0 otherwise. The loss function $\mathcal{L}_\\theta$ of the model with parameter config $\\theta$ aims to minimize the cross entropy between the prediction and the ground truth, as lower cross entropy indicates high similarity between two distributions.
 
-$$ \mathcal{L}_\\theta = - \sum_{i=1}^V y_i \\log p(w_i | w_I) = - \\log p(w_O \vert w_I) $$
+$$ \mathcal{L}_\\theta = - \sum_{i=1}^V y_i \log p(w_i | w_I) = - \log p(w_O \vert w_I) $$
 
 Recall that,
 
@@ -185,31 +185,31 @@ $$ p(w_O \vert w_I) = \frac{\exp({v'_{w_O}}^{\top} v_{w_I})}{\sum_{i=1}^V \exp({
 
 Therefore,
 
-$$ \mathcal{L}_{\\theta} = - \\log \frac{\exp({v'_{w_O}}^{\top}{v_{w_I}})}{\sum_{i=1}^V \exp({v'_{w_i}}^{\top}{v_{w_I} })} = - {v'_{w_O}}^{\top}{v_{w_I} } + \\log \sum_{i=1}^V \exp({v'_{w_i} }^{\top}{v_{w_I}}) $$
+$$ \mathcal{L}_{\\theta} = - \log \frac{\exp({v'_{w_O}}^{\top}{v_{w_I}})}{\sum_{i=1}^V \exp({v'_{w_i}}^{\top}{v_{w_I} })} = - {v'_{w_O}}^{\top}{v_{w_I} } + \log \sum_{i=1}^V \exp({v'_{w_i} }^{\top}{v_{w_I}}) $$
 
 To start training the model using back-propagation with SGD, we need to compute the gradient of the loss function. For simplicity, let's label $z_{IO} = {v'_{w_O}}^{\top}{v_{w_I}}$.
 
-$$ \begin{align} \\nabla_\\theta \mathcal{L}_{\\theta} &= \\nabla_\\theta\\big( - z_{IO} + \\log \sum_{i=1}^V e^{z_{Ii}} \\big) \\ &= - \\nabla_\\theta z_{IO} + \\nabla_\\theta \\big( \\log \sum_{i=1}^V e^{z_{Ii}} \\big) \\ &= - \\nabla_\\theta z_{IO} + \frac{1}{\sum_{i=1}^V e^{z_{Ii}}} \sum_{i=1}^V e^{z_{Ii}} \\nabla_\\theta z_{Ii} \\ &= - \\nabla_\\theta z_{IO} + \sum_{i=1}^V \frac{e^{z_{Ii}}}{\sum_{i=1}^V e^{z_{Ii}}} \\nabla_\\theta z_{Ii} \\ &= - \\nabla_\\theta z_{IO} + \sum_{i=1}^V p(w_i \vert w_I) \\nabla_\\theta z_{Ii} \\ &= - \\nabla_\\theta z_{IO} + \mathbb{E}_{w_i \\sim Q(\\tilde{w})} \\nabla_\\theta z_{Ii} \end{align} $$
+$$ \begin{align} \\nabla_\\theta \mathcal{L}_{\\theta} &= \\nabla_\\theta\big( - z_{IO} + \log \sum_{i=1}^V e^{z_{Ii}} \big) \\ &= - \\nabla_\\theta z_{IO} + \\nabla_\\theta \big( \log \sum_{i=1}^V e^{z_{Ii}} \big) \\ &= - \\nabla_\\theta z_{IO} + \frac{1}{\sum_{i=1}^V e^{z_{Ii}}} \sum_{i=1}^V e^{z_{Ii}} \\nabla_\\theta z_{Ii} \\ &= - \\nabla_\\theta z_{IO} + \sum_{i=1}^V \frac{e^{z_{Ii}}}{\sum_{i=1}^V e^{z_{Ii}}} \\nabla_\\theta z_{Ii} \\ &= - \\nabla_\\theta z_{IO} + \sum_{i=1}^V p(w_i \vert w_I) \\nabla_\\theta z_{Ii} \\ &= - \\nabla_\\theta z_{IO} + \mathbb{E}_{w_i \sim Q(\\tilde{w})} \\nabla_\\theta z_{Ii} \end{align} $$
 
 where $Q(\\tilde{w})$ is the distribution of noise samples.
 
 According to the formula above, the correct output word has a positive reinforcement according to the first term (the larger $\\nabla_\\theta z_{IO}$ the better loss we have), while other words have a negative impact as captured by the second term.
 
-How to estimate $\mathbb{E}_{w_i \\sim Q(\\tilde{w})} \\nabla_\\theta {v'_{w_i}}^{\top}{v_{w_I}}$ with a sample set of noise words rather than scanning through the entire vocabulary is the key of using cross-entropy-based sampling approach.
+How to estimate $\mathbb{E}_{w_i \sim Q(\\tilde{w})} \\nabla_\\theta {v'_{w_i}}^{\top}{v_{w_I}}$ with a sample set of noise words rather than scanning through the entire vocabulary is the key of using cross-entropy-based sampling approach.
 
 ## Noise Contrastive Estimation (NCE)[#](#noise-contrastive-estimation-nce)
 
 The Noise Contrastive Estimation (NCE) metric intends to differentiate the target word from noise samples using a logistic regression classifier ([Gutmann and Hyvärinen, 2010](http://proceedings.mlr.press/v9/gutmann10a/gutmann10a.pdf)).
 
-Given an input word $w_I$, the correct output word is known as $w$. In the meantime, we sample $N$ other words from the noise sample distribution $Q$, denoted as $\\tilde{w}_1, \\tilde{w}_2, \dots, \\tilde{w}_N \\sim Q$. Let's label the decision of the binary classifier as $d$ and $d$$ can only take a binary value.
+Given an input word $w_I$, the correct output word is known as $w$. In the meantime, we sample $N$ other words from the noise sample distribution $Q$, denoted as $\\tilde{w}_1, \\tilde{w}_2, \dots, \\tilde{w}_N \sim Q$. Let's label the decision of the binary classifier as $d$ and $d$$ can only take a binary value.
 
-$$ \mathcal{L}_\\theta = - \[ \\log p(d=1 \vert w, w_I) + \sum_{i=1, \\tilde{w}_i \\sim Q}^N \\log p(d=0|\\tilde{w}_i, w_I) \] $$
+$$ \mathcal{L}_\\theta = - \[ \log p(d=1 \vert w, w_I) + \sum_{i=1, \\tilde{w}_i \sim Q}^N \log p(d=0|\\tilde{w}_i, w_I) \] $$
 
 When $N$ is big enough, according to [the Law of large numbers](https://en.wikipedia.org/wiki/Law_of_large_numbers),
 
-$$ \mathcal{L}_\\theta = - \[ \\log p(d=1 \vert w, w_I) + N\mathbb{E}_{\\tilde{w}_i \\sim Q} \\log p(d=0|\\tilde{w}_i, w_I)\] $$
+$$ \mathcal{L}_\\theta = - \[ \log p(d=1 \vert w, w_I) + N\mathbb{E}_{\\tilde{w}_i \sim Q} \log p(d=0|\\tilde{w}_i, w_I)\] $$
 
-To compute the probability $p(d=1 \vert w, w_I)$, we can start with the joint probability $p(d, w \vert w_I)$. Among $w, \\tilde{w}_1, \\tilde{w}_2, \dots, \\tilde{w}_N$, we have 1 out of (N+1) chance to pick the true word $w$, which is sampled from the conditional probability $p(w \vert w_I)$; meanwhile, we have N out of (N+1) chances to pick a noise word, each sampled from $q(\\tilde{w}) \\sim Q$. Thus,
+To compute the probability $p(d=1 \vert w, w_I)$, we can start with the joint probability $p(d, w \vert w_I)$. Among $w, \\tilde{w}_1, \\tilde{w}_2, \dots, \\tilde{w}_N$, we have 1 out of (N+1) chance to pick the true word $w$, which is sampled from the conditional probability $p(w \vert w_I)$; meanwhile, we have N out of (N+1) chances to pick a noise word, each sampled from $q(\\tilde{w}) \sim Q$. Thus,
 
 $$ p(d, w | w_I) = \begin{cases} \frac{1}{N+1} p(w \vert w_I) & \text{if } d=1 \\ \frac{N}{N+1} q(\\tilde{w}) & \text{if } d=0 \end{cases} $$
 
@@ -221,18 +221,18 @@ $$ \begin{align} p(d=0 \vert w, w_I) &= \frac{p(d=0, w \vert w_I)}{p(d=1, w \ver
 
 Finally the loss function of NCE's binary classifier becomes:
 
-$$ \begin{align} \mathcal{L}_\\theta & = - \[ \\log p(d=1 \vert w, w_I) + \sum_{\\substack{i=1 \\ \\tilde{w}_i \\sim Q}}^N \\log p(d=0|\\tilde{w}_i, w_I)\] \\ & = - \[ \\log \frac{p(w \vert w_I)}{p(w \vert w_I) + Nq(\\tilde{w})} + \sum_{\\substack{i=1 \\ \\tilde{w}_i \\sim Q}}^N \\log \frac{Nq(\\tilde{w}_i)}{p(w \vert w_I) + Nq(\\tilde{w}_i)}\] \end{align} $$
+$$ \begin{align} \mathcal{L}_\\theta & = - \[ \log p(d=1 \vert w, w_I) + \sum_{\\substack{i=1 \\ \\tilde{w}_i \sim Q}}^N \log p(d=0|\\tilde{w}_i, w_I)\] \\ & = - \[ \log \frac{p(w \vert w_I)}{p(w \vert w_I) + Nq(\\tilde{w})} + \sum_{\\substack{i=1 \\ \\tilde{w}_i \sim Q}}^N \log \frac{Nq(\\tilde{w}_i)}{p(w \vert w_I) + Nq(\\tilde{w}_i)}\] \end{align} $$
 
 However, $p(w \vert w_I)$ still involves summing up the entire vocabulary in the denominator. Let's label the denominator as a partition function of the input word, $Z(w_I)$. A common assumption is $Z(w) \approx 1$ given that we expect the softmax output layer to be normalized ([Minh and Teh, 2012](https://www.cs.toronto.edu/~amnih/papers/ncelm.pdf)). Then the loss function is simplified to:
 
-$$ \mathcal{L}_\\theta = - \[ \\log \frac{\exp({v'_w}^{\top}{v_{w_I}})}{\exp({v'_w}^{\top}{v_{w_I}}) + Nq(\\tilde{w})} + \sum_{\\substack{i=1 \\ \\tilde{w}_i \\sim Q}}^N \\log \frac{Nq(\\tilde{w}_i)}{\exp({v'_w}^{\top}{v_{w_I}}) + Nq(\\tilde{w}_i)}\] $$
+$$ \mathcal{L}_\\theta = - \[ \log \frac{\exp({v'_w}^{\top}{v_{w_I}})}{\exp({v'_w}^{\top}{v_{w_I}}) + Nq(\\tilde{w})} + \sum_{\\substack{i=1 \\ \\tilde{w}_i \sim Q}}^N \log \frac{Nq(\\tilde{w}_i)}{\exp({v'_w}^{\top}{v_{w_I}}) + Nq(\\tilde{w}_i)}\] $$
 
 The noise distribution $Q$ is a tunable parameter and we would like to design it in a way so that:
 
 - intuitively it should be very similar to the real data distribution; and
 - it should be easy to sample from.
 
-For example, the sampling implementation ([log_uniform_candidate_sampler](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/python/ops/candidate_sampling_ops.py#L83)) of NCE loss in tensorflow assumes that such noise samples follow a log-uniform distribution, also known as [Zipfian's law](https://en.wikipedia.org/wiki/Zipf%27s_law). The probability of a given word in logarithm is expected to be reversely proportional to its rank, while high-frequency words are assigned with lower ranks. In this case, $q(\\tilde{w}) = \frac{1}{ \\log V}(\\log (r_{\\tilde{w}} + 1) - \\log r_{\\tilde{w}})$, where $r_{\\tilde{w}} \in \[1, V\]$ is the rank of a word by frequency in descending order.
+For example, the sampling implementation ([log_uniform_candidate_sampler](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/python/ops/candidate_sampling_ops.py#L83)) of NCE loss in tensorflow assumes that such noise samples follow a log-uniform distribution, also known as [Zipfian's law](https://en.wikipedia.org/wiki/Zipf%27s_law). The probability of a given word in logarithm is expected to be reversely proportional to its rank, while high-frequency words are assigned with lower ranks. In this case, $q(\\tilde{w}) = \frac{1}{ \log V}(\log (r_{\\tilde{w}} + 1) - \log r_{\\tilde{w}})$, where $r_{\\tilde{w}} \in \[1, V\]$ is the rank of a word by frequency in descending order.
 
 ## Negative Sampling (NEG)[#](#negative-sampling-neg)
 
@@ -244,7 +244,7 @@ $$ \begin{align} p(d=1 \vert w_, w_I) &= \sigma({v'_{w}}^\top v_{w_I}) \\ p(d=0 
 
 The final NCE loss function looks like:
 
-$$ \mathcal{L}_\\theta = - \[ \\log \sigma({v'_{w}}^\top v_{w_I}) + \sum_{\\substack{i=1 \\ \\tilde{w}_i \\sim Q}}^N \\log \sigma(-{v'_{\\tilde{w}_i}}^\top v_{w_I})\] $$
+$$ \mathcal{L}_\\theta = - \[ \log \sigma({v'_{w}}^\top v_{w_I}) + \sum_{\\substack{i=1 \\ \\tilde{w}_i \sim Q}}^N \log \sigma(-{v'_{\\tilde{w}_i}}^\top v_{w_I})\] $$
 
 # Other Tips for Learning Word Embedding[#](#other-tips-for-learning-word-embedding)
 
@@ -280,15 +280,15 @@ $$ \begin{align} F({w_i}^\top \\tilde{w}_k) &= \exp({w_i}^\top \\tilde{w}_k) = p
 
 Finally,
 
-$$ {w_i}^\top \\tilde{w}_k = \\log p_{\text{co}}(\\tilde{w}_k \vert w_i) = \\log \frac{C(w_i, \\tilde{w}_k)}{C(w_i)} = \\log C(w_i, \\tilde{w}_k) - \\log C(w_i) $$
+$$ {w_i}^\top \\tilde{w}_k = \log p_{\text{co}}(\\tilde{w}_k \vert w_i) = \log \frac{C(w_i, \\tilde{w}_k)}{C(w_i)} = \log C(w_i, \\tilde{w}_k) - \log C(w_i) $$
 
-Since the second term $-\\log C(w_i)$ is independent of $k$, we can add bias term $b_i$ for $w_i$ to capture $-\\log C(w_i)$. To keep the symmetric form, we also add in a bias $\\tilde{b}_k$ for $\\tilde{w}_k$.
+Since the second term $-\log C(w_i)$ is independent of $k$, we can add bias term $b_i$ for $w_i$ to capture $-\log C(w_i)$. To keep the symmetric form, we also add in a bias $\\tilde{b}_k$ for $\\tilde{w}_k$.
 
-$$ \\log C(w_i, \\tilde{w}_k) = {w_i}^\top \\tilde{w}_k + b_i + \\tilde{b}_k $$
+$$ \log C(w_i, \\tilde{w}_k) = {w_i}^\top \\tilde{w}_k + b_i + \\tilde{b}_k $$
 
 The loss function for the GloVe model is designed to preserve the above formula by minimizing the sum of the squared errors:
 
-$$ \mathcal{L}_\\theta = \sum_{i=1, j=1}^V f(C(w_i,w_j)) ({w_i}^\top \\tilde{w}_j + b_i + \\tilde{b}_j - \\log C(w_i, \\tilde{w}_j))^2 $$
+$$ \mathcal{L}_\\theta = \sum_{i=1, j=1}^V f(C(w_i,w_j)) ({w_i}^\top \\tilde{w}_j + b_i + \\tilde{b}_j - \log C(w_i, \\tilde{w}_j))^2 $$
 
 The weighting schema $f(c)$ is a function of the co-occurrence of $w_i$ and $w_j$ and it is an adjustable model configuration. It should be close to zero as $c \to 0$; should be non-decreasing as higher co-occurrence should have more impact; should saturate when $c$ become extremely large. The paper proposed the following weighting function.
 

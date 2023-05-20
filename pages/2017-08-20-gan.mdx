@@ -46,7 +46,7 @@ Before we start examining GANs closely, let us first review two metrics for quan
 
 (1) [KL (Kullback–Leibler) divergence](https://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence) measures how one probability distribution $p$ diverges from a second expected probability distribution $q$.
 
-$$ D_{KL}(p \| q) = \int_x p(x) \\log \frac{p(x)}{q(x)} dx $$
+$$ D_{KL}(p \| q) = \int_x p(x) \log \frac{p(x)}{q(x)} dx $$
 
 $D_{KL}$ achieves the minimum zero when $p(x)$ == $q(x)$ everywhere.
 
@@ -97,21 +97,21 @@ $p_{r}$
 
 Data distribution over real sample $x$
 
-On one hand, we want to make sure the discriminator $D$'s decisions over real data are accurate by maximizing $\mathbb{E}_{x \\sim p_{r}(x)} \[\\log D(x)\]$. Meanwhile, given a fake sample $G(z), z \\sim p_z(z)$, the discriminator is expected to output a probability, $D(G(z))$, close to zero by maximizing $\mathbb{E}_{z \\sim p_{z}(z)} \[\\log (1 - D(G(z)))\]$.
+On one hand, we want to make sure the discriminator $D$'s decisions over real data are accurate by maximizing $\mathbb{E}_{x \sim p_{r}(x)} \[\log D(x)\]$. Meanwhile, given a fake sample $G(z), z \sim p_z(z)$, the discriminator is expected to output a probability, $D(G(z))$, close to zero by maximizing $\mathbb{E}_{z \sim p_{z}(z)} \[\log (1 - D(G(z)))\]$.
 
-On the other hand, the generator is trained to increase the chances of $D$ producing a high probability for a fake example, thus to minimize $\mathbb{E}_{z \\sim p_{z}(z)} \[\\log (1 - D(G(z)))\]$.
+On the other hand, the generator is trained to increase the chances of $D$ producing a high probability for a fake example, thus to minimize $\mathbb{E}_{z \sim p_{z}(z)} \[\log (1 - D(G(z)))\]$.
 
 When combining both aspects together, $D$ and $G$ are playing a **minimax game** in which we should optimize the following loss function:
 
-$$ \begin{aligned} \min_G \max_D L(D, G) & = \mathbb{E}_{x \\sim p_{r}(x)} \[\\log D(x)\] + \mathbb{E}_{z \\sim p_z(z)} \[\\log(1 - D(G(z)))\] \\ & = \mathbb{E}_{x \\sim p_{r}(x)} \[\\log D(x)\] + \mathbb{E}_{x \\sim p_g(x)} \[\\log(1 - D(x)\] \end{aligned} $$
+$$ \begin{aligned} \min_G \max_D L(D, G) & = \mathbb{E}_{x \sim p_{r}(x)} \[\log D(x)\] + \mathbb{E}_{z \sim p_z(z)} \[\log(1 - D(G(z)))\] \\ & = \mathbb{E}_{x \sim p_{r}(x)} \[\log D(x)\] + \mathbb{E}_{x \sim p_g(x)} \[\log(1 - D(x)\] \end{aligned} $$
 
-($\mathbb{E}_{x \\sim p_{r}(x)} \[\\log D(x)\]$ has no impact on $G$ during gradient descent updates.)
+($\mathbb{E}_{x \sim p_{r}(x)} \[\log D(x)\]$ has no impact on $G$ during gradient descent updates.)
 
 ## What is the optimal value for D?[#](#what-is-the-optimal-value-for-d)
 
 Now we have a well-defined loss function. Let's first examine what is the best value for $D$.
 
-$$ L(G, D) = \int_x \\bigg( p_{r}(x) \\log(D(x)) + p_g (x) \\log(1 - D(x)) \\bigg) dx $$
+$$ L(G, D) = \int_x \bigg( p_{r}(x) \log(D(x)) + p_g (x) \log(1 - D(x)) \bigg) dx $$
 
 Since we are interested in what is the best value of $D(x)$ to maximize $L(G, D)$, let us label
 
@@ -129,19 +129,19 @@ Once the generator is trained to its optimal, $p_g$ gets very close to $p_{r}$. 
 
 When both $G$ and $D$ are at their optimal values, we have $p_g = p_{r}$ and $D^\*(x) = 1/2$ and the loss function becomes:
 
-$$ \begin{aligned} L(G, D^\*) &= \int_x \\bigg( p_{r}(x) \\log(D^\*(x)) + p_g (x) \\log(1 - D^\*(x)) \\bigg) dx \\ &= \\log \frac{1}{2} \int_x p_{r}(x) dx + \\log \frac{1}{2} \int_x p_g(x) dx \\ &= -2\\log2 \end{aligned} $$
+$$ \begin{aligned} L(G, D^\*) &= \int_x \bigg( p_{r}(x) \log(D^\*(x)) + p_g (x) \log(1 - D^\*(x)) \bigg) dx \\ &= \log \frac{1}{2} \int_x p_{r}(x) dx + \log \frac{1}{2} \int_x p_g(x) dx \\ &= -2\log2 \end{aligned} $$
 
 ## What does the loss function represent?[#](#what-does-the-loss-function-represent)
 
 According to the formula listed in the [previous section](https://lilianweng.github.io/posts/2017-08-20-gan/#kullbackleibler-and-jensenshannon-divergence), JS divergence between $p_{r}$ and $p_g$ can be computed as:
 
-$$ \begin{aligned} D_{JS}(p_{r} \| p_g) =& \frac{1}{2} D_{KL}(p_{r} || \frac{p_{r} + p_g}{2}) + \frac{1}{2} D_{KL}(p_{g} || \frac{p_{r} + p_g}{2}) \\ =& \frac{1}{2} \\bigg( \\log2 + \int_x p_{r}(x) \\log \frac{p_{r}(x)}{p_{r} + p_g(x)} dx \\bigg) + \\& \frac{1}{2} \\bigg( \\log2 + \int_x p_g(x) \\log \frac{p_g(x)}{p_{r} + p_g(x)} dx \\bigg) \\ =& \frac{1}{2} \\bigg( \\log4 + L(G, D^\*) \\bigg) \end{aligned} $$
+$$ \begin{aligned} D_{JS}(p_{r} \| p_g) =& \frac{1}{2} D_{KL}(p_{r} || \frac{p_{r} + p_g}{2}) + \frac{1}{2} D_{KL}(p_{g} || \frac{p_{r} + p_g}{2}) \\ =& \frac{1}{2} \bigg( \log2 + \int_x p_{r}(x) \log \frac{p_{r}(x)}{p_{r} + p_g(x)} dx \bigg) + \\& \frac{1}{2} \bigg( \log2 + \int_x p_g(x) \log \frac{p_g(x)}{p_{r} + p_g(x)} dx \bigg) \\ =& \frac{1}{2} \bigg( \log4 + L(G, D^\*) \bigg) \end{aligned} $$
 
 Thus,
 
-$$ L(G, D^\*) = 2D_{JS}(p_{r} \| p_g) - 2\\log2 $$
+$$ L(G, D^\*) = 2D_{JS}(p_{r} \| p_g) - 2\log2 $$
 
-Essentially the loss function of GAN quantifies the similarity between the generative data distribution $p_g$ and the real sample distribution $p_{r}$ by JS divergence when the discriminator is optimal. The best $G^\*$ that replicates the real data distribution leads to the minimum $L(G^\*, D^\*) = -2\\log2$ which is aligned with equations above.
+Essentially the loss function of GAN quantifies the similarity between the generative data distribution $p_g$ and the real sample distribution $p_{r}$ by JS divergence when the discriminator is optimal. The best $G^\*$ that replicates the real data distribution leads to the minimum $L(G^\*, D^\*) = -2\log2$ which is aligned with equations above.
 
 > **Other Variations of GAN**: There are many variations of GANs in different contexts or designed for different tasks. For example, for semi-supervised learning, one idea is to update the discriminator to output real class labels, $1, \dots, K-1$, as well as one fake class label $K$. The generator model aims to trick the discriminator to output a classification label smaller than $K$.
 
@@ -224,7 +224,7 @@ First five methods are practical techniques to achieve faster convergence of GAN
 
 (1) **Feature Matching**
 
-Feature matching suggests to optimize the discriminator to inspect whether the generator's output matches expected statistics of the real samples. In such a scenario, the new loss function is defined as $| \mathbb{E}_{x \\sim p_r} f(x) - \mathbb{E}_{z \\sim p_z(z)}f(G(z)) |_2^2 $, where $f(x)$ can be any computation of statistics of features, such as mean or median.
+Feature matching suggests to optimize the discriminator to inspect whether the generator's output matches expected statistics of the real samples. In such a scenario, the new loss function is defined as $| \mathbb{E}_{x \sim p_r} f(x) - \mathbb{E}_{z \sim p_z(z)}f(G(z)) |_2^2 $, where $f(x)$ can be any computation of statistics of features, such as mean or median.
 
 (2) **Minibatch Discrimination**
 
@@ -284,13 +284,13 @@ Fig. 7. Step-by-step plan of moving dirt between piles in $P$ and $Q$ to make th
 
 When dealing with the continuous probability domain, the distance formula becomes:
 
-$$ W(p_r, p_g) = \inf_{\\gamma \\sim \\Pi(p_r, p_g)} \mathbb{E}_{(x, y) \\sim \\gamma}\[\| x-y \|\] $$
+$$ W(p_r, p_g) = \inf_{\\gamma \sim \\Pi(p_r, p_g)} \mathbb{E}_{(x, y) \sim \\gamma}\[\| x-y \|\] $$
 
 In the formula above, $\\Pi(p_r, p_g)$ is the set of all possible joint probability distributions between $p_r$ and $p_g$. One joint distribution $\\gamma \in \\Pi(p_r, p_g)$ describes one dirt transport plan, same as the discrete example above, but in the continuous probability space. Precisely $\\gamma(x, y)$ states the percentage of dirt should be transported from point $x$ to $y$ so as to make $x$ follows the same probability distribution of $y$. That's why the marginal distribution over $x$ adds up to $p_g$, $\sum_{x} \\gamma(x, y) = p_g(y)$ (Once we finish moving the planned amount of dirt from every possible $x$ to the target $y$, we end up with exactly what $y$ has according to $p_g$.) and vice versa $\sum_{y} \\gamma(x, y) = p_r(x)$.
 
 When treating $x$ as the starting point and $y$ as the destination, the total amount of dirt moved is $\\gamma(x, y)$ and the travelling distance is $| x-y |$ and thus the cost is $\\gamma(x, y) \cdot | x-y |$. The expected cost averaged across all the $(x,y)$ pairs can be easily computed as:
 
-$$ \sum_{x, y} \\gamma(x, y) \| x-y \| = \mathbb{E}_{x, y \\sim \\gamma} \| x-y \| $$
+$$ \sum_{x, y} \\gamma(x, y) \| x-y \| = \mathbb{E}_{x, y \sim \\gamma} \| x-y \| $$
 
 Finally, we take the minimum one among the costs of all dirt moving solutions as the EM distance. In the definition of Wasserstein distance, the $\inf$ ([infimum](https://en.wikipedia.org/wiki/Infimum_and_supremum), also known as _greatest lower bound_) indicates that we are only interested in the smallest cost.
 
@@ -302,7 +302,7 @@ The WGAN paper exemplified the idea with a simple example.
 
 Suppose we have two probability distributions, $P$ and $Q$:
 
-$$ \\forall (x, y) \in P, x = 0 \text{ and } y \\sim U(0, 1)\\ \\forall (x, y) \in Q, x = \\theta, 0 \leq \\theta \leq 1 \text{ and } y \\sim U(0, 1)\\ $$
+$$ \\forall (x, y) \in P, x = 0 \text{ and } y \sim U(0, 1)\\ \\forall (x, y) \in Q, x = \\theta, 0 \leq \\theta \leq 1 \text{ and } y \sim U(0, 1)\\ $$
 
 ![](wasserstein_simple_example.png)
 
@@ -310,7 +310,7 @@ Fig. 8. There is no overlap between $P$ and $Q$ when $\\theta \\neq 0$.
 
 When $\\theta \\neq 0$:
 
-$$ \begin{aligned} D_{KL}(P \| Q) &= \sum_{x=0, y \\sim U(0, 1)} 1 \cdot \\log\frac{1}{0} = +\infty \\ D_{KL}(Q \| P) &= \sum_{x=\\theta, y \\sim U(0, 1)} 1 \cdot \\log\frac{1}{0} = +\infty \\ D_{JS}(P, Q) &= \frac{1}{2}(\sum_{x=0, y \\sim U(0, 1)} 1 \cdot \\log\frac{1}{1/2} + \sum_{x=0, y \\sim U(0, 1)} 1 \cdot \\log\frac{1}{1/2}) = \\log 2\\ W(P, Q) &= |\\theta| \end{aligned} $$
+$$ \begin{aligned} D_{KL}(P \| Q) &= \sum_{x=0, y \sim U(0, 1)} 1 \cdot \log\frac{1}{0} = +\infty \\ D_{KL}(Q \| P) &= \sum_{x=\\theta, y \sim U(0, 1)} 1 \cdot \log\frac{1}{0} = +\infty \\ D_{JS}(P, Q) &= \frac{1}{2}(\sum_{x=0, y \sim U(0, 1)} 1 \cdot \log\frac{1}{1/2} + \sum_{x=0, y \sim U(0, 1)} 1 \cdot \log\frac{1}{1/2}) = \log 2\\ W(P, Q) &= |\\theta| \end{aligned} $$
 
 But when $\\theta = 0$, two distributions are fully overlapped:
 
@@ -320,9 +320,9 @@ $D_{KL}$ gives us inifity when two distributions are disjoint. The value of $D_{
 
 ## Use Wasserstein distance as GAN loss function[#](#use-wasserstein-distance-as-gan-loss-function)
 
-It is intractable to exhaust all the possible joint distributions in $\\Pi(p_r, p_g)$ to compute $\inf_{\\gamma \\sim \\Pi(p_r, p_g)}$. Thus the authors proposed a smart transformation of the formula based on the Kantorovich-Rubinstein duality to:
+It is intractable to exhaust all the possible joint distributions in $\\Pi(p_r, p_g)$ to compute $\inf_{\\gamma \sim \\Pi(p_r, p_g)}$. Thus the authors proposed a smart transformation of the formula based on the Kantorovich-Rubinstein duality to:
 
-$$ W(p_r, p_g) = \frac{1}{K} \\sup_{\| f \|_L \leq K} \mathbb{E}_{x \\sim p_r}\[f(x)\] - \mathbb{E}_{x \\sim p_g}\[f(x)\] $$
+$$ W(p_r, p_g) = \frac{1}{K} \\sup_{\| f \|_L \leq K} \mathbb{E}_{x \sim p_r}\[f(x)\] - \mathbb{E}_{x \sim p_g}\[f(x)\] $$
 
 where $\\sup$ ([supremum](https://en.wikipedia.org/wiki/Infimum_and_supremum)) is the opposite of $inf$ (infimum); we want to measure the least upper bound or, in even simpler words, the maximum value.
 
@@ -330,7 +330,7 @@ where $\\sup$ ([supremum](https://en.wikipedia.org/wiki/Infimum_and_supremum)) i
 
 The function $f$ in the new form of Wasserstein metric is demanded to satisfy $| f |_L \leq K$, meaning it should be [K-Lipschitz continuous](https://en.wikipedia.org/wiki/Lipschitz_continuity).
 
-A real-valued function $f: \mathbb{R} \\rightarrow \mathbb{R}$ is called $K$-Lipschitz continuous if there exists a real constant $K \\geq 0$ such that, for all $x_1, x_2 \in \mathbb{R}$,
+A real-valued function $f: \mathbb{R} \rightarrow \mathbb{R}$ is called $K$-Lipschitz continuous if there exists a real constant $K \\geq 0$ such that, for all $x_1, x_2 \in \mathbb{R}$,
 
 $$ \\lvert f(x_1) - f(x_2) \\rvert \leq K \\lvert x_1 - x_2 \\rvert $$
 
@@ -340,7 +340,7 @@ Explaining how the transformation happens on the Wasserstein distance formula is
 
 Suppose this function $f$ comes from a family of K-Lipschitz continuous functions, $\{ f_w \}_{w \in W}$, parameterized by $w$. In the modified Wasserstein-GAN, the “discriminator” model is used to learn $w$ to find a good $f_w$ and the loss function is configured as measuring the Wasserstein distance between $p_r$ and $p_g$.
 
-$$ L(p_r, p_g) = W(p_r, p_g) = \max_{w \in W} \mathbb{E}_{x \\sim p_r}\[f_w(x)\] - \mathbb{E}_{z \\sim p_r(z)}\[f_w(g_\\theta(z))\] $$
+$$ L(p_r, p_g) = W(p_r, p_g) = \max_{w \in W} \mathbb{E}_{x \sim p_r}\[f_w(x)\] - \mathbb{E}_{z \sim p_r(z)}\[f_w(g_\\theta(z))\] $$
 
 Thus the “discriminator” is not a direct critic of telling the fake samples apart from the real ones anymore. Instead, it is trained to learn a $K$-Lipschitz continuous function to help compute Wasserstein distance. As the loss function decreases in the training, the Wasserstein distance gets smaller and the generator model's output grows closer to the real data distribution.
 

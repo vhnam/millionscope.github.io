@@ -117,13 +117,13 @@ Fig. 5. (Top) Three level-1 primitive operations are composed into a level-2 mot
 
 To build a network according to the hierarchical structure, we start from the lowest level $\ell=1$ and recursively define the $m$-th motif operation at level $\ell$ as
 
-$$ o^{(\ell)}_m = \text{assemble}\\Big( G_m^{(\ell)}, \mathcal{O}^{(\ell-1)} \\Big) $$
+$$ o^{(\ell)}_m = \text{assemble}\Big( G_m^{(\ell)}, \mathcal{O}^{(\ell-1)} \Big) $$
 
-A hierarchical representation becomes $\\Big( \\big\{ \{ G_m^{(\ell)} \}_{m=1}^{M_\ell} \\big\}_{\ell=2}^L, \mathcal{O}^{(1)} \\Big), \\forall \ell=2, \dots, L$, where $\mathcal{O}^{(1)}$ contains a set of primitive operations.
+A hierarchical representation becomes $\Big( \big\{ \{ G_m^{(\ell)} \}_{m=1}^{M_\ell} \big\}_{\ell=2}^L, \mathcal{O}^{(1)} \Big), \\forall \ell=2, \dots, L$, where $\mathcal{O}^{(1)}$ contains a set of primitive operations.
 
 The $\text{assemble}()$ process is equivalent to sequentially compute the feature map of node $i$ by aggregating all the feature maps of its predecessor node $j$ following the topological ordering:
 
-$$ x_i = \text{merge} \\big\[ \{ o^{(\ell)}_{G^{(\ell)}_{ij}}(x_j) \}_{j < i} \\big\], i = 2, \dots, \vert G^{(\ell)} \vert $$
+$$ x_i = \text{merge} \big\[ \{ o^{(\ell)}_{G^{(\ell)}_{ij}}(x_j) \}_{j < i} \big\], i = 2, \dots, \vert G^{(\ell)} \vert $$
 
 where $\text{merge}\[\]$ is implemented as depth-wise concatenation in the [paper](https://arxiv.org/abs/1711.00436).
 
@@ -165,7 +165,7 @@ The controller is trained as a _RL task_ using [REINFORCE](https://lilianweng.gi
 - **Reward**: The accuracy of a child network that can be achieved at convergence is the reward for training the controller, $R$.
 - **Loss**: NAS optimizes the controller parameters $\\theta$ with a REINFORCE loss. We want to maximize the expected reward (high accuracy) with the gradient as follows. The nice thing here with policy gradient is that it works even when the reward is non-differentiable.
 
-$$ \\nabla_{\\theta} J(\\theta) = \sum_{t=1}^T \mathbb{E}\[\\nabla_{\\theta} \\log P(a_t \vert a_{1:(t-1)}; \\theta) R \] $$
+$$ \\nabla_{\\theta} J(\\theta) = \sum_{t=1}^T \mathbb{E}\[\\nabla_{\\theta} \log P(a_t \vert a_{1:(t-1)}; \\theta) R \] $$
 
 **MetaQNN** ([Baker et al. 2017](https://arxiv.org/abs/1611.02167)) trains an agent to sequentially choose CNN layers using [_Q-learning_](https://lilianweng.github.io/posts/2018-02-19-rl-overview/#q-learning-off-policy-td-control) with an [$\\epsilon$-greedy](https://lilianweng.github.io/posts/2018-01-23-multi-armed-bandit/#%CE%B5-greedy-algorithm) exploration strategy and experience replay. The reward is the validation accuracy as well.
 
@@ -344,7 +344,7 @@ The motivation here is that we want to find an architecture with a low validatio
 
 Fig. 20. An illustration of how DARTS applies continuous relaxation on edges in DAG supergraph and identifies the final model. (Image source: [Liu et al 2019](https://arxiv.org/abs/1806.09055))
 
-$$ \begin{aligned} \text{Let }w'_k &= w_k - \\xi \\nabla_w \mathcal{L}_\text{train}(w_k, \\alpha_{k-1}) & \\ J_\\alpha &= \mathcal{L}_\text{val}(w_k - \\xi \\nabla_w \mathcal{L}_\text{train}(w_k, \\alpha_{k-1}), \\alpha_{k-1}) = \mathcal{L}_\text{val}(w'_k, \\alpha_{k-1}) & \\ \\nabla_\\alpha J_\\alpha &= \\nabla_{\\alpha_{k-1}} \mathcal{L}_\text{val}(w'_k, \\alpha_{k-1}) \\nabla_\\alpha \\alpha_{k-1} + \\nabla_{w'_k} \mathcal{L}_\text{val}(w'_k, \\alpha_{k-1})\\nabla_\\alpha w'_k & \\& \text{; multivariable chain rule}\\ &= \\nabla_{\\alpha_{k-1}} \mathcal{L}_\text{val}(w'_k, \\alpha_{k-1}) + \\nabla_{w'_k} \mathcal{L}_\text{val}(w'_k, \\alpha_{k-1}) \\big( - \\xi \color{red}{\\nabla^2_{\\alpha, w} \mathcal{L}_\text{train}(w_k, \\alpha_{k-1})} \\big) & \\ &\approx \\nabla_{\\alpha_{k-1}} \mathcal{L}_\text{val}(w'_k, \\alpha_{k-1}) - \\xi \\nabla_{w'_k} \mathcal{L}_\text{val}(w'_k, \\alpha_{k-1}) \color{red}{\frac{\\nabla_\\alpha \mathcal{L}_\text{train}(w_k^+, \\alpha_{k-1}) - \\nabla_\\alpha \mathcal{L}_\text{train}(w_k^-, \\alpha_{k-1}) }{2\\epsilon}} & \\ & \text{; apply numerical differentiation approximation} \end{aligned} $$
+$$ \begin{aligned} \text{Let }w'_k &= w_k - \\xi \\nabla_w \mathcal{L}_\text{train}(w_k, \\alpha_{k-1}) & \\ J_\\alpha &= \mathcal{L}_\text{val}(w_k - \\xi \\nabla_w \mathcal{L}_\text{train}(w_k, \\alpha_{k-1}), \\alpha_{k-1}) = \mathcal{L}_\text{val}(w'_k, \\alpha_{k-1}) & \\ \\nabla_\\alpha J_\\alpha &= \\nabla_{\\alpha_{k-1}} \mathcal{L}_\text{val}(w'_k, \\alpha_{k-1}) \\nabla_\\alpha \\alpha_{k-1} + \\nabla_{w'_k} \mathcal{L}_\text{val}(w'_k, \\alpha_{k-1})\\nabla_\\alpha w'_k & \\& \text{; multivariable chain rule}\\ &= \\nabla_{\\alpha_{k-1}} \mathcal{L}_\text{val}(w'_k, \\alpha_{k-1}) + \\nabla_{w'_k} \mathcal{L}_\text{val}(w'_k, \\alpha_{k-1}) \big( - \\xi \color{red}{\\nabla^2_{\\alpha, w} \mathcal{L}_\text{train}(w_k, \\alpha_{k-1})} \big) & \\ &\approx \\nabla_{\\alpha_{k-1}} \mathcal{L}_\text{val}(w'_k, \\alpha_{k-1}) - \\xi \\nabla_{w'_k} \mathcal{L}_\text{val}(w'_k, \\alpha_{k-1}) \color{red}{\frac{\\nabla_\\alpha \mathcal{L}_\text{train}(w_k^+, \\alpha_{k-1}) - \\nabla_\\alpha \mathcal{L}_\text{train}(w_k^-, \\alpha_{k-1}) }{2\\epsilon}} & \\ & \text{; apply numerical differentiation approximation} \end{aligned} $$
 
 where the red part is using numerical differentiation approximation where $w_k^+ = w_k + \\epsilon \\nabla_{w'_k} \mathcal{L}_\text{val}(w'_k, \\alpha_{k-1})$ and $w_k^- = w_k - \\epsilon \\nabla_{w'_k} \mathcal{L}_\text{val}(w'_k, \\alpha_{k-1})$.
 

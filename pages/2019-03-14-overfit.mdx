@@ -119,19 +119,19 @@ The paper proposed a theorem:
 
 > There exists a two-layer neural network with ReLU activations and $2n + d$ weights that can represent any function on a sample of size $n$ in $d$ dimensions.
 
-_Proof._ First we would like to construct a two-layer neural network $C: \mathbb{R}^d \\mapsto \mathbb{R}$. The input is a $d$-dimensional vector, $\\boldsymbol{x} \in \mathbb{R}^d$. The hidden layer has $h$ hidden units, associated with a weight matrix $\mathbf{W} \in \mathbb{R}^{d\\times h}$, a bias vector $-\mathbf{b} \in \mathbb{R}^h$ and ReLU activation function. The second layer outputs a scalar value with weight vector $\\boldsymbol{v} \in \mathbb{R}^h$ and zero biases.
+_Proof._ First we would like to construct a two-layer neural network $C: \mathbb{R}^d \\mapsto \mathbb{R}$. The input is a $d$-dimensional vector, $\\boldsymbol{x} \in \mathbb{R}^d$. The hidden layer has $h$ hidden units, associated with a weight matrix $\mathbf{W} \in \mathbb{R}^{d\times h}$, a bias vector $-\mathbf{b} \in \mathbb{R}^h$ and ReLU activation function. The second layer outputs a scalar value with weight vector $\\boldsymbol{v} \in \mathbb{R}^h$ and zero biases.
 
 The output of network $C$ for a input vector $\\boldsymbol{x}$ can be represented as follows:
 
 $$ C(\\boldsymbol{x}) = \\boldsymbol{v} \max\{ \\boldsymbol{x}\mathbf{W} - \\boldsymbol{b}, 0\}^\top = \sum_{i=1}^h v_i \max\{\\boldsymbol{x}\\boldsymbol{W}_{(:,i)} - b_i, 0\} $$
 
-where $\\boldsymbol{W}_{(:,i)}$ is the $i$-th column in the $d \\times h$ matrix.
+where $\\boldsymbol{W}_{(:,i)}$ is the $i$-th column in the $d \times h$ matrix.
 
-Given a sample set $S = \{\\boldsymbol{x}_1, \dots, \\boldsymbol{x}_n\}$ and target values $\\boldsymbol{y} = \{y_1, \dots, y_n \}$, we would like to find proper weights $\mathbf{W} \in \mathbb{R}^{d\\times h}$, $\\boldsymbol{b}, \\boldsymbol{v} \in \mathbb{R}^h$ so that $C(\\boldsymbol{x}_i) = y_i, \\forall i=1,\dots,n$.
+Given a sample set $S = \{\\boldsymbol{x}_1, \dots, \\boldsymbol{x}_n\}$ and target values $\\boldsymbol{y} = \{y_1, \dots, y_n \}$, we would like to find proper weights $\mathbf{W} \in \mathbb{R}^{d\times h}$, $\\boldsymbol{b}, \\boldsymbol{v} \in \mathbb{R}^h$ so that $C(\\boldsymbol{x}_i) = y_i, \\forall i=1,\dots,n$.
 
-Let's combine all sample points into one batch as one input matrix $\mathbf{X} \in \mathbb{R}^{n \\times d}$. If set $h=n$, $\mathbf{X}\mathbf{W} - \\boldsymbol{b}$ would be a square matrix of size $n \\times n$.
+Let's combine all sample points into one batch as one input matrix $\mathbf{X} \in \mathbb{R}^{n \times d}$. If set $h=n$, $\mathbf{X}\mathbf{W} - \\boldsymbol{b}$ would be a square matrix of size $n \times n$.
 
-$$ \mathbf{M}_\text{ReLU} = \max\{\mathbf{X}\mathbf{W} - \\boldsymbol{b}, 0 \} = \begin{bmatrix} \\boldsymbol{x}_1\mathbf{W} - \\boldsymbol{b} \\ \dots \\ \\boldsymbol{x}_n\mathbf{W} - \\boldsymbol{b} \\ \end{bmatrix} = \[\\boldsymbol{x}_i\\boldsymbol{W}_{(:,j)} - b_j\]_{i \\times j} $$
+$$ \mathbf{M}_\text{ReLU} = \max\{\mathbf{X}\mathbf{W} - \\boldsymbol{b}, 0 \} = \begin{bmatrix} \\boldsymbol{x}_1\mathbf{W} - \\boldsymbol{b} \\ \dots \\ \\boldsymbol{x}_n\mathbf{W} - \\boldsymbol{b} \\ \end{bmatrix} = \[\\boldsymbol{x}_i\\boldsymbol{W}_{(:,j)} - b_j\]_{i \times j} $$
 
 We can simplify $\mathbf{W}$ to have the same column vectors across all the columns:
 
@@ -141,7 +141,7 @@ $$ \mathbf{W}_{(:,j)} = \\boldsymbol{w} \in \mathbb{R}^{d}, \\forall j = 1, \dot
 
 Let $a_i = \\boldsymbol{x}_i \\boldsymbol{w}$, we would like to find a suitable $\\boldsymbol{w}$ and $\\boldsymbol{b}$ such that $b_1 < a_1 < b_2 < a_2 < \dots < b_n < a_n$. This is always achievable because we try to solve $n+d$ unknown variables with $n$ constraints and $\\boldsymbol{x}_i$ are independent (i.e. pick a random $\\boldsymbol{w}$, sort $\\boldsymbol{x}_i \\boldsymbol{w}$ and then set $b_j$'s as values in between). Then $\mathbf{M}_\text{ReLU}$ becomes a lower triangular matrix:
 
-$$ \mathbf{M}_\text{ReLU} = \[a_i - b_j\]_{i \\times j} = \begin{bmatrix} a_1 - b_1 & 0 & 0 & \dots & 0 \\ \\vdots & \\ddots & & & \\vdots \\ a_i - b_1 & \dots & a_i - b_i & \dots & 0\\ \\vdots & & & \\ddots & \\vdots \\ a_n - b_1 & a_n - b_2 & \dots & \dots & a_n - b_n \\ \end{bmatrix} $$
+$$ \mathbf{M}_\text{ReLU} = \[a_i - b_j\]_{i \times j} = \begin{bmatrix} a_1 - b_1 & 0 & 0 & \dots & 0 \\ \vdots & \\ddots & & & \vdots \\ a_i - b_1 & \dots & a_i - b_i & \dots & 0\\ \vdots & & & \\ddots & \vdots \\ a_n - b_1 & a_n - b_2 & \dots & \dots & a_n - b_n \\ \end{bmatrix} $$
 
 It is a nonsingular square matrix as $\\det(\mathbf{M}_\text{ReLU}) \\neq 0$, so we can always find suitable $\\boldsymbol{v}$ to solve $\\boldsymbol{v}\mathbf{M}_\text{ReLU}=\\boldsymbol{y}$ (In other words, the column space of $\mathbf{M}_\text{ReLU}$ is all of $\mathbb{R}^n$ and we can find a linear combination of column vectors to obtain any $\\boldsymbol{y}$).
 
@@ -222,7 +222,7 @@ The gradient update formula looks like the follows:
 
 $$ \\theta^{(D)} = \\theta_0^{(D)} + \mathbf{P} \\theta^{(d)} $$
 
-where $\\theta_0^{(D)}$ are the initialization values and $\mathbf{P}$ is a $D \\times d$ projection matrix that is randomly sampled before training. Both $\\theta_0^{(D)}$ and $\mathbf{P}$ are not trainable and fixed during training. $\\theta^{(d)}$ is initialized as all zeros.
+where $\\theta_0^{(D)}$ are the initialization values and $\mathbf{P}$ is a $D \times d$ projection matrix that is randomly sampled before training. Both $\\theta_0^{(D)}$ and $\mathbf{P}$ are not trainable and fixed during training. $\\theta^{(d)}$ is initialized as all zeros.
 
 By searching through the value of $d = 1, 2, \dots, D$, the corresponding $d$ when the solution emerges is defined as the _intrinsic dimension_.
 
@@ -241,7 +241,7 @@ The measurement of intrinsic dimensions suggests that deep learning models are s
 The paper proposed two types of operations that can be applied to parameters of the $\ell$-th layer, $\ell = 1, \dots, L$, at time $t$, $\\theta^{(\ell)}_t$ to test their impacts on model robustness:
 
 - **Re-initialization**: Reset the parameters to the initial values, $\\theta^{(\ell)}_t \\leftarrow \\theta^{(\ell)}_0$. The performance of a network in which layer $\ell$ was re-initialized is referred to as the _re-initialization robustness_ of layer $\ell$.
-- **Re-randomization**: Re-sampling the layer's parameters at random, $\\theta^{(\ell)}_t \\leftarrow \\tilde{\\theta}^{(\ell)} \\sim \mathcal{P}^{(\ell)}$. The corresponding network performance is called the _re-randomization robustness_ of layer $\ell$.
+- **Re-randomization**: Re-sampling the layer's parameters at random, $\\theta^{(\ell)}_t \\leftarrow \\tilde{\\theta}^{(\ell)} \sim \mathcal{P}^{(\ell)}$. The corresponding network performance is called the _re-randomization robustness_ of layer $\ell$.
 
 Layers can be categorized into two categories with the help of these two operations:
 
@@ -277,7 +277,7 @@ The lottery ticket hypothesis did the following experiments:
 1.  Randomly initialize a dense feed-forward network with initialization values $\\theta_0$;
 2.  Train the network for multiple iterations to achieve a good performance with parameter config $\\theta$;
 3.  Run pruning on $\\theta$ and creating a mask $m$.
-4.  The “winning ticket” initialization config is $m \\odot \\theta_0$.
+4.  The “winning ticket” initialization config is $m \odot \\theta_0$.
 
 Only training the small “winning ticket” subset of parameters with the initial values as found in step 1, the model is able to achieve the same level of accuracy as in step 2. It turns out a large parameter space is not needed in the final solution representation, but needed for training as it provides a big pool of initialization configs of many much smaller subnetworks.
 

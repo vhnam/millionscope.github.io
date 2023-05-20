@@ -51,7 +51,7 @@ To make the definition more general, let us call the environment that we have fu
 
 During policy training, episodes are collected from source domain with randomization applied. Thus the policy is exposed to a variety of environments and learns to generalize. The policy parameter $\\theta$ is trained to maximize the expected reward $R(.)$ average across a distribution of configurations:
 
-$$ \\theta^\* = \arg\max_\\theta \mathbb{E}_{\\xi \\sim \\Xi} \[\mathbb{E}_{\\pi_\\theta, \tau \\sim e_\\xi} \[R(\tau)\]\] $$
+$$ \\theta^\* = \arg\max_\\theta \mathbb{E}_{\\xi \sim \\Xi} \[\mathbb{E}_{\pi_\\theta, \tau \sim e_\\xi} \[R(\tau)\]\] $$
 
 where $\tau_\\xi$ is a trajectory collected in source domain randomized with $\\xi$. In a way, _“discrepancies between the source and target domains are modeled as variability in the source domain."_ (quote from [Peng et al. 2018](https://arxiv.org/abs/1710.06537)).
 
@@ -89,13 +89,13 @@ Now you may ask, why does domain randomization work so well? The idea sounds rea
 
 ## DR as Optimization[#](#dr-as-optimization)
 
-One idea ([Vuong, et al, 2019](https://arxiv.org/abs/1903.11774)) is to view learning randomization parameters in DR as a _bilevel optimization_. Assuming we have access to the real environment $e_\text{real}$ and the randomization config is sampled from a distribution parameterized by $\phi$, $\\xi \\sim P_\phi(\\xi)$, we would like to learn a distribution on which a policy $\\pi_\\theta$ is trained on can achieve maximal performance in $e_\text{real}$:
+One idea ([Vuong, et al, 2019](https://arxiv.org/abs/1903.11774)) is to view learning randomization parameters in DR as a _bilevel optimization_. Assuming we have access to the real environment $e_\text{real}$ and the randomization config is sampled from a distribution parameterized by $\phi$, $\\xi \sim P_\phi(\\xi)$, we would like to learn a distribution on which a policy $\pi_\\theta$ is trained on can achieve maximal performance in $e_\text{real}$:
 
-$$ \begin{aligned} &\phi^\* = \arg\min_{\phi} \mathcal{L}(\\pi_{\\theta^\*(\phi)}; e_\text{real}) \\ \text{where } &\\theta^\*(\phi) = \arg\min_\\theta \mathbb{E}_{\\xi \\sim P_\phi(\\xi)}\[\mathcal{L}(\\pi_\\theta; e_\\xi)\] \end{aligned} $$
+$$ \begin{aligned} &\phi^\* = \arg\min_{\phi} \mathcal{L}(\pi_{\\theta^\*(\phi)}; e_\text{real}) \\ \text{where } &\\theta^\*(\phi) = \arg\min_\\theta \mathbb{E}_{\\xi \sim P_\phi(\\xi)}\[\mathcal{L}(\pi_\\theta; e_\\xi)\] \end{aligned} $$
 
-where $\mathcal{L}(\\pi; e)$ is the loss function of policy $\\pi$ evaluated in the environment $e$.
+where $\mathcal{L}(\pi; e)$ is the loss function of policy $\pi$ evaluated in the environment $e$.
 
-Although randomization ranges are hand-picked in uniform DR, it often involves domain knowledge and a couple rounds of trial-and-error adjustment based on the transfer performance. Essentially this is a manual optimization process on tuning $\phi$ for the optimal $\mathcal{L}(\\pi_{\\theta^\*(\phi)}; e_\text{real})$.
+Although randomization ranges are hand-picked in uniform DR, it often involves domain knowledge and a couple rounds of trial-and-error adjustment based on the transfer performance. Essentially this is a manual optimization process on tuning $\phi$ for the optimal $\mathcal{L}(\pi_{\\theta^\*(\phi)}; e_\text{real})$.
 
 Guided domain randomization in the next section is largely inspired by this view, aiming to do bilevel optimization and learn the best parameter distribution automatically.
 
@@ -113,7 +113,7 @@ One motivation for guided DR is to save computation resources by avoiding traini
 
 ## Optimization for Task Performance[#](#optimization-for-task-performance)
 
-Say we train a family of policies with different randomization parameters $\\xi \\sim P_\phi(\\xi)$, where $P_\\xi$ is the distribution for $\\xi$ parameterized by $\phi$. Later we decide to try every one of them on the downstream task in the target domain (i.e. control a robot in reality or evaluate on a validation set) to collect feedback. This feedback tells us how good a configuration $\\xi$ is and provides signals for optimizing $\phi$.
+Say we train a family of policies with different randomization parameters $\\xi \sim P_\phi(\\xi)$, where $P_\\xi$ is the distribution for $\\xi$ parameterized by $\phi$. Later we decide to try every one of them on the downstream task in the target domain (i.e. control a robot in reality or evaluate on a validation set) to collect feedback. This feedback tells us how good a configuration $\\xi$ is and provides signals for optimizing $\phi$.
 
 Inspired by [NAS](https://ai.google/research/pubs/pub45826), **AutoAugment** ([Cubuk, et al. 2018](https://arxiv.org/abs/1805.09501)) frames the problem of learning best data augmentation operations (i.e. shearing, rotation, invert, etc.) for image classification as an RL problem. Note that AutoAugment is not proposed for sim2real transfer, but falls in the bucket of DR guided by task performance. Individual augmentation configuration is tested on the evaluation set and the performance improvement is used as a reward to train a PPO policy. This policy outputs different augmentation strategies for different datasets; for example, for CIFAR-10 AutoAugment mostly picks color-based transformations, while ImageNet prefers geometric based.
 
@@ -137,9 +137,9 @@ Unfortunately, this family of methods are not suitable for sim2real case. Either
 
 Using real data to guide domain randomization feels a lot like doing system identification or DA. The core idea behind DA is to improve the synthetic data to match the real data distribution. In the case of real-data-guided DR, we would like to learn the randomization parameters $\\xi$ that bring the state distribution in simulator close to the state distribution in the real world.
 
-The **SimOpt** model ([Chebotar et al, 2019](https://arxiv.org/abs/1810.05687)) is trained under an initial randomization distribution $P_\phi(\\xi)$ first, getting a policy $\\pi_{\\theta, P_\phi}$. Then this policy is deployed on both simulator and physical robot to collect trajectories $\tau_\\xi$ and $\tau_\text{real}$ respectively. The optimization objective is to minimize the discrepancy between sim and real trajectories:
+The **SimOpt** model ([Chebotar et al, 2019](https://arxiv.org/abs/1810.05687)) is trained under an initial randomization distribution $P_\phi(\\xi)$ first, getting a policy $\pi_{\\theta, P_\phi}$. Then this policy is deployed on both simulator and physical robot to collect trajectories $\tau_\\xi$ and $\tau_\text{real}$ respectively. The optimization objective is to minimize the discrepancy between sim and real trajectories:
 
-$$ \phi^\* = \arg\min_{\phi}\mathbb{E}_{\\xi \\sim P_\phi(\\xi)} \[\mathbb{E}_{\\pi_{\\theta, P_\phi}} \[D(\tau_\text{sim}, \tau_\text{real})\]\] $$
+$$ \phi^\* = \arg\min_{\phi}\mathbb{E}_{\\xi \sim P_\phi(\\xi)} \[\mathbb{E}_{\pi_{\\theta, P_\phi}} \[D(\tau_\text{sim}, \tau_\text{real})\]\] $$
 
 where $D(.)$ is a trajectory-based discrepancy measure. Like the “Learning to simulate” paper, SimOpt also has to solve the tricky problem of how to propagate gradient through non-differentiable simulator. It used a method called [relative entropy policy search](https://www.aaai.org/ocs/index.php/AAAI/AAAI10/paper/viewFile/1851/2264), see paper for more details.
 
@@ -185,7 +185,7 @@ Fig. 7. How active domain randomization (ADR) works. (Image source: [Mehta et al
 Precisely the training happens as follows:
 
 1.  Given a policy, run it on both reference and randomized envs and collect two sets of trajectories respectively.
-2.  Train a discriminator model to tell whether a rollout trajectory is randomized apart from reference run. The predicted $\\log p$ (probability of being randomized) is used as reward. The more different randomized and reference rollouts, the easier the prediction, the higher the reward.
+2.  Train a discriminator model to tell whether a rollout trajectory is randomized apart from reference run. The predicted $\log p$ (probability of being randomized) is used as reward. The more different randomized and reference rollouts, the easier the prediction, the higher the reward.
     - The intuition is that if an environment is easy, the same policy agent can produce similar trajectories as in the reference one. Then the model should reward and explore hard environments by encouraging different behaviors.
 3.  The reward by discriminator is fed into _Stein Variational Policy Gradient_ ([SVPG](https://arxiv.org/abs/1704.02399)) particles, outputting a diverse set of randomization configurations.
 

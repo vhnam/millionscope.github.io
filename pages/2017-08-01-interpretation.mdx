@@ -108,7 +108,7 @@ The interpretation framework should balance between two goals:
 
 [Robnik-Sikonja and Kononenko (2008)](http://lkm.fri.uni-lj.si/rmarko/papers/RobnikSikonjaKononenko08-TKDE.pdf) proposed to explain the model prediction for one instance by measuring the difference between the original prediction and the one made with omitting a set of features.
 
-Let's say we need to generate an explanation for a classification model $f: \mathbf{X} \\rightarrow \mathbf{Y}$. Given a data point $x \in X$ which consists of $a$ individual values of attribute $A_i$, $i = 1, \dots, a$, and is labeled with class $y \in Y$. The _prediction difference_ is quantified by computing the difference between the model predicted probabilities with or without knowing $A_i$:
+Let's say we need to generate an explanation for a classification model $f: \mathbf{X} \rightarrow \mathbf{Y}$. Given a data point $x \in X$ which consists of $a$ individual values of attribute $A_i$, $i = 1, \dots, a$, and is labeled with class $y \in Y$. The _prediction difference_ is quantified by computing the difference between the model predicted probabilities with or without knowing $A_i$:
 
 $$ \text{probDiff}_i (y | x) = p(y| x) - p(y | x \\backslash A_i) $$
 
@@ -126,7 +126,7 @@ With the help of the measures of prediction difference when omitting known featu
 
 ![](interpretability_prediction_decomposition.png)
 
-Fig. 1. Explanations for a SVM model predicting the survival of one male adult first-class passenger in the [Titanic dataset](https://www.kaggle.com/c/titanic/data). The information difference is very similar to the probability difference, but it measures the amount of information necessary to find out $y$ is true for the given instance without the knowledge of $A\\_i$: $\text{infDiff}\\_i (y|x) = \\log\\_2 p(y|x) - \\log\\_2 p(y|x \\backslash A\\_i)$. Explanations for particular instance are depicted with dark bars. The light shaded half-height bars are average positive and negative explanations for given attributes' values. In this case, being a male adult makes it very less likely to survive; the class level does not impact as much.
+Fig. 1. Explanations for a SVM model predicting the survival of one male adult first-class passenger in the [Titanic dataset](https://www.kaggle.com/c/titanic/data). The information difference is very similar to the probability difference, but it measures the amount of information necessary to find out $y$ is true for the given instance without the knowledge of $A\\_i$: $\text{infDiff}\\_i (y|x) = \log\\_2 p(y|x) - \log\\_2 p(y|x \\backslash A\\_i)$. Explanations for particular instance are depicted with dark bars. The light shaded half-height bars are average positive and negative explanations for given attributes' values. In this case, being a male adult makes it very less likely to survive; the class level does not impact as much.
 
 ## Local Gradient Explanation Vector[#](#local-gradient-explanation-vector)
 
@@ -168,7 +168,7 @@ Fig. 2. An example of how local gradient explanation vector is applied on simple
 
 Same as above, let us label the black-box model as $f$. LIME presents the following steps:
 
-(1) Convert the dataset into interpretable data representation: $x \\Rightarrow x_b$.
+(1) Convert the dataset into interpretable data representation: $x \rightarrow x_b$.
 
 - Text classifier: a binary vector indicating the presence or absence of a word
 - Image classifier: a binary vector indicating the presence or absence of a contiguous patch of similar pixels (super-pixel).

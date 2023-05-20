@@ -134,10 +134,10 @@ The paper considers two transformations:
 1.  _Scaling_: If an image is scaled up by 2x, the number of visual primitives should stay the same.
 2.  _Tiling_: If an image is tiled into a 2x2 grid, the number of visual primitives is expected to be the sum, 4 times the original feature counts.
 
-The model learns a feature encoder $\phi(.)$ using the above feature counting relationship. Given an input image $\mathbf{x} \in \mathbb{R}^{m \\times n \\times 3}$, considering two types of transformation operators:
+The model learns a feature encoder $\phi(.)$ using the above feature counting relationship. Given an input image $\mathbf{x} \in \mathbb{R}^{m \times n \times 3}$, considering two types of transformation operators:
 
-1.  Downsampling operator, $D: \mathbb{R}^{m \\times n \\times 3} \\mapsto \mathbb{R}^{\frac{m}{2} \\times \frac{n}{2} \\times 3}$: downsample by a factor of 2
-2.  Tiling operator $T_i: \mathbb{R}^{m \\times n \\times 3} \\mapsto \mathbb{R}^{\frac{m}{2} \\times \frac{n}{2} \\times 3}$: extract the $i$-th tile from a 2x2 grid of the image.
+1.  Downsampling operator, $D: \mathbb{R}^{m \times n \times 3} \\mapsto \mathbb{R}^{\frac{m}{2} \times \frac{n}{2} \times 3}$: downsample by a factor of 2
+2.  Tiling operator $T_i: \mathbb{R}^{m \times n \times 3} \\mapsto \mathbb{R}^{\frac{m}{2} \times \frac{n}{2} \times 3}$: extract the $i$-th tile from a 2x2 grid of the image.
 
 We expect to learn:
 
@@ -175,7 +175,7 @@ The **denoising autoencoder** ([Vincent, et al, 2008](https://www.cs.toronto.edu
 
 The **context encoder** ([Pathak, et al., 2016](https://arxiv.org/abs/1604.07379)) is trained to fill in a missing piece in the image. Let $\hat{M}$ be a binary mask, 0 for dropped pixels and 1 for remaining input pixels. The model is trained with a combination of the reconstruction (L2) loss and the adversarial loss. The removed regions defined by the mask could be of any shape.
 
-$$ \begin{aligned} \mathcal{L}(\mathbf{x}) &= \mathcal{L}_\text{recon}(\mathbf{x}) + \mathcal{L}_\text{adv}(\mathbf{x})\\ \mathcal{L}_\text{recon}(\mathbf{x}) &= \|(1 - \hat{M}) \\odot (\mathbf{x} - E(\hat{M} \\odot \mathbf{x})) \|_2^2 \\ \mathcal{L}_\text{adv}(\mathbf{x}) &= \max_D \mathbb{E}_{\mathbf{x}} \[\\log D(\mathbf{x}) + \\log(1 - D(E(\hat{M} \\odot \mathbf{x})))\] \end{aligned} $$
+$$ \begin{aligned} \mathcal{L}(\mathbf{x}) &= \mathcal{L}_\text{recon}(\mathbf{x}) + \mathcal{L}_\text{adv}(\mathbf{x})\\ \mathcal{L}_\text{recon}(\mathbf{x}) &= \|(1 - \hat{M}) \odot (\mathbf{x} - E(\hat{M} \odot \mathbf{x})) \|_2^2 \\ \mathcal{L}_\text{adv}(\mathbf{x}) &= \max_D \mathbb{E}_{\mathbf{x}} \[\log D(\mathbf{x}) + \log(1 - D(E(\hat{M} \odot \mathbf{x})))\] \end{aligned} $$
 
 where $E(.)$ is the encoder and $D(.)$ is the decoder.
 
@@ -183,7 +183,7 @@ where $E(.)$ is the encoder and $D(.)$ is the decoder.
 
 Fig. 8. Illustration of context encoder. (Image source: [Pathak, et al., 2016](https://arxiv.org/abs/1604.07379))
 
-When applying a mask on an image, the context encoder removes information of all the color channels in partial regions. How about only hiding a subset of channels? The **split-brain autoencoder** ([Zhang et al., 2017](https://arxiv.org/abs/1611.09842)) does this by predicting a subset of color channels from the rest of channels. Let the data tensor $\mathbf{x} \in \mathbb{R}^{h \\times w \\times \vert C \vert }$ with $C$ color channels be the input for the $l$-th layer of the network. It is split into two disjoint parts, $\mathbf{x}_1 \in \mathbb{R}^{h \\times w \\times \vert C_1 \vert}$ and $\mathbf{x}_2 \in \mathbb{R}^{h \\times w \\times \vert C_2 \vert}$, where $C_1 , C_2 \\subseteq C$. Then two sub-networks are trained to do two complementary predictions: one network $f_1$ predicts $\mathbf{x}_2$ from $\mathbf{x}_1$ and the other network $f_1$ predicts $\mathbf{x}_1$ from $\mathbf{x}_2$. The loss is either L1 loss or cross entropy if color values are quantized.
+When applying a mask on an image, the context encoder removes information of all the color channels in partial regions. How about only hiding a subset of channels? The **split-brain autoencoder** ([Zhang et al., 2017](https://arxiv.org/abs/1611.09842)) does this by predicting a subset of color channels from the rest of channels. Let the data tensor $\mathbf{x} \in \mathbb{R}^{h \times w \times \vert C \vert }$ with $C$ color channels be the input for the $l$-th layer of the network. It is split into two disjoint parts, $\mathbf{x}_1 \in \mathbb{R}^{h \times w \times \vert C_1 \vert}$ and $\mathbf{x}_2 \in \mathbb{R}^{h \times w \times \vert C_2 \vert}$, where $C_1 , C_2 \\subseteq C$. Then two sub-networks are trained to do two complementary predictions: one network $f_1$ predicts $\mathbf{x}_2$ from $\mathbf{x}_1$ and the other network $f_1$ predicts $\mathbf{x}_1$ from $\mathbf{x}_2$. The loss is either L1 loss or cross entropy if color values are quantized.
 
 The split can happen once on the RGB-D or L_a_b\* colorspace, or happen even in every layer of a CNN network in which the number of channels can be arbitrary.
 
@@ -195,7 +195,7 @@ The generative adversarial networks (GANs) are able to learn to map from simple 
 
 **Bidirectional GANs** ([Donahue, et al, 2017](https://arxiv.org/abs/1605.09782)) introduces an additional encoder $E(.)$ to learn the mappings from the input to the latent variable $\mathbf{z}$. The discriminator $D(.)$ predicts in the joint space of the input data and latent representation, $(\mathbf{x}, \mathbf{z})$, to tell apart the generated pair $(\mathbf{x}, E(\mathbf{x}))$ from the real one $(G(\mathbf{z}), \mathbf{z})$. The model is trained to optimize the objective: $\min_{G, E} \max_D V(D, E, G)$, where the generator $G$ and the encoder $E$ learn to generate data and latent variables that are realistic enough to confuse the discriminator and at the same time the discriminator $D$ tries to differentiate real and generated data.
 
-$$ V(D, E, G) = \mathbb{E}_{\mathbf{x} \\sim p_\mathbf{x}} \[ \\underbrace{\mathbb{E}_{\mathbf{z} \\sim p_E(.\vert\mathbf{x})}\[\\log D(\mathbf{x}, \mathbf{z})\]}_{\\log D(\text{real})} \] + \mathbb{E}_{\mathbf{z} \\sim p_\mathbf{z}} \[ \\underbrace{\mathbb{E}_{\mathbf{x} \\sim p_G(.\vert\mathbf{z})}\[\\log 1 - D(\mathbf{x}, \mathbf{z})\]}_{\\log(1- D(\text{fake}))}) \] $$
+$$ V(D, E, G) = \mathbb{E}_{\mathbf{x} \sim p_\mathbf{x}} \[ \\underbrace{\mathbb{E}_{\mathbf{z} \sim p_E(.\vert\mathbf{x})}\[\log D(\mathbf{x}, \mathbf{z})\]}_{\log D(\text{real})} \] + \mathbb{E}_{\mathbf{z} \sim p_\mathbf{z}} \[ \\underbrace{\mathbb{E}_{\mathbf{x} \sim p_G(.\vert\mathbf{z})}\[\log 1 - D(\mathbf{x}, \mathbf{z})\]}_{\log(1- D(\text{fake}))}) \] $$
 
 ![](bi-GAN.png)
 
@@ -213,7 +213,7 @@ CPC uses an encoder to compress the input data $z_t = g_\text{enc}(x_t)$ and an 
 
 While predicting future information, CPC is optimized to maximize the the mutual information between input $x$ and context vector $c$:
 
-$$ I(x; c) = \sum_{x, c} p(x, c) \\log\frac{p(x, c)}{p(x)p(c)} = \sum_{x, c} p(x, c)\\log\frac{p(x|c)}{p(x)} $$
+$$ I(x; c) = \sum_{x, c} p(x, c) \log\frac{p(x, c)}{p(x)p(c)} = \sum_{x, c} p(x, c)\log\frac{p(x|c)}{p(x)} $$
 
 Rather than modeling the future observations $p_k(x_{t+k} \vert c_t)$ directly (which could be fairly expensive), CPC models a density function to preserve the mutual information between $x_{t+k}$ and $c_t$:
 
@@ -221,9 +221,9 @@ $$ f_k(x_{t+k}, c_t) = \exp(z_{t+k}^\top W_k c_t) \\propto \frac{p(x_{t+k}|c_t)}
 
 where $f_k$ can be unnormalized and a linear transformation $W_k^\top c_t$ is used for the prediction with a different $W_k$ matrix for every step $k$.
 
-Given a set of $N$ random samples $X = \{x_1, \dots, x_N\}$ containing only one positive sample $x_t \\sim p(x_{t+k} \vert c_t)$ and $N-1$ negative samples $x_{i \\neq t} \\sim p(x_{t+k})$, the cross-entropy loss for classifying the positive sample (where $\frac{f_k}{\sum f_k}$ is the prediction) correctly is:
+Given a set of $N$ random samples $X = \{x_1, \dots, x_N\}$ containing only one positive sample $x_t \sim p(x_{t+k} \vert c_t)$ and $N-1$ negative samples $x_{i \\neq t} \sim p(x_{t+k})$, the cross-entropy loss for classifying the positive sample (where $\frac{f_k}{\sum f_k}$ is the prediction) correctly is:
 
-$$ \mathcal{L}_N = - \mathbb{E}_X \\Big\[\\log \frac{f_k(x_{t+k}, c_t)}{\sum_{i=1}^N f_k (x_i, c_t)}\\Big\] $$
+$$ \mathcal{L}_N = - \mathbb{E}_X \Big\[\log \frac{f_k(x_{t+k}, c_t)}{\sum_{i=1}^N f_k (x_i, c_t)}\Big\] $$
 
 ![](CPC-image.png)
 
@@ -237,7 +237,7 @@ When using CPC on images ([Henaff, et al. 2019](https://arxiv.org/abs/1905.09272
 
 A contrastive loss quantifies this prediction with a goal to correctly identify the target among a set of negative representation $\{z_l\}$ sampled from other patches in the same image and other images in the same batch:
 
-$$ \mathcal{L}_\text{CPC} = -\sum_{i,j,k} \\log p(z_{i+k, j} \vert \hat{z}_{i+k, j}, \{z_l\}) = -\sum_{i,j,k} \\log \frac{\exp(\hat{z}_{i+k, j}^\top z_{i+k, j})}{\exp(\hat{z}_{i+k, j}^\top z_{i+k, j}) + \sum_l \exp(\hat{z}_{i+k, j}^\top z_l)} $$
+$$ \mathcal{L}_\text{CPC} = -\sum_{i,j,k} \log p(z_{i+k, j} \vert \hat{z}_{i+k, j}, \{z_l\}) = -\sum_{i,j,k} \log \frac{\exp(\hat{z}_{i+k, j}^\top z_{i+k, j})}{\exp(\hat{z}_{i+k, j}^\top z_{i+k, j}) + \sum_l \exp(\hat{z}_{i+k, j}^\top z_l)} $$
 
 For more content on contrastive learning, check out the post on [“Contrastive Representation Learning”](https://lilianweng.github.io/posts/2021-05-31-contrastive/).
 
@@ -257,7 +257,7 @@ $$ D(\mathbf{x}_1, \mathbf{x}_2) = 1 - \frac{f(\mathbf{x}_1) f(\mathbf{x}_2)}{\|
 
 The loss function is:
 
-$$ \mathcal{L}(\mathbf{x}, \mathbf{x}^+, \mathbf{x}^-) = \max\\big(0, D(\mathbf{x}, \mathbf{x}^+) - D(\mathbf{x}, \mathbf{x}^-) + M\\big) + \text{weight decay regularization term} $$
+$$ \mathcal{L}(\mathbf{x}, \mathbf{x}^+, \mathbf{x}^-) = \max\big(0, D(\mathbf{x}, \mathbf{x}^+) - D(\mathbf{x}, \mathbf{x}^-) + M\big) + \text{weight decay regularization term} $$
 
 where $M$ is a scalar constant controlling for the minimum gap between two distances; $M=0.5$ in the paper. The loss enforces $D(\mathbf{x}, \mathbf{x}^-) >= D(\mathbf{x}, \mathbf{x}^+) + M$ at the optimal case.
 
@@ -365,7 +365,7 @@ To learn object-centric representation, we expect the difference between embeddi
 
 Let $\phi_s$ and $\phi_o$ be the embedding functions for the scene and the object respectively. The model learns the representation by minimizing the distance between $\phi_s(s_\text{pre}) - \phi_s(s_\text{post})$ and $\phi_o(o)$ using _n-pair loss_:
 
-$$ \begin{aligned} \mathcal{L}_\text{grasp2vec} &= \text{NPair}(\phi_s(s_\text{pre}) - \phi_s(s_\text{post}), \phi_o(o)) + \text{NPair}(\phi_o(o), \phi_s(s_\text{pre}) - \phi_s(s_\text{post})) \\ \text{where }\text{NPair}(a, p) &= \sum_{i<{B}} -\\log\frac{\exp(a_i^\top p_j)}{\sum_{j<{B}, i\\neq j}\exp(a_i^\top p_j)} + \\lambda (\|a_i\|_2^2 + \|p_i\|_2^2) \end{aligned} $$
+$$ \begin{aligned} \mathcal{L}_\text{grasp2vec} &= \text{NPair}(\phi_s(s_\text{pre}) - \phi_s(s_\text{post}), \phi_o(o)) + \text{NPair}(\phi_o(o), \phi_s(s_\text{pre}) - \phi_s(s_\text{post})) \\ \text{where }\text{NPair}(a, p) &= \sum_{i<{B}} -\log\frac{\exp(a_i^\top p_j)}{\sum_{j<{B}, i\\neq j}\exp(a_i^\top p_j)} + \\lambda (\|a_i\|_2^2 + \|p_i\|_2^2) \end{aligned} $$
 
 where $B$ refers to a batch of (anchor, positive) sample pairs.
 
@@ -392,7 +392,7 @@ Fig. 20. An illustration of time-contrastive approach for learning state embeddi
 
 TCN embedding extracts visual features that are invariant to camera configurations. It can be used to construct a reward function for imitation learning based on the euclidean distance between the demo video and the observations in the latent space.
 
-A further improvement over TCN is to learn embedding over multiple frames jointly rather than a single frame, resulting in **mfTCN** (**Multi-frame Time-Contrastive Networks**; [Dwibedi et al., 2019](https://arxiv.org/abs/1808.00928)). Given a set of videos from several synchronized camera viewpoints, $v_1, v_2, \dots, v_k$, the frame at time $t$ and the previous $n-1$ frames selected with stride $s$ in each video are aggregated and mapped into one embedding vector, resulting in a lookback window of size $(n−1) \\times s + 1$. Each frame first goes through a CNN to extract low-level features and then we use 3D temporal convolutions to aggregate frames in time. The model is trained with [n-pairs loss](#n-pair-loss).
+A further improvement over TCN is to learn embedding over multiple frames jointly rather than a single frame, resulting in **mfTCN** (**Multi-frame Time-Contrastive Networks**; [Dwibedi et al., 2019](https://arxiv.org/abs/1808.00928)). Given a set of videos from several synchronized camera viewpoints, $v_1, v_2, \dots, v_k$, the frame at time $t$ and the previous $n-1$ frames selected with stride $s$ in each video are aggregated and mapped into one embedding vector, resulting in a lookback window of size $(n−1) \times s + 1$. Each frame first goes through a CNN to extract low-level features and then we use 3D temporal convolutions to aggregate frames in time. The model is trained with [n-pairs loss](#n-pair-loss).
 
 ![](mfTCN.png)
 
@@ -418,7 +418,7 @@ The task is to control a robot arm to push a small puck on a table to a desired 
 
 Let's say a [$\\beta$-VAE](https://lilianweng.github.io/posts/2018-08-12-vae/#beta-vae) has an encoder $q_\phi$ mapping input states to latent variable $z$ which is modeled by a Gaussian distribution and a decoder $p_\\psi$ mapping $z$ back to the states. The state encoder in RIG is set to be the mean of $\\beta$-VAE encoder.
 
-$$ \begin{aligned} z &\\sim q_\phi(z \vert s) = \mathcal{N}(z; \\mu_\phi(s), \sigma^2_\phi(s)) \\ \mathcal{L}_{\\beta\text{-VAE}} &= - \mathbb{E}_{z \\sim q_\phi(z \vert s)} \[\\log p_\\psi (s \vert z)\] + \\beta D_\text{KL}(q_\phi(z \vert s) \| p_\\psi(s)) \\ e(s) &\\triangleq \\mu_\phi(s) \end{aligned} $$
+$$ \begin{aligned} z &\sim q_\phi(z \vert s) = \mathcal{N}(z; \\mu_\phi(s), \sigma^2_\phi(s)) \\ \mathcal{L}_{\\beta\text{-VAE}} &= - \mathbb{E}_{z \sim q_\phi(z \vert s)} \[\log p_\\psi (s \vert z)\] + \\beta D_\text{KL}(q_\phi(z \vert s) \| p_\\psi(s)) \\ e(s) &\\triangleq \\mu_\phi(s) \end{aligned} $$
 
 The reward is the Euclidean distance between state and goal embedding vectors: $r(s, g) = -|e(s) - e(g)|$. Similar to [grasp2vec](#grasp2vec), RIG applies data augmentation as well by latent goal relabeling: precisely half of the goals are generated from the prior at random and the other half are selected using HER. Also same as grasp2vec, rewards do not depend on any ground truth states but only the learned state encoding, so it can be used for training on real robots.
 
@@ -434,13 +434,13 @@ Fig. 24. The workflow of context-conditioned RIG. (Image source: [Nair, et al., 
 
 A CVAE conditions on a context variable $c$. It trains an encoder $q_\phi(z \vert s, c)$ and a decoder $p_\\psi (s \vert z, c)$ and note that both have access to $c$. The CVAE loss penalizes information passing from the input state $s$ through an information bottleneck but allows for _unrestricted_ information flow from $c$ to both encoder and decoder.
 
-$$ \mathcal{L}_\text{CVAE} = - \mathbb{E}_{z \\sim q_\phi(z \vert s,c)} \[\\log p_\\psi (s \vert z, c)\] + \\beta D_\text{KL}(q_\phi(z \vert s, c) \| p_\\psi(s)) $$
+$$ \mathcal{L}_\text{CVAE} = - \mathbb{E}_{z \sim q_\phi(z \vert s,c)} \[\log p_\\psi (s \vert z, c)\] + \\beta D_\text{KL}(q_\phi(z \vert s, c) \| p_\\psi(s)) $$
 
 To create plausible goals, CC-VAE conditions on a starting state $s_0$ so that the generated goal presents a consistent type of object as in $s_0$. This goal consistency is necessary; e.g. if the current scene contains a red puck but the goal has a blue block, it would confuse the policy.
 
 Other than the state encoder $e(s) \\triangleq \\mu_\phi(s)$, CC-VAE trains a second convolutional encoder $e_0(.)$ to translate the starting state $s_0$ into a compact context representation $c = e_0(s_0)$. Two encoders, $e(.)$ and $e_0(.)$, are intentionally different without shared weights, as they are expected to encode different factors of image variation. In addition to the loss function of CVAE, CC-VAE adds an extra term to learn to reconstruct $c$ back to $s_0$, $\hat{s}_0 = d_0(c)$.
 
-$$ \mathcal{L}_\text{CC-VAE} = \mathcal{L}_\text{CVAE} + \\log p(s_0\vert c) $$
+$$ \mathcal{L}_\text{CC-VAE} = \mathcal{L}_\text{CVAE} + \log p(s_0\vert c) $$
 
 ![](CC-RIG-goal-samples.png)
 
@@ -460,7 +460,7 @@ $$ \begin{aligned} \mathcal{R}(s_i, a) &= \mathcal{R}(s_j, a) \\; \\forall a \in
 
 where $\mathcal{S}_B$ is a partition of the state space under the relation $B$.
 
-Note that $=$ is always a bisimulation relation. The most interesting one is the maximal bisimulation relation $\\sim$, which defines a partition $\mathcal{S}_\\sim$ with _fewest_ groups of states.
+Note that $=$ is always a bisimulation relation. The most interesting one is the maximal bisimulation relation $\sim$, which defines a partition $\mathcal{S}_\sim$ with _fewest_ groups of states.
 
 ![](DeepMDP.png)
 
@@ -475,15 +475,15 @@ $$ \begin{aligned} \mathcal{L}_{\\bar{\mathcal{R}}}(s, a) = \vert \mathcal{R}(s,
 
 where $\phi(s)$ is the embedding of state $s$; symbols with bar are functions (reward function $R$ and transition function $P$) in the same MDP but running in the latent low-dimensional observation space. Here the embedding representation $\phi$ can be connected to bisimulation metrics, as the bisimulation distance is proved to be upper-bounded by the L2 distance in the latent space.
 
-The function $D$ quantifies the distance between two probability distributions and should be chosen carefully. DeepMDP focuses on _Wasserstein-1_ metric (also known as [“earth-mover distance”](https://lilianweng.github.io/posts/2017-08-20-gan/#what-is-wasserstein-distance)). The Wasserstein-1 distance between distributions $P$ and $Q$ on a metric space $(M, d)$ (i.e., $d: M \\times M \to \mathbb{R}$) is:
+The function $D$ quantifies the distance between two probability distributions and should be chosen carefully. DeepMDP focuses on _Wasserstein-1_ metric (also known as [“earth-mover distance”](https://lilianweng.github.io/posts/2017-08-20-gan/#what-is-wasserstein-distance)). The Wasserstein-1 distance between distributions $P$ and $Q$ on a metric space $(M, d)$ (i.e., $d: M \times M \to \mathbb{R}$) is:
 
-$$ W_d (P, Q) = \inf_{\\lambda \in \\Pi(P, Q)} \int_{M \\times M} d(x, y) \\lambda(x, y) \\; \\mathrm{d}x \\mathrm{d}y $$
+$$ W_d (P, Q) = \inf_{\\lambda \in \\Pi(P, Q)} \int_{M \times M} d(x, y) \\lambda(x, y) \\; \\mathrm{d}x \\mathrm{d}y $$
 
 where $\\Pi(P, Q)$ is the set of all [couplings](<https://en.wikipedia.org/wiki/Coupling_(probability)>) of $P$ and $Q$. $d(x, y)$ defines the cost of moving a particle from point $x$ to point $y$.
 
 The Wasserstein metric has a dual form according to the Monge-Kantorovich duality:
 
-$$ W_d (P, Q) = \\sup_{f \in \mathcal{F}_d} \vert \mathbb{E}_{x \\sim P} f(x) - \mathbb{E}_{y \\sim Q} f(y) \vert $$
+$$ W_d (P, Q) = \\sup_{f \in \mathcal{F}_d} \vert \mathbb{E}_{x \sim P} f(x) - \mathbb{E}_{y \sim Q} f(y) \vert $$
 
 where $\mathcal{F}_d$ is the set of 1-Lipschitz functions under the metric $d$ - $\mathcal{F}_d = \{ f: \vert f(x) - f(y) \vert \leq d(x, y) \}$.
 
@@ -497,19 +497,19 @@ Fig. 27. The Deep Bisimulation for Control algorithm learns a bisimulation metri
 
 Similar to DeepMDP, DBC models the dynamics by learning a reward model and a transition model. Both models operate in the latent space, $\phi(s)$. The optimization of embedding $\phi$ depends on one important conclusion from [Ferns, et al. 2004](https://arxiv.org/abs/1207.4114) (Theorem 4.5) and [Ferns, et al 2011](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.295.2114&rep=rep1&type=pdf) (Theorem 2.6):
 
-> Given $c \in (0, 1)$ a discounting factor, $\\pi$ a policy that is being improved continuously, and $M$ the space of bounded [pseudometric](https://mathworld.wolfram.com/Pseudometric.html) on the state space $\mathcal{S}$, we can define $\mathcal{F}: M \\mapsto M$:
+> Given $c \in (0, 1)$ a discounting factor, $\pi$ a policy that is being improved continuously, and $M$ the space of bounded [pseudometric](https://mathworld.wolfram.com/Pseudometric.html) on the state space $\mathcal{S}$, we can define $\mathcal{F}: M \\mapsto M$:
 >
-> $$ \mathcal{F}(d; \\pi)(s_i, s_j) = (1-c) \vert \mathcal{R}_{s_i}^\\pi - \mathcal{R}_{s_j}^\\pi \vert + c W_d (\mathcal{P}_{s_i}^\\pi, \mathcal{P}_{s_j}^\\pi) $$
+> $$ \mathcal{F}(d; \pi)(s_i, s_j) = (1-c) \vert \mathcal{R}_{s_i}^\pi - \mathcal{R}_{s_j}^\pi \vert + c W_d (\mathcal{P}_{s_i}^\pi, \mathcal{P}_{s_j}^\pi) $$
 >
-> Then, $\mathcal{F}$ has a unique fixed point $\\tilde{d}$ which is a $\\pi^\*$-bisimulation metric and $\\tilde{d}(s_i, s_j) = 0 \\iff s_i \\sim s_j$.
+> Then, $\mathcal{F}$ has a unique fixed point $\\tilde{d}$ which is a $\pi^\*$-bisimulation metric and $\\tilde{d}(s_i, s_j) = 0 \\iff s_i \sim s_j$.
 
 \[The proof is not trivial. I may or may not add it in the future _(:3」∠)_ …\]
 
 Given batches of observations pairs, the training loss for $\phi$, $J(\phi)$, minimizes the mean square error between the on-policy bisimulation metric and Euclidean distance in the latent space:
 
-$$ J(\phi) = \\Big( \|\phi(s_i) - \phi(s_j)\|_1 - \vert \hat{\mathcal{R}}(\\bar{\phi}(s_i)) - \hat{\mathcal{R}}(\\bar{\phi}(s_j)) \vert - \\gamma W_2(\hat{\mathcal{P}}(\cdot \vert \\bar{\phi}(s_i), \\bar{\\pi}(\\bar{\phi}(s_i))), \hat{\mathcal{P}}(\cdot \vert \\bar{\phi}(s_j), \\bar{\\pi}(\\bar{\phi}(s_j)))) \\Big)^2 $$
+$$ J(\phi) = \Big( \|\phi(s_i) - \phi(s_j)\|_1 - \vert \hat{\mathcal{R}}(\\bar{\phi}(s_i)) - \hat{\mathcal{R}}(\\bar{\phi}(s_j)) \vert - \\gamma W_2(\hat{\mathcal{P}}(\cdot \vert \\bar{\phi}(s_i), \\bar{\pi}(\\bar{\phi}(s_i))), \hat{\mathcal{P}}(\cdot \vert \\bar{\phi}(s_j), \\bar{\pi}(\\bar{\phi}(s_j)))) \Big)^2 $$
 
-where $\\bar{\phi}(s)$ denotes $\phi(s)$ with stop gradient and $\\bar{\\pi}$ is the mean policy output. The learned reward model $\hat{\mathcal{R}}$ is deterministic and the learned forward dynamics model $\hat{\mathcal{P}}$ outputs a Gaussian distribution.
+where $\\bar{\phi}(s)$ denotes $\phi(s)$ with stop gradient and $\\bar{\pi}$ is the mean policy output. The learned reward model $\hat{\mathcal{R}}$ is deterministic and the learned forward dynamics model $\hat{\mathcal{P}}$ outputs a Gaussian distribution.
 
 DBC is based on SAC but operates on the latent space:
 

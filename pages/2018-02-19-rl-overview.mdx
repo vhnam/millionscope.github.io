@@ -72,7 +72,7 @@ The model defines the reward function and transition probabilities. We may or ma
 - **Know the model**: planning with perfect information; do model-based RL. When we fully know the environment, we can find the optimal solution by [Dynamic Programming](https://en.wikipedia.org/wiki/Dynamic_programming) (DP). Do you still remember “longest increasing subsequence” or “traveling salesmen problem” from your Algorithms 101 class? LOL. This is not the focus of this post though.
 - **Does not know the model**: learning with incomplete information; do model-free RL or try to learn the model explicitly as part of the algorithm. Most of the following content serves the scenarios when the model is unknown.
 
-The agent's **policy** $\\pi(s)$ provides the guideline on what is the optimal action to take in a certain state with **the goal to maximize the total rewards**. Each state is associated with a **value** function $V(s)$ predicting the expected amount of future rewards we are able to receive in this state by acting the corresponding policy. In other words, the value function quantifies how good a state is. Both policy and value functions are what we try to learn in reinforcement learning.
+The agent's **policy** $\pi(s)$ provides the guideline on what is the optimal action to take in a certain state with **the goal to maximize the total rewards**. Each state is associated with a **value** function $V(s)$ predicting the expected amount of future rewards we are able to receive in this state by acting the corresponding policy. In other words, the value function quantifies how good a state is. Both policy and value functions are what we try to learn in reinforcement learning.
 
 ![](RL_algorithm_categorization.png)
 
@@ -109,10 +109,10 @@ $$ R(s, a) = \mathbb{E} \[R_{t+1} \vert S_t = s, A_t = a\] = \sum_{r\in\mathcal{
 
 ### Policy[#](#policy)
 
-Policy, as the agent's behavior function $\\pi$, tells us which action to take in state s. It is a mapping from state s to action a and can be either deterministic or stochastic:
+Policy, as the agent's behavior function $\pi$, tells us which action to take in state s. It is a mapping from state s to action a and can be either deterministic or stochastic:
 
-- Deterministic: $\\pi(s) = a$.
-- Stochastic: $\\pi(a \vert s) = \mathbb{P}_\\pi \[A=a \vert S=s\]$.
+- Deterministic: $\pi(s) = a$.
+- Stochastic: $\pi(a \vert s) = \mathbb{P}_\pi \[A=a \vert S=s\]$.
 
 ### Value Function[#](#value-function)
 
@@ -129,31 +129,31 @@ The discounting factor $\\gamma \in \[0, 1\]$ penalize the rewards in the future
 
 The **state-value** of a state s is the expected return if we are in this state at time t, $S_t = s$:
 
-$$ V_{\\pi}(s) = \mathbb{E}_{\\pi}\[G_t \vert S_t = s\] $$
+$$ V_{\pi}(s) = \mathbb{E}_{\pi}\[G_t \vert S_t = s\] $$
 
 Similarly, we define the **action-value** (“Q-value”; Q as “Quality” I believe?) of a state-action pair as:
 
-$$ Q_{\\pi}(s, a) = \mathbb{E}_{\\pi}\[G_t \vert S_t = s, A_t = a\] $$
+$$ Q_{\pi}(s, a) = \mathbb{E}_{\pi}\[G_t \vert S_t = s, A_t = a\] $$
 
-Additionally, since we follow the target policy $\\pi$, we can make use of the probility distribution over possible actions and the Q-values to recover the state-value:
+Additionally, since we follow the target policy $\pi$, we can make use of the probility distribution over possible actions and the Q-values to recover the state-value:
 
-$$ V_{\\pi}(s) = \sum_{a \in \mathcal{A}} Q_{\\pi}(s, a) \\pi(a \vert s) $$
+$$ V_{\pi}(s) = \sum_{a \in \mathcal{A}} Q_{\pi}(s, a) \pi(a \vert s) $$
 
 The difference between action-value and state-value is the action **advantage** function (“A-value”):
 
-$$ A_{\\pi}(s, a) = Q_{\\pi}(s, a) - V_{\\pi}(s) $$
+$$ A_{\pi}(s, a) = Q_{\pi}(s, a) - V_{\pi}(s) $$
 
 ### Optimal Value and Policy[#](#optimal-value-and-policy)
 
 The optimal value function produces the maximum return:
 
-$$ V_{\*}(s) = \max_{\\pi} V_{\\pi}(s), Q_{\*}(s, a) = \max_{\\pi} Q_{\\pi}(s, a) $$
+$$ V_{\*}(s) = \max_{\pi} V_{\pi}(s), Q_{\*}(s, a) = \max_{\pi} Q_{\pi}(s, a) $$
 
 The optimal policy achieves optimal value functions:
 
-$$ \\pi_{\*} = \arg\max_{\\pi} V_{\\pi}(s), \\pi_{\*} = \arg\max_{\\pi} Q_{\\pi}(s, a) $$
+$$ \pi_{\*} = \arg\max_{\pi} V_{\pi}(s), \pi_{\*} = \arg\max_{\pi} Q_{\pi}(s, a) $$
 
-And of course, we have $V_{\\pi_{\*}}(s)=V_{\*}(s)$ and $Q_{\\pi_{\*}}(s, a) = Q_{\*}(s, a)$.
+And of course, we have $V_{\pi_{\*}}(s)=V_{\*}(s)$ and $Q_{\pi_{\*}}(s, a) = Q_{\*}(s, a)$.
 
 ## Markov Decision Processes[#](#markov-decision-processes)
 
@@ -187,23 +187,23 @@ $$ \begin{aligned} V(s) &= \mathbb{E}\[G_t \vert S_t = s\] \\ &= \mathbb{E} \[R_
 
 Similarly for Q-value,
 
-$$ \begin{aligned} Q(s, a) &= \mathbb{E} \[R_{t+1} + \\gamma V(S_{t+1}) \mid S_t = s, A_t = a\] \\ &= \mathbb{E} \[R_{t+1} + \\gamma \mathbb{E}_{a\\sim\\pi} Q(S_{t+1}, a) \mid S_t = s, A_t = a\] \end{aligned} $$
+$$ \begin{aligned} Q(s, a) &= \mathbb{E} \[R_{t+1} + \\gamma V(S_{t+1}) \mid S_t = s, A_t = a\] \\ &= \mathbb{E} \[R_{t+1} + \\gamma \mathbb{E}_{a\sim\pi} Q(S_{t+1}, a) \mid S_t = s, A_t = a\] \end{aligned} $$
 
 ### Bellman Expectation Equations[#](#bellman-expectation-equations)
 
-The recursive update process can be further decomposed to be equations built on both state-value and action-value functions. As we go further in future action steps, we extend V and Q alternatively by following the policy $\\pi$.
+The recursive update process can be further decomposed to be equations built on both state-value and action-value functions. As we go further in future action steps, we extend V and Q alternatively by following the policy $\pi$.
 
 ![](bellman_equation.png)
 
 Fig. 5. Illustration of how Bellman expection equations update state-value and action-value functions.
 
-$$ \begin{aligned} V_{\\pi}(s) &= \sum_{a \in \mathcal{A}} \\pi(a \vert s) Q_{\\pi}(s, a) \\ Q_{\\pi}(s, a) &= R(s, a) + \\gamma \sum_{s' \in \mathcal{S}} P_{ss'}^a V_{\\pi} (s') \\ V_{\\pi}(s) &= \sum_{a \in \mathcal{A}} \\pi(a \vert s) \\big( R(s, a) + \\gamma \sum_{s' \in \mathcal{S}} P_{ss'}^a V_{\\pi} (s') \\big) \\ Q_{\\pi}(s, a) &= R(s, a) + \\gamma \sum_{s' \in \mathcal{S}} P_{ss'}^a \sum_{a' \in \mathcal{A}} \\pi(a' \vert s') Q_{\\pi} (s', a') \end{aligned} $$
+$$ \begin{aligned} V_{\pi}(s) &= \sum_{a \in \mathcal{A}} \pi(a \vert s) Q_{\pi}(s, a) \\ Q_{\pi}(s, a) &= R(s, a) + \\gamma \sum_{s' \in \mathcal{S}} P_{ss'}^a V_{\pi} (s') \\ V_{\pi}(s) &= \sum_{a \in \mathcal{A}} \pi(a \vert s) \big( R(s, a) + \\gamma \sum_{s' \in \mathcal{S}} P_{ss'}^a V_{\pi} (s') \big) \\ Q_{\pi}(s, a) &= R(s, a) + \\gamma \sum_{s' \in \mathcal{S}} P_{ss'}^a \sum_{a' \in \mathcal{A}} \pi(a' \vert s') Q_{\pi} (s', a') \end{aligned} $$
 
 ### Bellman Optimality Equations[#](#bellman-optimality-equations)
 
 If we are only interested in the optimal values, rather than computing the expectation following a policy, we could jump right into the maximum returns during the alternative updates without using a policy. RECAP: the optimal values $V_\*$ and $Q_\*$ are the best returns we can obtain, defined [here](#optimal-value-and-policy).
 
-$$ \begin{aligned} V_\*(s) &= \max_{a \in \mathcal{A}} Q_\*(s,a)\\ Q_\*(s, a) &= R(s, a) + \\gamma \sum_{s' \in \mathcal{S}} P_{ss'}^a V_\*(s') \\ V_\*(s) &= \max_{a \in \mathcal{A}} \\big( R(s, a) + \\gamma \sum_{s' \in \mathcal{S}} P_{ss'}^a V_\*(s') \\big) \\ Q_\*(s, a) &= R(s, a) + \\gamma \sum_{s' \in \mathcal{S}} P_{ss'}^a \max_{a' \in \mathcal{A}} Q_\*(s', a') \end{aligned} $$
+$$ \begin{aligned} V_\*(s) &= \max_{a \in \mathcal{A}} Q_\*(s,a)\\ Q_\*(s, a) &= R(s, a) + \\gamma \sum_{s' \in \mathcal{S}} P_{ss'}^a V_\*(s') \\ V_\*(s) &= \max_{a \in \mathcal{A}} \big( R(s, a) + \\gamma \sum_{s' \in \mathcal{S}} P_{ss'}^a V_\*(s') \big) \\ Q_\*(s, a) &= R(s, a) + \\gamma \sum_{s' \in \mathcal{S}} P_{ss'}^a \max_{a' \in \mathcal{A}} Q_\*(s', a') \end{aligned} $$
 
 Unsurprisingly they look very similar to Bellman expectation equations.
 
@@ -219,27 +219,27 @@ When the model is fully known, following Bellman equations, we can use [Dynamic 
 
 ### Policy Evaluation[#](#policy-evaluation)
 
-Policy Evaluation is to compute the state-value $V_\\pi$ for a given policy $\\pi$:
+Policy Evaluation is to compute the state-value $V_\pi$ for a given policy $\pi$:
 
-$$ V_{t+1}(s) = \mathbb{E}_\\pi \[r + \\gamma V_t(s') | S_t = s\] = \sum_a \\pi(a \vert s) \sum_{s', r} P(s', r \vert s, a) (r + \\gamma V_t(s')) $$
+$$ V_{t+1}(s) = \mathbb{E}_\pi \[r + \\gamma V_t(s') | S_t = s\] = \sum_a \pi(a \vert s) \sum_{s', r} P(s', r \vert s, a) (r + \\gamma V_t(s')) $$
 
 ### Policy Improvement[#](#policy-improvement)
 
-Based on the value functions, Policy Improvement generates a better policy $\\pi' \\geq \\pi$ by acting greedily.
+Based on the value functions, Policy Improvement generates a better policy $\pi' \\geq \pi$ by acting greedily.
 
-$$ Q_\\pi(s, a) = \mathbb{E} \[R_{t+1} + \\gamma V_\\pi(S_{t+1}) \vert S_t=s, A_t=a\] = \sum_{s', r} P(s', r \vert s, a) (r + \\gamma V_\\pi(s')) $$
+$$ Q_\pi(s, a) = \mathbb{E} \[R_{t+1} + \\gamma V_\pi(S_{t+1}) \vert S_t=s, A_t=a\] = \sum_{s', r} P(s', r \vert s, a) (r + \\gamma V_\pi(s')) $$
 
 ### Policy Iteration[#](#policy-iteration)
 
 The _Generalized Policy Iteration (GPI)_ algorithm refers to an iterative procedure to improve the policy when combining policy evaluation and improvement.
 
-$$ \\pi_0 \\xrightarrow\[\]{\text{evaluation}} V_{\\pi_0} \\xrightarrow\[\]{\text{improve}} \\pi_1 \\xrightarrow\[\]{\text{evaluation}} V_{\\pi_1} \\xrightarrow\[\]{\text{improve}} \\pi_2 \\xrightarrow\[\]{\text{evaluation}} \dots \\xrightarrow\[\]{\text{improve}} \\pi_\* \\xrightarrow\[\]{\text{evaluation}} V_\* $$
+$$ \pi_0 \\xrightarrow\[\]{\text{evaluation}} V_{\pi_0} \\xrightarrow\[\]{\text{improve}} \pi_1 \\xrightarrow\[\]{\text{evaluation}} V_{\pi_1} \\xrightarrow\[\]{\text{improve}} \pi_2 \\xrightarrow\[\]{\text{evaluation}} \dots \\xrightarrow\[\]{\text{improve}} \pi_\* \\xrightarrow\[\]{\text{evaluation}} V_\* $$
 
 In GPI, the value function is approximated repeatedly to be closer to the true value of the current policy and in the meantime, the policy is improved repeatedly to approach optimality. This policy iteration process works and always converges to the optimality, but why this is the case?
 
-Say, we have a policy $\\pi$ and then generate an improved version $\\pi'$ by greedily taking actions, $\\pi'(s) = \arg\max_{a \in \mathcal{A}} Q_\\pi(s, a)$. The value of this improved $\\pi'$ is guaranteed to be better because:
+Say, we have a policy $\pi$ and then generate an improved version $\pi'$ by greedily taking actions, $\pi'(s) = \arg\max_{a \in \mathcal{A}} Q_\pi(s, a)$. The value of this improved $\pi'$ is guaranteed to be better because:
 
-$$ \begin{aligned} Q_\\pi(s, \\pi'(s)) &= Q_\\pi(s, \arg\max_{a \in \mathcal{A}} Q_\\pi(s, a)) \\ &= \max_{a \in \mathcal{A}} Q_\\pi(s, a) \\geq Q_\\pi(s, \\pi(s)) = V_\\pi(s) \end{aligned} $$
+$$ \begin{aligned} Q_\pi(s, \pi'(s)) &= Q_\pi(s, \arg\max_{a \in \mathcal{A}} Q_\pi(s, a)) \\ &= \max_{a \in \mathcal{A}} Q_\pi(s, a) \\geq Q_\pi(s, \pi(s)) = V_\pi(s) \end{aligned} $$
 
 ## Monte-Carlo Methods[#](#monte-carlo-methods)
 
@@ -257,9 +257,9 @@ To learn the optimal policy by MC, we iterate it by following a similar idea to 
 
 ![](MC_control.png)
 
-1.  Improve the policy greedily with respect to the current value function: $\\pi(s) = \arg\max_{a \in \mathcal{A}} Q(s, a)$.
-2.  Generate a new episode with the new policy $\\pi$ (i.e. using algorithms like [ε-greedy](https://lilianweng.github.io/posts/2018-01-23-multi-armed-bandit/#%CE%B5-greedy-algorithm) helps us balance between exploitation and exploration.)
-3.  Estimate Q using the new episode: $q_\\pi(s, a) = \frac{\sum_{t=1}^T \\big( \mathbb{1}\[S_t = s, A_t = a\] \sum_{k=0}^{T-t-1} \\gamma^k R_{t+k+1} \\big)}{\sum_{t=1}^T \mathbb{1}\[S_t = s, A_t = a\]}$
+1.  Improve the policy greedily with respect to the current value function: $\pi(s) = \arg\max_{a \in \mathcal{A}} Q(s, a)$.
+2.  Generate a new episode with the new policy $\pi$ (i.e. using algorithms like [ε-greedy](https://lilianweng.github.io/posts/2018-01-23-multi-armed-bandit/#%CE%B5-greedy-algorithm) helps us balance between exploitation and exploration.)
+3.  Estimate Q using the new episode: $q_\pi(s, a) = \frac{\sum_{t=1}^T \big( \mathbb{1}\[S_t = s, A_t = a\] \sum_{k=0}^{T-t-1} \\gamma^k R_{t+k+1} \big)}{\sum_{t=1}^T \mathbb{1}\[S_t = s, A_t = a\]}$
 
 ## Temporal-Difference Learning[#](#temporal-difference-learning)
 
@@ -324,7 +324,7 @@ Deep Q-Network (“DQN”; Mnih et al. 2015) aims to greatly improve and stabili
 
 The loss function looks like this:
 
-$$ \mathcal{L}(\\theta) = \mathbb{E}_{(s, a, r, s') \\sim U(D)} \\Big\[ \\big( r + \\gamma \max_{a'} Q(s', a'; \\theta^{-}) - Q(s, a; \\theta) \\big)^2 \\Big\] $$
+$$ \mathcal{L}(\\theta) = \mathbb{E}_{(s, a, r, s') \sim U(D)} \Big\[ \big( r + \\gamma \max_{a'} Q(s', a'; \\theta^{-}) - Q(s, a; \\theta) \big)^2 \Big\] $$
 
 where $U(D)$ is a uniform distribution over the replay memory D; $\\theta^{-}$ is the parameters of the frozen target Q-network.
 
@@ -390,19 +390,19 @@ Fig. 8. Comparison of the backup diagrams of Monte-Carlo, Temporal-Difference le
 
 ## Policy Gradient[#](#policy-gradient)
 
-All the methods we have introduced above aim to learn the state/action value function and then to select actions accordingly. Policy Gradient methods instead learn the policy directly with a parameterized function respect to $\\theta$, $\\pi(a \vert s; \\theta)$. Let's define the reward function (opposite of loss function) as _the expected return_ and train the algorithm with the goal to maximize the reward function. My [next post](https://lilianweng.github.io/posts/2018-04-08-policy-gradient/) described why the policy gradient theorem works (proof) and introduced a number of policy gradient algorithms.
+All the methods we have introduced above aim to learn the state/action value function and then to select actions accordingly. Policy Gradient methods instead learn the policy directly with a parameterized function respect to $\\theta$, $\pi(a \vert s; \\theta)$. Let's define the reward function (opposite of loss function) as _the expected return_ and train the algorithm with the goal to maximize the reward function. My [next post](https://lilianweng.github.io/posts/2018-04-08-policy-gradient/) described why the policy gradient theorem works (proof) and introduced a number of policy gradient algorithms.
 
 In discrete space:
 
-$$ \mathcal{J}(\\theta) = V_{\\pi_\\theta}(S_1) = \mathbb{E}_{\\pi_\\theta}\[V_1\] $$
+$$ \mathcal{J}(\\theta) = V_{\pi_\\theta}(S_1) = \mathbb{E}_{\pi_\\theta}\[V_1\] $$
 
 where $S_1$ is the initial starting state.
 
 Or in continuous space:
 
-$$ \mathcal{J}(\\theta) = \sum_{s \in \mathcal{S}} d_{\\pi_\\theta}(s) V_{\\pi_\\theta}(s) = \sum_{s \in \mathcal{S}} \\Big( d_{\\pi_\\theta}(s) \sum_{a \in \mathcal{A}} \\pi(a \vert s, \\theta) Q_\\pi(s, a) \\Big) $$
+$$ \mathcal{J}(\\theta) = \sum_{s \in \mathcal{S}} d_{\pi_\\theta}(s) V_{\pi_\\theta}(s) = \sum_{s \in \mathcal{S}} \Big( d_{\pi_\\theta}(s) \sum_{a \in \mathcal{A}} \pi(a \vert s, \\theta) Q_\pi(s, a) \Big) $$
 
-where $d_{\\pi_\\theta}(s)$ is stationary distribution of Markov chain for $\\pi_\\theta$. If you are unfamiliar with the definition of a “stationary distribution,” please check this [reference](https://jeremykun.com/2015/04/06/markov-chain-monte-carlo-without-all-the-bullshit/).
+where $d_{\pi_\\theta}(s)$ is stationary distribution of Markov chain for $\pi_\\theta$. If you are unfamiliar with the definition of a “stationary distribution,” please check this [reference](https://jeremykun.com/2015/04/06/markov-chain-monte-carlo-without-all-the-bullshit/).
 
 Using _gradient ascent_ we can find the best θ that produces the highest return. It is natural to expect policy-based methods are more useful in continuous space, because there is an infinite number of actions and/or states to estimate the values for in continuous space and hence value-based approaches are computationally much more expensive.
 
@@ -414,25 +414,25 @@ $$ \frac{\\partial \mathcal{J}(\\theta)}{\\partial \\theta_k} \approx \frac{\mat
 
 Or _analytically_,
 
-$$ \mathcal{J}(\\theta) = \mathbb{E}_{\\pi_\\theta} \[r\] = \sum_{s \in \mathcal{S}} d_{\\pi_\\theta}(s) \sum_{a \in \mathcal{A}} \\pi(a \vert s; \\theta) R(s, a) $$
+$$ \mathcal{J}(\\theta) = \mathbb{E}_{\pi_\\theta} \[r\] = \sum_{s \in \mathcal{S}} d_{\pi_\\theta}(s) \sum_{a \in \mathcal{A}} \pi(a \vert s; \\theta) R(s, a) $$
 
-Actually we have nice theoretical support for (replacing $d(.)$ with $d_\\pi(.)$):
+Actually we have nice theoretical support for (replacing $d(.)$ with $d_\pi(.)$):
 
-$$ \mathcal{J}(\\theta) = \sum_{s \in \mathcal{S}} d_{\\pi_\\theta}(s) \sum_{a \in \mathcal{A}} \\pi(a \vert s; \\theta) Q_\\pi(s, a) \\propto \sum_{s \in \mathcal{S}} d(s) \sum_{a \in \mathcal{A}} \\pi(a \vert s; \\theta) Q_\\pi(s, a) $$
+$$ \mathcal{J}(\\theta) = \sum_{s \in \mathcal{S}} d_{\pi_\\theta}(s) \sum_{a \in \mathcal{A}} \pi(a \vert s; \\theta) Q_\pi(s, a) \\propto \sum_{s \in \mathcal{S}} d(s) \sum_{a \in \mathcal{A}} \pi(a \vert s; \\theta) Q_\pi(s, a) $$
 
 Check Sec 13.1 in Sutton & Barto (2017) for why this is the case.
 
 Then,
 
-$$ \begin{aligned} \mathcal{J}(\\theta) &= \sum_{s \in \mathcal{S}} d(s) \sum_{a \in \mathcal{A}} \\pi(a \vert s; \\theta) Q_\\pi(s, a) \\ \\nabla \mathcal{J}(\\theta) &= \sum_{s \in \mathcal{S}} d(s) \sum_{a \in \mathcal{A}} \\nabla \\pi(a \vert s; \\theta) Q_\\pi(s, a) \\ &= \sum_{s \in \mathcal{S}} d(s) \sum_{a \in \mathcal{A}} \\pi(a \vert s; \\theta) \frac{\\nabla \\pi(a \vert s; \\theta)}{\\pi(a \vert s; \\theta)} Q_\\pi(s, a) \\ & = \sum_{s \in \mathcal{S}} d(s) \sum_{a \in \mathcal{A}} \\pi(a \vert s; \\theta) \\nabla \\ln \\pi(a \vert s; \\theta) Q_\\pi(s, a) \\ & = \mathbb{E}_{\\pi_\\theta} \[\\nabla \\ln \\pi(a \vert s; \\theta) Q_\\pi(s, a)\] \end{aligned} $$
+$$ \begin{aligned} \mathcal{J}(\\theta) &= \sum_{s \in \mathcal{S}} d(s) \sum_{a \in \mathcal{A}} \pi(a \vert s; \\theta) Q_\pi(s, a) \\ \\nabla \mathcal{J}(\\theta) &= \sum_{s \in \mathcal{S}} d(s) \sum_{a \in \mathcal{A}} \\nabla \pi(a \vert s; \\theta) Q_\pi(s, a) \\ &= \sum_{s \in \mathcal{S}} d(s) \sum_{a \in \mathcal{A}} \pi(a \vert s; \\theta) \frac{\\nabla \pi(a \vert s; \\theta)}{\pi(a \vert s; \\theta)} Q_\pi(s, a) \\ & = \sum_{s \in \mathcal{S}} d(s) \sum_{a \in \mathcal{A}} \pi(a \vert s; \\theta) \\nabla \\ln \pi(a \vert s; \\theta) Q_\pi(s, a) \\ & = \mathbb{E}_{\pi_\\theta} \[\\nabla \\ln \pi(a \vert s; \\theta) Q_\pi(s, a)\] \end{aligned} $$
 
 This result is named “Policy Gradient Theorem” which lays the theoretical foundation for various policy gradient algorithms:
 
-$$ \\nabla \mathcal{J}(\\theta) = \mathbb{E}_{\\pi_\\theta} \[\\nabla \\ln \\pi(a \vert s, \\theta) Q_\\pi(s, a)\] $$
+$$ \\nabla \mathcal{J}(\\theta) = \mathbb{E}_{\pi_\\theta} \[\\nabla \\ln \pi(a \vert s, \\theta) Q_\pi(s, a)\] $$
 
 ### REINFORCE[#](#reinforce)
 
-REINFORCE, also known as Monte-Carlo policy gradient, relies on $Q_\\pi(s, a)$, an estimated return by [MC](#monte-carlo-methods) methods using episode samples, to update the policy parameter $\\theta$.
+REINFORCE, also known as Monte-Carlo policy gradient, relies on $Q_\pi(s, a)$, an estimated return by [MC](#monte-carlo-methods) methods using episode samples, to update the policy parameter $\\theta$.
 
 A commonly used variation of REINFORCE is to subtract a baseline value from the return $G_t$ to reduce the variance of gradient estimation while keeping the bias unchanged. For example, a common baseline is state-value, and if applied, we would use $A(s, a) = Q(s, a) - V(s)$ in the gradient ascent update.
 
@@ -440,22 +440,22 @@ A commonly used variation of REINFORCE is to subtract a baseline value from the 
 2.  Generate one episode $S_1, A_1, R_2, S_2, A_2, \dots, S_T$
 3.  For t=1, 2, … , T:
     1.  Estimate the the return G_t since the time step t.
-    2.  $\\theta \\leftarrow \\theta + \\alpha \\gamma^t G_t \\nabla \\ln \\pi(A_t \vert S_t, \\theta)$.
+    2.  $\\theta \\leftarrow \\theta + \\alpha \\gamma^t G_t \\nabla \\ln \pi(A_t \vert S_t, \\theta)$.
 
 ### Actor-Critic[#](#actor-critic)
 
 If the value function is learned in addition to the policy, we would get Actor-Critic algorithm.
 
 - **Critic**: updates value function parameters w and depending on the algorithm it could be action-value $Q(a \vert s; w)$ or state-value $V(s; w)$.
-- **Actor**: updates policy parameters θ, in the direction suggested by the critic, $\\pi(a \vert s; \\theta)$.
+- **Actor**: updates policy parameters θ, in the direction suggested by the critic, $\pi(a \vert s; \\theta)$.
 
 Let's see how it works in an action-value actor-critic algorithm.
 
-1.  Initialize s, θ, w at random; sample $a \\sim \\pi(a \vert s; \\theta)$.
+1.  Initialize s, θ, w at random; sample $a \sim \pi(a \vert s; \\theta)$.
 2.  For t = 1… T:
-    1.  Sample reward $r_t \\sim R(s, a)$ and next state $s' \\sim P(s' \vert s, a)$.
-    2.  Then sample the next action $a' \\sim \\pi(s', a'; \\theta)$.
-    3.  Update policy parameters: $\\theta \\leftarrow \\theta + \\alpha_\\theta Q(s, a; w) \\nabla_\\theta \\ln \\pi(a \vert s; \\theta)$.
+    1.  Sample reward $r_t \sim R(s, a)$ and next state $s' \sim P(s' \vert s, a)$.
+    2.  Then sample the next action $a' \sim \pi(s', a'; \\theta)$.
+    3.  Update policy parameters: $\\theta \\leftarrow \\theta + \\alpha_\\theta Q(s, a; w) \\nabla_\\theta \\ln \pi(a \vert s; \\theta)$.
     4.  Compute the correction for action-value at time t:  
         $G_{t:t+1} = r_t + \\gamma Q(s', a'; w) - Q(s, a; w)$  
         and use it to update value function parameters:  
@@ -481,12 +481,12 @@ Here is the algorithm outline:
     2.  Synchronize thread-specific parameters with global ones: θ' = θ and w' = w.
     3.  $t_\text{start}$ = t and get $s_t$.
     4.  While ($s_t \\neq \text{TERMINAL}$) and ($t - t_\text{start} <= t_\text{max}$):
-        1.  Pick the action $a_t \\sim \\pi(a_t \vert s_t; \\theta')$ and receive a new reward $r_t$ and a new state $s_{t+1}$.
+        1.  Pick the action $a_t \sim \pi(a_t \vert s_t; \\theta')$ and receive a new reward $r_t$ and a new state $s_{t+1}$.
         2.  Update t = t + 1 and T = T + 1.
     5.  Initialize the variable that holds the return estimation $$R = \begin{cases} 0 & \text{if } s_t \text{ is TERMINAL} \\ V(s_t; w') & \text{otherwise} \end{cases}$$.
     6.  For $i = t-1, \dots, t_\text{start}$:
         1.  $R \\leftarrow r_i + \\gamma R$; here R is a MC measure of $G_i$.
-        2.  Accumulate gradients w.r.t. θ': $d\\theta \\leftarrow d\\theta + \\nabla_{\\theta'} \\log \\pi(a_i \vert s_i; \\theta')(R - V(s_i; w'))$;  
+        2.  Accumulate gradients w.r.t. θ': $d\\theta \\leftarrow d\\theta + \\nabla_{\\theta'} \log \pi(a_i \vert s_i; \\theta')(R - V(s_i; w'))$;  
             Accumulate gradients w.r.t. w': $dw \\leftarrow dw + \\nabla_{w'} (R - V(s_i; w'))^2$.
     7.  Update synchronously θ using dθ, and w using dw.
 
@@ -500,11 +500,11 @@ Say, we start with a population of random solutions. All of them are capable of 
 
 Very different from the popular MDP-based approaches as what we have introduced above, ES aims to learn the policy parameter $\\theta$ without value approximation. Let's assume the distribution over the parameter $\\theta$ is an [isotropic](https://math.stackexchange.com/questions/1991961/gaussian-distribution-is-isotropic) multivariate Gaussian with mean $\\mu$ and fixed covariance $\sigma^2I$. The gradient of $F(\\theta)$ is calculated:
 
-$$ \begin{aligned} & \\nabla_\\theta \mathbb{E}_{\\theta \\sim N(\\mu, \sigma^2)} F(\\theta) \\ =& \\nabla_\\theta \int_\\theta F(\\theta) \\Pr(\\theta) && \text{Pr(.) is the Gaussian density function.} \\ =& \int_\\theta F(\\theta) \\Pr(\\theta) \frac{\\nabla_\\theta \\Pr(\\theta)}{\\Pr(\\theta)} \\ =& \int_\\theta F(\\theta) \\Pr(\\theta) \\nabla_\\theta \\log \\Pr(\\theta) \\ =& \mathbb{E}_{\\theta \\sim N(\\mu, \sigma^2)} \[F(\\theta) \\nabla_\\theta \\log \\Pr(\\theta)\] && \text{Similar to how we do policy gradient update.} \\ =& \mathbb{E}_{\\theta \\sim N(\\mu, \sigma^2)} \\Big\[ F(\\theta) \\nabla_\\theta \\log \\Big( \frac{1}{\sqrt{2\\pi\sigma^2}} e^{-\frac{(\\theta - \\mu)^2}{2 \sigma^2 }} \\Big) \\Big\] \\ =& \mathbb{E}_{\\theta \\sim N(\\mu, \sigma^2)} \\Big\[ F(\\theta) \\nabla_\\theta \\Big( -\\log \sqrt{2\\pi\sigma^2} - \frac{(\\theta - \\mu)^2}{2 \sigma^2} \\Big) \\Big\] \\ =& \mathbb{E}_{\\theta \\sim N(\\mu, \sigma^2)} \\Big\[ F(\\theta) \frac{\\theta - \\mu}{\sigma^2} \\Big\] \end{aligned} $$
+$$ \begin{aligned} & \\nabla_\\theta \mathbb{E}_{\\theta \sim N(\\mu, \sigma^2)} F(\\theta) \\ =& \\nabla_\\theta \int_\\theta F(\\theta) \\Pr(\\theta) && \text{Pr(.) is the Gaussian density function.} \\ =& \int_\\theta F(\\theta) \\Pr(\\theta) \frac{\\nabla_\\theta \\Pr(\\theta)}{\\Pr(\\theta)} \\ =& \int_\\theta F(\\theta) \\Pr(\\theta) \\nabla_\\theta \log \\Pr(\\theta) \\ =& \mathbb{E}_{\\theta \sim N(\\mu, \sigma^2)} \[F(\\theta) \\nabla_\\theta \log \\Pr(\\theta)\] && \text{Similar to how we do policy gradient update.} \\ =& \mathbb{E}_{\\theta \sim N(\\mu, \sigma^2)} \Big\[ F(\\theta) \\nabla_\\theta \log \Big( \frac{1}{\sqrt{2\pi\sigma^2}} e^{-\frac{(\\theta - \\mu)^2}{2 \sigma^2 }} \Big) \Big\] \\ =& \mathbb{E}_{\\theta \sim N(\\mu, \sigma^2)} \Big\[ F(\\theta) \\nabla_\\theta \Big( -\log \sqrt{2\pi\sigma^2} - \frac{(\\theta - \\mu)^2}{2 \sigma^2} \Big) \Big\] \\ =& \mathbb{E}_{\\theta \sim N(\\mu, \sigma^2)} \Big\[ F(\\theta) \frac{\\theta - \\mu}{\sigma^2} \Big\] \end{aligned} $$
 
-We can rewrite this formula in terms of a “mean” parameter $\\theta$ (different from the $\\theta$ above; this $\\theta$ is the base gene for further mutation), $\\epsilon \\sim N(0, I)$ and therefore $\\theta + \\epsilon \sigma \\sim N(\\theta, \sigma^2)$. $\\epsilon$ controls how much Gaussian noises should be added to create mutation:
+We can rewrite this formula in terms of a “mean” parameter $\\theta$ (different from the $\\theta$ above; this $\\theta$ is the base gene for further mutation), $\\epsilon \sim N(0, I)$ and therefore $\\theta + \\epsilon \sigma \sim N(\\theta, \sigma^2)$. $\\epsilon$ controls how much Gaussian noises should be added to create mutation:
 
-$$ \\nabla_\\theta \mathbb{E}_{\\epsilon \\sim N(0, I)} F(\\theta + \sigma \\epsilon) = \frac{1}{\sigma} \mathbb{E}_{\\epsilon \\sim N(0, I)} \[F(\\theta + \sigma \\epsilon) \\epsilon\] $$
+$$ \\nabla_\\theta \mathbb{E}_{\\epsilon \sim N(0, I)} F(\\theta + \sigma \\epsilon) = \frac{1}{\sigma} \mathbb{E}_{\\epsilon \sim N(0, I)} \[F(\\theta + \sigma \\epsilon) \\epsilon\] $$
 
 ![](EA_RL_parallel.png)
 
@@ -545,7 +545,7 @@ $$ (p, v) = f_\\theta(s) $$
 - $p$: the probability of selecting a move over 19^2 + 1 candidates (19^2 positions on the board, in addition to passing).
 - $v$: the winning probability given the current setting.
 
-During self-play, MCTS further improves the action probability distribution $\\pi \\sim p(.)$ and then the action $a_t$ is sampled from this improved policy. The reward $z_t$ is a binary value indicating whether the current player _eventually_ wins the game. Each move generates an episode tuple $(s_t, \\pi_t, z_t)$ and it is saved into the replay memory. The details on MCTS are skipped for the sake of space in this post; please read the original [paper](https://www.dropbox.com/s/yva172qos2u15hf/2017-silver.pdf?dl=0) if you are interested.
+During self-play, MCTS further improves the action probability distribution $\pi \sim p(.)$ and then the action $a_t$ is sampled from this improved policy. The reward $z_t$ is a binary value indicating whether the current player _eventually_ wins the game. Each move generates an episode tuple $(s_t, \pi_t, z_t)$ and it is saved into the replay memory. The details on MCTS are skipped for the sake of space in this post; please read the original [paper](https://www.dropbox.com/s/yva172qos2u15hf/2017-silver.pdf?dl=0) if you are interested.
 
 ![](alphago-zero-selfplay.png)
 
@@ -553,7 +553,7 @@ Fig. 11. AlphaGo Zero is trained by self-play while MCTS improves the output pol
 
 The network is trained with the samples in the replay memory to minimize the loss:
 
-$$ \mathcal{L} = (z - v)^2 - \\pi^\top \\log p + c \| \\theta \|^2 $$
+$$ \mathcal{L} = (z - v)^2 - \pi^\top \log p + c \| \\theta \|^2 $$
 
 where $c$ is a hyperparameter controlling the intensity of L2 penalty to avoid overfitting.
 
