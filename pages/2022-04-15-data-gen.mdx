@@ -96,7 +96,7 @@ EDA is shown to improve the classification accuracy on several classification be
 
 Fig. 1. EDA leads to performance improvement on several classification benchmarks. (Image source: [Wei & Zou 2019](https://arxiv.org/abs/1901.11196))
 
-_Contextual_ Augmentation ([Kobayashi, 2018](https://arxiv.org/abs/1805.06201)) replaces word $w_i$ at position $i$ by sampling from a probability distribution learned by a bidirectional LM such as BERT, $p(.\mid S\\setminus{w_i})$. In this way, the words are substituted by synonyms, or similar words suitable for the context. To guarantee such operations do not alter the labels, the LM is fit to be label-conditioned bidirectional LM. Conditional BERT (CBERT; [Xing Wu et al. 2018](https://arxiv.org/abs/1812.06705)) extends BERT to predict masked tokens conditioned on the class label and can be used for contextual augmentation prediction.
+_Contextual_ Augmentation ([Kobayashi, 2018](https://arxiv.org/abs/1805.06201)) replaces word $w_i$ at position $i$ by sampling from a probability distribution learned by a bidirectional LM such as BERT, $p(.\mid S\setminus{w_i})$. In this way, the words are substituted by synonyms, or similar words suitable for the context. To guarantee such operations do not alter the labels, the LM is fit to be label-conditioned bidirectional LM. Conditional BERT (CBERT; [Xing Wu et al. 2018](https://arxiv.org/abs/1812.06705)) extends BERT to predict masked tokens conditioned on the class label and can be used for contextual augmentation prediction.
 
 ### Back-translation[#](#back-translation)
 

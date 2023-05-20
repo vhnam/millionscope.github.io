@@ -281,15 +281,15 @@ where $\text{TopK}(\theta, x)$ selected top $x$ proportion of weights from $\the
 
 $$ \Delta*{\theta^t_i} = \begin{cases} -\eta \nabla*{\alpha_t} \mathcal{L}(y, x, \alpha^t)\_i & \text{ if } i\in B^t = \{i \mid \theta^t_i \in \text{TopK}(\theta^t, D+M) \} \\ 0 & \text{ otherwise } \end{cases} $$
 
-Training is split into two stages and the additional coordinates in the set $B \\setminus A$ controls how much exploration is brought in. The amount of exploration is expected to diminish gradually through the training process and the mask eventually stabilizes.
+Training is split into two stages and the additional coordinates in the set $B \setminus A$ controls how much exploration is brought in. The amount of exploration is expected to diminish gradually through the training process and the mask eventually stabilizes.
 
 ![](assets/images/2023-01-10-inference-optimization/Top-KAST-stabilize.png)
 
 Fig. 12. The pruning mask of Top-KAST stabilizes in time. (Image source: [Jayakumar et al. 2021](https://arxiv.org/abs/2106.03517))
 
-To prevent rich-get-richer phenomenon, Top-KAST penalizes the magnitude of active weights via a L2 regularization loss to encourage more exploration of new items. Parameters in $B \\setminus A$ are penalized more than $A$ for a higher selection bar during updates to stabilize the mask.
+To prevent rich-get-richer phenomenon, Top-KAST penalizes the magnitude of active weights via a L2 regularization loss to encourage more exploration of new items. Parameters in $B \setminus A$ are penalized more than $A$ for a higher selection bar during updates to stabilize the mask.
 
-$$ L\_\text{penalty}(\alpha^t_i) = \begin{cases} \vert \theta^t_i\vert & \text{ if } i \in A^t \\ \vert \theta^t_i\vert / D & \text{ if } i \in B^t \\setminus A^t \\ 0 & \text{ otherwise} \end{cases} $$
+$$ L\_\text{penalty}(\alpha^t_i) = \begin{cases} \vert \theta^t_i\vert & \text{ if } i \in A^t \\ \vert \theta^t_i\vert / D & \text{ if } i \in B^t \setminus A^t \\ 0 & \text{ otherwise} \end{cases} $$
 
 ## Sparsified Transformer[#](#sparsified-transformer)
 
