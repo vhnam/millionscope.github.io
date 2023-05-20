@@ -44,7 +44,7 @@ Here is a quick summary of the difference between GAN, VAE, and flow-based gener
 2.  Variational autoencoders: VAE inexplicitly optimizes the log-likelihood of the data by maximizing the evidence lower bound (ELBO).
 3.  Flow-based generative models: A flow-based generative model is constructed by a sequence of invertible transformations. Unlike other two, the model explicitly learns the data distribution $p(\mathbf{x})$ and therefore the loss function is simply the negative log-likelihood.
 
-![](three-generative-models.png)
+![](assets/images/2018-10-13-flow-models/three-generative-models.png)
 
 Fig. 1. Comparison of three categories of generative models.
 
@@ -92,7 +92,7 @@ Being able to do good density estimation has direct applications in many machine
 
 Here comes a **Normalizing Flow** (NF) model for better and more powerful distribution approximation. A normalizing flow transforms a simple distribution into a complex one by applying a sequence of invertible transformation functions. Flowing through a chain of transformations, we repeatedly substitute the variable for the new one according to the change of variables theorem and eventually obtain a probability distribution of the final target variable.
 
-![](normalizing-flow.png)
+![](assets/images/2018-10-13-flow-models/normalizing-flow.png)
 
 Fig. 2. Illustration of a normalizing flow model, transforming a simple distribution $p\\_0(\mathbf{z}\\_0)$ to a complex one $p\\_K(\mathbf{z}\\_K)$ step by step.
 
@@ -172,7 +172,7 @@ $$\begin{cases} \mathbf{y}_{1:d} &= \mathbf{x}_{1:d} \\ \mathbf{y}_{d+1:D} &= \m
 
 The **Glow** ([Kingma and Dhariwal, 2018](https://arxiv.org/abs/1807.03039)) model extends the previous reversible generative models, NICE and RealNVP, and simplifies the architecture by replacing the reverse permutation operation on the channel ordering with invertible 1x1 convolutions.
 
-![](one-glow-step.png)
+![](assets/images/2018-10-13-flow-models/one-glow-step.png)
 
 Fig. 3. One step of flow in the Glow model. (Image source: [Kingma and Dhariwal, 2018](https://arxiv.org/abs/1807.03039))
 
@@ -198,7 +198,7 @@ Substep 3: **Affine coupling layer**
 
 The design is same as in RealNVP.
 
-![](glow-table.png)
+![](assets/images/2018-10-13-flow-models/glow-table.png)
 
 Fig. 4. Three substeps in one step of flow in Glow. (Image source: [Kingma and Dhariwal, 2018](https://arxiv.org/abs/1807.03039))
 
@@ -224,7 +224,7 @@ Without any mask, the computation through layers looks like the following:
 
 $$\begin{aligned} \mathbf{h}^0 &= \mathbf{x} \\ \mathbf{h}^l &= \text{activation}^l(\mathbf{W}^l\mathbf{h}^{l-1} + \mathbf{b}^l) \\ \hat{\mathbf{x}} &= \sigma(\mathbf{V}\mathbf{h}^L + \mathbf{c}) \end{aligned}$$
 
-![](MADE.png)
+![](assets/images/2018-10-13-flow-models/MADE.png)
 
 Fig. 5. Demonstration of how MADE works in a three-layer feed-forward neural network. (Image source: [Germain et al., 2015](https://arxiv.org/abs/1502.03509))
 
@@ -245,7 +245,7 @@ PixelRNN ([Oord et al, 2016](https://arxiv.org/abs/1601.06759)) is a deep genera
 
 Let's consider an image of size $n \times n$, $\mathbf{x} = \{x_1, \dots, x_{n^2}\}$, the model starts generating pixels from the top left corner, from left to right and top to bottom (See Fig. 6).
 
-![](pixel-rnn-context.png)
+![](assets/images/2018-10-13-flow-models/pixel-rnn-context.png)
 
 Fig. 6. The context for generating one pixel in PixelRNN. (Image source: [Oord et al, 2016](https://arxiv.org/abs/1601.06759))
 
@@ -253,7 +253,7 @@ Every pixel $x_i$ is sampled from a probability distribution conditional over th
 
 One implementation that could capture the entire context is the _Diagonal BiLSTM_. First, apply the **skewing** operation by offsetting each row of the input feature map by one position with respect to the previous row, so that computation for each row can be parallelized. Then the LSTM states are computed with respect to the current pixel and the pixels on the left.
 
-![](diagonal-biLSTM.png)
+![](assets/images/2018-10-13-flow-models/diagonal-biLSTM.png)
 
 Fig. 7. (a) PixelRNN with diagonal BiLSTM. (b) Skewing operation that offsets each row in the feature map by one with regards to the row above. (Image source: [Oord et al, 2016](https://arxiv.org/abs/1601.06759))
 
@@ -263,7 +263,7 @@ where $\circledast$ denotes the convolution operation and $\odot$ is the element
 
 The diagonal BiLSTM layers are capable of processing an unbounded context field, but expensive to compute due to the sequential dependency between states. A faster implementation uses multiple convolutional layers without pooling to define a bounded context box. The convolution kernel is masked so that the future context is not seen, similar to [MADE](#MADE). This convolution version is called **PixelCNN**.
 
-![](pixel-cnn.png)
+![](assets/images/2018-10-13-flow-models/pixel-cnn.png)
 
 Fig. 8. PixelCNN with masked convolution constructed by an elementwise product of a mask tensor and the convolution kernel before applying it. (Image source: http://slazebni.cs.illinois.edu/spring17/lec13_advanced.pdf)
 
@@ -273,7 +273,7 @@ Fig. 8. PixelCNN with masked convolution constructed by an elementwise product o
 
 One big drawback of convolution layer is a very limited size of receptive field. The output can hardly depend on the input hundreds or thousands of timesteps ago, which can be a crucial requirement for modeling long sequences. WaveNet therefore adopts _dilated convolution_ ([animation](https://github.com/vdumoulin/conv_arithmetic#dilated-convolution-animations)), where the kernel is applied to an evenly-distributed subset of samples in a much larger receptive field of the input.
 
-![](wavenet.png)
+![](assets/images/2018-10-13-flow-models/wavenet.png)
 
 Fig. 9. Visualization of WaveNet models with a stack of (top) causal convolution layers and (bottom) dilated convolution layers. (Image source: [Van Den Oord, et al. 2016](https://arxiv.org/abs/1609.03499))
 
@@ -319,7 +319,7 @@ $$\tilde{x}_i \sim p(\tilde{x}_i\vert\tilde{\mathbf{z}}_{1:i}) = \tilde{z}_i \od
 
 IAF intends to estimate the probability density function of $\tilde{\mathbf{x}}$ given that $\tilde{\pi}(\tilde{\mathbf{z}})$ is already known. The inverse flow is an autoregressive affine transformation too, same as in MAF, but the scale and shift terms are autoregressive functions of observed variables from the known distribution $\tilde{\pi}(\tilde{\mathbf{z}})$. See the comparison between MAF and IAF in Fig. 10.
 
-![](MAF-vs-IAF.png)
+![](assets/images/2018-10-13-flow-models/MAF-vs-IAF.png)
 
 Fig. 10. Comparison of MAF and IAF. The variable with known density is in green while the unknown one is in red.
 
@@ -385,6 +385,7 @@ See you in the next post :D
 
 Cited as:
 
+```
     @article{weng2018flow,
       title   = "Flow-based Deep Generative Models",
       author  = "Weng, Lilian",
@@ -392,6 +393,7 @@ Cited as:
       year    = "2018",
       url     = "https://lilianweng.github.io/posts/2018-10-13-flow-models/"
     }
+```
 
 # Reference[#](#reference)
 
