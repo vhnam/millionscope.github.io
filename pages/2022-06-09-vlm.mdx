@@ -8,10 +8,9 @@ author: Lilian Weng
 date: 2017-06-21
 ---
 
-Source : https://lilianweng.github.io
+Source : https://lilianweng.github.io/posts/2022-06-09-vlm
 
 # Generalized Visual Language Models
-
 
 Table of Contents
 
@@ -46,7 +45,7 @@ One straightforward approach to fuse visual information into language models is 
 
 **VisualBERT** ([Li et al. 2019](https://arxiv.org/abs/1908.03557)) feeds both text inputs and image regions into [BERT](https://lilianweng.github.io/posts/2019-01-31-lm/#bert) such that it is able to discover the internal alignment between images and text with self-attention mechanism.
 
-![](VisualBERT-arch.png)
+![](assets/images/2022-06-09-vlm/VisualBERT-arch.png)
 
 Fig. 1. VisualBERT is trained on the combination of both text and image embeddings. (Image source: [Li et al. 2019](https://arxiv.org/abs/1908.03557))
 
@@ -63,7 +62,7 @@ The model is trained on MS COCO image caption dataset with both text and image a
 
 According to ablation experiments, the most important configuration is to fuse visual information early on into the transformer layers and to pretrain the model on the COCO caption dataset. Initialization from a pre-trained BERT and the adoption of the sentence-image prediction training objective have relatively small impacts.
 
-![](VisualBERT-ablation.png)
+![](assets/images/2022-06-09-vlm/VisualBERT-ablation.png)
 
 Fig. 2. Ablation study results of VisualBERT on NLVR.  
 (Image source: [Li et al. 2019](https://arxiv.org/abs/1908.03557))
@@ -74,7 +73,7 @@ VisualBERT outperforms SoTA at the time on NLVR and Flickr30K, but still has som
 
 Inspired by [ViT](https://arxiv.org/abs/2010.11929) and [CoAtNet](https://arxiv.org/abs/2106.04803), SimVLM splits the image into smaller patches in a flatten 1D sequence of patches. They use the convolutional stage consisting of the first 3 blocks of ResNet to extract contextualized patches and this setup is found to work better than a naive linear projection.
 
-![](SimVLM-arch.png)
+![](assets/images/2022-06-09-vlm/SimVLM-arch.png)
 
 Fig. 3. Training architecture for SimVLM, where the image patches are processed by the cross-attention encoder and the text decoder has causal attention. (Image source: [Wang et al. 2022](https://arxiv.org/abs/2108.10904))
 
@@ -82,7 +81,7 @@ Training data for SimVLM consists of a large number of image-text pairs from ALI
 
 According to ablation studies, it is important to have both image-text and text-only data for training. The PrefixLM objective outperforms both [span corruption](https://arxiv.org/abs/1910.10683) and naive LM.
 
-![](SimVLM-ablation.png)
+![](assets/images/2022-06-09-vlm/SimVLM-ablation.png)
 
 Fig. 4. Ablation study results of SimVLM on VQA.  
 (Image source: [Wang et al. 2022](https://arxiv.org/abs/2108.10904))
@@ -91,7 +90,7 @@ Fig. 4. Ablation study results of SimVLM on VQA.
 
 Architecture-wise, CM3 is an autoregressive model. However, in order to combine causal and masked language modeling, CM3 also masks out a small number of long token spans and tries to generate them at the _end_ of the sequences.
 
-![](CM3-arch.png)
+![](assets/images/2022-06-09-vlm/CM3-arch.png)
 
 Fig. 5. Illustration of how a causally masked language model works.  
 (Image source: [Aghajanyan, et al. 2022](https://arxiv.org/abs/2201.07520))
@@ -102,35 +101,44 @@ CM3 can be used to complete several types of tasks by prompt engineering:
 
 - Image in-filling:
 
+```
   Infilling Prompt: <img src="{prefix}<mask:0>{postfix}"><mask:0>
+```
 
 - Conditional image in-filling:
 
+```
   Conditional Infilling Prompt:
 
   <img alt="Photo: {text}" src="{prefix}<mask:0>{postfix}"><mask:0>
+```
 
 - Conditional image generation:
 
+```
   Conditional Generation Prompt: <img alt="{prompt}
+```
 
 - Image captions:
 
+```
   Captioning Masked Prompt #1:
 
   <img alt="Photo: A photo taken of<mask:0>" src="{image}">
-
   Captioning Causal Prompt #1:
 
   <img src="{image}" title="Photo: A photo taken of
+```
 
 - Entity disambiguation
 
+```
   Original: Manetho writes that these kings ruled from <a title="Memphis, Egypt">Memphis</a>
 
   Prompt: Manetho writes that these kings ruled from <a title="<mask:0>">Memphis</a>...<mask:0>
 
   Target: Manetho writes that these kings ruled from <a title="<mask:0>">Memphis</a>...<mask:0> Memphis, Egypt
+```
 
 # Learned Image Embedding as (Frozen) LM Prefix[#](#learned-image-embedding-as-frozen-lm-prefix)
 
@@ -140,13 +148,13 @@ Inspired by [prefix](https://arxiv.org/abs/2101.00190) or [prompt](https://arxiv
 
 The vision encoder of Frozen is based on NF-ResNet-50 and uses the final output vector of the NF-Resnet after the global pooling layer. The Frozen VLM can be used as a multi-model few-shot learner to adapt to new tasks at test time for zero-shot or few-shot transfer with a sequence of interleaved images and text.
 
-![](Frozen-arch.png)
+![](assets/images/2022-06-09-vlm/Frozen-arch.png)
 
 Fig. 6. Illustration of Frozen model (left) training architecture and (right) testing pipeline. (Image source: [Tsimpoukelli et al. 2021](https://arxiv.org/abs/2106.13884))
 
 Experiments showed that fine-tuning the pre-trained LM interestingly leads to worse performance on VQA tasks. It is important to initialize the language model from a pre-trained version, as training from scratch (${Frozen}_\text{scratch}$) does not show any meaningful progress. The baseline ${Frozen}_\text{train-blind}$ blacks out the image but still can achieve decent performance because of the innate power of the pre-trained LM.
 
-![](Frozen-results.png)
+![](assets/images/2022-06-09-vlm/Frozen-results.png)
 
 Fig. 7. Performance of different versions of Frozen on (left) VQAv2 and (right) OKVQA, trained on Conceptual Captions. "Frozen scratch" does not load a pre-trained LM and is trained from scratch. "Frozen finetuned" has the language model finetuned, while "Frozen" keeps LM frozen. "Frozen train-blind" blacks out the image. (Image source: [Tsimpoukelli et al. 2021](https://arxiv.org/abs/2106.13884))
 
@@ -154,13 +162,13 @@ ClipCap relies on [CLIP](https://lilianweng.github.io/posts/2021-05-31-contrasti
 
 Even though ClipCap only trains such a minimum set of parameters, it still achieves decent performance on image captioning tasks, comparable with SoTA at the time (e.g. [Oscar](https://arxiv.org/abs/2004.06165), [VLP](https://arxiv.org/abs/1909.11059), [BUTD](https://arxiv.org/abs/1707.07998)). Hence they postulate that “the CLIP space already encapsulates the required information, and adapting it towards specific styles does not contribute to flexibility.”
 
-![](ClipCap-arch.png)
+![](assets/images/2022-06-09-vlm/ClipCap-arch.png)
 
 Fig. 8. Overview of ClipCap training pipeline where only the mapping network needs to be train to transform CLIP image embedding to work with the pre-trained LM. (Image source: [Mokady, Hertz & Hertz, 2021](https://arxiv.org/abs/2111.09734))
 
 The fun fact is - because ClipCap translates CLIP image embeddings into LM space, the processed prefixes can be even interpreted as words.
 
-![](ClipCap-words.png)
+![](assets/images/2022-06-09-vlm/ClipCap-words.png)
 
 Fig. 9. The learned image embedding can be interpreted as text, containing words related to the image context. (Image source: [Mokady, Hertz & Hertz, 2021](https://arxiv.org/abs/2111.09734))
 
@@ -170,7 +178,7 @@ To more efficiently fuse visual information into different layers of the languag
 
 **VisualGPT** ([Chen et al. 2021](https://arxiv.org/abs/2102.10407)) employs a self-resurrecting encoder-decoder attention mechanism to quickly adapt the pre-trained LM with a small amount of in-domain image-text data.
 
-![](VisualGPT.png)
+![](assets/images/2022-06-09-vlm/VisualGPT.png)
 
 Fig. 10. Illustration of VisualGPT architecture. (Image source: [Chen et al. 2021](https://arxiv.org/abs/2102.10407))
 
@@ -178,13 +186,13 @@ Let $I$ be the output of a visual encoder and $H$ be the hidden state of the LM 
 
 $$\begin{aligned} & B^\text{vis} \otimes \text{EncDecAttn}(H, I) + B^\text{lan} \otimes H \\ \text{where } & B^\text{vis}\[i,j\] = \sigma(H\[i,j\]) \mathbb{1}\[\sigma(H\[i,j\]) > \tau\] \\ & B^\text{lan}\[i,j\] = (1 - \sigma(H\[i,j\])) \mathbb{1}\[1 - \sigma(H\[i,j\]) > \tau\] \\ \end{aligned}$$where $\otimes$ is element-wise multiplication and $\[i,j\]$ denotes one element in the matrix. $\tau$ is a predefined threshold hyperparameter.
 
-![](VisualGPT-results.png)
+![](assets/images/2022-06-09-vlm/VisualGPT-results.png)
 
 Fig. 11. Comparison of different models trained on 0.1% and 1% of the MS COCO and Conceptual Caption datasets. (Image source: [Chen et al. 2021](https://arxiv.org/abs/2102.10407))
 
 **VC-GPT** (Visual Conditioned GPT; [Luo et al. 2022](https://arxiv.org/abs/2201.12723)) combines a pretrained visual transformer (CLIP-ViT) as visual encoder and a pretrained LM as language decoder.
 
-![](VC-GPT.png)
+![](assets/images/2022-06-09-vlm/VC-GPT.png)
 
 Fig. 12. Illustration of VC-GPT training framework.  
 (Image source: [Luo et al. 2022](https://arxiv.org/abs/2201.12723))
@@ -195,7 +203,7 @@ $$\text{logits} = W^G h^G + W^\text{fuse}h^\text{fuse}$$
 
 where $W^G$ is a linear projection of the language decoder, initialized by the word embedding matrix of GPT2 and $W^\text{fuse}$ is a linear projection of the fusion module and initialized randomly.
 
-![](VC-GPT-results.png)
+![](assets/images/2022-06-09-vlm/VC-GPT-results.png)
 
 Fig. 13. Performance of VC-GPT on the MS COCO test set, in comparison with other end-to-end image captioning baseline models. Metric abbreviation: C = CIDEr; B = BLEU; M = METEOR; S = SPICE. (Image source: [Luo et al. 2022](https://arxiv.org/abs/2201.12723))
 
@@ -209,7 +217,7 @@ There are 3 learning objectives in MERLOT:
 2.  _Contrastive frame-caption matching_ uses the language-only part from the joint vision-language transformer. Matched representations for each frame $\mathbf{I}_t$ and caption $\boldsymbol{w}_t$ are treated as positive examples, while the negative examples come from all other frame-caption pairs in the minibatch.
 3.  _Temporal reordering_ learns temporal reasoning: scramble random $i$ frames and replace the segment-level position embeddings with a random and unique position embedding. The random position embeddings are learned, allowing the model to unshuffle these “‘shuffled'” frames conditioned on correctly-ordered ones. The loss is to predict whether $t_i < t_j$ or $t_j < t_i$ for each frame-frame pair.
 
-![](MERLOT.png)
+![](assets/images/2022-06-09-vlm/MERLOT.png)
 
 Fig. 14. Illustration of MERLOT training framework: (Left) contrastive frame-caption matching training; (Right) joint vision-language transformer is trained with MLM loss, as well as on the temporal reordering task to unshuffle scrambled video frames. (Image source: [Zellers, et al. 2021](https://arxiv.org/abs/2106.02636))
 
@@ -222,11 +230,11 @@ Ablation studies showed that it is important to (1) train on videos instead of i
 
 Similar to ClipCap, both pretrained models are _frozen_ during training and thus Flamingo is only trained to harmoniously connect existing, powerful language and vision models together. Tha main difference between ClipCap and Flamingo is that the former treats the image embedding as simple prefix for LM, while the latter uses the gated cross-attention-dense layer to fuse image information. In addition, Flamingo incorporates a lot more training data than ClipCap.
 
-![](Flamingo.png)
+![](assets/images/2022-06-09-vlm/Flamingo.png)
 
 Fig. 15. Overview of the Flamingo model. (Image source: [Alayrac et al. 2022](https://arxiv.org/abs/2204.14198))
 
-![](Flamingo-cross-attention.png)
+![](assets/images/2022-06-09-vlm/Flamingo-cross-attention.png)
 
 Fig. 16. The architecture illustration and pseudo code of the gated cross-attention-dense layer in Flamingo. (Image source: [Alayrac et al. 2022](https://arxiv.org/abs/2204.14198))
 
@@ -238,25 +246,27 @@ Data processing of the Internet dataset includes:
 
 - The input Web page text is processed by inserting `<image>` tags at the location of visual inputs, as well as special tokens, `<BOS>` (beginning of sentence) and `<EOC>` (end of chunks; always at the end of the document, before any image tag).
 - From each document, they sample a random subsequence of $L = 256$ tokens and take up to $N = 5$ images included in the sampled sequence (using only the first $N$ within that sampled subsequence if there are more, or padding to $N$ if fewer)
-- A function $\phi: \[1,L\] \to \[0,N\]$ is computed to track the text and image interleaving order, which assigns to each text position the index of the last image/video appearing before this position; 0 if no preceding visual data.
+- A function $$\phi \: \[ 1,L \] \to \[ 0,N \]$$ is computed to track the text and image interleaving order, which assigns to each text position the index of the last image/video appearing before this position; 0 if no preceding visual data.
+
+{/* $$\phi : \[ 1,L \] \to \[ 0,N \] $$ */}
 
 Since Flamingo is trained on a mixture of three different datasets, it optimizes for a weighted sum of dataset-specific NLL losses. Tuning the dataset weights is very important for the final performance. In practice, instead of round-robin between datasets, they actually sample one batch from each dataset and apply a weighted sum of these gradients in each update. Gradient accumulation across different heterogeneous datasets can be viewed as a mean to stabilize training, as it reduces the gradient variance between each update.
 
 At test time, Flamingo naturally supports few-shot learning since it can work with any sequence of interleaved text and images. And more examples in the context contribute to better performance.
 
-![](Flamingo-fewshot.png)
+![](assets/images/2022-06-09-vlm/Flamingo-fewshot.png)
 
 Fig. 17. Larger model sizes and more few-shot examples lead to better performance. (Image source: [Alayrac et al. 2022](https://arxiv.org/abs/2204.14198))
 
 Flamingo outperforms SoTA fine-tuned models on 6 out of the 16 tasks despite even when not using any fine-tuning but only few-shot prompting. Fine-tuning Flamingo is expensive and it is difficult to do hyperparemeter tuning, but it does lead to better results.
 
-![](Flamingo-results.png)
+![](assets/images/2022-06-09-vlm/Flamingo-results.png)
 
 Fig. 18. Performance of Flamingo model using different numbers of shots and of different sizes, in comparison with SoTA fine-tuned baseline. (Image source: [Alayrac et al. 2022](https://arxiv.org/abs/2204.14198))
 
 **CoCa** (Contrastive Captioner; [Yu & Wang et al., 2022](https://arxiv.org/abs/2205.01917)) captures both the merits of contrastive learning and image-to-caption generation. It is a model jointly trained with contrastive loss on CLIP-style representation and generative loss on image captioning, achieving SoTA zero-shot transfer on a variety of multi-modal evaluation tasks.
 
-![](CoCa-arch.png)
+![](assets/images/2022-06-09-vlm/CoCa-arch.png)
 
 Fig. 19. Overview of CoCa training framework.  
 (Image source: [Yu & Wang et al., 2022](https://arxiv.org/abs/2205.01917))
@@ -272,13 +282,13 @@ There are two major training components in CoCa. The final loss is a weighted su
 
 CoCa performs better than the contrastive-only model and on par with the captioning-only model on VQA. Captioning loss is found to be beneficial to the zero-shot classification capacity too.
 
-![](CoCa.png)
+![](assets/images/2022-06-09-vlm/CoCa.png)
 
 Fig. 20. Illustration of how CoCa can be used to solve various downstream tasks at test time. (Image source: [Yu & Wang et al., 2022](https://arxiv.org/abs/2205.01917))
 
 They use task-specific attention pooling, or attention pooler, as a natural task adapter, as they found that a single pooled image embedding helps visual recognition tasks (e.g. ImageNet classification), while a more fine-grained embedding helps multimodal understanding tasks (e.g. VQA). A pooler is a single multi-head attention layer with $n_\text{query}$ learnable queries (note that $\mathbf{X} \in \mathbb{R}^{L \times d}$, $\mathbf{W}^q \in \mathbb{R}^{d \times d_q}$, and $d_k = d_q$), with the encoder output as both keys and values. CoCa uses attentional poolers in pretraining for generative loss $n_\text{query} = 256$ and contrastive loss $n_\text{query} = 1$. This enables the model to obtain strong performance as a _frozen_ encoder where we only learn a new pooler to aggregate features.
 
-![](CoCa-code.png)
+![](assets/images/2022-06-09-vlm/CoCa-code.png)
 
 Fig. 21. Pseudo code for CoCa architecture and training.  
 (Image source: [Yu & Wang et al., 2022](https://arxiv.org/abs/2205.01917))
@@ -299,7 +309,7 @@ where $\mathcal{I}$ is the input image; $\mathcal{V}^{(k)}$ contains top-$k$ pos
 
 MAGiC has decent performance compared to other unsupervised approaches, but still has big gaps with supervised methods.
 
-![](MAGiC-results.png)
+![](assets/images/2022-06-09-vlm/MAGiC-results.png)
 
 Fig. 22. Image captioning performance on COCO and Flickr30k. (Image source: [Su et al. 2022](https://arxiv.org/abs/2205.02655))
 
@@ -307,7 +317,7 @@ Fig. 22. Image captioning performance on COCO and Flickr30k. (Image source: [Su 
 
 For knowledge-based VQA tasks, PICa (Prompts GPT-3 via the use of Image Captions; [Yang et al. 2021](https://arxiv.org/abs/2109.05014)) first converts the images into captions or tags and then uses few-shot examples to prompt GPT3 to provide answers. Image captions or tags are extracted by some existing models (e.g. [VinVL](https://openaccess.thecvf.com/content/CVPR2021/html/Zhang_VinVL_Revisiting_Visual_Representations_in_Vision-Language_Models_CVPR_2021_paper.html)) or Azure Tagging API. And GPT3 is considered as an unstructured, implicit knowledge base.
 
-![](PICa-fewshot.png)
+![](assets/images/2022-06-09-vlm/PICa-fewshot.png)
 
 Fig. 23. How PICa works for $n$-shot VQA at inference time. (Image source: [Yang et al. 2021](https://arxiv.org/abs/2109.05014))
 
@@ -318,7 +328,7 @@ PICa explored two ways to improve few-shot examples to achieve better results:
 
 This simple approach with only 16 examples improved SoTA on OK-VQA by +8.6 points and got decent performance on VQAv2.
 
-![](PICa-OKVQA.png)
+![](assets/images/2022-06-09-vlm/PICa-OKVQA.png)
 
 Fig. 24. Performance of PICa on OK-VQA. "PICa-Base" has random in-context examples, while "PICa-Full" incorporates both similar in-context example selection and multi-query ensembling. (Image source: [Yang et al. 2021](https://arxiv.org/abs/2109.05014))
 
@@ -326,7 +336,7 @@ Fig. 24. Performance of PICa on OK-VQA. "PICa-Base" has random in-context exampl
 
 Let's examine a concrete example. Given an ego-centric video (images + audio), SM can produce a summary of the person's activity using text-to-text LM, image-to-text VLM and speech-to-text ALM. They are chained as follows:
 
-![](SM-example.png)
+![](assets/images/2022-06-09-vlm/SM-example.png)
 
 (Image source: [Zeng et al. 2022](https://arxiv.org/abs/2204.00598))
 
@@ -337,19 +347,19 @@ Let's examine a concrete example. Given an ego-centric video (images + audio), S
 5.  the VLM ranks the most likely activity;
 6.  the LM generates a summary of the Socratic interaction.
 
-![](SM-caption-example.png)
+![](assets/images/2022-06-09-vlm/SM-caption-example.png)
 
 Fig. 25. Illustration of the Socratic Model solution for image captioning. (Image source: [Zeng et al. 2022](https://arxiv.org/abs/2204.00598))
 
 SM can generate image captions by first using VLM to zero-shot predict different place categories, object categories, image type and the number of people; and then the VLM-filled language prompt is fed into a causal LM to generate caption candidates. The Socratic approach still has performance gap with ClipCap on image captioning but pretty decent given it does not involve any training.
 
-![](SM-caption.png)
+![](assets/images/2022-06-09-vlm/SM-caption.png)
 
 Fig. 26. Comparison of image captioning performance of different models on random 100 COCO text examples. (Image source: [Zeng et al. 2022](https://arxiv.org/abs/2204.00598))
 
 SM framework is very flexible and can be used on a lot more complicated tasks other than image captions. For example, the egocentric perception (User inputs + VLM + LM + ALM) task is to take as inputs egocentric videos to (1) summarize content; (2) answer free-form reasoning questions; (3) and do forecasting.
 
-![](SM-egocentric.png)
+![](assets/images/2022-06-09-vlm/SM-egocentric.png)
 
 Fig. 27. The Socratic Model approach for generating captions and question answering based on the egocentric videos. (Image source: [Zeng et al. 2022](https://arxiv.org/abs/2204.00598))
 
@@ -410,6 +420,7 @@ Cited as:
 
 Or
 
+```
     @article{weng2022vlm,
       title   = "Generalized Visual Language Models",
       author  = "Weng, Lilian",
@@ -418,6 +429,7 @@ Or
       month   = "Jun",
       url     = "https://lilianweng.github.io/posts/2022-06-09-vlm/"
     }
+```
 
 # References[#](#references)
 
