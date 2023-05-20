@@ -51,7 +51,7 @@ To make the definition more general, let us call the environment that we have fu
 
 During policy training, episodes are collected from source domain with randomization applied. Thus the policy is exposed to a variety of environments and learns to generalize. The policy parameter $\theta$ is trained to maximize the expected reward $R(.)$ average across a distribution of configurations:
 
-$$\theta^\* = \arg\max_\theta \mathbb{E}_{\xi \sim \\Xi} [\mathbb{E}_{\pi_\theta, \tau \sim e_\xi} [R(\tau)]]$$
+$$\theta^* = \arg\max_\theta \mathbb{E}_{\xi \sim \\Xi} [\mathbb{E}_{\pi_\theta, \tau \sim e_\xi} [R(\tau)]]$$
 
 where $\tau_\xi$ is a trajectory collected in source domain randomized with $\xi$. In a way, _"discrepancies between the source and target domains are modeled as variability in the source domain."_ (quote from [Peng et al. 2018](https://arxiv.org/abs/1710.06537)).
 
@@ -91,11 +91,11 @@ Now you may ask, why does domain randomization work so well? The idea sounds rea
 
 One idea ([Vuong, et al, 2019](https://arxiv.org/abs/1903.11774)) is to view learning randomization parameters in DR as a _bilevel optimization_. Assuming we have access to the real environment $e_\text{real}$ and the randomization config is sampled from a distribution parameterized by $\phi$, $\xi \sim P_\phi(\xi)$, we would like to learn a distribution on which a policy $\pi_\theta$ is trained on can achieve maximal performance in $e_\text{real}$:
 
-$$\begin{aligned} &\phi^\* = \arg\min_{\phi} \mathcal{L}(\pi_{\theta^\*(\phi)}; e_\text{real}) \\ \text{where } &\theta^\*(\phi) = \arg\min_\theta \mathbb{E}_{\xi \sim P_\phi(\xi)}[\mathcal{L}(\pi_\theta; e_\xi)] \end{aligned}$$
+$$\begin{aligned} &\phi^* = \arg\min_{\phi} \mathcal{L}(\pi_{\theta^*(\phi)}; e_\text{real}) \\ \text{where } &\theta^*(\phi) = \arg\min_\theta \mathbb{E}_{\xi \sim P_\phi(\xi)}[\mathcal{L}(\pi_\theta; e_\xi)] \end{aligned}$$
 
 where $\mathcal{L}(\pi; e)$ is the loss function of policy $\pi$ evaluated in the environment $e$.
 
-Although randomization ranges are hand-picked in uniform DR, it often involves domain knowledge and a couple rounds of trial-and-error adjustment based on the transfer performance. Essentially this is a manual optimization process on tuning $\phi$ for the optimal $\mathcal{L}(\pi_{\theta^\*(\phi)}; e_\text{real})$.
+Although randomization ranges are hand-picked in uniform DR, it often involves domain knowledge and a couple rounds of trial-and-error adjustment based on the transfer performance. Essentially this is a manual optimization process on tuning $\phi$ for the optimal $\mathcal{L}(\pi_{\theta^*(\phi)}; e_\text{real})$.
 
 Guided domain randomization in the next section is largely inspired by this view, aiming to do bilevel optimization and learn the best parameter distribution automatically.
 
@@ -139,7 +139,7 @@ Using real data to guide domain randomization feels a lot like doing system iden
 
 The **SimOpt** model ([Chebotar et al, 2019](https://arxiv.org/abs/1810.05687)) is trained under an initial randomization distribution $P_\phi(\xi)$ first, getting a policy $\pi_{\theta, P_\phi}$. Then this policy is deployed on both simulator and physical robot to collect trajectories $\tau_\xi$ and $\tau_\text{real}$ respectively. The optimization objective is to minimize the discrepancy between sim and real trajectories:
 
-$$\phi^\* = \arg\min_{\phi}\mathbb{E}_{\xi \sim P_\phi(\xi)} [\mathbb{E}_{\pi_{\theta, P_\phi}} [D(\tau_\text{sim}, \tau_\text{real})]]$$
+$$\phi^* = \arg\min_{\phi}\mathbb{E}_{\xi \sim P_\phi(\xi)} [\mathbb{E}_{\pi_{\theta, P_\phi}} [D(\tau_\text{sim}, \tau_\text{real})]]$$
 
 where $D(.)$ is a trajectory-based discrepancy measure. Like the "Learning to simulate" paper, SimOpt also has to solve the tricky problem of how to propagate gradient through non-differentiable simulator. It used a method called [relative entropy policy search](https://www.aaai.org/ocs/index.php/AAAI/AAAI10/paper/viewFile/1851/2264), see paper for more details.
 
@@ -155,7 +155,7 @@ Fig. 5. RCAN is an image-conditional generator that can convert a domain-randomi
 
 The RL model is trained end-to-end in a simulator to do vision-based robot arm grasping. Randomization is applied at each timestep, including the position of tray divider, objects to grasp, random textures, as well as the position, direction, and color of the lighting. The canonical version is the default simulator look. RCAN is trying to learn a generator
 
-$G$: randomized image $\to$ {canonical image, segmentation, depth}
+$G$: randomized image $\to$ \{canonical image, segmentation, depth\}
 
 where segmentation masks and depth images are used as auxiliary tasks. RCAN had a better zero-shot transfer compared to uniform DR, although both were shown to be worse than the model trained on only real images. Conceptually, RCAN operates in a reverse direction of [GraspGAN](https://arxiv.org/abs/1709.07857) which translates synthetic images into real ones by domain adaptation.
 
@@ -194,15 +194,17 @@ The idea of ADR is very appealing with two small concerns. The similarity betwee
 ---
 
 Cited as:
+
 ```bibtex
-    @article{weng2019DR,
-      title   = "Domain Randomization for Sim2Real Transfer",
-      author  = "Weng, Lilian",
-      journal = "lilianweng.github.io",
-      year    = "2019",
-      url     = "https://lilianweng.github.io/posts/2019-05-05-domain-randomization/"
-    }
+@article{weng2019DR,
+  title   = "Domain Randomization for Sim2Real Transfer",
+  author  = "Weng, Lilian",
+  journal = "lilianweng.github.io",
+  year    = "2019",
+  url     = "https://lilianweng.github.io/posts/2019-05-05-domain-randomization/"
+}
 ```
+
 Overall, after reading this post, I hope you like domain randomization as much as I do :).
 
 # References[#](#references)
