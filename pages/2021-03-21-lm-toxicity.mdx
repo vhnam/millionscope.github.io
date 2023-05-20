@@ -179,10 +179,12 @@ Despite of its popularity, Perspective API contains known biases, as summarized 
 
 **Self-diagnosis** ([Schick, et al. 2021](https://arxiv.org/abs/2103.00453)) is a process of exploiting the capacity of a pretrained language model to detect socially undesired attributes in its own outputs. The diagnosis depends on a predefined prompt template where the attributes are described in short text and measures the normalized probability of the model outputting "yes" versus "no". Note that self-diagnosis does not need to access a labelled dataset for training.
 
+```
     # Self-diagnosis template
     "{sample text}"
     Question: Does the above text contain {undesired attribute}?
     Answer: {yes/no}
+```
 
 They use RealToxicityPrompts dataset and Perspective API for evaluation in the experiments. The self-diagnosis performance is positively correlated with the model size.
 
@@ -201,11 +203,11 @@ Fig. 7. Self-diagnosis abilities for identifying undesired attributes. The groun
 ## Prompt-based Detox[#](#prompt-based-detox)
 
 **Self-debiasing** ([Schick et al. 2021](https://arxiv.org/abs/2103.00453)) follows the similar idea as in [self-diagnosis](#prompt-based-detection). It is a process for using the internal knowledge of a pretrained language model to reduce the probability of undesired attributes in the model generation.
-
+```
     # Self-debiasing template, denoted as sdb(.)
     The following text contains {undesired attribute s}:
     {sample text x}
-
+```
 Given an input prompt $\mathbf{x}$, a textual description of undesired attributes $s$, and the language model $M$, self-debiasing computes the difference between the probability of next words without and with the self-debiasing template $\text{sdb}(.)$:
 
 $$\Delta(w, \mathbf{x}, s) = p_M(w\vert\mathbf{x}) - p_M(w\vert\text{sdb}(\mathbf{x}, s))$$
@@ -250,7 +252,7 @@ $$\mathcal{L}_\text{self} = \mathbb{E}_{\mathbf{x}^i_k \sim \mathcal{X}} [-\log 
 - The bottom branch of forward transfer: $E(\mathbf{x}^i_k, s_i) \to H^i_k \to G(H^i_k, s_j) \to \hat{\mathbf{x}}^{i\to j}_k$
   - Classification loss measures the effectiveness of style transfer:
 
-$$\mathcal{L}_\text{style_fwd} = \mathbb{E}_{\hat{\mathbf{x}}^{i\to j}_k \sim \hat{\mathcal{X}}} [-\log p_C(s_j \mid \hat{\mathbf{x}}^{i\to j}_k)]$$
+$$\mathcal{L}_\text{style\_fwd} = \mathbb{E}_{\hat{\mathbf{x}}^{i\to j}_k \sim \hat{\mathcal{X}}} [-\log p_C(s_j \mid \hat{\mathbf{x}}^{i\to j}_k)]$$
 
 - The back transfer uses cycle consistency loss: $E(\hat{\mathbf{x}}^{i\to j}_k, s_j) \to H^{i\to j}_k \to G(H^{i\to j}_k, s_i) \to \hat{\mathbf{x}}^{i\to j \to i}_k$
   - The cycle consistency loss controls how well the transferred sample can be converted back to the original form to encourage content preservation:
@@ -259,7 +261,7 @@ $$\mathcal{L}_\text{cycle} = \mathbb{E}_{\mathbf{x}^i_k \sim \mathcal{X}} [-\log
 
     - The classification loss ensures that the back-transferred sample has the correct label:
 
-$$\mathcal{L}_\text{style_back} = \mathbb{E}_{\hat{\mathbf{x}}^{i\to j}_k \sim \hat{\mathcal{X}}} [-\log p_C(s_i \mid G(E(\hat{\mathbf{x}}^{i\to j}_k, s_j), s_i))]$$
+$$\mathcal{L}_\text{style\_back} = \mathbb{E}_{\hat{\mathbf{x}}^{i\to j}_k \sim \hat{\mathcal{X}}} [-\log p_C(s_i \mid G(E(\hat{\mathbf{x}}^{i\to j}_k, s_j), s_i))]$$
 
 - There is an additional supervised classification loss for training an accurate classifier:
 
@@ -267,7 +269,7 @@ $$\mathcal{L}_\text{class} = \mathbb{E}_{\hat{\mathbf{x}}^{i\to j}_k \sim \hat{\
 
 The final training objective is as follows and the encoder, decoder and classifier are jointly trained:
 
-$$\mathcal{L}(\theta_E, \theta_G, \theta_C) = \min_{E, G, C} \mathcal{L}_\text{self} + \mathcal{L}_\text{style_fwd} + \mathcal{L}_\text{cycle} + \mathcal{L}_\text{style_back}+ \mathcal{L}_\text{class}$$
+$$\mathcal{L}(\theta_E, \theta_G, \theta_C) = \min_{E, G, C} \mathcal{L}_\text{self} + \mathcal{L}_\text{style\_fwd} + \mathcal{L}_\text{cycle} + \mathcal{L}_\text{style\_back}+ \mathcal{L}_\text{class}$$
 
 **Style Transformer** ([Dai et al. 2019](https://arxiv.org/abs/1905.05621)) also aims to learn unsupervised text style transfer. Different from the encoder-decoder model in [Santos et al. 2018](https://arxiv.org/abs/1805.07685), it learns a Transformer-based style transfer function $f_\theta(\mathbf{x}, s)$ for a given input sample $\mathbf{x}$ and a desired style control variable $s$.
 
@@ -387,16 +389,18 @@ Cited as:
 > Weng, Lilian. (Mar 2021). Reducing toxicity in language models. Lil'Log. https://lilianweng.github.io/posts/2021-03-21-lm-toxicity/.
 
 Or
+
 ```bibtex
-    @article{weng2021toxic,
-      title   = "Reducing Toxicity in Language Models.",
-      author  = "Weng, Lilian",
-      journal = "lilianweng.github.io",
-      year    = "2021",
-      month   = "Mar",
-      url     = "https://lilianweng.github.io/posts/2021-03-21-lm-toxicity/"
-    }
+@article{weng2021toxic,
+  title   = "Reducing Toxicity in Language Models.",
+  author  = "Weng, Lilian",
+  journal = "lilianweng.github.io",
+  year    = "2021",
+  month   = "Mar",
+  url     = "https://lilianweng.github.io/posts/2021-03-21-lm-toxicity/"
+}
 ```
+
 # References[#](#references)
 
 [1] Vidgen, et al. ["Challenges and frontiers in abusive content detection."](https://www.aclweb.org/anthology/W19-3509/) Workshop on Abusive Language Online 2019.
