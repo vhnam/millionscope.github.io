@@ -12,7 +12,6 @@ Source : https://lilianweng.github.io
 
 # Contrastive Representation Learning
 
-
 Table of Contents
 
 - [Contrastive Training Objectives](#contrastive-training-objectives)
@@ -82,7 +81,7 @@ where $\\epsilon$ is a hyperparameter, defining the lower bound distance between
 
 **Triplet loss** was originally proposed in the FaceNet ([Schroff et al. 2015](https://arxiv.org/abs/1503.03832)) paper and was used to learn face recognition of the same person at different poses and angles.
 
-![](triplet-loss.png)
+![](assets/images/2021-05-31-contrastive/triplet-loss.png)
 
 Fig. 1. Illustration of triplet loss given one positive and one negative per anchor. (Image source: [Schroff et al. 2015](https://arxiv.org/abs/1503.03832))
 
@@ -98,7 +97,7 @@ It is crucial to select challenging $\mathbf{x}^-$ to truly improve the model.
 
 **Lifted Structured Loss** ([Song et al. 2015](https://arxiv.org/abs/1511.06452)) utilizes all the pairwise edges within one training batch for better computational efficiency.
 
-![](lifted-structured-loss.png)
+![](assets/images/2021-05-31-contrastive/lifted-structured-loss.png)
 
 Fig. 2. Illustration compares contrastive loss, triplet loss and lifted structured loss. Red and blue edges connect similar and dissimilar sample pairs respectively. (Image source: [Song et al. 2015](https://arxiv.org/abs/1511.06452))
 
@@ -205,7 +204,7 @@ However, it becomes tricky to do hard negative mining when we want to remain uns
 
 [Chuang et al. (2020)](https://arxiv.org/abs/2007.00224) studied the sampling bias in contrastive learning and proposed debiased loss. In the unsupervised setting, since we do not know the ground truth labels, we may accidentally sample false negative samples. Sampling bias can lead to significant performance drop.
 
-![](contrastive-sampling-bias.png)
+![](assets/images/2021-05-31-contrastive/contrastive-sampling-bias.png)
 
 Fig. 3. Sampling bias which refers to false negative samples in contrastive learning can lead to a big performance drop. (Image source: [Chuang et al., 2020](https://arxiv.org/abs/2007.00224))
 
@@ -228,7 +227,7 @@ The final debiased contrastive loss looks like:
 
 $$\mathcal{L}^{N,M}_\text{debias}(f) = \mathbb{E}_{\mathbf{x},\{\mathbf{u}_i\}^N_{i=1}\sim p;\\;\mathbf{x}^+, \{\mathbf{v}_i\}_{i=1}^M\sim p^+} \Big\[ -\log\frac{\exp(f(\mathbf{x})^\top f(\mathbf{x}^+)}{\exp(f(\mathbf{x})^\top f(\mathbf{x}^+) + N g(x,\{\mathbf{u}_i\}^N_{i=1}, \{\mathbf{v}_i\}_{i=1}^M)} \Big\]$$
 
-![](contrastive-debias-t-SNE.png)
+![](assets/images/2021-05-31-contrastive/contrastive-debias-t-SNE.png)
 
 Fig. 4. t-SNE visualization of learned representation with debiased contrastive learning. (Image source: [Chuang et al., 2020](https://arxiv.org/abs/2007.00224))
 
@@ -242,7 +241,7 @@ We can estimate the second term in the denominator $\mathbb{E}_{\mathbf{x}^- \si
 
 $$\begin{aligned} \mathbb{E}_{\mathbf{u} \sim q_\beta} \[\exp(f(\mathbf{x})^\top f(\mathbf{u}))\] &= \mathbb{E}_{\mathbf{u} \sim p} \[\frac{q_\beta}{p}\exp(f(\mathbf{x})^\top f(\mathbf{u}))\] = \mathbb{E}_{\mathbf{u} \sim p} \[\frac{1}{Z_\beta}\exp((\beta + 1)f(\mathbf{x})^\top f(\mathbf{u}))\] \\ \mathbb{E}_{\mathbf{v} \sim q^+_\beta} \[\exp(f(\mathbf{x})^\top f(\mathbf{v}))\] &= \mathbb{E}_{\mathbf{v} \sim p^+} \[\frac{q^+_\beta}{p}\exp(f(\mathbf{x})^\top f(\mathbf{v}))\] = \mathbb{E}_{\mathbf{v} \sim p} \[\frac{1}{Z^+_\beta}\exp((\beta + 1)f(\mathbf{x})^\top f(\mathbf{v}))\] \end{aligned}$$
 
-![](contrastive-hard-negatives-code.png)
+![](assets/images/2021-05-31-contrastive/contrastive-hard-negatives-code.png)
 
 Fig. 5. Pseudo code for computing NCE loss, debiased contrastive loss, and hard negative sample objective when setting $M=1$. (Image source: [Robinson et al., 2021](https://arxiv.org/abs/2010.04592) )
 
@@ -290,7 +289,7 @@ This category of approaches produce two noise versions of one anchor image and a
 
 **SimCLR** ([Chen et al, 2020](https://arxiv.org/abs/2002.05709)) proposed a simple framework for contrastive learning of visual representations. It learns representations for visual inputs by maximizing agreement between differently augmented views of the same sample via a contrastive loss in the latent space.
 
-![](SimCLR.png)
+![](assets/images/2021-05-31-contrastive/SimCLR.png)
 
 Fig. 6. A simple framework for contrastive learning of visual representations. (Image source: [Chen et al, 2020](https://arxiv.org/abs/2002.05709))
 
@@ -312,7 +311,7 @@ where $\mathbb{1}_{\[k \\neq i\]}$ is an indicator function: 1 if $k\\neq i$ 0 o
 
 SimCLR needs a large batch size to incorporate enough negative samples to achieve good performance.
 
-![](SimCLR-algo.png)
+![](assets/images/2021-05-31-contrastive/SimCLR-algo.png)
 
 Fig. 7. The algorithm for SimCLR. (Image source: [Chen et al, 2020](https://arxiv.org/abs/2002.05709)).
 
@@ -320,7 +319,7 @@ Fig. 7. The algorithm for SimCLR. (Image source: [Chen et al, 2020](https://arxi
 
 **Barlow Twins** ([Zbontar et al. 2021](https://arxiv.org/abs/2103.03230)) feeds two distorted versions of samples into the same network to extract features and learns to make the _cross-correlation matrix_ between these two groups of output features close to the identity. The goal is to keep the representation vectors of different distorted versions of one sample similar, while minimizing the redundancy between these vectors.
 
-![](barlow-twins.png)
+![](assets/images/2021-05-31-contrastive/barlow-twins.png)
 
 Fig. 8. Illustration of Barlow Twins learning pipeline. (Image source: [Zbontar et al. 2021](https://arxiv.org/abs/2103.03230)).
 
@@ -330,7 +329,7 @@ $$\begin{aligned} \mathcal{L}_\text{BT} &= \underbrace{\sum_i (1-\mathcal{C}_{ii
 
 Barlow Twins is competitive with SOTA methods for self-supervised learning. It naturally avoids trivial constants (i.e. collapsed representations), and is robust to different training batch sizes.
 
-![](barlow-twins-algo.png)
+![](assets/images/2021-05-31-contrastive/barlow-twins-algo.png)
 
 Fig. 9. Algorithm of Barlow Twins in Pytorch style pseudo code. (Image source: [Zbontar et al. 2021](https://arxiv.org/abs/2103.03230)).
 
@@ -346,7 +345,7 @@ The goal is to learn a presentation $y$ that can be used in downstream tasks. Th
 
 The target network has the same network architecture, but with different parameter $\\xi$, updated by polyak averaging $\theta$: $\\xi \\leftarrow \tau \\xi + (1-\tau) \theta$.
 
-![](BYOL.png)
+![](assets/images/2021-05-31-contrastive/BYOL.png)
 
 Fig. 10. The model architecture of BYOL. After training, we only care about $f\\_\theta$ for producing representation, $y=f\\_\theta(x)$, and everything else is discarded. $\text{sg}$ means stop gradient. (Image source: [Grill, et al 2020](https://arxiv.org/abs/2006.07733))
 
@@ -376,7 +375,7 @@ Computing embeddings for a large number of negative samples in every batch is ex
 
 **Instance contrastive learning** ([Wu et al, 2018](https://arxiv.org/abs/1805.01978v1)) pushes the class-wise supervision to the extreme by considering each instance as _a distinct class of its own_. It implies that the number of “classes” will be the same as the number of samples in the training dataset. Hence, it is unfeasible to train a softmax layer with these many heads, but instead it can be approximated by [NCE](#nce).
 
-![](instance-level-discrimination.png)
+![](assets/images/2021-05-31-contrastive/instance-level-discrimination.png)
 
 Fig. 11. The training pipeline of instance-level contrastive learning. The learned embedding is L2-normalized. (Image source: [Wu et al, 2018](https://arxiv.org/abs/1805.01978v1))
 
@@ -410,7 +409,7 @@ The MoCo dictionary is not differentiable as a queue, so we cannot rely on back-
 
 $$\theta_k \\leftarrow m \theta_k + (1-m) \theta_q$$
 
-![](MoCo.png)
+![](assets/images/2021-05-31-contrastive/MoCo.png)
 
 Fig. 12. Illustration of how Momentum Contrast (MoCo) learns visual representations. (Image source: [He et al, 2019](https://arxiv.org/abs/1911.05722))
 
@@ -424,7 +423,7 @@ Two designs in SimCLR, namely, (1) an MLP projection head and (2) stronger data 
 
 One significant difference between RL and supervised visual tasks is that RL depends on _temporal consistency_ between consecutive frames. Therefore, CURL applies augmentation consistently on each stack of frames to retain information about the temporal structure of the observation.
 
-![](CURL.png)
+![](assets/images/2021-05-31-contrastive/CURL.png)
 
 Fig. 13. The architecture of CURL. (Image source: [Srinivas, et al. 2020](https://arxiv.org/abs/2004.04136))
 
@@ -434,7 +433,7 @@ Fig. 13. The architecture of CURL. (Image source: [Srinivas, et al. 2020](https:
 
 **DeepCluster** ([Caron et al. 2018](https://arxiv.org/abs/1807.05520)) iteratively clusters features via k-means and uses cluster assignments as pseudo labels to provide supervised signals.
 
-![](deepcluster.png)
+![](assets/images/2021-05-31-contrastive/deepcluster.png)
 
 Fig. 14. Illustration of DeepCluster method which iteratively clusters deep features and uses the cluster assignments as pseudo-labels. (Image source: [Caron et al. 2018](https://arxiv.org/abs/1807.05520))
 
@@ -444,7 +443,7 @@ In each iteration, DeepCluster clusters data points using the prior representati
 
 **SwAV** (_Swapping Assignments between multiple Views_; [Caron et al. 2020](https://arxiv.org/abs/2006.09882)) is an online contrastive learning algorithm. It computes a code from an augmented version of the image and tries to predict this code using another augmented version of the same image.
 
-![](SwAV.png)
+![](assets/images/2021-05-31-contrastive/SwAV.png)
 
 Fig. 15. Comparison of SwAV and \[contrastive instance learning\](#instance-discrimination-with-memoy-bank). (Image source: [Caron et al. 2020](https://arxiv.org/abs/2006.09882))
 
@@ -470,7 +469,7 @@ SwAV relies on the iterative Sinkhorn-Knopp algorithm ([Cuturi 2013](https://arx
 
 **CLIP** (_Contrastive Language-Image Pre-training_; [Radford et al. 2021](https://arxiv.org/abs/2103.00020)) jointly trains a text encoder and an image feature extractor over the pretraining task that predicts which caption goes with which image.
 
-![](CLIP.png)
+![](assets/images/2021-05-31-contrastive/CLIP.png)
 
 Fig. 16. Illustration of CLIP contrastive pre-training over text-image pairs. (Image source: [Radford et al. 2021](https://arxiv.org/abs/2103.00020))
 
@@ -478,13 +477,13 @@ Given a batch of $N$ (image, text) pairs, CLIP computes the dense cosine similar
 
 See the numy-like pseudo code for CLIP in Fig. 17.
 
-![](CLIP-algo.png)
+![](assets/images/2021-05-31-contrastive/CLIP-algo.png)
 
 Fig. 17. CLIP algorithm in Numpy style pseudo code. (Image source: [Radford et al. 2021](https://arxiv.org/abs/2103.00020))
 
 Compared to other methods above for learning good visual representation, what makes CLIP really special is _“the appreciation of using natural language as a training signal”_. It does demand access to supervised dataset in which we know which text matches which image. It is trained on 400 million (text, image) pairs, collected from the Internet. The query list contains all the words occurring at least 100 times in the English version of Wikipedia. Interestingly, they found that Transformer-based language models are 3x slower than a bag-of-words (BoW) text encoder at zero-shot ImageNet classification. Using contrastive objective instead of trying to predict the exact words associated with images (i.e. a method commonly adopted by image caption prediction tasks) can further improve the data efficiency another 4x.
 
-![](CLIP-efficiency.png)
+![](assets/images/2021-05-31-contrastive/CLIP-efficiency.png)
 
 Fig. 18. Using bag-of-words text encoding and contrastive training objectives can bring in multiple folds of data efficiency improvement. (Image source: [Radford et al. 2021](https://arxiv.org/abs/2103.00020))
 
@@ -494,7 +493,7 @@ CLIP produces good visual representation that can non-trivially transfer to many
 
 There are several known issues with cross entropy loss, such as the lack of robustness to noisy labels and the possibility of poor margins. Existing improvement for cross entropy loss involves the curation of better training data, such as label smoothing and data augmentation. **Supervised Contrastive Loss** ([Khosla et al. 2021](https://arxiv.org/abs/2004.11362)) aims to leverage label information more effectively than cross entropy, imposing that normalized embeddings from the same class are closer together than embeddings from different classes.
 
-![](sup-con.png)
+![](assets/images/2021-05-31-contrastive/sup-con.png)
 
 Fig. 19. Supervised vs self-supervised contrastive losses. Supervised contrastive learning considers different samples from the same class as positive examples, in addition to augmented versions. (Image source: [Khosla et al. 2021](https://arxiv.org/abs/2004.11362))
 
@@ -533,7 +532,7 @@ where $p=\alpha$ and $n=\alpha \times \text{sentence_length}$, with the intuitio
 
 EDA is shown to improve the classification accuracy on several classification benchmark datasets compared to baseline without EDA. The performance lift is more significant on a smaller training set. All the four operations in EDA help improve the classification accuracy, but get to optimal at different $\alpha$'s.
 
-![](EDA-exp1.png)
+![](assets/images/2021-05-31-contrastive/EDA-exp1.png)
 
 Fig. 20. EDA leads to performance improvement on several classification benchmarks. (Image source: [Wei & Zou 2019](https://arxiv.org/abs/1901.11196))
 
@@ -551,7 +550,7 @@ In **Contextual Augmentation** ([Sosuke Kobayashi, 2018](https://arxiv.org/abs/1
 2.  _Feature cutoff_ removes a few feature columns.
 3.  _Span cutoff_ removes a continuous chunk of texts.
 
-![](text-cutoff.png)
+![](assets/images/2021-05-31-contrastive/text-cutoff.png)
 
 Fig. 21. Schematic illustration of token, feature and span cutoff augmentation strategies. (Image source: [Shen et al. 2020](https://arxiv.org/abs/2009.13818))
 
@@ -559,13 +558,13 @@ Multiple augmented versions of one sample can be created. When training, [Shen e
 
 **SimCSE** ([Gao et al. 2021](https://arxiv.org/abs/2104.08821); [code](https://github.com/princeton-nlp/SimCSE)) learns from unsupervised data by predicting a sentence from itself with only **dropout** noise. In other words, they treat dropout as data augmentation for text sequences. A sample is simply fed into the encoder twice with different dropout masks and these two versions are the positive pair where the other in-batch samples are considered as negative pairs. It feels quite similar to the cutoff augmentation, but dropout is more flexible with less well-defined semantic meaning of what content can be masked off.
 
-![](SimCSE.png)
+![](assets/images/2021-05-31-contrastive/SimCSE.png)
 
 Fig. 22. SimCSE creates augmented samples by applying different dropout masks. The supervised version leverages NLI datasets to predict positive (entailment) or negative (contradiction) given a pair of sentences. (Image source: [Gao et al. 2021](https://arxiv.org/abs/2104.08821))
 
 They ran experiments on 7 STS (Semantic Text Similarity) datasets and computed cosine similarity between sentence embeddings. They also tried out an optional MLM auxiliary objective loss to help avoid catastrophic forgetting of token-level knowledge. This aux loss was found to help improve performance on transfer tasks, but a consistent drop on the main STS tasks.
 
-![](SimCSE-STS-exp.png)
+![](assets/images/2021-05-31-contrastive/SimCSE-STS-exp.png)
 
 Fig. 23. Experiment numbers on a collection of STS benchmarks with SimCES. (Image source: [Gao et al. 2021](https://arxiv.org/abs/2104.08821))
 
@@ -587,13 +586,13 @@ They experimented with a few different prediction heads on top of BERT model:
 
 In the experiments, which objective function works the best depends on the datasets, so there is no universal winner.
 
-![](SBERT.png)
+![](assets/images/2021-05-31-contrastive/SBERT.png)
 
 Fig. 24. Illustration of Sentence-BERT training framework with softmax classification head and regression head. (Image source: [Reimers & Gurevych, 2019](https://arxiv.org/abs/1908.10084))
 
 The [SentEval](https://github.com/facebookresearch/SentEval) library ([Conneau and Kiela, 2018](https://arxiv.org/abs/1803.05449)) is commonly used for evaluating the quality of learned sentence embedding. SBERT outperformed other baselines at that time (Aug 2019) on 5 out of 7 tasks.
 
-![](SBERT-SentEval.png)
+![](assets/images/2021-05-31-contrastive/SBERT-SentEval.png)
 
 Fig. 25. The performance of Sentence-BERT on the SentEval benchmark. (Image source: [Reimers & Gurevych, 2019](https://arxiv.org/abs/1908.10084))
 
@@ -603,7 +602,7 @@ The embedding representation space is deemed _isotropic_ if embeddings are unifo
 
 **BERT-flow** ([Li et al, 2020](https://arxiv.org/abs/2011.05864); [code](https://github.com/bohanli/BERT-flow)) was proposed to transform the embedding to a smooth and isotropic Gaussian distribution via [normalizing flows](https://lilianweng.github.io/posts/2018-10-13-flow-models/#what-is-normalizing-flows).
 
-![](BERT-flow.png)
+![](assets/images/2021-05-31-contrastive/BERT-flow.png)
 
 Fig. 26. Illustration of the flow-based calibration over the original sentence embedding space in BERT-flow. (Image source: [Li et al, 2020](https://arxiv.org/abs/2011.05864))
 
@@ -631,7 +630,7 @@ If we get [SVD](https://en.wikipedia.org/wiki/Singular_value_decomposition) deco
 
 A dimensionality reduction strategy can be applied by only taking the first $k$ columns of $W$, named `Whitening`\-$k$.
 
-![](whitening-SBERT.png)
+![](assets/images/2021-05-31-contrastive/whitening-SBERT.png)
 
 Fig. 27. Pseudo code of the whitening-$k$ operation. (Image source: [Su et al. 2021](https://arxiv.org/abs/2103.15316))
 
@@ -643,7 +642,7 @@ Whitening operations were shown to outperform BERT-flow and achieve SOTA with 25
 
 **Quick-Thought (QT) vectors** ([Logeswaran & Lee, 2018](https://arxiv.org/abs/1803.02893)) formulate sentence representation learning as a _classification_ problem: Given a sentence and its context, a classifier distinguishes context sentences from other contrastive sentences based on their vector representations ([“cloze test”](https://lilianweng.github.io/posts/2019-01-31-lm/#MLM)). Such a formulation removes the softmax output layer which causes training slowdown.
 
-![](quick-thought.png)
+![](assets/images/2021-05-31-contrastive/quick-thought.png)
 
 Fig. 28. Illustration of how Quick-Thought sentence embedding vectors are learned. (Image source: [Logeswaran & Lee, 2018](https://arxiv.org/abs/1803.02893))
 
@@ -655,7 +654,7 @@ $$\mathcal{L}_\text{QT} = - \sum_{s \in \mathcal{D}} \sum_{s_c \in C(s)} \log p(
 
 **IS-BERT (Info-Sentence BERT)** ([Zhang et al. 2020](https://arxiv.org/abs/2009.12061); [code](https://github.com/yanzhangnlp/IS-BERT)) adopts a self-supervised learning objective based on _mutual information maximization_ to learn good sentence embeddings in the _unsupervised_ manners.
 
-![](IS-BERT.png)
+![](assets/images/2021-05-31-contrastive/IS-BERT.png)
 
 Fig. 29. Illustration of Info-Sentence BERT. (Image source: [Zhang et al. 2020](https://arxiv.org/abs/2009.12061))
 
@@ -674,7 +673,7 @@ where $T_\\omega: \mathcal{F}\times\mathcal{E} \to \mathbb{R}$ is a learnable ne
 
 The unsupervised numbers on SentEval with IS-BERT outperforms most of the unsupervised baselines (Sep 2020), but unsurprisingly weaker than supervised runs. When using labelled NLI datasets, IS-BERT produces results comparable with SBERT (See Fig. 25 & 30).
 
-![](IS-BERT-SentEval.png)
+![](assets/images/2021-05-31-contrastive/IS-BERT-SentEval.png)
 
 Fig. 30. The performance of IS-BERT on the SentEval benchmark. (Image source: [Zhang et al. 2020](https://arxiv.org/abs/2009.12061))
 
@@ -686,6 +685,7 @@ Cited as:
 
 Or
 
+```
     @article{weng2021contrastive,
       title   = "Contrastive Representation Learning",
       author  = "Weng, Lilian",
@@ -694,6 +694,7 @@ Or
       month   = "May",
       url     = "https://lilianweng.github.io/posts/2021-05-31-contrastive/"
     }
+```
 
 # References[#](#references)
 
