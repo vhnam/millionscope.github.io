@@ -346,7 +346,7 @@ Here I used [tf.gather()](https://www.tensorflow.org/api_docs/python/tf/gather) 
 During the episode rollout, we compute the `actions_next` by feeding the next states' data into the `actions_selected_by_q` operation.
 
 ```python
-    # batch_data is a dict with keys, ‘s', ‘a', ‘r', ‘s_next' and ‘done', containing a batch of transitions.
+    # batch_data is a dict with keys, 's', 'a', 'r', 's_next' and 'done', containing a batch of transitions.
     actions_next = sess.run(actions_selected_by_q, {states: batch_data['s_next']})
 ```
 

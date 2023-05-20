@@ -69,7 +69,7 @@ To make sure the generated architecture is valid, additional rules might be need
 - If one layer has many input layers, then all input layers are concatenated in the depth dimension;
 - If input layers to be concatenated have different sizes, we pad the small layers with zeros so that the concatenated layers have the same sizes.
 
-The skip connection can be predicted as well, using an [attention](https://lilianweng.github.io/posts/2018-06-24-attention/)\-style mechanism. At layer $i$ , an anchor point is added with $i−1$ content-based sigmoids to indicate which of the previous layers to be connected. Each sigmoid takes as input the hidden states of the current node $h_i$ and $i-1$ previous nodes $h_j, j=1, \dots, i-1$ .
+The skip connection can be predicted as well, using an [attention](https://lilianweng.github.io/posts/2018-06-24-attention/)\-style mechanism. At layer $i$ , an anchor point is added with $i-1$ content-based sigmoids to indicate which of the previous layers to be connected. Each sigmoid takes as input the hidden states of the current node $h_i$ and $i-1$ previous nodes $h_j, j=1, \dots, i-1$ .
 
 $$P(\text{Layer j is an input to layer i}) = \text{sigmoid}(v^\top \tanh(\mathbf{W}_\text{prev} h_j + \mathbf{W}_\text{curr} h_i))$$
 
@@ -332,7 +332,7 @@ The bilevel optimization exists as we want to optimize both the network weights 
 
 $$\begin{aligned} \min_\alpha & \mathcal{L}_\text{validate} (w^\*(\alpha), \alpha) \\ \text{s.t.} & w^\*(\alpha) = \arg\min_w \mathcal{L}_\text{train} (w, \alpha) \end{aligned}$$
 
-At step $k$, given the current architecture parameters $\alpha_{k−1}$, we first optimize weights $w_k$ by moving $w_{k−1}$ in the direction of minimizing the training loss $\mathcal{L}_\text{train}(w_{k−1}, \alpha_{k−1})$ with a learning rate $\\xi$. Next, while keeping the newly updated weights $w_k$ fixed, we update the mixing probabilities so as to minimize the validation loss _after a single step of gradient descent w.r.t. the weights_:
+At step $k$, given the current architecture parameters $\alpha_{k-1}$, we first optimize weights $w_k$ by moving $w_{k-1}$ in the direction of minimizing the training loss $\mathcal{L}_\text{train}(w_{k-1}, \alpha_{k-1})$ with a learning rate $\\xi$. Next, while keeping the newly updated weights $w_k$ fixed, we update the mixing probabilities so as to minimize the validation loss _after a single step of gradient descent w.r.t. the weights_:
 
 $$J_\alpha = \mathcal{L}_\text{val}(w_k - \\xi \nabla_w \mathcal{L}_\text{train}(w_k, \alpha_{k-1}), \alpha_{k-1})$$
 

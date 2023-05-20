@@ -392,7 +392,7 @@ Reformer proposed two main changes:
 
 In$$\mathbf{Q} \mathbf{K}^\top$$part of the [attention formula](#attention-and-self-attention), we are only interested in the largest elements as only large elements contribute a lot after softmax. For each query$$\mathbf{q}_i \in \mathbf{Q}$$, we are looking for row vectors in$$\mathbf{K}$$closest to$$\mathbf{q}_i$$. In order to find nearest neighbors quickly in high-dimensional space, Reformer incorporates [Locality-Sensitive Hashing (LSH)](https://en.wikipedia.org/wiki/Locality-sensitive_hashing) into its attention mechanism.
 
-A hashing scheme$$x \mapsto h(x)$$is _locality-sensitive_ if it preserves the distancing information between data points, such that close vectors obtain similar hashes while distant vectors have very different ones. The Reformer adopts a hashing scheme as such, given a fixed random matrix$$\mathbf{R} \in \mathbb{R}^{d \times b/2}$$(where$$b$$is a hyperparam), the hash function is$$h(x) = \arg\max([xR; −xR])$$.
+A hashing scheme$$x \mapsto h(x)$$is _locality-sensitive_ if it preserves the distancing information between data points, such that close vectors obtain similar hashes while distant vectors have very different ones. The Reformer adopts a hashing scheme as such, given a fixed random matrix$$\mathbf{R} \in \mathbb{R}^{d \times b/2}$$(where$$b$$is a hyperparam), the hash function is$$h(x) = \arg\max([xR; -xR])$$.
 
 
 {/* If we omit the scalar in self-attention and summarize the denominator into a normalizing term$$Z(.)$$, an normal attention output looks as follows:
@@ -433,7 +433,7 @@ and reversing is easy:
 
 $$
 
-x_2 = y_2 - G(y_1), \; x_1 = y_1 − F(x_2)
+x_2 = y_2 - G(y_1), \; x_1 = y_1 - F(x_2)
 
 $$
 

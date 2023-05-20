@@ -495,7 +495,7 @@ The gradient of the squared euclidean distance is:
 
 $$\begin{aligned} \nabla_\theta[\frac{1}{2}\text{dist}(\theta, \mathcal{W}_{\tau_i}^\*)^2] &= \nabla_\theta[\frac{1}{2}\text{dist}(\theta, W_{\tau_i}^\*(\theta))^2] & \\ &= \nabla_\theta[\frac{1}{2}(\theta - W_{\tau_i}^\*(\theta))^2] & \\ &= \theta - W_{\tau_i}^\*(\theta) & \\scriptstyle{\text{; See notes.}} \end{aligned}$$
 
-Notes: According to the Reptile paper, "_the gradient of the squared euclidean distance between a point Θ and a set S is the vector 2(Θ − p), where p is the closest point in S to Θ_". Technically the closest point in S is also a function of Θ, but I'm not sure why the gradient does not need to worry about the derivative of p. (Please feel free to leave me a comment or send me an email about this if you have ideas.)
+Notes: According to the Reptile paper, "_the gradient of the squared euclidean distance between a point Θ and a set S is the vector 2(Θ - p), where p is the closest point in S to Θ_". Technically the closest point in S is also a function of Θ, but I'm not sure why the gradient does not need to worry about the derivative of p. (Please feel free to leave me a comment or send me an email about this if you have ideas.)
 
 Thus the update rule for one stochastic gradient step is:
 

@@ -45,7 +45,7 @@ In this post, we delve into the issue of toxicity in language models. As I'm sti
 
 > [[Kurita et al. 2019](https://arxiv.org/abs/1912.06872)] Content that can offend or harm its recipients, including hate speech, racism, and offensive language.
 
-> [[Pavlopoulos et al. 2020](https://arxiv.org/abs/2006.00998)] We use the term ‘toxic' as an umbrella term, but we note that the literature uses several terms for different kinds of toxic language or related phenomena: ‘offensive', ‘abusive', ‘hateful', etc.
+> [[Pavlopoulos et al. 2020](https://arxiv.org/abs/2006.00998)] We use the term 'toxic' as an umbrella term, but we note that the literature uses several terms for different kinds of toxic language or related phenomena: 'offensive', 'abusive', 'hateful', etc.
 
 Overall, toxicity is a broad term to describe several types of unsafe content. Methodologies in this post can be applied given some form of definition of toxicity; e.g. presented in the instruction for annotators. How to properly define the concept of toxicity and thus collect accurate annotation labels is out of the scope of this post.
 
@@ -304,11 +304,11 @@ $$\mathcal{L} = \lambda_\text{DAE} \mathcal{L}_\text{DAE} + \lambda_\text{cycle}
 
 - The denoising auto-encoder loss is the loss for denoising auto-encoders, where $\eta$ is a [masking](https://lilianweng.github.io/posts/2019-01-31-lm/#pre-training-tasks) function same as in BERT training:
 
-$$\mathcal{L}_\text{DAE} = \mathbb{E}_{\mathbf{x} \sim \mathcal{X}} [−\log p_\theta(\mathbf{x} \mid \eta(\mathbf{x}), s)]$$
+$$\mathcal{L}_\text{DAE} = \mathbb{E}_{\mathbf{x} \sim \mathcal{X}} [-\log p_\theta(\mathbf{x} \mid \eta(\mathbf{x}), s)]$$
 
 - The cycle consistency loss ([Zhu et al. 2017](https://arxiv.org/abs/1703.10593)) has $\tilde{\theta}$ to produce a non-differentiable pseudo-prediction $\hat{\mathbf{y}}$ and it does not take gradient backpropagation.
 
-$$\mathcal{L}_\text{cycle} = \mathbb{E}_{\mathbf{x} \sim \mathcal{X}} [−\log p_\theta(\mathbf{x} \mid f_{\tilde{\theta}}(\mathbf{x}, \bar{s}), s)]$$
+$$\mathcal{L}_\text{cycle} = \mathbb{E}_{\mathbf{x} \sim \mathcal{X}} [-\log p_\theta(\mathbf{x} \mid f_{\tilde{\theta}}(\mathbf{x}, \bar{s}), s)]$$
 
 They used the above loss to fine-tune a T5 model, resulting in a model named **CAE-T5**. The conditioning is implemented like CTRL via control code ("civil" or "toxic") prepended to the start of a sequence.
 
