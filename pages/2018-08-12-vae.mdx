@@ -131,17 +131,17 @@ In the experiment of the original DAE paper, the noise is applied in this way: a
 
 Recall that common [activation functions](http://cs231n.github.io/neural-networks-1/#actfun) include sigmoid, tanh, relu, leaky relu, etc. A neuron is activated when the value is close to 1 and inactivate with a value close to 0.
 
-Let's say there are $s\_l$ neurons in the $l$-th hidden layer and the activation function for the $j$-th neuron in this layer is labelled as $a^{(l)}\_j(.)$, $j=1, \dots, s\_l$. The fraction of activation of this neuron $\\hat{\rho}\_j$ is expected to be a small number $\rho$, known as _sparsity parameter_; a common config is $\rho = 0.05$.
+Let's say there are $s\_l$ neurons in the $l$-th hidden layer and the activation function for the $j$-th neuron in this layer is labelled as $a^{(l)}\_j(.)$, $j=1, \dots, s\_l$. The fraction of activation of this neuron $\hat{\rho}\_j$ is expected to be a small number $\rho$, known as _sparsity parameter_; a common config is $\rho = 0.05$.
 
-$$ \\hat{\rho}\_j^{(l)} = \frac{1}{n} \sum\_{i=1}^n \[a_j^{(l)}(\mathbf{x}^{(i)})\] \\approx \rho $$
+$$ \hat{\rho}\_j^{(l)} = \frac{1}{n} \sum\_{i=1}^n \[a_j^{(l)}(\mathbf{x}^{(i)})\] \\approx \rho $$
 
-This constraint is achieved by adding a penalty term into the loss function. The KL-divergence $D\_\text{KL}$ measures the difference between two Bernoulli distributions, one with mean $\rho$ and the other with mean $\\hat{\rho}\_j^{(l)}$. The hyperparameter $\\beta$ controls how strong the penalty we want to apply on the sparsity loss.
+This constraint is achieved by adding a penalty term into the loss function. The KL-divergence $D\_\text{KL}$ measures the difference between two Bernoulli distributions, one with mean $\rho$ and the other with mean $\hat{\rho}\_j^{(l)}$. The hyperparameter $\\beta$ controls how strong the penalty we want to apply on the sparsity loss.
 
-$$ \begin{aligned} L\_\text{SAE}(\\theta) &= L(\\theta) + \\beta \sum\_{l=1}^L \sum\_{j=1}^{s_l} D\_\text{KL}(\rho \\| \\hat{\rho}\_j^{(l)}) \\ &= L(\\theta) + \\beta \sum\_{l=1}^L \sum\_{j=1}^{s_l} \rho\\log\frac{\rho}{\\hat{\rho}\_j^{(l)}} + (1-\rho)\\log\frac{1-\rho}{1-\\hat{\rho}\_j^{(l)}} \end{aligned} $$
+$$ \begin{aligned} L\_\text{SAE}(\\theta) &= L(\\theta) + \\beta \sum\_{l=1}^L \sum\_{j=1}^{s_l} D\_\text{KL}(\rho \\| \hat{\rho}\_j^{(l)}) \\ &= L(\\theta) + \\beta \sum\_{l=1}^L \sum\_{j=1}^{s_l} \rho\\log\frac{\rho}{\hat{\rho}\_j^{(l)}} + (1-\rho)\\log\frac{1-\rho}{1-\hat{\rho}\_j^{(l)}} \end{aligned} $$
 
 ![](kl-metric-sparse-autoencoder.png)
 
-Fig. 4. The KL divergence between a Bernoulli distribution with mean $\rho=0.25$ and a Bernoulli distribution with mean $0 \\leq \\hat{\rho} \\leq 1$.
+Fig. 4. The KL divergence between a Bernoulli distribution with mean $\rho=0.25$ and a Bernoulli distribution with mean $0 \leq \hat{\rho} \leq 1$.
 
 **$k$-Sparse Autoencoder**
 
@@ -236,7 +236,7 @@ $$ \begin{aligned} L\_\text{VAE}(\\theta, \\phi) &= -\\log p\_\\theta(\mathbf{x}
 
 In Variational Bayesian methods, this loss function is known as the _variational lower bound_, or _evidence lower bound_. The “lower bound” part in the name comes from the fact that KL divergence is always non-negative and thus $-L\_\text{VAE}$ is the lower bound of $\\log p\_\\theta (\mathbf{x})$.
 
-$$ -L\_\text{VAE} = \\log p\_\\theta(\mathbf{x}) - D\_\text{KL}( q\_\\phi(\mathbf{z}\vert\mathbf{x}) \\| p\_\\theta(\mathbf{z}\vert\mathbf{x}) ) \\leq \\log p\_\\theta(\mathbf{x}) $$
+$$ -L\_\text{VAE} = \\log p\_\\theta(\mathbf{x}) - D\_\text{KL}( q\_\\phi(\mathbf{z}\vert\mathbf{x}) \\| p\_\\theta(\mathbf{z}\vert\mathbf{x}) ) \leq \\log p\_\\theta(\mathbf{x}) $$
 
 Therefore by minimizing the loss, we are maximizing the lower bound of the probability of generating real data samples.
 
@@ -246,7 +246,7 @@ The expectation term in the loss function invokes generating samples from $\math
 
 For example, a common choice of the form of $q\_\\phi(\mathbf{z}\vert\mathbf{x})$ is a multivariate Gaussian with a diagonal covariance structure:
 
-$$ \begin{aligned} \mathbf{z} &\\sim q\_\\phi(\mathbf{z}\vert\mathbf{x}^{(i)}) = \mathcal{N}(\mathbf{z}; \\boldsymbol{\\mu}^{(i)}, \\boldsymbol{\\sigma}^{2(i)}\\boldsymbol{I}) & \\ \mathbf{z} &= \\boldsymbol{\\mu} + \\boldsymbol{\\sigma} \\odot \\boldsymbol{\\epsilon} \text{, where } \\boldsymbol{\\epsilon} \\sim \mathcal{N}(0, \\boldsymbol{I}) & \\scriptstyle{\text{; Reparameterization trick.}} \end{aligned} $$
+$$ \begin{aligned} \mathbf{z} &\\sim q\_\\phi(\mathbf{z}\vert\mathbf{x}^{(i)}) = \mathcal{N}(\mathbf{z}; \\boldsymbol{\\mu}^{(i)}, \\boldsymbol{\sigma}^{2(i)}\\boldsymbol{I}) & \\ \mathbf{z} &= \\boldsymbol{\\mu} + \\boldsymbol{\sigma} \\odot \\boldsymbol{\\epsilon} \text{, where } \\boldsymbol{\\epsilon} \\sim \mathcal{N}(0, \\boldsymbol{I}) & \\scriptstyle{\text{; Reparameterization trick.}} \end{aligned} $$
 
 where $\\odot$ refers to element-wise product.
 
@@ -254,7 +254,7 @@ where $\\odot$ refers to element-wise product.
 
 Fig. 8. Illustration of how the reparameterization trick makes the $\mathbf{z}$ sampling process trainable.(Image source: Slide 12 in Kingma's NIPS 2015 workshop [talk](http://dpkingma.com/wordpress/wp-content/uploads/2015/12/talk_nips_workshop_2015.pdf))
 
-The reparameterization trick works for other types of distributions too, not only Gaussian. In the multivariate Gaussian case, we make the model trainable by learning the mean and variance of the distribution, $\\mu$ and $\\sigma$, explicitly using the reparameterization trick, while the stochasticity remains in the random variable $\\boldsymbol{\\epsilon} \\sim \mathcal{N}(0, \\boldsymbol{I})$.
+The reparameterization trick works for other types of distributions too, not only Gaussian. In the multivariate Gaussian case, we make the model trainable by learning the mean and variance of the distribution, $\\mu$ and $\sigma$, explicitly using the reparameterization trick, while the stochasticity remains in the random variable $\\boldsymbol{\\epsilon} \\sim \mathcal{N}(0, \\boldsymbol{I})$.
 
 ![](vae-gaussian.png)
 
@@ -357,11 +357,11 @@ $$ \begin{aligned} \\log p(x) &\\geq \\log p(x) - D\_\text{KL}(q(z|x)\\|p(z|x)) 
 
 Now let's model the distribution of the state $x\_t$ as a probability function conditioned on all the past states $x\_{<t}$ and two latent variables, $z\_t$ and $z\_{t-1}$, at current time step and one step back:
 
-$$ \\log p(x_t|x\_{<{t}}) \\geq \mathbb{E}\_{(z\_{t-1}, z_t) \\sim q}\[\\log p(x_t, z\_{t-1}, z\_{t}|x\_{<{t}}) -\\log q(z\_{t-1}, z_t|x\_{\\leq t})\] $$
+$$ \\log p(x_t|x\_{<{t}}) \\geq \mathbb{E}\_{(z\_{t-1}, z_t) \\sim q}\[\\log p(x_t, z\_{t-1}, z\_{t}|x\_{<{t}}) -\\log q(z\_{t-1}, z_t|x\_{\leq t})\] $$
 
 Continue expanding the equation:
 
-$$ \begin{aligned} & \\log p(x_t|x\_{<{t}}) \\ &\\geq \mathbb{E}\_{(z\_{t-1}, z_t) \\sim q}\[\\log p(x_t, z\_{t-1}, z\_{t}|x\_{<{t}}) -\\log q(z\_{t-1}, z_t|x\_{\\leq t})\] \\ &\\geq \mathbb{E}\_{(z\_{t-1}, z_t) \\sim q}\[\\log p(x_t|\\color{red}{z\_{t-1}}, z\_{t}, \\color{red}{x\_{<{t}}}) + \\color{blue}{\\log p(z\_{t-1}, z\_{t}|x\_{<{t}})} -\\log q(z\_{t-1}, z_t|x\_{\\leq t})\] \\ &\\geq \mathbb{E}\_{(z\_{t-1}, z_t) \\sim q}\[\\log p(x_t|z\_{t}) + \\color{blue}{\\log p(z\_{t-1}|x\_{<{t}})} + \\color{blue}{\\log p(z\_{t}|z\_{t-1})} - \\color{green}{\\log q(z\_{t-1}, z_t|x\_{\\leq t})}\] \\ &\\geq \mathbb{E}\_{(z\_{t-1}, z_t) \\sim q}\[\\log p(x_t|z\_{t}) + \\log p(z\_{t-1}|x\_{<{t}}) + \\log p(z\_{t}|z\_{t-1}) - \\color{green}{\\log q(z_t|x\_{\\leq t})} - \\color{green}{\\log q(z\_{t-1}|z_t, x\_{\\leq t})}\] \end{aligned} $$
+$$ \begin{aligned} & \\log p(x_t|x\_{<{t}}) \\ &\\geq \mathbb{E}\_{(z\_{t-1}, z_t) \\sim q}\[\\log p(x_t, z\_{t-1}, z\_{t}|x\_{<{t}}) -\\log q(z\_{t-1}, z_t|x\_{\leq t})\] \\ &\\geq \mathbb{E}\_{(z\_{t-1}, z_t) \\sim q}\[\\log p(x_t|\\color{red}{z\_{t-1}}, z\_{t}, \\color{red}{x\_{<{t}}}) + \\color{blue}{\\log p(z\_{t-1}, z\_{t}|x\_{<{t}})} -\\log q(z\_{t-1}, z_t|x\_{\leq t})\] \\ &\\geq \mathbb{E}\_{(z\_{t-1}, z_t) \\sim q}\[\\log p(x_t|z\_{t}) + \\color{blue}{\\log p(z\_{t-1}|x\_{<{t}})} + \\color{blue}{\\log p(z\_{t}|z\_{t-1})} - \\color{green}{\\log q(z\_{t-1}, z_t|x\_{\leq t})}\] \\ &\\geq \mathbb{E}\_{(z\_{t-1}, z_t) \\sim q}\[\\log p(x_t|z\_{t}) + \\log p(z\_{t-1}|x\_{<{t}}) + \\log p(z\_{t}|z\_{t-1}) - \\color{green}{\\log q(z_t|x\_{\leq t})} - \\color{green}{\\log q(z\_{t-1}|z_t, x\_{\leq t})}\] \end{aligned} $$
 
 Notice two things:
 
@@ -383,14 +383,14 @@ Precisely, there are four types of distributions to learn:
 
 3.  $p\_B(.)$ is the **belief** distribution:
 
-- Both $p(z\_{t-1} \mid x\_{<t})$ and $q(z\_t \mid x\_{\\leq t})$ can use the belief states to predict the latent variables;
+- Both $p(z\_{t-1} \mid x\_{<t})$ and $q(z\_t \mid x\_{\leq t})$ can use the belief states to predict the latent variables;
 - $p(z\_{t-1} \mid x\_{<t}) \to p\_B(z\_{t-1} \mid b\_{t-1})$;
-- $q(z\_{t} \mid x\_{\\leq t}) \to p\_B(z\_t \mid b\_t)$;
+- $q(z\_{t} \mid x\_{\leq t}) \to p\_B(z\_t \mid b\_t)$;
 
 4.  $p\_S(.)$ is the **smoothing** distribution:
 
-- The back-to-past smoothing term $q(z\_{t-1} \mid z\_t, x\_{\\leq t})$ can be rewritten to be dependent of belief states too;
-- $q(z\_{t-1} \mid z\_t, x\_{\\leq t}) \to p\_S(z\_{t-1} \mid z\_t, b\_{t-1}, b\_t)$;
+- The back-to-past smoothing term $q(z\_{t-1} \mid z\_t, x\_{\leq t})$ can be rewritten to be dependent of belief states too;
+- $q(z\_{t-1} \mid z\_t, x\_{\leq t}) \to p\_S(z\_{t-1} \mid z\_t, b\_{t-1}, b\_t)$;
 
 To incorporate the idea of jumpy prediction, the sequential ELBO has to not only work on $t, t+1$, but also two distant timestamp $t\_1 < t\_2$. Here is the final TD-VAE objective function to maximize:
 

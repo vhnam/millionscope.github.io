@@ -158,9 +158,9 @@ _Per-embedding group (PEG)_ activation quantization was motivated by the observa
 
 Q-BERT ([Shen, Dong & Ye, et al. 2020](https://arxiv.org/abs/1909.05840)) developed Hessian AWare Quantization (HAWQ) for its mixed-precision quantization. The motivation is that parameters with higher Hessian spectrum (i.e., larger top eigenvalues) are more sensitive to quantization and thus require higher precision. It is essentially a way to identify outliers.
 
-In another viewpoint, the problem of quantization is an optimization problem. Given a weight matrix $\mathbf{W}$ and an input matrix $\mathbf{X}$ , we want to find a quantized weight matrix $\\hat{\mathbf{W}}$ to minimize the MSE:
+In another viewpoint, the problem of quantization is an optimization problem. Given a weight matrix $\mathbf{W}$ and an input matrix $\mathbf{X}$ , we want to find a quantized weight matrix $\hat{\mathbf{W}}$ to minimize the MSE:
 
-$$ \\hat{\mathbf{W}}^\* = {\arg\min}\_{\\hat{\mathbf{W}}} | \mathbf{W}\mathbf{X} - \\hat{\mathbf{W}}\mathbf{X}| $$
+$$ \hat{\mathbf{W}}^\* = {\arg\min}\_{\hat{\mathbf{W}}} | \mathbf{W}\mathbf{X} - \hat{\mathbf{W}}\mathbf{X}| $$
 
 **GPTQ** ([Frantar et al. 2022](https://arxiv.org/abs/2210.17323)) treats the weight matrix $\mathbf{W}$ as a collection of row vectors ${\mathbf{w}}$ and applies quantization to each row independently. GPTQ iteratively quantizes more weights that are selected greedily to minimize the quantization error. The update on selected weights has a closed-form formula, utilizing Hessian matrices. Read more details in the paper and the OBQ (Optimal Brain Quantization; [Frantar & Alistarh 2022](https://arxiv.org/abs/2208.11580)) method if interested. GPTQ can reduce the bitwidth of weights in OPT-175B down to 3 or 4 bits without much performance loss, but it only applies to model weights not activation.
 
@@ -174,7 +174,7 @@ Fig. 6. SmoothQuant migrates the scale variance from activations to weights offl
 
 Considering a per-channel smooth factor $\mathbf{s}$, SmoothQuant scales the weights according to:
 
-$$ \mathbf{Y} = (\mathbf{X} \text{diag}(\mathbf{s})^{-1}) \cdot (\text{diag}(\mathbf{s})\mathbf{W}) = \\hat{\mathbf{X}}\\hat{\mathbf{W}} $$
+$$ \mathbf{Y} = (\mathbf{X} \text{diag}(\mathbf{s})^{-1}) \cdot (\text{diag}(\mathbf{s})\mathbf{W}) = \hat{\mathbf{X}}\hat{\mathbf{W}} $$
 
 The smoothing factor can be easily fused into previous layers' parameters offline. A hyperparameter $\\alpha$ controls how much we migrate the quantization difficulty from activations to weights: $\mathbf{s} = \max (\vert \mathbf{X}\_j \vert)^\\alpha / \max( \vert \mathbf{W}\_j \vert )^{1-\\alpha}$. The paper found that $\\alpha=0.5$ is a sweet spot for many LLMs in the experiments. For models with more significant outliers in activation, $\\alpha$ can be adjusted to be larger.
 
@@ -279,7 +279,7 @@ $$ W\_{t+1} \\gets W\_t - \\gamma \frac{\\partial\mathcal{L}}{\\partial\\widetil
 
 ![](SR-STE.png)
 
-Fig. 11. Comparison of STE and SR-STE. $\\odot$ is element-wise product; $\\otimes$ is matrix multiplication. (Image source: [Zhou & Ma, et al. 2021](https://arxiv.org/abs/2102.04010))
+Fig. 11. Comparison of STE and SR-STE. $\\odot$ is element-wise product; $\otimes$ is matrix multiplication. (Image source: [Zhou & Ma, et al. 2021](https://arxiv.org/abs/2102.04010))
 
 Different from STE or SR-STE, the **Top-KAST** ([Jayakumar et al. 2021](https://arxiv.org/abs/2106.03517)) method can preserve constant sparsity throughout training in both the forward and backward-passes but does not require forward passes with dense parameters or dense gradients.
 
@@ -361,7 +361,7 @@ Since each expert has a limited capacity, some important and informative tokens 
 
 Fig. 16. How image patches are discarded according to priority scores when $C < 1$. (Image source: [Riquelme et al. 2021](https://arxiv.org/abs/2106.05974))
 
-BPR works much better than vanilla routing when $C\\leq 0.5$, where the model starts dropping a significant amount of tokens. It capacitates the model to be competitive with the dense network even at quite low capacities.
+BPR works much better than vanilla routing when $C\leq 0.5$, where the model starts dropping a significant amount of tokens. It capacitates the model to be competitive with the dense network even at quite low capacities.
 
 When looking into how to interpret image class-expert association, they observed that early MoE layers are more general, while later MoE layers could be specialized for a few image classes.
 

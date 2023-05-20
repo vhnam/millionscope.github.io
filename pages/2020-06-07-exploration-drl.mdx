@@ -45,8 +45,8 @@ I would like to discuss several common exploration strategies in Deep RL here. A
 As a quick recap, let's first go through several classic exploration algorithms that work out pretty well in the multi-armed bandit problem or simple tabular RL.
 
 - **Epsilon-greedy**: The agent does random exploration occasionally with probability $\\epsilon$ and takes the optimal action most of the time with probability $1-\\epsilon$.
-- **Upper confidence bounds**: The agent selects the greediest action to maximize the upper confidence bound $\\hat{Q}\_t(a) + \\hat{U}\_t(a)$, where $\\hat{Q}\_t(a)$ is the average rewards associated with action $a$ up to time $t$ and $\\hat{U}\_t(a)$ is a function reversely proportional to how many times action $a$ has been taken. See [here](https://lilianweng.github.io/posts/2018-01-23-multi-armed-bandit/#upper-confidence-bounds) for more details.
-- **Boltzmann exploration**: The agent draws actions from a [boltzmann distribution](https://en.wikipedia.org/wiki/Boltzmann_distribution) (softmax) over the learned Q values, regulated by a temperature parameter $\\tau$.
+- **Upper confidence bounds**: The agent selects the greediest action to maximize the upper confidence bound $\hat{Q}\_t(a) + \hat{U}\_t(a)$, where $\hat{Q}\_t(a)$ is the average rewards associated with action $a$ up to time $t$ and $\hat{U}\_t(a)$ is a function reversely proportional to how many times action $a$ has been taken. See [here](https://lilianweng.github.io/posts/2018-01-23-multi-armed-bandit/#upper-confidence-bounds) for more details.
+- **Boltzmann exploration**: The agent draws actions from a [boltzmann distribution](https://en.wikipedia.org/wiki/Boltzmann_distribution) (softmax) over the learned Q values, regulated by a temperature parameter $\tau$.
 - **Thompson sampling**: The agent keeps track of a belief over the probability of optimal actions and samples from this distribution. See [here](https://lilianweng.github.io/posts/2018-01-23-multi-armed-bandit/#thompson-sampling) for more details.
 
 The following strategies could be used for better exploration in deep RL training when neural networks are used for function approximation:
@@ -98,21 +98,21 @@ Let $N\_n(s)$ be the _empirical count_ function that tracks the real number of v
 
 Let's also define a _recoding probability_ of a state $s$ as the probability assigned by the density model to $s$ _after observing a new occurrence of_ $s$, $\rho'\_n(s) = \rho(s \vert s\_{1:n}s)$.
 
-The paper introduced two concepts to better regulate the density model, a _pseudo-count_ function $\\hat{N}\_n(s)$ and a _pseudo-count total_ $\\hat{n}$. As they are designed to imitate an empirical count function, we would have:
+The paper introduced two concepts to better regulate the density model, a _pseudo-count_ function $\hat{N}\_n(s)$ and a _pseudo-count total_ $\hat{n}$. As they are designed to imitate an empirical count function, we would have:
 
-$$ \rho_n(s) = \frac{\\hat{N}\_n(s)}{\\hat{n}} \\leq \rho'\_n(s) = \frac{\\hat{N}\_n(s) + 1}{\\hat{n} + 1} $$
+$$ \rho_n(s) = \frac{\hat{N}\_n(s)}{\hat{n}} \leq \rho'\_n(s) = \frac{\hat{N}\_n(s) + 1}{\hat{n} + 1} $$
 
-The relationship between $\rho\_n(x)$ and $\rho'\_n(x)$ requires the density model to be _learning-positive_: for all $s\_{1:n} \in \mathcal{S}^n$ and all $s \in \mathcal{S}$, $\rho\_n(s) \\leq \rho'\_n(s)$. In other words, After observing one instance of $s$, the density model's prediction of that same $s$ should increase. Apart from being learning-positive, the density model should be trained completely _online_ with non-randomized mini-batches of experienced states, so naturally we have $\rho'\_n = \rho\_{n+1}$.
+The relationship between $\rho\_n(x)$ and $\rho'\_n(x)$ requires the density model to be _learning-positive_: for all $s\_{1:n} \in \mathcal{S}^n$ and all $s \in \mathcal{S}$, $\rho\_n(s) \leq \rho'\_n(s)$. In other words, After observing one instance of $s$, the density model's prediction of that same $s$ should increase. Apart from being learning-positive, the density model should be trained completely _online_ with non-randomized mini-batches of experienced states, so naturally we have $\rho'\_n = \rho\_{n+1}$.
 
 The pseudo-count can be computed from $\rho\_n(s)$ and $\rho'\_n(s)$ after solving the above linear system:
 
-$$ \\hat{N}\_n(s) = \\hat{n} \rho_n(s) = \frac{\rho_n(s)(1 - \rho'\_n(s))}{\rho'\_n(s) - \rho_n(s)} $$
+$$ \hat{N}\_n(s) = \hat{n} \rho_n(s) = \frac{\rho_n(s)(1 - \rho'\_n(s))}{\rho'\_n(s) - \rho_n(s)} $$
 
 Or estimated by the _prediction gain (PG)_:
 
-$$ \\hat{N}\_n(s) \\approx (e^{\text{PG}\_n(s)} - 1)^{-1} = (e^{\\log \rho'\_n(s) - \\log \rho(s)} - 1)^{-1} $$
+$$ \hat{N}\_n(s) \\approx (e^{\text{PG}\_n(s)} - 1)^{-1} = (e^{\\log \rho'\_n(s) - \\log \rho(s)} - 1)^{-1} $$
 
-A common choice of a count-based intrinsic bonus is $r^i\_t = N(s\_t, a\_t)^{-1/2}$ (as in MBIE-EB; [Strehl & Littman, 2008](https://www.ics.uci.edu/~dechter/courses/ics-295/fall-2019/papers/2008-littman-aij-main.pdf)). The pseudo-count-based exploration bonus is shaped in a similar form, $r^i\_t = \\big(\\hat{N}\_n(s\_t, a\_t) + 0.01 \\big)^{-1/2}$.
+A common choice of a count-based intrinsic bonus is $r^i\_t = N(s\_t, a\_t)^{-1/2}$ (as in MBIE-EB; [Strehl & Littman, 2008](https://www.ics.uci.edu/~dechter/courses/ics-295/fall-2019/papers/2008-littman-aij-main.pdf)). The pseudo-count-based exploration bonus is shaped in a similar form, $r^i\_t = \\big(\hat{N}\_n(s\_t, a\_t) + 0.01 \\big)^{-1/2}$.
 
 Experiments in [Bellemare et al., (2016)](https://arxiv.org/abs/1606.01868) adopted a simple [CTS](http://proceedings.mlr.press/v32/bellemare14.html) (Context Tree Switching) density model to estimate pseudo-counts. The CTS model takes as input a 2D image and assigns to it a probability according to the product of location-dependent L-shaped filters, where the prediction of each filter is given by a CTS algorithm trained on past images. The CTS model is simple but limited in expressiveness, scalability, and data efficiency. In a following-up paper, [Georg Ostrovski, et al. (2017)](https://arxiv.org/abs/1703.01310) improved the approach by training a PixelCNN ([van den Oord et al., 2016](https://arxiv.org/abs/1606.05328)) as the density model.
 
@@ -150,13 +150,13 @@ _Intelligent Adaptive Curiosity_ (**IAC**; [Oudeyer, et al. 2007](http://citesee
 
 IAC relies on a memory which stores all the experiences encountered by the robot, $M=\{(s\_t, a\_t, s\_{t+1})\}$ and a forward dynamics model $f$. IAC incrementally splits the state space (i.e. sensorimotor space in the context of robotics, as discussed in the paper) into separate regions based on the transition samples, using a process similar to how a decision tree is split: The split happens when the number of samples is larger than a threshold, and the variance of states in each leaf should be minimal. Each tree node is characterized by its exclusive set of samples and has its own forward dynamics predictor $f$, named “expert”.
 
-The prediction error $e\_t$ of an expert is pushed into a list associated with each region. The _learning progress_ is then measured as the difference between the mean error rate of a moving window with offset $\\tau$ and the current moving window. The intrinsic reward is defined for tracking the learning progress: $r^i\_t = \frac{1}{k}\sum\_{i=0}^{k-1}(e\_{t-i-\\tau} - e\_{t-i})$, where $k$ is the moving window size. So the larger prediction error rate decrease we can achieve, the higher intrinsic reward we would assign to the agent. In other words, the agent is encouraged to take actions to quickly learn about the environment.
+The prediction error $e\_t$ of an expert is pushed into a list associated with each region. The _learning progress_ is then measured as the difference between the mean error rate of a moving window with offset $\tau$ and the current moving window. The intrinsic reward is defined for tracking the learning progress: $r^i\_t = \frac{1}{k}\sum\_{i=0}^{k-1}(e\_{t-i-\tau} - e\_{t-i})$, where $k$ is the moving window size. So the larger prediction error rate decrease we can achieve, the higher intrinsic reward we would assign to the agent. In other words, the agent is encouraged to take actions to quickly learn about the environment.
 
 ![](IAC.png)
 
 Fig. 3. Architecture of the IAC (Intelligent Adaptive Curiosity) module: the intrinsic reward is assigned w.r.t the learning progress in reducing prediction error of the dynamics model. (Image source: [Oudeyer, et al. 2007](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.177.7661&rep=rep1&type=pdf)))
 
-[Stadie et al. (2015)](https://arxiv.org/abs/1507.00814) trained a forward dynamics model in the encoding space defined by $\\phi$, $f\_\\phi: (\\phi(s\_t), a\_t) \\mapsto \\phi(s\_{t+1})$. The model's prediction error at time $T$ is normalized by the maximum error up to time $t$, $\\bar{e}\_t = \frac{e\_t}{\max\_{i \\leq t} e\_i}$, so it is always between 0 and 1. The intrinsic reward is defined accordingly: $r^i\_t = (\frac{\\bar{e}\_t(s\_t, a\_t)}{t \cdot C})$, where $C > 0$ is a decay constant.
+[Stadie et al. (2015)](https://arxiv.org/abs/1507.00814) trained a forward dynamics model in the encoding space defined by $\\phi$, $f\_\\phi: (\\phi(s\_t), a\_t) \\mapsto \\phi(s\_{t+1})$. The model's prediction error at time $T$ is normalized by the maximum error up to time $t$, $\\bar{e}\_t = \frac{e\_t}{\max\_{i \leq t} e\_i}$, so it is always between 0 and 1. The intrinsic reward is defined accordingly: $r^i\_t = (\frac{\\bar{e}\_t(s\_t, a\_t)}{t \cdot C})$, where $C > 0$ is a decay constant.
 
 Encoding the state space via $\\phi(.)$ is necessary, as experiments in the paper have shown that a dynamics model trained directly on raw pixels has _very poor_ behavior — assigning same exploration bonuses to all the states. In [Stadie et al. (2015)](https://arxiv.org/abs/1507.00814), the encoding function $\\phi$ is learned via an autocoder (AE) and $\\phi(.)$ is one of the output layers in AE. The AE can be statically trained using a set of images collected by a random agent, or dynamically trained together with the policy where the early frames are gathered using [$\\epsilon$-greedy](#classic-exploration-strategies) exploration.
 
@@ -164,7 +164,7 @@ Instead of autoencoder, _Intrinsic Curiosity Module_ (**ICM**; [Pathak, et al., 
 
 Given a forward model $f$, an inverse dynamics model $g$ and an observation $(s\_t, a\_t, s\_{t+1})$:
 
-$$ g\_{\\psi_I}(\\phi(s_t), \\phi(s\_{t+1})) = \\hat{a}\_t \quad f\_{\\psi_F}(\\phi(s_t), a_t) = \\hat{\\phi}(s\_{t+1}) \quad r_t^i = \\| \\hat{\\phi}(s\_{t+1}) - \\phi(s\_{t+1}) \\|\_2^2 $$
+$$ g\_{\\psi_I}(\\phi(s_t), \\phi(s\_{t+1})) = \hat{a}\_t \quad f\_{\\psi_F}(\\phi(s_t), a_t) = \hat{\\phi}(s\_{t+1}) \quad r_t^i = \\| \hat{\\phi}(s\_{t+1}) - \\phi(s\_{t+1}) \\|\_2^2 $$
 
 Such $\\phi(.)$ is expected to be robust to uncontrollable aspects of the environment.
 
@@ -215,7 +215,7 @@ $$ r^i_t = D\_\text{KL} \[q\_{\\phi\_{t+1}}(\\theta) \\| q\_{\\phi_t}(\\theta))\
 
 where $\\phi\_{t+1}$ represents $q$'s parameters associated with the new relief after seeing $a\_t$ and $s\_{t+1}$. When used as an exploration bonus, it is normalized by division by the moving median of this KL divergence value.
 
-Here the dynamics model is parameterized as a [Bayesian neural network](https://link.springer.com/book/10.1007/978-1-4612-0745-0) (BNN), as it maintains a distribution over its weights. The BNN weight distribution $q\_\\phi(\\theta)$ is modeled as a fully _factorized_ Gaussian with $\\phi = \{\\mu, \\sigma\}$ and we can easily sample $\\theta \\sim q\_\\phi(.)$. After applying a second-order Taylor expansion, the KL term $D\_\text{KL}\[q\_{\\phi + \\lambda \\Delta\\phi}(\\theta) | q\_{\\phi}(\\theta)\]$ can be estimated using [Fisher Information Matrix](https://lilianweng.github.io/posts/2019-09-05-evolution-strategies/#estimation-using-fisher-information-matrix) $\mathbf{F}\_\\phi$, which is easy to compute, because $q\_\\phi$ is factorized Gaussian and thus the covariance matrix is only a diagonal matrix. See more details in [the paper](https://arxiv.org/abs/1605.09674), especially section 2.3-2.5.
+Here the dynamics model is parameterized as a [Bayesian neural network](https://link.springer.com/book/10.1007/978-1-4612-0745-0) (BNN), as it maintains a distribution over its weights. The BNN weight distribution $q\_\\phi(\\theta)$ is modeled as a fully _factorized_ Gaussian with $\\phi = \{\\mu, \sigma\}$ and we can easily sample $\\theta \\sim q\_\\phi(.)$. After applying a second-order Taylor expansion, the KL term $D\_\text{KL}\[q\_{\\phi + \\lambda \\Delta\\phi}(\\theta) | q\_{\\phi}(\\theta)\]$ can be estimated using [Fisher Information Matrix](https://lilianweng.github.io/posts/2019-09-05-evolution-strategies/#estimation-using-fisher-information-matrix) $\mathbf{F}\_\\phi$, which is easy to compute, because $q\_\\phi$ is factorized Gaussian and thus the covariance matrix is only a diagonal matrix. See more details in [the paper](https://arxiv.org/abs/1605.09674), especially section 2.3-2.5.
 
 All the methods above depend on a single prediction model. If we have multiple such models, we could use the disagreement among models to set the exploration bonus ([Pathak, et al. 2019](https://arxiv.org/abs/1906.04161)). High disagreement indicates low confidence in prediction and thus requires more exploration. [Pathak, et al. (2019)](https://arxiv.org/abs/1906.04161) proposed to train a set of forward dynamics models and to use the variance over the ensemble of model outputs as $r\_t^i$. Precisely, they encode the state space with [random feature](#random-feature) and learn 5 models in the ensemble.
 
@@ -238,7 +238,7 @@ Initially E-value is assigned with value 1. Such positive initialization can enc
 
 When using a neural network to do function approximation for E-value, another value head is added to predict E-value and it is simply expected to predict zero. Given a predicted E-value $E(s\_t, a\_t)$, the exploration bonus is $r^i\_t = \frac{1}{\\sqrt{-\\log E(s\_t, a\_t)}}$.
 
-Similar to DORA, **Random Network Distillation** (**RND**; [Burda, et al. 2018](https://arxiv.org/abs/1810.12894)) introduces a prediction task _independent of the main task_. The RND exploration bonus is defined as the error of a neural network $\\hat{f}(s\_t)$ predicting features of the observations given by a _fixed randomly initialized_ neural network $f(s\_t)$. The motivation is that given a new state, if similar states have been visited many times in the past, the prediction should be easier and thus has lower error. The exploration bonus is $r^i(s\_t) = |\\hat{f}(s\_t; \\theta) - f(s\_t) |\_2^2$.
+Similar to DORA, **Random Network Distillation** (**RND**; [Burda, et al. 2018](https://arxiv.org/abs/1810.12894)) introduces a prediction task _independent of the main task_. The RND exploration bonus is defined as the error of a neural network $\hat{f}(s\_t)$ predicting features of the observations given by a _fixed randomly initialized_ neural network $f(s\_t)$. The motivation is that given a new state, if similar states have been visited many times in the past, the prediction should be easier and thus has lower error. The exploration bonus is $r^i(s\_t) = |\hat{f}(s\_t; \\theta) - f(s\_t) |\_2^2$.
 
 ![](RND.png)
 
@@ -297,7 +297,7 @@ The short-term per-episode reward is provided by an _episodic novelty module_. I
 
 Fig. 9. The architecture of NGU's embedding function (left) and reward generator (right). (Image source: [Badia, et al. 2020a](https://arxiv.org/abs/2002.06038))
 
-The long-term across-episode novelty relies on RND prediction error in _life-long novelty module_. The exploration bonus is $\\alpha\_t = 1 + \frac{e^\text{RND}(s\_t) - \\mu\_e}{\\sigma\_e}$ where $\\mu\_e$ and $\\sigma\_e$ are running mean and std dev for RND error $e^\text{RND}(s\_t)$.
+The long-term across-episode novelty relies on RND prediction error in _life-long novelty module_. The exploration bonus is $\\alpha\_t = 1 + \frac{e^\text{RND}(s\_t) - \\mu\_e}{\sigma\_e}$ where $\\mu\_e$ and $\sigma\_e$ are running mean and std dev for RND error $e^\text{RND}(s\_t)$.
 
 > However in the conclusion section of the [RND paper](https://arxiv.org/abs/1810.12894), I noticed the following statement:
 >

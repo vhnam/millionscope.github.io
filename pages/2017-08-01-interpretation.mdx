@@ -67,7 +67,7 @@ $$ \begin{aligned} p(c | x_1, x_2, \dots, x_n) &\\propto p(c, x_1, x_2, \dots, x
 
 The Naive Bayes classifier is then defined as:
 
-$$ \\hat{y} = \arg\max\_{c \in 1, \dots, C} p(c) \\prod\_{i=1}^n p(x_i | c) $$
+$$ \hat{y} = \arg\max\_{c \in 1, \dots, C} p(c) \\prod\_{i=1}^n p(x_i | c) $$
 
 Because the model has learned the prior $p(x\_i \vert c)$ during the training, the contribution of an individual feature value can be easily measured by the posterior, $p(c \vert x\_i) = p(c)p(x\_i \vert c) / p(x\_i)$.
 
@@ -142,19 +142,19 @@ However, this approach requires the model output to be a probability (similar to
 
 (1) Apply [Parzen window](https://en.wikipedia.org/?title=Parzen_window&redirect=no) to the training data to estimate the weighted class densities:
 
-$$ \\hat{p}\_{\\sigma}(x, y=c) = \frac{1}{n} \sum\_{i \in I_c} k\_{\\sigma} (x - x_i) $$
+$$ \hat{p}\_{\sigma}(x, y=c) = \frac{1}{n} \sum\_{i \in I_c} k\_{\sigma} (x - x_i) $$
 
-Where $I\_c$ is the index set containing the indices of data points assigned to class $c$ by the model $f$, $I\_c = \{i \vert f(x\_i) = c\}$. $k\_{\\sigma}$ is a kernel function. Gaussian kernel is a popular one among [many candidates](<https://en.wikipedia.org/wiki/Kernel_(statistics)#Kernel_functions_in_common_use>).
+Where $I\_c$ is the index set containing the indices of data points assigned to class $c$ by the model $f$, $I\_c = \{i \vert f(x\_i) = c\}$. $k\_{\sigma}$ is a kernel function. Gaussian kernel is a popular one among [many candidates](<https://en.wikipedia.org/wiki/Kernel_(statistics)#Kernel_functions_in_common_use>).
 
 (2) Then, apply the Bayes' rule to approximate the probability $p(Y=c \vert X=x)$ for all classes:
 
-$$ \begin{aligned} \\hat{p}\_{\\sigma}(y=c | x) &= \frac{\\hat{p}\_{\\sigma}(x, y=c)}{\\hat{p}\_{\\sigma}(x, y=c) + \\hat{p}\_{\\sigma}(x, y \\neq c)} \\ &\\approx \frac{\sum\_{i \in I_c} k\_{\\sigma} (x - x_i)}{\sum_i k\_{\\sigma} (x - x_i)} \end{aligned} $$
+$$ \begin{aligned} \hat{p}\_{\sigma}(y=c | x) &= \frac{\hat{p}\_{\sigma}(x, y=c)}{\hat{p}\_{\sigma}(x, y=c) + \hat{p}\_{\sigma}(x, y \\neq c)} \\ &\\approx \frac{\sum\_{i \in I_c} k\_{\sigma} (x - x_i)}{\sum_i k\_{\sigma} (x - x_i)} \end{aligned} $$
 
 (3) The final estimated Bayes classifier takes the form:
 
-$$ \\hat{f}\_{\\sigma} = \arg\min\_{c \in \{1, \dots, C\}} \\hat{p}\_{\\sigma}(y \\neq c \vert x) $$
+$$ \hat{f}\_{\sigma} = \arg\min\_{c \in \{1, \dots, C\}} \hat{p}\_{\sigma}(y \\neq c \vert x) $$
 
-Noted that we can generate the labeled data with the original model $f$, as much as we want, not restricted by the size of the training data. The hyperparameter $\\sigma$ is selected to optimize the chances of $\\hat{f}\_{\\sigma}(x) = f(x)$ to achieve high fidelity.
+Noted that we can generate the labeled data with the original model $f$, as much as we want, not restricted by the size of the training data. The hyperparameter $\sigma$ is selected to optimize the chances of $\hat{f}\_{\sigma}(x) = f(x)$ to achieve high fidelity.
 
 ![](interpretability_local_gradient.png)
 

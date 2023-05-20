@@ -159,7 +159,7 @@ Their approach iterates through 3 steps until the policy converges:
 1.  Label a set of goals based on whether they are at the appropriate level of difficulty for the current policy.
 
 - The set of goals at the appropriate level of difficulty are named **GOID** (short for “Goals of Intermediate Difficulty”).  
-  $\text{GOID}\_i := \{g : R\_\text{min} \\leq R^g(\\pi\_i) \\leq R\_\text{max} \} \\subseteq G$
+  $\text{GOID}\_i := \{g : R\_\text{min} \leq R^g(\\pi\_i) \leq R\_\text{max} \} \\subseteq G$
 - Here $R\_\text{min}$ and $R\_\text{max}$ can be interpreted as a minimum and maximum probability of reaching a goal over T time-steps.
 
 2.  Train a Goal GAN model using labelled goals from step 1 to produce new goals
@@ -187,7 +187,7 @@ Fig. 6. The algorithm of Generative Goal Learning. (Image source: ([Florensa, et
 Following the same idea, [Racaniere & Lampinen, et al. (2019)](https://arxiv.org/abs/1909.12892) designs a method to make the objectives of goal generator more sophisticated. Their method contains three components, same as generative goal learning above:
 
 - **Solver**/Policy $\\pi$: In each episode, the solver gets a goal $g$ at the beginning and get a single binary reward $R^g$ at the end.
-- **Judge**/Discriminator $D(.)$: A classifier to predict the binary reward (whether goal can be achieved or not); precisely it outputs the logit of a probability of achieving the given goal, $\\sigma(D(g)) = p(R^g=1\vert g)$, where $\\sigma$ is the sigmoid function.
+- **Judge**/Discriminator $D(.)$: A classifier to predict the binary reward (whether goal can be achieved or not); precisely it outputs the logit of a probability of achieving the given goal, $\sigma(D(g)) = p(R^g=1\vert g)$, where $\sigma$ is the sigmoid function.
 - **Setter**/Generator $G(.)$: The goal setter takes as input a desired feasibility score $f \in \text{Unif}(0, 1)$ and generates $g = G(z, f)$, where the latent variable $z$ is sampled by $z \\sim \mathcal{N}(0, I)$. The goal generator is designed to reversible, so $G^{-1}$ can map backwards from a goal $g$ to a latent $z = G^{-1}(g, f)$
 
 The generator is optimized with three objectives:
@@ -200,7 +200,7 @@ $$ \begin{align\*} \mathcal{L}\_\text{val} = \mathbb{E}\_{\\substack{ g \\sim \t
 2.  Goal **feasibility**: The proposed goal should be achievable by the current policy; that is, the level of difficulty should be appropriate.
     - $\mathcal{L}\_\text{feas}$ is the output probability by the judge model $D$ on the generated goal $G(z, f)$ should match the desired $f$.
 
-$$ \begin{align\*} \mathcal{L}\_\text{feas} = \mathbb{E}\_{\\substack{ z \in \mathcal{N}(0, 1), \\ f \in \text{Uniform}(0, 1) }} \\big\[ D(G(z, f)) - \\sigma^{-1}(f)^2 \\big\] \end{align\*} $$
+$$ \begin{align\*} \mathcal{L}\_\text{feas} = \mathbb{E}\_{\\substack{ z \in \mathcal{N}(0, 1), \\ f \in \text{Uniform}(0, 1) }} \\big\[ D(G(z, f)) - \sigma^{-1}(f)^2 \\big\] \end{align\*} $$
 
 3.  Goal **coverage**: We should maximize the entropy of generated goals to encourage diverse goal and to improve the coverage over the goal space.
 
@@ -228,22 +228,22 @@ CARML is framed as a [variational Expectation-Maximization (EM)](https://chrisch
 
 Let $z$ be a latent task variable and $q\_\\phi$ be a variational distribution of $z$, which could be a mixture model with discrete $z$ or a VAE with continuous $z$. A variational posterior $q\_\\phi(z \vert s)$ works like a classifier, predicting a skill given a state, and we would like to maximize $q\_\\phi(z \vert s)$ to discriminate between data produced by different skills as much as possible. In E-step, $q\_\\phi$ is fitted to a set of trajectories produced by $\\pi\_\\theta$.
 
-Precisely, given a trajectory $\\tau = (s\_1,\dots,s\_T)$, we would like to find $\\phi$ such that
+Precisely, given a trajectory $\tau = (s\_1,\dots,s\_T)$, we would like to find $\\phi$ such that
 
-$$ \max\_\\phi \mathbb{E}\_{z\\sim q\_\\phi(z)} \\big\[ \\log q\_\\phi(\\tau \vert z) \\big\] = \max\_\\phi \mathbb{E}\_{z\\sim q\_\\phi(z)} \\big\[ \sum\_{s_i \in \\tau} \\log q\_\\phi(s_i \vert z) \\big\] $$
+$$ \max\_\\phi \mathbb{E}\_{z\\sim q\_\\phi(z)} \\big\[ \\log q\_\\phi(\tau \vert z) \\big\] = \max\_\\phi \mathbb{E}\_{z\\sim q\_\\phi(z)} \\big\[ \sum\_{s_i \in \tau} \\log q\_\\phi(s_i \vert z) \\big\] $$
 
 A simplifying assumption is made here to ignore the order of states in one trajectory.
 
 (2) **M-Step**: This is the stage for doing meta-RL training with $\\pi\_\\theta$. The learned skill space is considered as a training task distribution. CARML is agnostic to the type of meta-RL algorithm for policy parameter updates.
 
-Given a trajectory $\\tau$, it makes sense for the policy to maximize the mutual information between $\\tau$ and $z$, $I(\\tau;z) = H(\\tau) - H(\\tau \vert z)$, because:
+Given a trajectory $\tau$, it makes sense for the policy to maximize the mutual information between $\tau$ and $z$, $I(\tau;z) = H(\tau) - H(\tau \vert z)$, because:
 
-- maximizing $H(\\tau)$ => diversity in the policy data space; expected to be large.
-- minimizing $H(\\tau \vert z)$ => given a certain skill, the behavior should be restricted; expected to be small.
+- maximizing $H(\tau)$ => diversity in the policy data space; expected to be large.
+- minimizing $H(\tau \vert z)$ => given a certain skill, the behavior should be restricted; expected to be small.
 
 Then we have,
 
-$$ \begin{aligned} I(\\tau; z) &= \mathcal{H}(z) - \mathcal{H}(z \vert s_1,\dots, s_T) \\ &\\geq \mathbb{E}\_{s \in \\tau} \[\mathcal{H}(z) - \mathcal{H}(z\vert s)\] & \\scriptstyle{\text{; discard the order of states.}} \\ &= \mathbb{E}\_{s \in \\tau} \[\mathcal{H}(s_t) - \mathcal{H}(s\vert z)\] & \\scriptstyle{\text{; by definition of MI.}} \\ &= \mathbb{E}\_{z\\sim q\_\\phi(z), s\\sim \\pi\_\\theta(s|z)} \[\\log q\_\\phi(s|z) - \\log \\pi\_\\theta(s)\] \\ &\\approx \mathbb{E}\_{z\\sim q\_\\phi(z), s\\sim \\pi\_\\theta(s|z)} \[\\color{green}{\\log q\_\\phi(s|z) - \\log q\_\\phi(s)}\] & \\scriptstyle{\text{; assume learned marginal distr. matches policy.}} \end{aligned} $$
+$$ \begin{aligned} I(\tau; z) &= \mathcal{H}(z) - \mathcal{H}(z \vert s_1,\dots, s_T) \\ &\\geq \mathbb{E}\_{s \in \tau} \[\mathcal{H}(z) - \mathcal{H}(z\vert s)\] & \\scriptstyle{\text{; discard the order of states.}} \\ &= \mathbb{E}\_{s \in \tau} \[\mathcal{H}(s_t) - \mathcal{H}(s\vert z)\] & \\scriptstyle{\text{; by definition of MI.}} \\ &= \mathbb{E}\_{z\\sim q\_\\phi(z), s\\sim \\pi\_\\theta(s|z)} \[\\log q\_\\phi(s|z) - \\log \\pi\_\\theta(s)\] \\ &\\approx \mathbb{E}\_{z\\sim q\_\\phi(z), s\\sim \\pi\_\\theta(s|z)} \[\\color{green}{\\log q\_\\phi(s|z) - \\log q\_\\phi(s)}\] & \\scriptstyle{\text{; assume learned marginal distr. matches policy.}} \end{aligned} $$
 
 We can set the reward as $\\log q\_\\phi(s \vert z) - \\log q\_\\phi(s)$, as shown in the red part in the equation above. In order to balance between task-specific exploration (as in red below) and latent skill matching (as in blue below) , a parameter $\\lambda \in \[0, 1\]$ is added. Each realization of $z \\sim q\_\\phi(z)$ induces a reward function $r\_z(s)$ (remember that reward + CMP => MDP) as follows:
 

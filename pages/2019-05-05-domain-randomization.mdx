@@ -51,9 +51,9 @@ To make the definition more general, let us call the environment that we have fu
 
 During policy training, episodes are collected from source domain with randomization applied. Thus the policy is exposed to a variety of environments and learns to generalize. The policy parameter $\\theta$ is trained to maximize the expected reward $R(.)$ average across a distribution of configurations:
 
-$$ \\theta^\* = \arg\max\_\\theta \mathbb{E}\_{\\xi \\sim \\Xi} \[\mathbb{E}\_{\\pi\_\\theta, \\tau \\sim e\_\\xi} \[R(\\tau)\]\] $$
+$$ \\theta^\* = \arg\max\_\\theta \mathbb{E}\_{\\xi \\sim \\Xi} \[\mathbb{E}\_{\\pi\_\\theta, \tau \\sim e\_\\xi} \[R(\tau)\]\] $$
 
-where $\\tau\_\\xi$ is a trajectory collected in source domain randomized with $\\xi$. In a way, _“discrepancies between the source and target domains are modeled as variability in the source domain."_ (quote from [Peng et al. 2018](https://arxiv.org/abs/1710.06537)).
+where $\tau\_\\xi$ is a trajectory collected in source domain randomized with $\\xi$. In a way, _“discrepancies between the source and target domains are modeled as variability in the source domain."_ (quote from [Peng et al. 2018](https://arxiv.org/abs/1710.06537)).
 
 # Uniform Domain Randomization[#](#uniform-domain-randomization)
 
@@ -137,9 +137,9 @@ Unfortunately, this family of methods are not suitable for sim2real case. Either
 
 Using real data to guide domain randomization feels a lot like doing system identification or DA. The core idea behind DA is to improve the synthetic data to match the real data distribution. In the case of real-data-guided DR, we would like to learn the randomization parameters $\\xi$ that bring the state distribution in simulator close to the state distribution in the real world.
 
-The **SimOpt** model ([Chebotar et al, 2019](https://arxiv.org/abs/1810.05687)) is trained under an initial randomization distribution $P\_\\phi(\\xi)$ first, getting a policy $\\pi\_{\\theta, P\_\\phi}$. Then this policy is deployed on both simulator and physical robot to collect trajectories $\\tau\_\\xi$ and $\\tau\_\text{real}$ respectively. The optimization objective is to minimize the discrepancy between sim and real trajectories:
+The **SimOpt** model ([Chebotar et al, 2019](https://arxiv.org/abs/1810.05687)) is trained under an initial randomization distribution $P\_\\phi(\\xi)$ first, getting a policy $\\pi\_{\\theta, P\_\\phi}$. Then this policy is deployed on both simulator and physical robot to collect trajectories $\tau\_\\xi$ and $\tau\_\text{real}$ respectively. The optimization objective is to minimize the discrepancy between sim and real trajectories:
 
-$$ \\phi^\* = \arg\min\_{\\phi}\mathbb{E}\_{\\xi \\sim P\_\\phi(\\xi)} \[\mathbb{E}\_{\\pi\_{\\theta, P\_\\phi}} \[D(\\tau\_\text{sim}, \\tau\_\text{real})\]\] $$
+$$ \\phi^\* = \arg\min\_{\\phi}\mathbb{E}\_{\\xi \\sim P\_\\phi(\\xi)} \[\mathbb{E}\_{\\pi\_{\\theta, P\_\\phi}} \[D(\tau\_\text{sim}, \tau\_\text{real})\]\] $$
 
 where $D(.)$ is a trajectory-based discrepancy measure. Like the “Learning to simulate” paper, SimOpt also has to solve the tricky problem of how to propagate gradient through non-differentiable simulator. It used a method called [relative entropy policy search](https://www.aaai.org/ocs/index.php/AAAI/AAAI10/paper/viewFile/1851/2264), see paper for more details.
 

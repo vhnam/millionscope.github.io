@@ -164,15 +164,15 @@ Fig. 2. The architecture of convolutional siamese neural network for few-show im
 3.  The distance is converted to a probability $p$ by a linear feedforward layer and sigmoid. It is the probability of whether two images are drawn from the same class.
 4.  Intuitively the loss is cross entropy because the label is binary.
 
-$$ \begin{aligned} p(\mathbf{x}\_i, \mathbf{x}\_j) &= \\sigma(\mathbf{W}\vert f\_\\theta(\mathbf{x}\_i) - f\_\\theta(\mathbf{x}\_j) \vert) \\ \mathcal{L}(B) &= \sum\_{(\mathbf{x}\_i, \mathbf{x}\_j, y_i, y_j)\in B} \mathbf{1}\_{y_i=y_j}\\log p(\mathbf{x}\_i, \mathbf{x}\_j) + (1-\mathbf{1}\_{y_i=y_j})\\log (1-p(\mathbf{x}\_i, \mathbf{x}\_j)) \end{aligned} $$
+$$ \begin{aligned} p(\mathbf{x}\_i, \mathbf{x}\_j) &= \sigma(\mathbf{W}\vert f\_\\theta(\mathbf{x}\_i) - f\_\\theta(\mathbf{x}\_j) \vert) \\ \mathcal{L}(B) &= \sum\_{(\mathbf{x}\_i, \mathbf{x}\_j, y_i, y_j)\in B} \mathbf{1}\_{y_i=y_j}\\log p(\mathbf{x}\_i, \mathbf{x}\_j) + (1-\mathbf{1}\_{y_i=y_j})\\log (1-p(\mathbf{x}\_i, \mathbf{x}\_j)) \end{aligned} $$
 
 Images in the training batch $B$ can be augmented with distortion. Of course, you can replace the L1 distance with other distance metric, L2, cosine, etc. Just make sure they are differential and then everything else works the same.
 
 Given a support set $S$ and a test image $\mathbf{x}$, the final predicted class is:
 
-$$ \\hat{c}\_S(\mathbf{x}) = c(\arg\max\_{\mathbf{x}\_i \in S} P(\mathbf{x}, \mathbf{x}\_i)) $$
+$$ \hat{c}\_S(\mathbf{x}) = c(\arg\max\_{\mathbf{x}\_i \in S} P(\mathbf{x}, \mathbf{x}\_i)) $$
 
-where $c(\mathbf{x})$ is the class label of an image $\mathbf{x}$ and $\\hat{c}(.)$ is the predicted label.
+where $c(\mathbf{x})$ is the class label of an image $\mathbf{x}$ and $\hat{c}(.)$ is the predicted label.
 
 The assumption is that the learned embedding can be generalized to be useful for measuring the distance between images of unknown categories. This is the same assumption behind transfer learning via the adoption of a pre-trained model; for example, the convolutional features learned in the model pre-trained with ImageNet are expected to help other image tasks. However, the benefit of a pre-trained model decreases when the new task diverges from the original task that the model was trained on.
 
@@ -188,7 +188,7 @@ $$ c_S(\mathbf{x}) = P(y \vert \mathbf{x}, S) = \sum\_{i=1}^k a(\mathbf{x}, \mat
 
 The attention kernel depends on two embedding functions, $f$ and $g$, for encoding the test sample and the support set samples respectively. The attention weight between two data points is the cosine similarity, $\text{cosine}(.)$, between their embedding vectors, normalized by softmax:
 
-$$ a(\mathbf{x}, \mathbf{x}\_i) = \frac{\\exp(\text{cosine}(f(\mathbf{x}), g(\mathbf{x}\_i))}{\sum\_{j=1}^k\\exp(\text{cosine}(f(\mathbf{x}), g(\mathbf{x}\_j))} $$
+$$ a(\mathbf{x}, \mathbf{x}\_i) = \frac{\exp(\text{cosine}(f(\mathbf{x}), g(\mathbf{x}\_i))}{\sum\_{j=1}^k\exp(\text{cosine}(f(\mathbf{x}), g(\mathbf{x}\_j))} $$
 
 ### Simple Embedding[#](#simple-embedding)
 
@@ -204,7 +204,7 @@ The embedding vectors are critical inputs for building a good classifier. Taking
   1.  First the test sample goes through a simple neural network, such as a CNN, to extract basic features, $f'(\mathbf{x})$.
   2.  Then an LSTM is trained with a read attention vector over the support set as part of the hidden state:
 
-  $$ \begin{aligned} \\hat{\mathbf{h}}\_t, \mathbf{c}\_t &= \text{LSTM}(f'(\mathbf{x}), \[\mathbf{h}\_{t-1}, \mathbf{r}\_{t-1}\], \mathbf{c}\_{t-1}) \\ \mathbf{h}\_t &= \\hat{\mathbf{h}}\_t + f'(\mathbf{x}) \\ \mathbf{r}\_{t-1} &= \sum\_{i=1}^k a(\mathbf{h}\_{t-1}, g(\mathbf{x}\_i)) g(\mathbf{x}\_i) \\ a(\mathbf{h}\_{t-1}, g(\mathbf{x}\_i)) &= \text{softmax}(\mathbf{h}\_{t-1}^\top g(\mathbf{x}\_i)) = \frac{\\exp(\mathbf{h}\_{t-1}^\top g(\mathbf{x}\_i))}{\sum\_{j=1}^k \\exp(\mathbf{h}\_{t-1}^\top g(\mathbf{x}\_j))} \end{aligned} $$
+  $$ \begin{aligned} \hat{\mathbf{h}}\_t, \mathbf{c}\_t &= \text{LSTM}(f'(\mathbf{x}), \[\mathbf{h}\_{t-1}, \mathbf{r}\_{t-1}\], \mathbf{c}\_{t-1}) \\ \mathbf{h}\_t &= \hat{\mathbf{h}}\_t + f'(\mathbf{x}) \\ \mathbf{r}\_{t-1} &= \sum\_{i=1}^k a(\mathbf{h}\_{t-1}, g(\mathbf{x}\_i)) g(\mathbf{x}\_i) \\ a(\mathbf{h}\_{t-1}, g(\mathbf{x}\_i)) &= \text{softmax}(\mathbf{h}\_{t-1}^\top g(\mathbf{x}\_i)) = \frac{\exp(\mathbf{h}\_{t-1}^\top g(\mathbf{x}\_i))}{\sum\_{j=1}^k \exp(\mathbf{h}\_{t-1}^\top g(\mathbf{x}\_j))} \end{aligned} $$
 
   3.  Eventually $f(\mathbf{x}, S)=\mathbf{h}\_K$ if we do K steps of “read”.
 
@@ -239,7 +239,7 @@ Fig. 5. Prototypical networks in the few-shot and zero-shot scenarios. (Image so
 
 The distribution over classes for a given test input $\mathbf{x}$ is a softmax over the inverse of distances between the test data embedding and prototype vectors.
 
-$$ P(y=c\vert\mathbf{x})=\text{softmax}(-d\_\\varphi(f\_\\theta(\mathbf{x}), \mathbf{v}\_c)) = \frac{\\exp(-d\_\\varphi(f\_\\theta(\mathbf{x}), \mathbf{v}\_c))}{\sum\_{c' \in \mathcal{C}}\\exp(-d\_\\varphi(f\_\\theta(\mathbf{x}), \mathbf{v}\_{c'}))} $$
+$$ P(y=c\vert\mathbf{x})=\text{softmax}(-d\_\\varphi(f\_\\theta(\mathbf{x}), \mathbf{v}\_c)) = \frac{\exp(-d\_\\varphi(f\_\\theta(\mathbf{x}), \mathbf{v}\_c))}{\sum\_{c' \in \mathcal{C}}\exp(-d\_\\varphi(f\_\\theta(\mathbf{x}), \mathbf{v}\_{c'}))} $$
 
 where $d\_\\varphi$ can be any distance function as long as $\\varphi$ is differentiable. In the paper, they used the squared euclidean distance.
 
@@ -302,7 +302,7 @@ The preference of LRUA is carried out in a way that everything is differentiable
 2.  The write vector is an interpolation between the previous read weight (prefer “the last used location”) and the previous least-used weight (prefer “rarely used location”). The interpolation parameter is the sigmoid of a hyperparameter $\\alpha$.
 3.  The least-used weight $\mathbf{w}^{lu}$ is scaled according to usage weights $\mathbf{w}\_t^u$, in which any dimension remains at 1 if smaller than the n-th smallest element in the vector and 0 otherwise.
 
-$$ \begin{aligned} \mathbf{w}\_t^u &= \\gamma \mathbf{w}\_{t-1}^u + \mathbf{w}\_t^r + \mathbf{w}\_t^w \\ \mathbf{w}\_t^r &= \text{softmax}(\text{cosine}(\mathbf{k}\_t, \mathbf{M}\_t(i))) \\ \mathbf{w}\_t^w &= \\sigma(\\alpha)\mathbf{w}\_{t-1}^r + (1-\\sigma(\\alpha))\mathbf{w}^{lu}\_{t-1}\\ \mathbf{w}\_t^{lu} &= \mathbf{1}\_{w_t^u(i) \\leq m(\mathbf{w}\_t^u, n)} \text{, where }m(\mathbf{w}\_t^u, n)\text{ is the }n\text{-th smallest element in vector }\mathbf{w}\_t^u\text{.} \end{aligned} $$
+$$ \begin{aligned} \mathbf{w}\_t^u &= \\gamma \mathbf{w}\_{t-1}^u + \mathbf{w}\_t^r + \mathbf{w}\_t^w \\ \mathbf{w}\_t^r &= \text{softmax}(\text{cosine}(\mathbf{k}\_t, \mathbf{M}\_t(i))) \\ \mathbf{w}\_t^w &= \sigma(\\alpha)\mathbf{w}\_{t-1}^r + (1-\sigma(\\alpha))\mathbf{w}^{lu}\_{t-1}\\ \mathbf{w}\_t^{lu} &= \mathbf{1}\_{w_t^u(i) \leq m(\mathbf{w}\_t^u, n)} \text{, where }m(\mathbf{w}\_t^u, n)\text{ is the }n\text{-th smallest element in vector }\mathbf{w}\_t^u\text{.} \end{aligned} $$
 
 Finally, after the least used memory location, indicated by $\mathbf{w}\_t^{lu}$, is set to zero, every memory row is updated:
 
@@ -350,13 +350,13 @@ Fig.9. The MetaNet architecture.
     for $t = 1, \dots, K$:
 
     - a. Compute a loss for representation learning; i.e., cross entropy for the verification task:  
-      $\mathcal{L}^\text{emb}\_t = \mathbf{1}\_{y'\_i=y'\_j} \\log P\_t + (1 - \mathbf{1}\_{y'\_i=y'\_j})\\log(1 - P\_t)\text{, where }P\_t = \\sigma(\mathbf{W}\vert f\_\\theta(\mathbf{x}\_{(t,1)}) - f\_\\theta(\mathbf{x}\_{(t,2)})\vert)$
+      $\mathcal{L}^\text{emb}\_t = \mathbf{1}\_{y'\_i=y'\_j} \\log P\_t + (1 - \mathbf{1}\_{y'\_i=y'\_j})\\log(1 - P\_t)\text{, where }P\_t = \sigma(\mathbf{W}\vert f\_\\theta(\mathbf{x}\_{(t,1)}) - f\_\\theta(\mathbf{x}\_{(t,2)})\vert)$
 
 2.  Compute the task-level fast weights: $\\theta^+ = F\_w(\\nabla\_\\theta \mathcal{L}^\text{emb}\_1, \dots, \mathcal{L}^\text{emb}\_T)$
 3.  Next go through examples in the support set $S$ and compute the example-level fast weights. Meanwhile, update the memory with learned representations.  
     for $i=1, \dots, K$:
 
-    - a. The base learner outputs a probability distribution: $P(\\hat{y}\_i \vert \mathbf{x}\_i) = g\_\\phi(\mathbf{x}\_i)$ and the loss can be cross-entropy or MSE: $\mathcal{L}^\text{task}\_i = y'\_i \\log g\_\\phi(\mathbf{x}'\_i) + (1- y'\_i) \\log (1 - g\_\\phi(\mathbf{x}'\_i))$
+    - a. The base learner outputs a probability distribution: $P(\hat{y}\_i \vert \mathbf{x}\_i) = g\_\\phi(\mathbf{x}\_i)$ and the loss can be cross-entropy or MSE: $\mathcal{L}^\text{task}\_i = y'\_i \\log g\_\\phi(\mathbf{x}'\_i) + (1- y'\_i) \\log (1 - g\_\\phi(\mathbf{x}'\_i))$
     - b. Extract meta information (loss gradients) of the task and compute the example-level fast weights: $\\phi\_i^+ = G\_v(\\nabla\_\\phi\mathcal{L}^\text{task}\_i)$
       - Then store $\\phi^+\_i$ into $i$-th location of the “value” memory $\mathbf{M}$.
     - d. Encode the support sample into a task-specific input representation using both slow and fast weights: $r'\_i = f\_{\\theta, \\theta^+}(\mathbf{x}'\_i)$
@@ -402,7 +402,7 @@ $$ \begin{aligned} c_t &= f_t \\odot c\_{t-1} + i_t \\odot \\tilde{c}\_t\\ &= \\
 
 While fixing $f\_t=1$ and $i\_t=\\alpha\_t$ might not be the optimal, both of them can be learnable and adaptable to different datasets.
 
-$$ \begin{aligned} f_t &= \\sigma(\mathbf{W}\_f \cdot \[\\nabla\_{\\theta\_{t-1}}\mathcal{L}\_t, \mathcal{L}\_t, \\theta\_{t-1}, f\_{t-1}\] + \mathbf{b}\_f) & \\scriptstyle{\text{; how much to forget the old value of parameters.}}\\ i_t &= \\sigma(\mathbf{W}\_i \cdot \[\\nabla\_{\\theta\_{t-1}}\mathcal{L}\_t, \mathcal{L}\_t, \\theta\_{t-1}, i\_{t-1}\] + \mathbf{b}\_i) & \\scriptstyle{\text{; corresponding to the learning rate at time step t.}}\\ \\tilde{\\theta}\_t &= -\\nabla\_{\\theta\_{t-1}}\mathcal{L}\_t &\\ \\theta_t &= f_t \\odot \\theta\_{t-1} + i_t \\odot \\tilde{\\theta}\_t &\\ \end{aligned} $$
+$$ \begin{aligned} f_t &= \sigma(\mathbf{W}\_f \cdot \[\\nabla\_{\\theta\_{t-1}}\mathcal{L}\_t, \mathcal{L}\_t, \\theta\_{t-1}, f\_{t-1}\] + \mathbf{b}\_f) & \\scriptstyle{\text{; how much to forget the old value of parameters.}}\\ i_t &= \sigma(\mathbf{W}\_i \cdot \[\\nabla\_{\\theta\_{t-1}}\mathcal{L}\_t, \mathcal{L}\_t, \\theta\_{t-1}, i\_{t-1}\] + \mathbf{b}\_i) & \\scriptstyle{\text{; corresponding to the learning rate at time step t.}}\\ \\tilde{\\theta}\_t &= -\\nabla\_{\\theta\_{t-1}}\mathcal{L}\_t &\\ \\theta_t &= f_t \\odot \\theta\_{t-1} + i_t \\odot \\tilde{\\theta}\_t &\\ \end{aligned} $$
 
 ### Model Setup[#](#model-setup)
 
@@ -410,7 +410,7 @@ $$ \begin{aligned} f_t &= \\sigma(\mathbf{W}\_f \cdot \[\\nabla\_{\\theta\_{t-1}
 
 Fig. 10. How the learner $M\\\_\\theta$ and the meta-learner $R\\\_\\Theta$ are trained. (Image source: [original paper](https://openreview.net/pdf?id=rJY0-Kcll)) with more annotations)
 
-The training process mimics what happens during test, since it has been proved to be beneficial in [Matching Networks](#matching-networks). During each training epoch, we first sample a dataset $\mathcal{D} = (\mathcal{D}\_\text{train}, \mathcal{D}\_\text{test}) \in \\hat{\mathcal{D}}\_\text{meta-train}$ and then sample mini-batches out of $\mathcal{D}\_\text{train}$ to update $\\theta$ for $T$ rounds. The final state of the learner parameter $\\theta\_T$ is used to train the meta-learner on the test data $\mathcal{D}\_\text{test}$.
+The training process mimics what happens during test, since it has been proved to be beneficial in [Matching Networks](#matching-networks). During each training epoch, we first sample a dataset $\mathcal{D} = (\mathcal{D}\_\text{train}, \mathcal{D}\_\text{test}) \in \hat{\mathcal{D}}\_\text{meta-train}$ and then sample mini-batches out of $\mathcal{D}\_\text{train}$ to update $\\theta$ for $T$ rounds. The final state of the learner parameter $\\theta\_T$ is used to train the meta-learner on the test data $\mathcal{D}\_\text{test}$.
 
 Two implementation details to pay extra attention to:
 
@@ -423,9 +423,9 @@ Two implementation details to pay extra attention to:
 
 **MAML**, short for **Model-Agnostic Meta-Learning** ([Finn, et al. 2017](https://arxiv.org/abs/1703.03400)) is a fairly general optimization algorithm, compatible with any model that learns through gradient descent.
 
-Let's say our model is $f\_\\theta$ with parameters $\\theta$. Given a task $\\tau\_i$ and its associated dataset $(\mathcal{D}^{(i)}\_\text{train}, \mathcal{D}^{(i)}\_\text{test})$, we can update the model parameters by one or more gradient descent steps (the following example only contains one step):
+Let's say our model is $f\_\\theta$ with parameters $\\theta$. Given a task $\tau\_i$ and its associated dataset $(\mathcal{D}^{(i)}\_\text{train}, \mathcal{D}^{(i)}\_\text{test})$, we can update the model parameters by one or more gradient descent steps (the following example only contains one step):
 
-$$ \\theta'\_i = \\theta - \\alpha \\nabla\_\\theta\mathcal{L}^{(0)}\_{\\tau_i}(f\_\\theta) $$
+$$ \\theta'\_i = \\theta - \\alpha \\nabla\_\\theta\mathcal{L}^{(0)}\_{\tau_i}(f\_\\theta) $$
 
 where $\mathcal{L}^{(0)}$ is the loss computed using the mini data batch with id (0).
 
@@ -435,7 +435,7 @@ Fig. 11. Diagram of MAML. (Image source: [original paper](https://arxiv.org/abs/
 
 Well, the above formula only optimizes for one task. To achieve a good generalization across a variety of tasks, we would like to find the optimal $\\theta^\*$ so that the task-specific fine-tuning is more efficient. Now, we sample a new data batch with id (1) for updating the meta-objective. The loss, denoted as $\mathcal{L}^{(1)}$, depends on the mini batch (1). The superscripts in $\mathcal{L}^{(0)}$ and $\mathcal{L}^{(1)}$ only indicate different data batches, and they refer to the same loss objective for the same task.
 
-$$ \begin{aligned} \\theta^\* &= \arg\min\_\\theta \sum\_{\\tau_i \\sim p(\\tau)} \mathcal{L}\_{\\tau_i}^{(1)} (f\_{\\theta'\_i}) = \arg\min\_\\theta \sum\_{\\tau_i \\sim p(\\tau)} \mathcal{L}\_{\\tau_i}^{(1)} (f\_{\\theta - \\alpha\\nabla\_\\theta \mathcal{L}\_{\\tau_i}^{(0)}(f\_\\theta)}) & \\ \\theta &\\leftarrow \\theta - \\beta \\nabla\_{\\theta} \sum\_{\\tau_i \\sim p(\\tau)} \mathcal{L}\_{\\tau_i}^{(1)} (f\_{\\theta - \\alpha\\nabla\_\\theta \mathcal{L}\_{\\tau_i}^{(0)}(f\_\\theta)}) & \\scriptstyle{\text{; updating rule}} \end{aligned} $$
+$$ \begin{aligned} \\theta^\* &= \arg\min\_\\theta \sum\_{\tau_i \\sim p(\tau)} \mathcal{L}\_{\tau_i}^{(1)} (f\_{\\theta'\_i}) = \arg\min\_\\theta \sum\_{\tau_i \\sim p(\tau)} \mathcal{L}\_{\tau_i}^{(1)} (f\_{\\theta - \\alpha\\nabla\_\\theta \mathcal{L}\_{\tau_i}^{(0)}(f\_\\theta)}) & \\ \\theta &\\leftarrow \\theta - \\beta \\nabla\_{\\theta} \sum\_{\tau_i \\sim p(\tau)} \mathcal{L}\_{\tau_i}^{(1)} (f\_{\\theta - \\alpha\\nabla\_\\theta \mathcal{L}\_{\tau_i}^{(0)}(f\_\\theta)}) & \\scriptstyle{\text{; updating rule}} \end{aligned} $$
 
 ![](maml-algo.png)
 
@@ -471,39 +471,39 @@ The Reptile works by repeatedly:
 - 2.  training on it by multiple gradient descent steps,
 - 3.  and then moving the model weights towards the new parameters.
 
-See the algorithm below: $\text{SGD}(\mathcal{L}\_{\\tau\_i}, \\theta, k)$ performs stochastic gradient update for k steps on the loss $\mathcal{L}\_{\\tau\_i}$ starting with initial parameter $\\theta$ and returns the final parameter vector. The batch version samples multiple tasks instead of one within each iteration. The reptile gradient is defined as $(\\theta - W)/\\alpha$, where $\\alpha$ is the stepsize used by the SGD operation.
+See the algorithm below: $\text{SGD}(\mathcal{L}\_{\tau\_i}, \\theta, k)$ performs stochastic gradient update for k steps on the loss $\mathcal{L}\_{\tau\_i}$ starting with initial parameter $\\theta$ and returns the final parameter vector. The batch version samples multiple tasks instead of one within each iteration. The reptile gradient is defined as $(\\theta - W)/\\alpha$, where $\\alpha$ is the stepsize used by the SGD operation.
 
 ![](reptile-algo.png)
 
 Fig. 13. The batched version of Reptile algorithm. (Image source: [original paper](https://arxiv.org/abs/1803.02999))
 
-At a glance, the algorithm looks a lot like an ordinary SGD. However, because the task-specific optimization can take more than one step. it eventually makes $$\text{SGD}(\mathbb{E} _\\tau\[\mathcal{L}_{\\tau}\], \\theta, k)$ diverge from $\mathbb{E}_\\tau \[\text{SGD}(\mathcal{L}_{\\tau}, \\theta, k)\]$$ when k > 1.
+At a glance, the algorithm looks a lot like an ordinary SGD. However, because the task-specific optimization can take more than one step. it eventually makes $$\text{SGD}(\mathbb{E} _\tau\[\mathcal{L}_{\tau}\], \\theta, k)$ diverge from $\mathbb{E}_\tau \[\text{SGD}(\mathcal{L}_{\tau}, \\theta, k)\]$$ when k > 1.
 
 ### The Optimization Assumption[#](#the-optimization-assumption)
 
-Assuming that a task $\\tau \\sim p(\\tau)$ has a manifold of optimal network configuration, $\mathcal{W}\_{\\tau}^\*$. The model $f\_\\theta$ achieves the best performance for task $\\tau$ when $\\theta$ lays on the surface of $\mathcal{W}\_{\\tau}^\*$. To find a solution that is good across tasks, we would like to find a parameter close to all the optimal manifolds of all tasks:
+Assuming that a task $\tau \\sim p(\tau)$ has a manifold of optimal network configuration, $\mathcal{W}\_{\tau}^\*$. The model $f\_\\theta$ achieves the best performance for task $\tau$ when $\\theta$ lays on the surface of $\mathcal{W}\_{\tau}^\*$. To find a solution that is good across tasks, we would like to find a parameter close to all the optimal manifolds of all tasks:
 
-$$ \\theta^\* = \arg\min\_\\theta \mathbb{E}\_{\\tau \\sim p(\\tau)} \[\frac{1}{2} \text{dist}(\\theta, \mathcal{W}\_\\tau^\*)^2\] $$
+$$ \\theta^\* = \arg\min\_\\theta \mathbb{E}\_{\tau \\sim p(\tau)} \[\frac{1}{2} \text{dist}(\\theta, \mathcal{W}\_\tau^\*)^2\] $$
 
 ![](reptile-optim.png)
 
 Fig. 14. The Reptile algorithm updates the parameter alternatively to be closer to the optimal manifolds of different tasks. (Image source: [original paper](https://arxiv.org/abs/1803.02999))
 
-Let's use the L2 distance as $\text{dist}(.)$ and the distance between a point $\\theta$ and a set $\mathcal{W}\_\\tau^\*$ equals to the distance between $\\theta$ and a point $W\_{\\tau}^\*(\\theta)$ on the manifold that is closest to $\\theta$:
+Let's use the L2 distance as $\text{dist}(.)$ and the distance between a point $\\theta$ and a set $\mathcal{W}\_\tau^\*$ equals to the distance between $\\theta$ and a point $W\_{\tau}^\*(\\theta)$ on the manifold that is closest to $\\theta$:
 
-$$ \text{dist}(\\theta, \mathcal{W}\_{\\tau}^\*) = \text{dist}(\\theta, W\_{\\tau}^\*(\\theta)) \text{, where }W\_{\\tau}^\*(\\theta) = \arg\min\_{W\in\mathcal{W}\_{\\tau}^\*} \text{dist}(\\theta, W) $$
+$$ \text{dist}(\\theta, \mathcal{W}\_{\tau}^\*) = \text{dist}(\\theta, W\_{\tau}^\*(\\theta)) \text{, where }W\_{\tau}^\*(\\theta) = \arg\min\_{W\in\mathcal{W}\_{\tau}^\*} \text{dist}(\\theta, W) $$
 
 The gradient of the squared euclidean distance is:
 
-$$ \begin{aligned} \\nabla\_\\theta\[\frac{1}{2}\text{dist}(\\theta, \mathcal{W}\_{\\tau_i}^\*)^2\] &= \\nabla\_\\theta\[\frac{1}{2}\text{dist}(\\theta, W\_{\\tau_i}^\*(\\theta))^2\] & \\ &= \\nabla\_\\theta\[\frac{1}{2}(\\theta - W\_{\\tau_i}^\*(\\theta))^2\] & \\ &= \\theta - W\_{\\tau_i}^\*(\\theta) & \\scriptstyle{\text{; See notes.}} \end{aligned} $$
+$$ \begin{aligned} \\nabla\_\\theta\[\frac{1}{2}\text{dist}(\\theta, \mathcal{W}\_{\tau_i}^\*)^2\] &= \\nabla\_\\theta\[\frac{1}{2}\text{dist}(\\theta, W\_{\tau_i}^\*(\\theta))^2\] & \\ &= \\nabla\_\\theta\[\frac{1}{2}(\\theta - W\_{\tau_i}^\*(\\theta))^2\] & \\ &= \\theta - W\_{\tau_i}^\*(\\theta) & \\scriptstyle{\text{; See notes.}} \end{aligned} $$
 
 Notes: According to the Reptile paper, “_the gradient of the squared euclidean distance between a point Θ and a set S is the vector 2(Θ − p), where p is the closest point in S to Θ_”. Technically the closest point in S is also a function of Θ, but I'm not sure why the gradient does not need to worry about the derivative of p. (Please feel free to leave me a comment or send me an email about this if you have ideas.)
 
 Thus the update rule for one stochastic gradient step is:
 
-$$ \\theta = \\theta - \\alpha \\nabla\_\\theta\[\frac{1}{2} \text{dist}(\\theta, \mathcal{W}\_{\\tau_i}^\*)^2\] = \\theta - \\alpha(\\theta - W\_{\\tau_i}^\*(\\theta)) = (1-\\alpha)\\theta + \\alpha W\_{\\tau_i}^\*(\\theta) $$
+$$ \\theta = \\theta - \\alpha \\nabla\_\\theta\[\frac{1}{2} \text{dist}(\\theta, \mathcal{W}\_{\tau_i}^\*)^2\] = \\theta - \\alpha(\\theta - W\_{\tau_i}^\*(\\theta)) = (1-\\alpha)\\theta + \\alpha W\_{\tau_i}^\*(\\theta) $$
 
-The closest point on the optimal task manifold $W\_{\\tau\_i}^\*(\\theta)$ cannot be computed exactly, but Reptile approximates it using $\text{SGD}(\mathcal{L}\_\\tau, \\theta, k)$.
+The closest point on the optimal task manifold $W\_{\tau\_i}^\*(\\theta)$ cannot be computed exactly, but Reptile approximates it using $\text{SGD}(\mathcal{L}\_\tau, \\theta, k)$.
 
 ### Reptile vs FOMAML[#](#reptile-vs-fomaml)
 
@@ -547,16 +547,16 @@ So far we have the formula of three types of gradients:
 
 $$ \begin{aligned} g\_\text{FOMAML} &= g_0^{(1)} - \\alpha H^{(1)}\_0 g_0^{(0)} + O(\\alpha^2)\\ g\_\text{MAML} &= g_0^{(1)} - \\alpha H^{(1)}\_0 g_0^{(0)} - \\alpha H^{(0)}\_0 g_0^{(1)} + O(\\alpha^2)\\ g\_\text{Reptile} &= g^{(0)}\_0 + g_0^{(1)} - \\alpha H^{(1)}\_0 g_0^{(0)} + O(\\alpha^2) \end{aligned} $$
 
-During training, we often average over multiple data batches. In our example, the mini batches (0) and (1) are interchangeable since both are drawn at random. The expectation $\mathbb{E}\_{\\tau,0,1}$ is averaged over two data batches, ids (0) and (1), for task $\\tau$.
+During training, we often average over multiple data batches. In our example, the mini batches (0) and (1) are interchangeable since both are drawn at random. The expectation $\mathbb{E}\_{\tau,0,1}$ is averaged over two data batches, ids (0) and (1), for task $\tau$.
 
 Let,
 
-- $A = \mathbb{E}\_{\\tau,0,1} \[g\_0^{(0)}\] = \mathbb{E}\_{\\tau,0,1} \[g\_0^{(1)}\]$; it is the average gradient of task loss. We expect to improve the model parameter to achieve better task performance by following this direction pointed by $A$.
-- $B = \mathbb{E}\_{\\tau,0,1} \[H^{(1)}\_0 g\_0^{(0)}\] = \frac{1}{2}\mathbb{E}\_{\\tau,0,1} \[H^{(1)}\_0 g\_0^{(0)} + H^{(0)}\_0 g\_0^{(1)}\] = \frac{1}{2}\mathbb{E}\_{\\tau,0,1} \[\\nabla\_\\theta(g^{(0)}\_0 g\_0^{(1)})\]$; it is the direction (gradient) that increases the inner product of gradients of two different mini batches for the same task. We expect to improve the model parameter to achieve better generalization over different data by following this direction pointed by $B$.
+- $A = \mathbb{E}\_{\tau,0,1} \[g\_0^{(0)}\] = \mathbb{E}\_{\tau,0,1} \[g\_0^{(1)}\]$; it is the average gradient of task loss. We expect to improve the model parameter to achieve better task performance by following this direction pointed by $A$.
+- $B = \mathbb{E}\_{\tau,0,1} \[H^{(1)}\_0 g\_0^{(0)}\] = \frac{1}{2}\mathbb{E}\_{\tau,0,1} \[H^{(1)}\_0 g\_0^{(0)} + H^{(0)}\_0 g\_0^{(1)}\] = \frac{1}{2}\mathbb{E}\_{\tau,0,1} \[\\nabla\_\\theta(g^{(0)}\_0 g\_0^{(1)})\]$; it is the direction (gradient) that increases the inner product of gradients of two different mini batches for the same task. We expect to improve the model parameter to achieve better generalization over different data by following this direction pointed by $B$.
 
 To conclude, both MAML and Reptile aim to optimize for the same goal, better task performance (guided by A) and better generalization (guided by B), when the gradient update is approximated by first three leading terms.
 
-$$ \begin{aligned} \mathbb{E}\_{\\tau,1,2}\[g\_\text{FOMAML}\] &= A - \\alpha B + O(\\alpha^2)\\ \mathbb{E}\_{\\tau,1,2}\[g\_\text{MAML}\] &= A - 2\\alpha B + O(\\alpha^2)\\ \mathbb{E}\_{\\tau,1,2}\[g\_\text{Reptile}\] &= 2A - \\alpha B + O(\\alpha^2) \end{aligned} $$
+$$ \begin{aligned} \mathbb{E}\_{\tau,1,2}\[g\_\text{FOMAML}\] &= A - \\alpha B + O(\\alpha^2)\\ \mathbb{E}\_{\tau,1,2}\[g\_\text{MAML}\] &= A - 2\\alpha B + O(\\alpha^2)\\ \mathbb{E}\_{\tau,1,2}\[g\_\text{Reptile}\] &= 2A - \\alpha B + O(\\alpha^2) \end{aligned} $$
 
 It is not clear to me whether the ignored term $O(\\alpha^2)$ might play a big impact on the parameter learning. But given that FOMAML is able to obtain a similar performance as the full version of MAML, it might be safe to say higher-level derivatives would not be critical during gradient descent update.
 

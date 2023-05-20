@@ -145,7 +145,7 @@ Both the skip-gram model and the CBOW model should be trained to minimize a well
 
 The skip-gram model defines the embedding vector of every word by the matrix $W$ and the context vector by the output matrix $W'$. Given an input word $w\_I$, let us label the corresponding row of $W$ as vector $v\_{w\_I}$ (embedding vector) and its corresponding column of $W'$ as $v'\_{w\_I}$ (context vector). The final output layer applies softmax to compute the probability of predicting the output word $w\_O$ given $w\_I$, and therefore:
 
-$$ p(w_O \vert w_I) = \frac{\\exp({v'\_{w_O}}^{\top} v\_{w_I})}{\sum\_{i=1}^V \\exp({v'\_{w_i}}^{\top} v\_{w_I})} $$
+$$ p(w_O \vert w_I) = \frac{\exp({v'\_{w_O}}^{\top} v\_{w_I})}{\sum\_{i=1}^V \exp({v'\_{w_i}}^{\top} v\_{w_I})} $$
 
 This is accurate as presented in Fig. 1. However, when $V$ is extremely large, calculating the denominator by going through all the words for every single sample is computationally impractical. The demand for more efficient conditional probability estimation leads to the new methods like _hierarchical softmax_.
 
@@ -159,13 +159,13 @@ Fig. 3. An illustration of the hierarchical softmax binary tree. The leaf nodes 
 
 Each word $w\_i$ has a unique path from the root down to its corresponding leaf. The probability of picking this word is equivalent to the probability of taking this path from the root down through the tree branches. Since we know the embedding vector $v\_n$ of the internal node $n$, the probability of getting the word can be computed by the product of taking left or right turn at every internal node stop.
 
-According to Fig. 3, the probability of one node is ($\\sigma$ is the sigmoid function):
+According to Fig. 3, the probability of one node is ($\sigma$ is the sigmoid function):
 
-$$ \begin{align} p(\text{turn right} \to \dots w_I \vert n) &= \\sigma({v'\_n}^{\top} v\_{w_I})\\ p(\text{turn left } \to \dots w_I \vert n) &= 1 - p(\text{turn right} \vert n) = \\sigma(-{v'\_n}^{\top} v\_{w_I}) \end{align} $$
+$$ \begin{align} p(\text{turn right} \to \dots w_I \vert n) &= \sigma({v'\_n}^{\top} v\_{w_I})\\ p(\text{turn left } \to \dots w_I \vert n) &= 1 - p(\text{turn right} \vert n) = \sigma(-{v'\_n}^{\top} v\_{w_I}) \end{align} $$
 
 The final probability of getting a context word $w\_O$ given an input word $w\_I$ is:
 
-$$ p(w_O \vert w_I) = \\prod\_{k=1}^{L(w_O)} \\sigma(\mathbb{I}\_{\text{turn}}(n(w_O, k), n(w_O, k+1)) \cdot {v'\_{n(w_O, k)}}^{\top} v\_{w_I}) $$
+$$ p(w_O \vert w_I) = \\prod\_{k=1}^{L(w_O)} \sigma(\mathbb{I}\_{\text{turn}}(n(w_O, k), n(w_O, k+1)) \cdot {v'\_{n(w_O, k)}}^{\top} v\_{w_I}) $$
 
 where $L(w\_O)$ is the depth of the path leading to the word $w\_O$ and $\mathbb{I}\_{\text{turn}}$ is a specially indicator function which returns 1 if $n(w\_O, k+1)$ is the left child of $n(w\_O, k)$ otherwise -1. The internal nodes' embeddings are learned during the model training. The tree structure helps greatly reduce the complexity of the denominator estimation from O(V) (vocabulary size) to O(log V) (the depth of the tree) at the training time. However, at the prediction time, we still to compute the probability of every word and pick the best, as we don't know which leaf to reach for in advance.
 
@@ -181,11 +181,11 @@ $$ \mathcal{L}\_\\theta = - \sum\_{i=1}^V y_i \\log p(w_i | w_I) = - \\log p(w_O
 
 Recall that,
 
-$$ p(w_O \vert w_I) = \frac{\\exp({v'\_{w_O}}^{\top} v\_{w_I})}{\sum\_{i=1}^V \\exp({v'\_{w_i}}^{\top} v\_{w_I})} $$
+$$ p(w_O \vert w_I) = \frac{\exp({v'\_{w_O}}^{\top} v\_{w_I})}{\sum\_{i=1}^V \exp({v'\_{w_i}}^{\top} v\_{w_I})} $$
 
 Therefore,
 
-$$ \mathcal{L}\_{\\theta} = - \\log \frac{\\exp({v'\_{w_O}}^{\top}{v\_{w_I}})}{\sum\_{i=1}^V \\exp({v'\_{w_i}}^{\top}{v\_{w_I} })} = - {v'\_{w_O}}^{\top}{v\_{w_I} } + \\log \sum\_{i=1}^V \\exp({v'\_{w_i} }^{\top}{v\_{w_I}}) $$
+$$ \mathcal{L}\_{\\theta} = - \\log \frac{\exp({v'\_{w_O}}^{\top}{v\_{w_I}})}{\sum\_{i=1}^V \exp({v'\_{w_i}}^{\top}{v\_{w_I} })} = - {v'\_{w_O}}^{\top}{v\_{w_I} } + \\log \sum\_{i=1}^V \exp({v'\_{w_i} }^{\top}{v\_{w_I}}) $$
 
 To start training the model using back-propagation with SGD, we need to compute the gradient of the loss function. For simplicity, let's label $z\_{IO} = {v'\_{w\_O}}^{\top}{v\_{w\_I}}$.
 
@@ -225,7 +225,7 @@ $$ \begin{align} \mathcal{L}\_\\theta & = - \[ \\log p(d=1 \vert w, w_I) + \sum\
 
 However, $p(w \vert w\_I)$ still involves summing up the entire vocabulary in the denominator. Let's label the denominator as a partition function of the input word, $Z(w\_I)$. A common assumption is $Z(w) \\approx 1$ given that we expect the softmax output layer to be normalized ([Minh and Teh, 2012](https://www.cs.toronto.edu/~amnih/papers/ncelm.pdf)). Then the loss function is simplified to:
 
-$$ \mathcal{L}\_\\theta = - \[ \\log \frac{\\exp({v'\_w}^{\top}{v\_{w_I}})}{\\exp({v'\_w}^{\top}{v\_{w_I}}) + Nq(\\tilde{w})} + \sum\_{\\substack{i=1 \\ \\tilde{w}\_i \\sim Q}}^N \\log \frac{Nq(\\tilde{w}\_i)}{\\exp({v'\_w}^{\top}{v\_{w_I}}) + Nq(\\tilde{w}\_i)}\] $$
+$$ \mathcal{L}\_\\theta = - \[ \\log \frac{\exp({v'\_w}^{\top}{v\_{w_I}})}{\exp({v'\_w}^{\top}{v\_{w_I}}) + Nq(\\tilde{w})} + \sum\_{\\substack{i=1 \\ \\tilde{w}\_i \\sim Q}}^N \\log \frac{Nq(\\tilde{w}\_i)}{\exp({v'\_w}^{\top}{v\_{w_I}}) + Nq(\\tilde{w}\_i)}\] $$
 
 The noise distribution $Q$ is a tunable parameter and we would like to design it in a way so that:
 
@@ -240,11 +240,11 @@ The Negative Sampling (NEG) proposed by Mikolov et al. ([2013](https://papers.ni
 
 NEG approximates the binary classifier's output with sigmoid functions as follows:
 
-$$ \begin{align} p(d=1 \vert w\_, w_I) &= \\sigma({v'\_{w}}^\top v\_{w_I}) \\ p(d=0 \vert w, w_I) &= 1 - \\sigma({v'\_{w}}^\top v\_{w_I}) = \\sigma(-{v'\_{w}}^\top v\_{w_I}) \end{align} $$
+$$ \begin{align} p(d=1 \vert w\_, w_I) &= \sigma({v'\_{w}}^\top v\_{w_I}) \\ p(d=0 \vert w, w_I) &= 1 - \sigma({v'\_{w}}^\top v\_{w_I}) = \sigma(-{v'\_{w}}^\top v\_{w_I}) \end{align} $$
 
 The final NCE loss function looks like:
 
-$$ \mathcal{L}\_\\theta = - \[ \\log \\sigma({v'\_{w}}^\top v\_{w_I}) + \sum\_{\\substack{i=1 \\ \\tilde{w}\_i \\sim Q}}^N \\log \\sigma(-{v'\_{\\tilde{w}\_i}}^\top v\_{w_I})\] $$
+$$ \mathcal{L}\_\\theta = - \[ \\log \sigma({v'\_{w}}^\top v\_{w_I}) + \sum\_{\\substack{i=1 \\ \\tilde{w}\_i \\sim Q}}^N \\log \sigma(-{v'\_{\\tilde{w}\_i}}^\top v\_{w_I})\] $$
 
 # Other Tips for Learning Word Embedding[#](#other-tips-for-learning-word-embedding)
 
@@ -276,7 +276,7 @@ $$ F((w_i - w_j)^\top \\tilde{w}\_k) = \frac{p\_{\text{co}}(\\tilde{w}\_k \vert 
 
 With the consideration of $F$ being symmetric between target words and context words, the final solution is to model $F$ as an **exponential** function. Please read the original paper ([Pennington et al., 2014](http://www.aclweb.org/anthology/D14-1162)) for more details of the equations.
 
-$$ \begin{align} F({w_i}^\top \\tilde{w}\_k) &= \\exp({w_i}^\top \\tilde{w}\_k) = p\_{\text{co}}(\\tilde{w}\_k \vert w_i) \\ F((w_i - w_j)^\top \\tilde{w}\_k) &= \\exp((w_i - w_j)^\top \\tilde{w}\_k) = \frac{\\exp(w_i^\top \\tilde{w}\_k)}{\\exp(w_j^\top \\tilde{w}\_k)} = \frac{p\_{\text{co}}(\\tilde{w}\_k \vert w_i)}{p\_{\text{co}}(\\tilde{w}\_k \vert w_j)} \end{align} $$
+$$ \begin{align} F({w_i}^\top \\tilde{w}\_k) &= \exp({w_i}^\top \\tilde{w}\_k) = p\_{\text{co}}(\\tilde{w}\_k \vert w_i) \\ F((w_i - w_j)^\top \\tilde{w}\_k) &= \exp((w_i - w_j)^\top \\tilde{w}\_k) = \frac{\exp(w_i^\top \\tilde{w}\_k)}{\exp(w_j^\top \\tilde{w}\_k)} = \frac{p\_{\text{co}}(\\tilde{w}\_k \vert w_i)}{p\_{\text{co}}(\\tilde{w}\_k \vert w_j)} \end{align} $$
 
 Finally,
 

@@ -110,7 +110,7 @@ It is also possible to apply [_Mixup_](#image-mixture) to text ([Guo et al. 2019
 
 Here is a list of several commonly used audio data augmentation methods, operated on raw audio or spectrograms, summarized by [Wang & van den Oord (2021)](https://arxiv.org/abs/2103.06508).
 
-**Audio mixup.** Given two audio clips $\mathbf{x}\_1$ and $\mathbf{x}\_2$, the mixed-up version $\\hat{\mathbf{x}} = \\alpha \mathbf{x}\_1 + (1-\\alpha)\mathbf{x}\_2$ should be associated with the label of the more dominant input. The audio mixup augments the data with more realistic noise.
+**Audio mixup.** Given two audio clips $\mathbf{x}\_1$ and $\mathbf{x}\_2$, the mixed-up version $\hat{\mathbf{x}} = \\alpha \mathbf{x}\_1 + (1-\\alpha)\mathbf{x}\_2$ should be associated with the label of the more dominant input. The audio mixup augments the data with more realistic noise.
 
 **Time masking.** A small consecutive chunk of the audio can be masked without losing semantic information.
 
@@ -173,10 +173,10 @@ To simplify LAMBADA, we can actually remove the dependency of a fine-tuned gener
 
 Fig. 5. Illustration of the unsupervised data generation (UDG) framework. (Image source: [Wang et al., 2021](https://arxiv.org/abs/2109.09193))
 
-The few-shot prompts of UDG contain a small number of unlabeled examples, as well as a task-specific natural language description of the desired label. Because some generated examples are noisy, they implemented **noisy label annealing** (**NLA**) techniques to filter potentially misaligned samples out during the training processes. NLA gradually removes noisy training signals in time during training when the model starts to disagree with its pseudo label with high confidence. At each training step $t$, a given example $(\mathbf{x}\_i, \\hat{y}\_i)$ is considered noisy and should be removed if:
+The few-shot prompts of UDG contain a small number of unlabeled examples, as well as a task-specific natural language description of the desired label. Because some generated examples are noisy, they implemented **noisy label annealing** (**NLA**) techniques to filter potentially misaligned samples out during the training processes. NLA gradually removes noisy training signals in time during training when the model starts to disagree with its pseudo label with high confidence. At each training step $t$, a given example $(\mathbf{x}\_i, \hat{y}\_i)$ is considered noisy and should be removed if:
 
 - The model predicted probability is higher than a threshold $p(\\bar{y}\_i \vert \mathbf{x}\_i) > \\mu\_t$ where $\\bar{y}\_i = \arg\max\_y p(y \vert \mathbf{x}\_i)$;
-- And the predicted label is different from the synthetic label, $\\bar{y}\_i \\neq \\hat{y}\_i$.
+- And the predicted label is different from the synthetic label, $\\bar{y}\_i \\neq \hat{y}\_i$.
 
 Note that the threshold $\\mu\_t$ is time-dependent, initialized as 0.9 and then gradually annealed to $1/\text{num\_of\_classes}$ in time.
 
@@ -255,15 +255,15 @@ $$ \mathcal{L}\_q(f(\mathbf{x}\_i, y_i = j)) = \frac{1 - f^{(j)}(\mathbf{x}\_i)^
 
 where $f^{(j)}$ denotes the $j$-th element of $f(.)$ and $q \in (0, 1\]$. $\mathcal{L}\_q$ is equivalent to CCE when $q \to 0$ and becomes MAE when $q=1$. Empirical experiments show that there exists a threshold of $q$ with which overfitting never emerges and the noisier the data the higher such a threshold should be.
 
-Given true and predicted labels, $y\_i, \\hat{y}\_i \in \{0, 1\}$ and let $u\_i=y\_i \cdot \\hat{y}\_i$, the **zero-one loss**, $\mathcal{L}\_{01}(\mathbf{u}) = \sum\_{i=1}^n \mathbb{1}\[u\_i < 0\]$, is another learning subjective shown to be robust to noisy data. Minimizing the empirical risk with the zero-one loss is shown to be equivalent to minimizing the empirical adversarial (worse-case) risk ([Hu et al 2018](https://arxiv.org/abs/1611.02041)). Because the worst-case risk is the upper bound of the classification risk of the clean data distribution, minimizing the worst-case risk can lead to decreased true risk, which makes the zero-one loss especially robust. However, the zero-one loss is non-differentiable and cannot be optimized directly. One solution is to approximate an _upper bound_ of the zero-one loss and to minimize the upper bound loss instead.
+Given true and predicted labels, $y\_i, \hat{y}\_i \in \{0, 1\}$ and let $u\_i=y\_i \cdot \hat{y}\_i$, the **zero-one loss**, $\mathcal{L}\_{01}(\mathbf{u}) = \sum\_{i=1}^n \mathbb{1}\[u\_i < 0\]$, is another learning subjective shown to be robust to noisy data. Minimizing the empirical risk with the zero-one loss is shown to be equivalent to minimizing the empirical adversarial (worse-case) risk ([Hu et al 2018](https://arxiv.org/abs/1611.02041)). Because the worst-case risk is the upper bound of the classification risk of the clean data distribution, minimizing the worst-case risk can lead to decreased true risk, which makes the zero-one loss especially robust. However, the zero-one loss is non-differentiable and cannot be optimized directly. One solution is to approximate an _upper bound_ of the zero-one loss and to minimize the upper bound loss instead.
 
-The [hinge loss](https://en.wikipedia.org/wiki/Hinge_loss), $\mathcal{L}\_\text{hinge}(\mathbf{u}) = \sum\_{i=1}^n \max(0, 1 - u\_i)$, defines a rough upper bound of the zero-one loss. [Lyu & Tsang (2020)](https://arxiv.org/abs/1905.10045) proposed a _curriculum loss_ (**CL**), which is a tighter upper bound compared to a conventional surrogate loss like the hinge loss, $\mathcal{L}\_\text{01}(\mathbf{u}) \\leq \mathcal{L}\_\text{CL}(\mathbf{u}) \\leq \mathcal{L}\_\text{hinge}(\mathbf{u})$.
+The [hinge loss](https://en.wikipedia.org/wiki/Hinge_loss), $\mathcal{L}\_\text{hinge}(\mathbf{u}) = \sum\_{i=1}^n \max(0, 1 - u\_i)$, defines a rough upper bound of the zero-one loss. [Lyu & Tsang (2020)](https://arxiv.org/abs/1905.10045) proposed a _curriculum loss_ (**CL**), which is a tighter upper bound compared to a conventional surrogate loss like the hinge loss, $\mathcal{L}\_\text{01}(\mathbf{u}) \leq \mathcal{L}\_\text{CL}(\mathbf{u}) \leq \mathcal{L}\_\text{hinge}(\mathbf{u})$.
 
 $$ \mathcal{L}\_\text{CL}(\mathbf{u}) = \min\_{\mathbf{w}\in\{0,1\}^n}\max(\sum\_{i=1}^n w_i \ell(u_i), n - \sum\_{i=1}^n w_i + \sum\_{i=1}^n\mathbb{1}\[u_i < 0\]) $$
 
 where $\ell(u\_i)$ is a base surrogate loss for the zero-one loss (e.g. hinge loss) and the optimal weighting variable $\mathbf{w}$ is to be learned.
 
-Given a label corruption rate $\rho$, the _noise pruned curriculum loss_ (**NPCL**) is constructed based on the intuition that an ideal model should correctly classify $n(1-\rho)$ samples with clean labels but misclassify $n\rho$ corrupted labels. If $\rho$ is a known prior, we would know how many samples (with largest losses) to be pruned. Assuming $\ell(u\_1) \\leq \dots \\leq \ell(u\_n)$, then $u\_{n(1-\rho)+1} = \dots = u\_n =0$ and the following NPCL is the basic CL for only $n(1-\rho)$ samples:
+Given a label corruption rate $\rho$, the _noise pruned curriculum loss_ (**NPCL**) is constructed based on the intuition that an ideal model should correctly classify $n(1-\rho)$ samples with clean labels but misclassify $n\rho$ corrupted labels. If $\rho$ is a known prior, we would know how many samples (with largest losses) to be pruned. Assuming $\ell(u\_1) \leq \dots \leq \ell(u\_n)$, then $u\_{n(1-\rho)+1} = \dots = u\_n =0$ and the following NPCL is the basic CL for only $n(1-\rho)$ samples:
 
 $$ \text{NPCL}(\mathbf{u}) = \min\_{\mathbf{w}\in\{0,1\}^{n(1-\rho)}} \max(\sum\_{i=1}^{n(1-\rho)} w_i \ell(u_i), n(1-\rho) - \sum\_{i=1}^{n(1-\rho)} w_i) $$
 
@@ -279,15 +279,15 @@ $$ C\_{ij} = p(\\tilde{y}= j \vert y =i, \mathbf{x}) \\approx p(\\tilde{y}= j \v
 
 Then we can proceed a forward label correction procedure to incorporate the prior knowledge of noisy transition matrix into the prediction.
 
-$$ \begin{aligned} \mathcal{L}(\\hat{p}(\\tilde{y}\vert\mathbf{x}), y) &= - \\log \\hat{p}(\\tilde{y}=i\vert\mathbf{x}) \\ &= - \\log \sum\_{j=1}^k p(\\tilde{y}=i\vert y=j) \\hat{p}(y=j\vert\mathbf{x}) \\ &= - \\log \sum\_{j=1}^k C\_{ji} \\hat{p}(y=j\vert\mathbf{x}) \end{aligned} $$
+$$ \begin{aligned} \mathcal{L}(\hat{p}(\\tilde{y}\vert\mathbf{x}), y) &= - \\log \hat{p}(\\tilde{y}=i\vert\mathbf{x}) \\ &= - \\log \sum\_{j=1}^k p(\\tilde{y}=i\vert y=j) \hat{p}(y=j\vert\mathbf{x}) \\ &= - \\log \sum\_{j=1}^k C\_{ji} \hat{p}(y=j\vert\mathbf{x}) \end{aligned} $$
 
-In matrix form, we have $\mathcal{L}(\\hat{p}(y \vert \mathbf{x})) = - \\log C^\top \\hat{p}(y \vert \mathbf{x})$. However, such a noise transition matrix is usually _unknown_. If we have access to a clean dataset, the noise matrix $C$ can be estimated ([Hendrycks et al. 2018](https://arxiv.org/abs/1802.05300)) by calculating confusion matrix on the clean data. Let's denote a clean trusted dataset as $\mathcal{D}\_c$ and a noisy dataset as $\mathcal{D}\_n$ going forward.
+In matrix form, we have $\mathcal{L}(\hat{p}(y \vert \mathbf{x})) = - \\log C^\top \hat{p}(y \vert \mathbf{x})$. However, such a noise transition matrix is usually _unknown_. If we have access to a clean dataset, the noise matrix $C$ can be estimated ([Hendrycks et al. 2018](https://arxiv.org/abs/1802.05300)) by calculating confusion matrix on the clean data. Let's denote a clean trusted dataset as $\mathcal{D}\_c$ and a noisy dataset as $\mathcal{D}\_n$ going forward.
 
-$$ \\hat{C}\_{ij} = \frac{1}{\vert \mathcal{A}\_i\vert} \sum\_{\mathbf{x} \in \mathcal{A}\_i} \\hat{p}(\\tilde{y}=j \vert y=i, \mathbf{x}) \\approx p(\\tilde{y}=j \vert y=i) $$
+$$ \hat{C}\_{ij} = \frac{1}{\vert \mathcal{A}\_i\vert} \sum\_{\mathbf{x} \in \mathcal{A}\_i} \hat{p}(\\tilde{y}=j \vert y=i, \mathbf{x}) \\approx p(\\tilde{y}=j \vert y=i) $$
 
 where $\mathcal{A}\_i$ is a subset of data points from $\mathcal{D}\_c$ with label $i$.
 
-Let $f(x) = \\hat{p}(\\tilde{y} \vert \mathbf{x}; \\theta)$ and this model should be trained with $\mathcal{L}(f(\mathbf{x}), y)$ on clean data $\mathcal{D}\_c$ and with $\mathcal{L}(\\hat{C}^\top f(\mathbf{x}), \\hat{y})$ on noisy data $\mathcal{D}\_n$.
+Let $f(x) = \hat{p}(\\tilde{y} \vert \mathbf{x}; \\theta)$ and this model should be trained with $\mathcal{L}(f(\mathbf{x}), y)$ on clean data $\mathcal{D}\_c$ and with $\mathcal{L}(\hat{C}^\top f(\mathbf{x}), \hat{y})$ on noisy data $\mathcal{D}\_n$.
 
 ![](GLC.png)
 
@@ -298,22 +298,22 @@ If the trusted training dataset $\mathcal{D}\_c$ gets large, we can train a neur
 The label correction distillation works as following:
 
 1.  First train an auxiliary model $f\_c$ from the small clean dataset $\mathcal{D}\_c$ to provide a soft label for each sample $x\_i$, $s\_i = \\delta(f\_c(\mathbf{x}\_i)/T)$ is the sigmoid activation with temperature $T$.
-2.  Because the clean dataset is not large, $f\_c$ is likely to overfit, [Li et al. (2017)](https://arxiv.org/abs/1703.02391) turn to a knowledge graph $\mathcal{G}$ that defines the relations in the label space and _propagate_ the prediction among labels accordingly. The new soft label is donated as $\\hat{s}\_i = \mathcal{G}(s\_i)$.
+2.  Because the clean dataset is not large, $f\_c$ is likely to overfit, [Li et al. (2017)](https://arxiv.org/abs/1703.02391) turn to a knowledge graph $\mathcal{G}$ that defines the relations in the label space and _propagate_ the prediction among labels accordingly. The new soft label is donated as $\hat{s}\_i = \mathcal{G}(s\_i)$.
 3.  The primary model $f$ is trained with predictions from $f\_c$ to imitate,
 
-$$ \mathcal{L}(y_i, f(\mathbf{x}\_i)) = \text{CE}(\\underbrace{\\lambda y_i + (1 - \\lambda) \\hat{s}\_i}\_\text{pseudo label}, f(\mathbf{x}\_i)) $$
+$$ \mathcal{L}(y_i, f(\mathbf{x}\_i)) = \text{CE}(\\underbrace{\\lambda y_i + (1 - \\lambda) \hat{s}\_i}\_\text{pseudo label}, f(\mathbf{x}\_i)) $$
 
 ## Sample Reweighting and Selection[#](#sample-reweighting-and-selection)
 
 Some samples may be more likely to have inaccurate labels than others. Such estimation gives us intuition on which samples should be weighted less or more in the loss function. However, considering two types of biases in training data, class imbalance and noisy labels, there is actually a contradictory preference — We would prefer samples with larger loss to balance the label distribution but those with smaller loss for mitigating the potential noise. Some work ([Ren et al. 2018](https://arxiv.org/abs/1803.09050)) thus argue that in order to learn general forms of training data biases, it is _necessary_ to have _a small unbiased validation_ to guide training. The sample reweighting methods presented in this section all assume access to a small trusted set of clean data.
 
-Considering a binary classification task with random classification noise, $y, \\hat{y} \in \{-1, +1\}$, the label flipping probabilities, $\rho\_{-1}, \rho\_{+1} \in \[0, 0.5)$, are defined as:
+Considering a binary classification task with random classification noise, $y, \hat{y} \in \{-1, +1\}$, the label flipping probabilities, $\rho\_{-1}, \rho\_{+1} \in \[0, 0.5)$, are defined as:
 
 $$ \rho\_{-1} = P(\\tilde{y} = +1 \vert y=-1)\quad\rho\_{+1} = P(\\tilde{y}=-1 \vert y =+1) $$
 
-[Liu & Tao (2015)](https://arxiv.org/abs/1411.7718) applies **importance reweighting** to adjust the weighted distribution of observed $\\hat{y}$ to match the distribution of unobservable $y$. Let $\mathcal{D}$ be the true data distribution and $\mathcal{D}\_\rho$ be the corrupted version.
+[Liu & Tao (2015)](https://arxiv.org/abs/1411.7718) applies **importance reweighting** to adjust the weighted distribution of observed $\hat{y}$ to match the distribution of unobservable $y$. Let $\mathcal{D}$ be the true data distribution and $\mathcal{D}\_\rho$ be the corrupted version.
 
-$$ \begin{aligned} \mathcal{L}\_{\ell,\mathcal{D}}(f) &= \mathbb{E}\_{(\mathbf{x},y)\\sim \mathcal{D}}\[\ell(f(\mathbf{x}), y)\] \\ &= \mathbb{E}\_{(\mathbf{x},\\tilde{y})\\sim \mathcal{D}\_\rho} \\Big\[ \frac{P\_\mathcal{D}(\mathbf{x}, y=\\tilde{y})}{P\_{\mathcal{D}\_\rho}(\mathbf{x}, \\tilde{y})} \ell(f(\mathbf{x}), \\tilde{y}) \\Big\] \\ &= \mathbb{E}\_{(\mathbf{x},\\tilde{y})\\sim \mathcal{D}\_\rho} \\Big\[ \frac{P\_\mathcal{D}(y=\\tilde{y} \vert \mathbf{x})}{P\_{\mathcal{D}\_\rho}(\\tilde{y} \vert \mathbf{x})} \ell(f(\mathbf{x}), \\tilde{y}) \\Big\] & \text{; because }P\_\mathcal{D}(\mathbf{x})=P\_{\mathcal{D}\_\rho}(\mathbf{x}) \\ &= \mathbb{E}\_{(\mathbf{x},\\tilde{y})\\sim \mathcal{D}\_\rho} \[ w(\mathbf{x}, \\hat{y})\ell(f(\mathbf{x}), \\tilde{y}) \] = \mathcal{L}\_{w\ell,\mathcal{D}}(f) \end{aligned} $$
+$$ \begin{aligned} \mathcal{L}\_{\ell,\mathcal{D}}(f) &= \mathbb{E}\_{(\mathbf{x},y)\\sim \mathcal{D}}\[\ell(f(\mathbf{x}), y)\] \\ &= \mathbb{E}\_{(\mathbf{x},\\tilde{y})\\sim \mathcal{D}\_\rho} \\Big\[ \frac{P\_\mathcal{D}(\mathbf{x}, y=\\tilde{y})}{P\_{\mathcal{D}\_\rho}(\mathbf{x}, \\tilde{y})} \ell(f(\mathbf{x}), \\tilde{y}) \\Big\] \\ &= \mathbb{E}\_{(\mathbf{x},\\tilde{y})\\sim \mathcal{D}\_\rho} \\Big\[ \frac{P\_\mathcal{D}(y=\\tilde{y} \vert \mathbf{x})}{P\_{\mathcal{D}\_\rho}(\\tilde{y} \vert \mathbf{x})} \ell(f(\mathbf{x}), \\tilde{y}) \\Big\] & \text{; because }P\_\mathcal{D}(\mathbf{x})=P\_{\mathcal{D}\_\rho}(\mathbf{x}) \\ &= \mathbb{E}\_{(\mathbf{x},\\tilde{y})\\sim \mathcal{D}\_\rho} \[ w(\mathbf{x}, \hat{y})\ell(f(\mathbf{x}), \\tilde{y}) \] = \mathcal{L}\_{w\ell,\mathcal{D}}(f) \end{aligned} $$
 
 Because,
 
@@ -323,7 +323,7 @@ Thus the weight assigned to a noisy sample is,
 
 $$ w(x, \\tilde{y}) = \frac{P\_\mathcal{D}(y=\\tilde{y} \vert \mathbf{x})}{P\_{\mathcal{D}\_\rho}(\\tilde{y} \vert \mathbf{x})} = \frac{P\_{\mathcal{D}\_\rho}(\\tilde{y} \vert \mathbf{x}) - \rho\_{-\\tilde{y}}}{(1-\rho_0-\rho_1) P\_{\mathcal{D}\_\rho}(\\tilde{y} \vert \mathbf{x})} $$
 
-where $P\_{\mathcal{D}\_\rho}(\\tilde{y} \vert \mathbf{x})$ can be estimated using a simple logistic regression, but estimating the note rates is more challenging. Naive cross-validation can work out but is costly as the quality depends on the amount of trusted labels available. The paper approximates the upper bounds for noise rates first, $\rho\_\\tilde{y} \\leq P\_{\mathcal{D}\_\rho}(- \\tilde{y} \vert \mathbf{x})$ and then use a mild assumption to efficiently estimate them, $\\hat{\rho}\_{\\tilde{y}} = \min\_{\mathbf{x} \in {\mathbf{x}\_1, \dots, \mathbf{x}\_n}} \\hat{P}\_{\mathcal{D}\_\rho}(- \\tilde{y} \vert \mathbf{x})$. In their experiments, the advantage of importance reweighting only varies across datasets and is more beneficial when the noise rates are high in general.
+where $P\_{\mathcal{D}\_\rho}(\\tilde{y} \vert \mathbf{x})$ can be estimated using a simple logistic regression, but estimating the note rates is more challenging. Naive cross-validation can work out but is costly as the quality depends on the amount of trusted labels available. The paper approximates the upper bounds for noise rates first, $\rho\_\\tilde{y} \leq P\_{\mathcal{D}\_\rho}(- \\tilde{y} \vert \mathbf{x})$ and then use a mild assumption to efficiently estimate them, $\hat{\rho}\_{\\tilde{y}} = \min\_{\mathbf{x} \in {\mathbf{x}\_1, \dots, \mathbf{x}\_n}} \hat{P}\_{\mathcal{D}\_\rho}(- \\tilde{y} \vert \mathbf{x})$. In their experiments, the advantage of importance reweighting only varies across datasets and is more beneficial when the noise rates are high in general.
 
 Sample reweighting schemes can be learned by a separate network. _Learning to reweight_ (**L2R**; [Ren et al. 2018](https://arxiv.org/abs/1803.09050)) is a meta-learning approach to directly optimize the weights in pursuit of best validation performance on a known set of clean data. Each example gets assigned with the weight based on its gradient direction. The weighted loss to minimize $\\theta^\*(\mathbf{w})$ involves a set of training weights $\{w\_i\}\_{i=1}^n$ as unknown hyperparameters. These sample training weights $w\_i$ are learned to minimize the loss on this unbiased validate set, $\mathcal{D}\_c = \{x^\text{valid}\_j\}\_{j=1}^m$.
 

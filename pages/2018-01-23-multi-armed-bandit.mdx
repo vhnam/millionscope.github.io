@@ -69,7 +69,7 @@ The goal is to maximize the cumulative reward $\sum\_{t=1}^T r\_t$. If we know t
 
 The optimal reward probability $\\theta^{\*}$ of the optimal action $a^{\*}$ is:
 
-$$ \\theta^{\*}=Q(a^{\*})=\max\_{a \in \mathcal{A}} Q(a) = \max\_{1 \\leq i \\leq K} \\theta_i $$
+$$ \\theta^{\*}=Q(a^{\*})=\max\_{a \in \mathcal{A}} Q(a) = \max\_{1 \leq i \leq K} \\theta_i $$
 
 Our loss function is the total regret we might have by not selecting the optimal action up to the time step T:
 
@@ -87,11 +87,11 @@ Based on how we do exploration, there several ways to solve the multi-armed band
 
 The ε-greedy algorithm takes the best action most of the time, but does random exploration occasionally. The action value is estimated according to the past experience by averaging the rewards associated with the target action a that we have observed so far (up to the current time step t):
 
-$$ \\hat{Q}\_t(a) = \frac{1}{N_t(a)} \sum\_{\\tau=1}^t r\_\\tau \mathbb{1}\[a\_\\tau = a\] $$
+$$ \hat{Q}\_t(a) = \frac{1}{N_t(a)} \sum\_{\tau=1}^t r\_\tau \mathbb{1}\[a\_\tau = a\] $$
 
-where $\mathbb{1}$ is a binary indicator function and $N\_t(a)$ is how many times the action a has been selected so far, $N\_t(a) = \sum\_{\\tau=1}^t \mathbb{1}\[a\_\\tau = a\]$.
+where $\mathbb{1}$ is a binary indicator function and $N\_t(a)$ is how many times the action a has been selected so far, $N\_t(a) = \sum\_{\tau=1}^t \mathbb{1}\[a\_\tau = a\]$.
 
-According to the ε-greedy algorithm, with a small probability $\\epsilon$ we take a random action, but otherwise (which should be the most of the time, probability 1-$\\epsilon$) we pick the best action that we have learnt so far: $\\hat{a}^{\*}\_t = \arg\max\_{a \in \mathcal{A}} \\hat{Q}\_t(a)$.
+According to the ε-greedy algorithm, with a small probability $\\epsilon$ we take a random action, but otherwise (which should be the most of the time, probability 1-$\\epsilon$) we pick the best action that we have learnt so far: $\hat{a}^{\*}\_t = \arg\max\_{a \in \mathcal{A}} \hat{Q}\_t(a)$.
 
 Check my toy implementation [here](https://github.com/lilianweng/multi-armed-bandit/blob/master/solvers.py#L45).
 
@@ -99,11 +99,11 @@ Check my toy implementation [here](https://github.com/lilianweng/multi-armed-ban
 
 Random exploration gives us an opportunity to try out options that we have not known much about. However, due to the randomness, it is possible we end up exploring a bad action which we have confirmed in the past (bad luck!). To avoid such inefficient exploration, one approach is to decrease the parameter ε in time and the other is to be optimistic about options with _high uncertainty_ and thus to prefer actions for which we haven't had a confident value estimation yet. Or in other words, we favor exploration of actions with a strong potential to have a optimal value.
 
-The Upper Confidence Bounds (UCB) algorithm measures this potential by an upper confidence bound of the reward value, $\\hat{U}\_t(a)$, so that the true value is below with bound $Q(a) \\leq \\hat{Q}\_t(a) + \\hat{U}\_t(a)$ with high probability. The upper bound $\\hat{U}\_t(a)$ is a function of $N\_t(a)$; a larger number of trials $N\_t(a)$ should give us a smaller bound $\\hat{U}\_t(a)$.
+The Upper Confidence Bounds (UCB) algorithm measures this potential by an upper confidence bound of the reward value, $\hat{U}\_t(a)$, so that the true value is below with bound $Q(a) \leq \hat{Q}\_t(a) + \hat{U}\_t(a)$ with high probability. The upper bound $\hat{U}\_t(a)$ is a function of $N\_t(a)$; a larger number of trials $N\_t(a)$ should give us a smaller bound $\hat{U}\_t(a)$.
 
 In UCB algorithm, we always select the greediest action to maximize the upper confidence bound:
 
-$$ a^{UCB}\_t = argmax\_{a \in \mathcal{A}} \\hat{Q}\_t(a) + \\hat{U}\_t(a) $$
+$$ a^{UCB}\_t = argmax\_{a \in \mathcal{A}} \hat{Q}\_t(a) + \hat{U}\_t(a) $$
 
 Now, the question is _how to estimate the upper confidence bound_.
 
@@ -111,20 +111,20 @@ Now, the question is _how to estimate the upper confidence bound_.
 
 If we do not want to assign any prior knowledge on how the distribution looks like, we can get help from [“Hoeffding's Inequality”](http://cs229.stanford.edu/extra-notes/hoeffding.pdf) — a theorem applicable to any bounded distribution.
 
-Let $X\_1, \dots, X\_t$ be i.i.d. (independent and identically distributed) random variables and they are all bounded by the interval \[0, 1\]. The sample mean is $\\overline{X}\_t = \frac{1}{t}\sum\_{\\tau=1}^t X\_\\tau$. Then for u > 0, we have:
+Let $X\_1, \dots, X\_t$ be i.i.d. (independent and identically distributed) random variables and they are all bounded by the interval \[0, 1\]. The sample mean is $\\overline{X}\_t = \frac{1}{t}\sum\_{\tau=1}^t X\_\tau$. Then for u > 0, we have:
 
-$$ \mathbb{P} \[ \mathbb{E}\[X\] > \\overline{X}\_t + u\] \\leq e^{-2tu^2} $$
+$$ \mathbb{P} \[ \mathbb{E}\[X\] > \\overline{X}\_t + u\] \leq e^{-2tu^2} $$
 
 Given one target action a, let us consider:
 
 - $r\_t(a)$ as the random variables,
 - $Q(a)$ as the true mean,
-- $\\hat{Q}\_t(a)$ as the sample mean,
+- $\hat{Q}\_t(a)$ as the sample mean,
 - And $u$ as the upper confidence bound, $u = U\_t(a)$
 
 Then we have,
 
-$$ \mathbb{P} \[ Q(a) > \\hat{Q}\_t(a) + U_t(a)\] \\leq e^{-2t{U_t(a)}^2} $$
+$$ \mathbb{P} \[ Q(a) > \hat{Q}\_t(a) + U_t(a)\] \leq e^{-2t{U_t(a)}^2} $$
 
 We want to pick a bound so that with high chances the true mean is blow the sample mean + the upper confidence bound. Thus $e^{-2t U\_t(a)^2}$ should be a small probability. Let's say we are ok with a tiny threshold p:
 
@@ -140,11 +140,11 @@ $$ U_t(a) = \\sqrt{\frac{2 \\log t}{N_t(a)}} \text{ and } a^{UCB1}\_t = \arg\max
 
 In UCB or UCB1 algorithm, we do not assume any prior on the reward distribution and therefore we have to rely on the Hoeffding's Inequality for a very generalize estimation. If we are able to know the distribution upfront, we would be able to make better bound estimation.
 
-For example, if we expect the mean reward of every slot machine to be Gaussian as in Fig 2, we can set the upper bound as 95% confidence interval by setting $\\hat{U}\_t(a)$ to be twice the standard deviation.
+For example, if we expect the mean reward of every slot machine to be Gaussian as in Fig 2, we can set the upper bound as 95% confidence interval by setting $\hat{U}\_t(a)$ to be twice the standard deviation.
 
 ![](bern_UCB.png)
 
-Fig. 3. When the expected reward has a Gaussian distribution. $\\sigma(a\\\_i)$ is the standard deviation and $c\\sigma(a\\\_i)$ is the upper confidence bound. The constant $c$ is a adjustable hyperparameter. (Image source: [UCL RL course lecture 9's slides](http://www0.cs.ucl.ac.uk/staff/d.silver/web/Teaching_files/XX.pdf))
+Fig. 3. When the expected reward has a Gaussian distribution. $\sigma(a\\\_i)$ is the standard deviation and $c\sigma(a\\\_i)$ is the upper confidence bound. The constant $c$ is a adjustable hyperparameter. (Image source: [UCL RL course lecture 9's slides](http://www0.cs.ucl.ac.uk/staff/d.silver/web/Teaching_files/XX.pdf))
 
 Check my toy implementation of [UCB1](https://github.com/lilianweng/multi-armed-bandit/blob/master/solvers.py#L76) and [Bayesian UCB](https://github.com/lilianweng/multi-armed-bandit/blob/master/solvers.py#L99) with Beta prior on θ.
 

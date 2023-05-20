@@ -71,7 +71,7 @@ To make sure the generated architecture is valid, additional rules might be need
 
 The skip connection can be predicted as well, using an [attention](https://lilianweng.github.io/posts/2018-06-24-attention/)\-style mechanism. At layer $i$ , an anchor point is added with $i−1$ content-based sigmoids to indicate which of the previous layers to be connected. Each sigmoid takes as input the hidden states of the current node $h\_i$ and $i-1$ previous nodes $h\_j, j=1, \dots, i-1$ .
 
-$$ P(\text{Layer j is an input to layer i}) = \text{sigmoid}(v^\top \\tanh(\mathbf{W}\_\text{prev} h_j + \mathbf{W}\_\text{curr} h_i)) $$
+$$ P(\text{Layer j is an input to layer i}) = \text{sigmoid}(v^\top \tanh(\mathbf{W}\_\text{prev} h_j + \mathbf{W}\_\text{curr} h_i)) $$
 
 The sequential search space has a lot of representation power, but it is very large and consumes a ton of computation resources to exhaustively cover the search space. In the experiments by [Zoph & Le 2017](https://arxiv.org/abs/1611.01578), they were running 800 GPUs in parallel for 28 days and [Baker et al. 2017](https://arxiv.org/abs/1611.02167) restricted the search space to contain at most 2 `FC` layers.
 
@@ -324,7 +324,7 @@ $$ x_i = \sum\_{j < i} o^{(i,j)}(x_j) $$
 
 To make the search space continuous, DARTS relaxes the categorical choice of a particular operation as a softmax over all the operations and the task of architecture search is reduced to learn a set of mixing probabilities $\\alpha = \{ \\alpha^{(i,j)} \}$.
 
-$$ \\bar{o}^{(i,j)}(x) = \sum\_{o\in\mathcal{O}} \frac{\\exp(\\alpha\_{ij}^o)}{\sum\_{o'\in\mathcal{O}} \\exp(\\alpha^{o'}\_{ij})} o(x) $$
+$$ \\bar{o}^{(i,j)}(x) = \sum\_{o\in\mathcal{O}} \frac{\exp(\\alpha\_{ij}^o)}{\sum\_{o'\in\mathcal{O}} \exp(\\alpha^{o'}\_{ij})} o(x) $$
 
 where $\\alpha\_{ij}$ is a vector of dimension $\vert \mathcal{O} \vert$, containing weights between nodes $i$ and $j$ over different operations.
 
@@ -362,7 +362,7 @@ Let's continue with the graph representation. In a DAG adjacency matrix $G$ wher
 
 In One-Shot, $m\_\mathcal{O}(x)$ is the sum of all the operations. In DARTS, it is a weighted sum where weights are softmax over a real-valued architecture weighting vector $\\alpha$ of length $\vert \mathcal{O} \vert$. ProxylessNAS transforms the softmax probabilities of $\\alpha$ into a binary gate and uses the binary gate to keep only one operation active at a time.
 
-$$ \begin{aligned} m^\text{one-shot}\_\mathcal{O}(x) &= \sum\_{i=1}^{\vert \mathcal{O} \vert} o_i(x) \\ m^\text{DARTS}\_\mathcal{O}(x) &= \sum\_{i=1}^{\vert \mathcal{O} \vert} p_i o_i(x) = \sum\_{i=1}^{\vert \mathcal{O} \vert} \frac{\\exp(\\alpha_i)}{\sum_j \\exp(\\alpha_j)} o_i(x) \\ m^\text{binary}\_\mathcal{O}(x) &= \sum\_{i=1}^{\vert \mathcal{O} \vert} g_i o_i(x) = \begin{cases} o_1(x) & \text{with probability }p_1, \\ \dots &\\ o\_{\vert \mathcal{O} \vert}(x) & \text{with probability }p\_{\vert \mathcal{O} \vert} \end{cases} \\ \text{ where } g &= \text{binarize}(p_1, \dots, p_N) = \begin{cases} \[1, 0, \dots, 0\] & \text{with probability }p_1, \\ \dots & \\ \[0, 0, \dots, 1\] & \text{with probability }p_N. \\ \end{cases} \end{aligned} $$
+$$ \begin{aligned} m^\text{one-shot}\_\mathcal{O}(x) &= \sum\_{i=1}^{\vert \mathcal{O} \vert} o_i(x) \\ m^\text{DARTS}\_\mathcal{O}(x) &= \sum\_{i=1}^{\vert \mathcal{O} \vert} p_i o_i(x) = \sum\_{i=1}^{\vert \mathcal{O} \vert} \frac{\exp(\\alpha_i)}{\sum_j \exp(\\alpha_j)} o_i(x) \\ m^\text{binary}\_\mathcal{O}(x) &= \sum\_{i=1}^{\vert \mathcal{O} \vert} g_i o_i(x) = \begin{cases} o_1(x) & \text{with probability }p_1, \\ \dots &\\ o\_{\vert \mathcal{O} \vert}(x) & \text{with probability }p\_{\vert \mathcal{O} \vert} \end{cases} \\ \text{ where } g &= \text{binarize}(p_1, \dots, p_N) = \begin{cases} \[1, 0, \dots, 0\] & \text{with probability }p_1, \\ \dots & \\ \[0, 0, \dots, 1\] & \text{with probability }p_N. \\ \end{cases} \end{aligned} $$
 
 ![](proxylessNAS-training.png)
 

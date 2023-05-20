@@ -72,7 +72,7 @@ State, action, and reward at time step $t$ of one trajectory. I may occasionally
 
 $\\gamma$
 
-Discount factor; penalty to uncertainty of future rewards; $0<\\gamma \\leq 1$.
+Discount factor; penalty to uncertainty of future rewards; $0<\\gamma \leq 1$.
 
 $G\_t$
 
@@ -261,12 +261,12 @@ Here is the algorithm outline:
 
 1.  We have global parameters, $\\theta$ and $w$; similar thread-specific parameters, $\\theta'$ and $w'$.
 2.  Initialize the time step $t = 1$
-3.  While $T \\leq T\_\text{MAX}$:
+3.  While $T \leq T\_\text{MAX}$:
 
     1.  Reset gradient: $\\mathrm{d}\\theta = 0$ and $\\mathrm{d}w = 0$.
     2.  Synchronize thread-specific parameters with global ones: $\\theta' = \\theta$ and $w' = w$.
     3.  $t\_\text{start}$ = t and sample a starting state $s\_t$.
-    4.  While ($s\_t$ != TERMINAL) and $t - t\_\text{start} \\leq t\_\text{max}$:
+    4.  While ($s\_t$ != TERMINAL) and $t - t\_\text{start} \leq t\_\text{max}$:
         1.  Pick the action $A\_t \\sim \\pi\_{\\theta'}(A\_t \vert S\_t)$ and receive a new reward $R\_t$ and a new state $s\_{t+1}$.
         2.  Update $t = t + 1$ and $T = T + 1$
     5.  Initialize the variable that holds the return estimation
@@ -310,7 +310,7 @@ $$ J(\\theta) = \int\_\mathcal{S} \rho^\\mu(s) Q(s, \\mu\_\\theta(s)) ds $$
 
 $$ \begin{aligned} \\nabla\_\\theta J(\\theta) &= \int\_\mathcal{S} \rho^\\mu(s) \\nabla_a Q^\\mu(s, a) \\nabla\_\\theta \\mu\_\\theta(s) \\rvert\_{a=\\mu\_\\theta(s)} ds \\ &= \mathbb{E}\_{s \\sim \rho^\\mu} \[\\nabla_a Q^\\mu(s, a) \\nabla\_\\theta \\mu\_\\theta(s) \\rvert\_{a=\\mu\_\\theta(s)}\] \end{aligned} $$
 
-We can consider the deterministic policy as a _special case_ of the stochastic one, when the probability distribution contains only one extreme non-zero value over one action. Actually, in the DPG [paper](https://hal.inria.fr/file/index/docid/938992/filename/dpg-icml2014.pdf), the authors have shown that if the stochastic policy $\\pi\_{\\mu\_\\theta, \\sigma}$ is re-parameterized by a deterministic policy $\\mu\_\\theta$ and a variation variable $\\sigma$, the stochastic policy is eventually equivalent to the deterministic case when $\\sigma=0$. Compared to the deterministic policy, we expect the stochastic policy to require more samples as it integrates the data over the whole state and action space.
+We can consider the deterministic policy as a _special case_ of the stochastic one, when the probability distribution contains only one extreme non-zero value over one action. Actually, in the DPG [paper](https://hal.inria.fr/file/index/docid/938992/filename/dpg-icml2014.pdf), the authors have shown that if the stochastic policy $\\pi\_{\\mu\_\\theta, \sigma}$ is re-parameterized by a deterministic policy $\\mu\_\\theta$ and a variation variable $\sigma$, the stochastic policy is eventually equivalent to the deterministic case when $\sigma=0$. Compared to the deterministic policy, we expect the stochastic policy to require more samples as it integrates the data over the whole state and action space.
 
 The deterministic policy gradient theorem can be plugged into common policy gradient frameworks.
 
@@ -336,7 +336,7 @@ In order to do better exploration, an exploration policy $\\mu'$ is constructed 
 
 $$ \\mu'(s) = \\mu\_\\theta(s) + \mathcal{N} $$
 
-In addition, DDPG does soft updates (“conservative policy iteration”) on the parameters of both actor and critic, with $\\tau \\ll 1$: $\\theta' \\leftarrow \\tau \\theta + (1 - \\tau) \\theta'$. In this way, the target network values are constrained to change slowly, different from the design in DQN that the target network stays frozen for some period of time.
+In addition, DDPG does soft updates (“conservative policy iteration”) on the parameters of both actor and critic, with $\tau \\ll 1$: $\\theta' \\leftarrow \tau \\theta + (1 - \tau) \\theta'$. In this way, the target network values are constrained to change slowly, different from the design in DQN that the target network stays frozen for some period of time.
 
 One detail in the paper that is particularly useful in robotics is on how to normalize the different physical units of low dimensional features. For example, a model is designed to learn a policy with the robot's positions and velocities as input; these physical statistics are different by nature and even statistics of the same type may vary a lot across multiple robots. [Batch normalization](http://proceedings.mlr.press/v37/ioffe15.pdf) is applied to fix it by normalizing every dimension across samples in one minibatch.
 
@@ -418,17 +418,17 @@ To improve training stability, we should avoid parameter updates that change the
 
 Consider the case when we are doing off-policy RL, the policy $\\beta$ used for collecting trajectories on rollout workers is different from the policy $\\pi$ to optimize for. The objective function in an off-policy model measures the total advantage over the state visitation distribution and actions, while the mismatch between the training data distribution and the true policy state distribution is compensated by importance sampling estimator:
 
-$$ \begin{aligned} J(\\theta) &= \sum\_{s \in \mathcal{S}} \rho^{\\pi\_{\\theta\_\text{old}}} \sum\_{a \in \mathcal{A}} \\big( \\pi\_\\theta(a \vert s) \\hat{A}\_{\\theta\_\text{old}}(s, a) \\big) & \\ &= \sum\_{s \in \mathcal{S}} \rho^{\\pi\_{\\theta\_\text{old}}} \sum\_{a \in \mathcal{A}} \\big( \\beta(a \vert s) \frac{\\pi\_\\theta(a \vert s)}{\\beta(a \vert s)} \\hat{A}\_{\\theta\_\text{old}}(s, a) \\big) & \\scriptstyle{\text{; Importance sampling}} \\ &= \mathbb{E}\_{s \\sim \rho^{\\pi\_{\\theta\_\text{old}}}, a \\sim \\beta} \\big\[ \frac{\\pi\_\\theta(a \vert s)}{\\beta(a \vert s)} \\hat{A}\_{\\theta\_\text{old}}(s, a) \\big\] & \end{aligned} $$
+$$ \begin{aligned} J(\\theta) &= \sum\_{s \in \mathcal{S}} \rho^{\\pi\_{\\theta\_\text{old}}} \sum\_{a \in \mathcal{A}} \\big( \\pi\_\\theta(a \vert s) \hat{A}\_{\\theta\_\text{old}}(s, a) \\big) & \\ &= \sum\_{s \in \mathcal{S}} \rho^{\\pi\_{\\theta\_\text{old}}} \sum\_{a \in \mathcal{A}} \\big( \\beta(a \vert s) \frac{\\pi\_\\theta(a \vert s)}{\\beta(a \vert s)} \hat{A}\_{\\theta\_\text{old}}(s, a) \\big) & \\scriptstyle{\text{; Importance sampling}} \\ &= \mathbb{E}\_{s \\sim \rho^{\\pi\_{\\theta\_\text{old}}}, a \\sim \\beta} \\big\[ \frac{\\pi\_\\theta(a \vert s)}{\\beta(a \vert s)} \hat{A}\_{\\theta\_\text{old}}(s, a) \\big\] & \end{aligned} $$
 
-where $\\theta\_\text{old}$ is the policy parameters before the update and thus known to us; $\rho^{\\pi\_{\\theta\_\text{old}}}$ is defined in the same way as [above](#dpg); $\\beta(a \vert s)$ is the behavior policy for collecting trajectories. Noted that we use an estimated advantage $\\hat{A}(.)$ rather than the true advantage function $A(.)$ because the true rewards are usually unknown.
+where $\\theta\_\text{old}$ is the policy parameters before the update and thus known to us; $\rho^{\\pi\_{\\theta\_\text{old}}}$ is defined in the same way as [above](#dpg); $\\beta(a \vert s)$ is the behavior policy for collecting trajectories. Noted that we use an estimated advantage $\hat{A}(.)$ rather than the true advantage function $A(.)$ because the true rewards are usually unknown.
 
 When training on policy, theoretically the policy for collecting data is same as the policy that we want to optimize. However, when rollout workers and optimizers are running in parallel asynchronously, the behavior policy can get stale. TRPO considers this subtle difference: It labels the behavior policy as $\\pi\_{\\theta\_\text{old}}(a \vert s)$ and thus the objective function becomes:
 
-$$ J(\\theta) = \mathbb{E}\_{s \\sim \rho^{\\pi\_{\\theta\_\text{old}}}, a \\sim \\pi\_{\\theta\_\text{old}}} \\big\[ \frac{\\pi\_\\theta(a \vert s)}{\\pi\_{\\theta\_\text{old}}(a \vert s)} \\hat{A}\_{\\theta\_\text{old}}(s, a) \\big\] $$
+$$ J(\\theta) = \mathbb{E}\_{s \\sim \rho^{\\pi\_{\\theta\_\text{old}}}, a \\sim \\pi\_{\\theta\_\text{old}}} \\big\[ \frac{\\pi\_\\theta(a \vert s)}{\\pi\_{\\theta\_\text{old}}(a \vert s)} \hat{A}\_{\\theta\_\text{old}}(s, a) \\big\] $$
 
 TRPO aims to maximize the objective function $J(\\theta)$ subject to, _trust region constraint_ which enforces the distance between old and new policies measured by [KL-divergence](https://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence) to be small enough, within a parameter δ:
 
-$$ \mathbb{E}\_{s \\sim \rho^{\\pi\_{\\theta\_\text{old}}}} \[D\_\text{KL}(\\pi\_{\\theta\_\text{old}}(.\vert s) \\| \\pi\_\\theta(.\vert s)\] \\leq \\delta $$
+$$ \mathbb{E}\_{s \\sim \rho^{\\pi\_{\\theta\_\text{old}}}} \[D\_\text{KL}(\\pi\_{\\theta\_\text{old}}(.\vert s) \\| \\pi\_\\theta(.\vert s)\] \leq \\delta $$
 
 In this way, the old and new policies would not diverge too much when this hard constraint is met. While still, TRPO can guarantee a monotonic improvement over policy iteration (Neat, right?). Please read the proof in the [paper](https://arxiv.org/pdf/1502.05477.pdf) if interested :)
 
@@ -444,11 +444,11 @@ $$ r(\\theta) = \frac{\\pi\_\\theta(a \vert s)}{\\pi\_{\\theta\_\text{old}}(a \v
 
 Then, the objective function of TRPO (on policy) becomes:
 
-$$ J^\text{TRPO} (\\theta) = \mathbb{E} \[ r(\\theta) \\hat{A}\_{\\theta\_\text{old}}(s, a) \] $$
+$$ J^\text{TRPO} (\\theta) = \mathbb{E} \[ r(\\theta) \hat{A}\_{\\theta\_\text{old}}(s, a) \] $$
 
 Without a limitation on the distance between $\\theta\_\text{old}$ and $\\theta$, to maximize $J^\text{TRPO} (\\theta)$ would lead to instability with extremely large parameter updates and big policy ratios. PPO imposes the constraint by forcing $r(\\theta)$ to stay within a small interval around 1, precisely $\[1-\\epsilon, 1+\\epsilon\]$, where $\\epsilon$ is a hyperparameter.
 
-$$ J^\text{CLIP} (\\theta) = \mathbb{E} \[ \min( r(\\theta) \\hat{A}\_{\\theta\_\text{old}}(s, a), \text{clip}(r(\\theta), 1 - \\epsilon, 1 + \\epsilon) \\hat{A}\_{\\theta\_\text{old}}(s, a))\] $$
+$$ J^\text{CLIP} (\\theta) = \mathbb{E} \[ \min( r(\\theta) \hat{A}\_{\\theta\_\text{old}}(s, a), \text{clip}(r(\\theta), 1 - \\epsilon, 1 + \\epsilon) \hat{A}\_{\\theta\_\text{old}}(s, a))\] $$
 
 The function $\text{clip}(r(\\theta), 1 - \\epsilon, 1 + \\epsilon)$ clips the ratio to be no more than $1+\\epsilon$ and no less than $1-\\epsilon$. The objective function of PPO takes the minimum one between the original value and the clipped version and therefore we lose the motivation for increasing the policy update to extremes for better rewards.
 
@@ -481,7 +481,7 @@ Sharing parameters between policy and value networks have pros and cons. It allo
 1.  The _policy phase_: updates the policy network by optimizing the PPO [objective](#ppo_loss) $L^\text{CLIP} (\\theta)$;
 2.  The _auxiliary phase_: optimizes an auxiliary objective alongside a behavioral cloning loss. In the paper, value function error is the sole auxiliary objective, but it can be quite general and includes any other additional auxiliary losses.
 
-$$ \begin{aligned} L^\text{joint} &= L^\text{aux} + \\beta\_\text{clone} \cdot \mathbb{E}\_t\[\text{KL}\[\\pi\_{\\theta\_\text{old}}(\cdot\mid s_t), \\pi\_\\theta(\cdot\mid s_t)\]\] \\ L^\text{aux} &= L^\text{value} = \mathbb{E}\_t \\big\[\frac{1}{2}\\big( V_w(s_t) - \\hat{V}\_t^\text{targ} \\big)^2\\big\] \end{aligned} $$
+$$ \begin{aligned} L^\text{joint} &= L^\text{aux} + \\beta\_\text{clone} \cdot \mathbb{E}\_t\[\text{KL}\[\\pi\_{\\theta\_\text{old}}(\cdot\mid s_t), \\pi\_\\theta(\cdot\mid s_t)\]\] \\ L^\text{aux} &= L^\text{value} = \mathbb{E}\_t \\big\[\frac{1}{2}\\big( V_w(s_t) - \hat{V}\_t^\text{targ} \\big)^2\\big\] \end{aligned} $$
 
 where $\\beta\_\text{clone}$ is a hyperparameter for controlling how much we would like to keep the policy not diverge too much from its original behavior while optimizing the auxiliary objectives.
 
@@ -522,19 +522,19 @@ Recall how TD learning works for prediction:
 
 When the rollout is off policy, we need to apply importance sampling on the Q update:
 
-$$ \\Delta Q^\text{imp}(S_t, A_t) = \\gamma^t \\prod\_{1 \\leq \\tau \\leq t} \frac{\\pi(A\_\\tau \vert S\_\\tau)}{\\beta(A\_\\tau \vert S\_\\tau)} \\delta_t $$
+$$ \\Delta Q^\text{imp}(S_t, A_t) = \\gamma^t \\prod\_{1 \leq \tau \leq t} \frac{\\pi(A\_\tau \vert S\_\tau)}{\\beta(A\_\tau \vert S\_\tau)} \\delta_t $$
 
 The product of importance weights looks pretty scary when we start imagining how it can cause super high variance and even explode. Retrace Q-value estimation method modifies $\\Delta Q$ to have importance weights truncated by no more than a constant $c$:
 
-$$ \\Delta Q^\text{ret}(S_t, A_t) = \\gamma^t \\prod\_{1 \\leq \\tau \\leq t} \min(c, \frac{\\pi(A\_\\tau \vert S\_\\tau)}{\\beta(A\_\\tau \vert S\_\\tau)}) \\delta_t $$
+$$ \\Delta Q^\text{ret}(S_t, A_t) = \\gamma^t \\prod\_{1 \leq \tau \leq t} \min(c, \frac{\\pi(A\_\tau \vert S\_\tau)}{\\beta(A\_\tau \vert S\_\tau)}) \\delta_t $$
 
 ACER uses $Q^\text{ret}$ as the target to train the critic by minimizing the L2 error term: $(Q^\text{ret}(s, a) - Q(s, a))^2$.
 
 **Importance weights truncation**
 
-To reduce the high variance of the policy gradient $\\hat{g}$, ACER truncates the importance weights by a constant c, plus a correction term. The label $\\hat{g}\_t^\text{acer}$ is the ACER policy gradient at time t.
+To reduce the high variance of the policy gradient $\hat{g}$, ACER truncates the importance weights by a constant c, plus a correction term. The label $\hat{g}\_t^\text{acer}$ is the ACER policy gradient at time t.
 
-$$ \begin{aligned} \\hat{g}\_t^\text{acer} = & \\omega_t \\big( Q^\text{ret}(S_t, A_t) - V\_{\\theta_v}(S_t) \\big) \\nabla\_\\theta \\ln \\pi\_\\theta(A_t \vert S_t) & \\scriptstyle{\text{; Let }\\omega_t=\frac{\\pi(A_t \vert S_t)}{\\beta(A_t \vert S_t)}} \\ = & \\color{blue}{\min(c, \\omega_t) \\big( Q^\text{ret}(S_t, A_t) - V_w(S_t) \\big) \\nabla\_\\theta \\ln \\pi\_\\theta(A_t \vert S_t)} \\ & + \\color{red}{\mathbb{E}\_{a \\sim \\pi} \\big\[ \max(0, \frac{\\omega_t(a) - c}{\\omega_t(a)}) \\big( Q_w(S_t, a) - V_w(S_t) \\big) \\nabla\_\\theta \\ln \\pi\_\\theta(a \vert S_t) \\big\]} & \\scriptstyle{\text{; Let }\\omega_t (a) =\frac{\\pi(a \vert S_t)}{\\beta(a \vert S_t)}} \end{aligned} $$
+$$ \begin{aligned} \hat{g}\_t^\text{acer} = & \\omega_t \\big( Q^\text{ret}(S_t, A_t) - V\_{\\theta_v}(S_t) \\big) \\nabla\_\\theta \\ln \\pi\_\\theta(A_t \vert S_t) & \\scriptstyle{\text{; Let }\\omega_t=\frac{\\pi(A_t \vert S_t)}{\\beta(A_t \vert S_t)}} \\ = & \\color{blue}{\min(c, \\omega_t) \\big( Q^\text{ret}(S_t, A_t) - V_w(S_t) \\big) \\nabla\_\\theta \\ln \\pi\_\\theta(A_t \vert S_t)} \\ & + \\color{red}{\mathbb{E}\_{a \\sim \\pi} \\big\[ \max(0, \frac{\\omega_t(a) - c}{\\omega_t(a)}) \\big( Q_w(S_t, a) - V_w(S_t) \\big) \\nabla\_\\theta \\ln \\pi\_\\theta(a \vert S_t) \\big\]} & \\scriptstyle{\text{; Let }\\omega_t (a) =\frac{\\pi(a \vert S_t)}{\\beta(a \vert S_t)}} \end{aligned} $$
 
 where $Q\_w(.)$ and $V\_w(.)$ are value functions predicted by the critic with parameter w. The first term (blue) contains the clipped important weight. The clipping helps reduce the variance, in addition to subtracting state value function $V\_w(.)$ as a baseline. The second term (red) makes a correction to achieve unbiased estimation.
 
@@ -612,7 +612,7 @@ where $\\bar{\\psi}$ is the target value function which is the exponential movin
 
 SAC updates the policy to minimize the [KL-divergence](https://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence):
 
-$$ \begin{aligned} \\pi\_\text{new} &= \arg\min\_{\\pi' \in \\Pi} D\_\text{KL} \\Big( \\pi'(.\vert s_t) \\| \frac{\\exp(Q^{\\pi\_\text{old}}(s_t, .))}{Z^{\\pi\_\text{old}}(s_t)} \\Big) \\\[6pt\] &= \arg\min\_{\\pi' \in \\Pi} D\_\text{KL} \\big( \\pi'(.\vert s_t) \\| \\exp(Q^{\\pi\_\text{old}}(s_t, .) - \\log Z^{\\pi\_\text{old}}(s_t)) \\big) \\\[6pt\] \text{objective for update: } J\_\\pi(\\theta) &= \\nabla\_\\theta D\_\text{KL} \\big( \\pi\_\\theta(. \vert s_t) \\| \\exp(Q_w(s_t, .) - \\log Z_w(s_t)) \\big) \\\[6pt\] &= \mathbb{E}\_{a_t\\sim\\pi} \\Big\[ - \\log \\big( \frac{\\exp(Q_w(s_t, a_t) - \\log Z_w(s_t))}{\\pi\_\\theta(a_t \vert s_t)} \\big) \\Big\] \\\[6pt\] &= \mathbb{E}\_{a_t\\sim\\pi} \[ \\log \\pi\_\\theta(a_t \vert s_t) - Q_w(s_t, a_t) + \\log Z_w(s_t) \] \end{aligned} $$
+$$ \begin{aligned} \\pi\_\text{new} &= \arg\min\_{\\pi' \in \\Pi} D\_\text{KL} \\Big( \\pi'(.\vert s_t) \\| \frac{\exp(Q^{\\pi\_\text{old}}(s_t, .))}{Z^{\\pi\_\text{old}}(s_t)} \\Big) \\\[6pt\] &= \arg\min\_{\\pi' \in \\Pi} D\_\text{KL} \\big( \\pi'(.\vert s_t) \\| \exp(Q^{\\pi\_\text{old}}(s_t, .) - \\log Z^{\\pi\_\text{old}}(s_t)) \\big) \\\[6pt\] \text{objective for update: } J\_\\pi(\\theta) &= \\nabla\_\\theta D\_\text{KL} \\big( \\pi\_\\theta(. \vert s_t) \\| \exp(Q_w(s_t, .) - \\log Z_w(s_t)) \\big) \\\[6pt\] &= \mathbb{E}\_{a_t\\sim\\pi} \\Big\[ - \\log \\big( \frac{\exp(Q_w(s_t, a_t) - \\log Z_w(s_t))}{\\pi\_\\theta(a_t \vert s_t)} \\big) \\Big\] \\\[6pt\] &= \mathbb{E}\_{a_t\\sim\\pi} \[ \\log \\pi\_\\theta(a_t \vert s_t) - Q_w(s_t, a_t) + \\log Z_w(s_t) \] \end{aligned} $$
 
 where $\\Pi$ is the set of potential policies that we can model our policy as to keep them tractable; for example, $\\Pi$ can be the family of Gaussian mixture distributions, expensive to model but highly expressive and still tractable. $Z^{\\pi\_\text{old}}(s\_t)$ is the partition function to normalize the distribution. It is usually intractable but does not contribute to the gradient. How to minimize $J\_\\pi(\\theta)$ depends our choice of $\\Pi$.
 
@@ -723,7 +723,7 @@ To reduce the variance, TD3 updates the policy at a lower frequency than the Q-f
 
 (3) **Target Policy Smoothing**: Given a concern with deterministic policies that they can overfit to narrow peaks in the value function, TD3 introduced a smoothing regularization strategy on the value function: adding a small amount of clipped random noises to the selected action and averaging over mini-batches.
 
-$$ \begin{aligned} y &= r + \\gamma Q_w (s', \\mu\_{\\theta}(s') + \\epsilon) & \\ \\epsilon &\\sim \text{clip}(\mathcal{N}(0, \\sigma), -c, +c) & \\scriptstyle{\text{ ; clipped random noises.}} \end{aligned} $$
+$$ \begin{aligned} y &= r + \\gamma Q_w (s', \\mu\_{\\theta}(s') + \\epsilon) & \\ \\epsilon &\\sim \text{clip}(\mathcal{N}(0, \sigma), -c, +c) & \\scriptstyle{\text{ ; clipped random noises.}} \end{aligned} $$
 
 This approach mimics the idea of [SARSA](https://lilianweng.github.io/posts/2018-02-19-rl-overview/#sarsa-on-policy-td-control) update and enforces that similar actions should have similar values.
 
@@ -741,27 +741,27 @@ Stein Variational Policy Gradient (**SVPG**; [Liu et al, 2017](https://arxiv.org
 
 In the setup of maximum entropy policy optimization, $\\theta$ is considered as a random variable $\\theta \\sim q(\\theta)$ and the model is expected to learn this distribution $q(\\theta)$. Assuming we know a prior on how $q$ might look like, $q\_0$, and we would like to guide the learning process to not make $\\theta$ too far away from $q\_0$ by optimizing the following objective function:
 
-$$ \\hat{J}(\\theta) = \mathbb{E}\_{\\theta \\sim q} \[J(\\theta)\] - \\alpha D\_\text{KL}(q\\|q_0) $$
+$$ \hat{J}(\\theta) = \mathbb{E}\_{\\theta \\sim q} \[J(\\theta)\] - \\alpha D\_\text{KL}(q\\|q_0) $$
 
 where $\mathbb{E}\_{\\theta \\sim q} \[R(\\theta)\]$ is the expected reward when $\\theta \\sim q(\\theta)$ and $D\_\text{KL}$ is the KL divergence.
 
 If we don't have any prior information, we might set $q\_0$ as a uniform distribution and set $q\_0(\\theta)$ to a constant. Then the above objective function becomes [SAC](#SAC), where the entropy term encourages exploration:
 
-$$ \begin{aligned} \\hat{J}(\\theta) &= \mathbb{E}\_{\\theta \\sim q} \[J(\\theta)\] - \\alpha D\_\text{KL}(q\\|q_0) \\ &= \mathbb{E}\_{\\theta \\sim q} \[J(\\theta)\] - \\alpha \mathbb{E}\_{\\theta \\sim q} \[\\log q(\\theta) - \\log q_0(\\theta)\] \\ &= \mathbb{E}\_{\\theta \\sim q} \[J(\\theta)\] + \\alpha H(q(\\theta)) \end{aligned} $$
+$$ \begin{aligned} \hat{J}(\\theta) &= \mathbb{E}\_{\\theta \\sim q} \[J(\\theta)\] - \\alpha D\_\text{KL}(q\\|q_0) \\ &= \mathbb{E}\_{\\theta \\sim q} \[J(\\theta)\] - \\alpha \mathbb{E}\_{\\theta \\sim q} \[\\log q(\\theta) - \\log q_0(\\theta)\] \\ &= \mathbb{E}\_{\\theta \\sim q} \[J(\\theta)\] + \\alpha H(q(\\theta)) \end{aligned} $$
 
-Let's take the derivative of $\\hat{J}(\\theta) = \mathbb{E}\_{\\theta \\sim q} \[J(\\theta)\] - \\alpha D\_\text{KL}(q|q\_0)$ w.r.t. $q$:
+Let's take the derivative of $\hat{J}(\\theta) = \mathbb{E}\_{\\theta \\sim q} \[J(\\theta)\] - \\alpha D\_\text{KL}(q|q\_0)$ w.r.t. $q$:
 
-$$ \begin{aligned} \\nabla_q \\hat{J}(\\theta) &= \\nabla_q \\big( \mathbb{E}\_{\\theta \\sim q} \[J(\\theta)\] - \\alpha D\_\text{KL}(q\\|q_0) \\big) \\ &= \\nabla_q \int\_\\theta \\big( q(\\theta) J(\\theta) - \\alpha q(\\theta)\\log q(\\theta) + \\alpha q(\\theta) \\log q_0(\\theta) \\big) \\ &= \int\_\\theta \\big( J(\\theta) - \\alpha \\log q(\\theta) -\\alpha + \\alpha \\log q_0(\\theta) \\big) \\ &= 0 \end{aligned} $$
+$$ \begin{aligned} \\nabla_q \hat{J}(\\theta) &= \\nabla_q \\big( \mathbb{E}\_{\\theta \\sim q} \[J(\\theta)\] - \\alpha D\_\text{KL}(q\\|q_0) \\big) \\ &= \\nabla_q \int\_\\theta \\big( q(\\theta) J(\\theta) - \\alpha q(\\theta)\\log q(\\theta) + \\alpha q(\\theta) \\log q_0(\\theta) \\big) \\ &= \int\_\\theta \\big( J(\\theta) - \\alpha \\log q(\\theta) -\\alpha + \\alpha \\log q_0(\\theta) \\big) \\ &= 0 \end{aligned} $$
 
 The optimal distribution is:
 
-$$ \\log q^{\*}(\\theta) = \frac{1}{\\alpha} J(\\theta) + \\log q_0(\\theta) - 1 \text{ thus } \\underbrace{ q^{\*}(\\theta) }\_\textrm{"posterior"} \\propto \\underbrace{\\exp ( J(\\theta) / \\alpha )}\_\textrm{"likelihood"} \\underbrace{q_0(\\theta)}\_\textrm{prior} $$
+$$ \\log q^{\*}(\\theta) = \frac{1}{\\alpha} J(\\theta) + \\log q_0(\\theta) - 1 \text{ thus } \\underbrace{ q^{\*}(\\theta) }\_\textrm{"posterior"} \\propto \\underbrace{\exp ( J(\\theta) / \\alpha )}\_\textrm{"likelihood"} \\underbrace{q_0(\\theta)}\_\textrm{prior} $$
 
 The temperature $\\alpha$ decides a tradeoff between exploitation and exploration. When $\\alpha \\rightarrow 0$, $\\theta$ is updated only according to the expected return $J(\\theta)$. When $\\alpha \\rightarrow \infty$, $\\theta$ always follows the prior belief.
 
 When using the SVGD method to estimate the target posterior distribution $q(\\theta)$, it relies on a set of particle $\{\\theta\_i\}\_{i=1}^n$ (independently trained policy agents) and each is updated:
 
-$$ \\theta_i \\gets \\theta_i + \\epsilon \\phi^{\*}(\\theta_i) \text{ where } \\phi^{\*} = \max\_{\\phi \in \mathcal{H}} \{ - \\nabla\_\\epsilon D\_\text{KL} (q'\_{\[\\theta + \\epsilon \\phi(\\theta)\]} \\| q) \text{ s.t. } \\|\\phi\\|\_{\mathcal{H}} \\leq 1\} $$
+$$ \\theta_i \\gets \\theta_i + \\epsilon \\phi^{\*}(\\theta_i) \text{ where } \\phi^{\*} = \max\_{\\phi \in \mathcal{H}} \{ - \\nabla\_\\epsilon D\_\text{KL} (q'\_{\[\\theta + \\epsilon \\phi(\\theta)\]} \\| q) \text{ s.t. } \\|\\phi\\|\_{\mathcal{H}} \leq 1\} $$
 
 where $\\epsilon$ is a learning rate and $\\phi^{\*}$ is the unit ball of a [RKHS](http://mlss.tuebingen.mpg.de/2015/slides/gretton/part_1.pdf) (reproducing kernel Hilbert space) $\mathcal{H}$ of $\\theta$-shaped value vectors that maximally decreases the KL divergence between the particles and the target distribution. $q'(.)$ is the distribution of $\\theta + \\epsilon \\phi(\\theta)$.
 

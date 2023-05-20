@@ -242,28 +242,28 @@ Let $s\_i$ be the desired style ($i=0$ for offensive and $i=1$ for non-offensive
 
 Following the illustration in Fig. 9:
 
-- The top branch of forward transfer is auto encoder: ​$E(\mathbf{x}^i\_k, s\_i) \to H^i\_k \to G(H^i\_k, s\_i) \to \\hat{\mathbf{x}}^{i\to i}\_k$. Two losses are computed:
+- The top branch of forward transfer is auto encoder: ​$E(\mathbf{x}^i\_k, s\_i) \to H^i\_k \to G(H^i\_k, s\_i) \to \hat{\mathbf{x}}^{i\to i}\_k$. Two losses are computed:
   - Reconstruction loss measures how well the decoder can reconstruct the sample back:
 
 $$ \mathcal{L}\_\text{self} = \mathbb{E}\_{\mathbf{x}^i_k \\sim \mathcal{X}} \[-\\log p_G(\mathbf{x}\_k^i \mid E(\mathbf{x}^i_k, s_i), s_i)\] $$
 
-- The bottom branch of forward transfer: $E(\mathbf{x}^i\_k, s\_i) \to H^i\_k \to G(H^i\_k, s\_j) \to \\hat{\mathbf{x}}^{i\to j}\_k$
+- The bottom branch of forward transfer: $E(\mathbf{x}^i\_k, s\_i) \to H^i\_k \to G(H^i\_k, s\_j) \to \hat{\mathbf{x}}^{i\to j}\_k$
   - Classification loss measures the effectiveness of style transfer:
 
-$$ \mathcal{L}\_\text{style_fwd} = \mathbb{E}\_{\\hat{\mathbf{x}}^{i\to j}\_k \\sim \\hat{\mathcal{X}}} \[-\\log p_C(s_j \mid \\hat{\mathbf{x}}^{i\to j}\_k)\] $$
+$$ \mathcal{L}\_\text{style_fwd} = \mathbb{E}\_{\hat{\mathbf{x}}^{i\to j}\_k \\sim \hat{\mathcal{X}}} \[-\\log p_C(s_j \mid \hat{\mathbf{x}}^{i\to j}\_k)\] $$
 
-- The back transfer uses cycle consistency loss: $E(\\hat{\mathbf{x}}^{i\to j}\_k, s\_j) \to H^{i\to j}\_k \to G(H^{i\to j}\_k, s\_i) \to \\hat{\mathbf{x}}^{i\to j \to i}\_k$
+- The back transfer uses cycle consistency loss: $E(\hat{\mathbf{x}}^{i\to j}\_k, s\_j) \to H^{i\to j}\_k \to G(H^{i\to j}\_k, s\_i) \to \hat{\mathbf{x}}^{i\to j \to i}\_k$
   - The cycle consistency loss controls how well the transferred sample can be converted back to the original form to encourage content preservation:
 
-$$ \mathcal{L}\_\text{cycle} = \mathbb{E}\_{\mathbf{x}^i_k \\sim \mathcal{X}} \[-\\log p_G(\mathbf{x}\_k^i \mid E(\\hat{\mathbf{x}}^{i \to j}\_k, s_j), s_i)\] $$
+$$ \mathcal{L}\_\text{cycle} = \mathbb{E}\_{\mathbf{x}^i_k \\sim \mathcal{X}} \[-\\log p_G(\mathbf{x}\_k^i \mid E(\hat{\mathbf{x}}^{i \to j}\_k, s_j), s_i)\] $$
 
     - The classification loss ensures that the back-transferred sample has the correct label:
 
-$$ \mathcal{L}\_\text{style_back} = \mathbb{E}\_{\\hat{\mathbf{x}}^{i\to j}\_k \\sim \\hat{\mathcal{X}}} \[-\\log p_C(s_i \mid G(E(\\hat{\mathbf{x}}^{i\to j}\_k, s_j), s_i))\] $$
+$$ \mathcal{L}\_\text{style_back} = \mathbb{E}\_{\hat{\mathbf{x}}^{i\to j}\_k \\sim \hat{\mathcal{X}}} \[-\\log p_C(s_i \mid G(E(\hat{\mathbf{x}}^{i\to j}\_k, s_j), s_i))\] $$
 
 - There is an additional supervised classification loss for training an accurate classifier:
 
-$$ \mathcal{L}\_\text{class} = \mathbb{E}\_{\\hat{\mathbf{x}}^{i\to j}\_k \\sim \\hat{\mathcal{X}}} \[-\\log p_C(s_i \mid \\hat{\mathbf{x}}^i_k)\] $$
+$$ \mathcal{L}\_\text{class} = \mathbb{E}\_{\hat{\mathbf{x}}^{i\to j}\_k \\sim \hat{\mathcal{X}}} \[-\\log p_C(s_i \mid \hat{\mathbf{x}}^i_k)\] $$
 
 The final training objective is as follows and the encoder, decoder and classifier are jointly trained:
 
@@ -277,18 +277,18 @@ Fig. 10. The comparison of style transformer and previous models that depend on 
 
 Without access to the parallel corpus, the style transformer adopts a discriminator to create supervision from non-parallel dataset.
 
-Let $s$ and $\\hat{s}$ be two mutually exclusive style variables and $\mathbf{x}$ is a sample of style $s$, style transformer computes several losses:
+Let $s$ and $\hat{s}$ be two mutually exclusive style variables and $\mathbf{x}$ is a sample of style $s$, style transformer computes several losses:
 
 - Self reconstruction loss: $\mathcal{L}\_\text{self} = - p\_\\theta (\mathbf{x} \vert \mathbf{x}, s)$
-- Cycle-consistency loss: $\mathcal{L}\_\text{cycle} = - p\_\\theta (\mathbf{x} \vert f\_\\theta(\mathbf{x}, \\hat{s}), s)$
+- Cycle-consistency loss: $\mathcal{L}\_\text{cycle} = - p\_\\theta (\mathbf{x} \vert f\_\\theta(\mathbf{x}, \hat{s}), s)$
 - Style controlling loss: This is necessary because otherwise the model would simply learn to copy the input over.
 
-$$ \mathcal{L}\_\text{style} = - p\_\\phi(\text{class} = 1 \vert f\_\\theta(\mathbf{x}, \\hat{s}), \\hat{s}) $$
+$$ \mathcal{L}\_\text{style} = - p\_\\phi(\text{class} = 1 \vert f\_\\theta(\mathbf{x}, \hat{s}), \hat{s}) $$
 
 , where the discriminator is a simple binary classifier trained to optimize the negative log-likelihood of the correct style. The discriminator is trained by labelling
 
-- $\{(\mathbf{x}, s), (f\_\\theta(\mathbf{x}, s), s), (f\_\\theta(\mathbf{x}, \\hat{s}), \\hat{s})\}$ as positive class 1
-- $\{(\mathbf{x}, \\hat{s}), (f\_\\theta(\mathbf{x}, s), \\hat{s}), (f\_\\theta(\mathbf{x}, \\hat{s}), s)\}$ as negative class 0.
+- $\{(\mathbf{x}, s), (f\_\\theta(\mathbf{x}, s), s), (f\_\\theta(\mathbf{x}, \hat{s}), \hat{s})\}$ as positive class 1
+- $\{(\mathbf{x}, \hat{s}), (f\_\\theta(\mathbf{x}, s), \hat{s}), (f\_\\theta(\mathbf{x}, \hat{s}), s)\}$ as negative class 0.
 
 ![](style-transformer-training.png)
 
@@ -306,7 +306,7 @@ $$ \mathcal{L} = \\lambda\_\text{DAE} \mathcal{L}\_\text{DAE} + \\lambda\_\text{
 
 $$ \mathcal{L}\_\text{DAE} = \mathbb{E}\_{\mathbf{x} \\sim \mathcal{X}} \[−\\log p\_\\theta(\mathbf{x} \mid \\eta(\mathbf{x}), s)\] $$
 
-- The cycle consistency loss ([Zhu et al. 2017](https://arxiv.org/abs/1703.10593)) has $\\tilde{\\theta}$ to produce a non-differentiable pseudo-prediction $\\hat{\mathbf{y}}$ and it does not take gradient backpropagation.
+- The cycle consistency loss ([Zhu et al. 2017](https://arxiv.org/abs/1703.10593)) has $\\tilde{\\theta}$ to produce a non-differentiable pseudo-prediction $\hat{\mathbf{y}}$ and it does not take gradient backpropagation.
 
 $$ \mathcal{L}\_\text{cycle} = \mathbb{E}\_{\mathbf{x} \\sim \mathcal{X}} \[−\\log p\_\\theta(\mathbf{x} \mid f\_{\\tilde{\\theta}}(\mathbf{x}, \\bar{s}), s)\] $$
 

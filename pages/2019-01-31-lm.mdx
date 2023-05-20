@@ -93,7 +93,7 @@ Fig. 1. The NMT base model used in CoVe.
 - The biLSTM encoder outputs a sequence of hidden states: $h = \[h\_1, \dots, h\_n\] = \text{biLSTM}(\text{GloVe}(x))$ and $h\_t = \[\\overrightarrow{h}\_t; \\overleftarrow{h}\_t\]$ where the forward LSTM computes $\\overrightarrow{h}\_t = \text{LSTM}(x\_t, \\overrightarrow{h}\_{t-1})$ and the backward computation gives us $\\overleftarrow{h}\_t = \text{LSTM}(x\_t, \\overleftarrow{h}\_{t-1})$.
 - The attentional decoder outputs a distribution over words: $p(y\_t \mid H, y\_1, \dots, y\_{t-1})$ where $H$ is a stack of hidden states $\{h\}$ along the time dimension:
 
-$$ \begin{aligned} \text{decoder hidden state: } s_t &= \text{LSTM}(\[z\_{t-1}; \\tilde{h}\_{t-1}\], s\_{t-1}) \\ \text{attention weights: } \\alpha_t &= \text{softmax}(H(W_1 s_t + b_1)) \\ \text{context-adjusted hidden state: } \\tilde{h}\_t &= \\tanh(W_2\[H^\top\\alpha_t;s_t\] + b_2) \\ \text{decoder output: } p(y_t\mid H, y_1, \dots, y\_{t-1}) &= \text{softmax}(W\_\text{out} \\tilde{h}\_t + b\_\text{out}) \end{aligned} $$
+$$ \begin{aligned} \text{decoder hidden state: } s_t &= \text{LSTM}(\[z\_{t-1}; \\tilde{h}\_{t-1}\], s\_{t-1}) \\ \text{attention weights: } \\alpha_t &= \text{softmax}(H(W_1 s_t + b_1)) \\ \text{context-adjusted hidden state: } \\tilde{h}\_t &= \tanh(W_2\[H^\top\\alpha_t;s_t\] + b_2) \\ \text{decoder output: } p(y_t\mid H, y_1, \dots, y\_{t-1}) &= \text{softmax}(W\_\text{out} \\tilde{h}\_t + b\_\text{out}) \end{aligned} $$
 
 ## Use CoVe in Downstream Tasks[#](#use-cove-in-downstream-tasks)
 
@@ -460,7 +460,7 @@ The _Autoregressive (AR)_ model such as GPT and _autoencoder (AE)_ model such as
 
 **XLNet** ([Yang et al. 2019](https://arxiv.org/abs/1906.08237)) generalizes the AE method to incorporate the benefits of AR. XLNet proposed the **permutation language modeling** objective. For a text sequence, it samples a factorization order $\mathbf{z}$ and decomposes the likelihood $p\_\\theta(\mathbf{x})$ according to this factorization order,
 
-$$ \begin{aligned} \mathcal{L}\_\text{XLNet} &= - \mathbb{E}\_{\mathbf{z} \\sim \mathcal{Z}\_T} \\Big\[ \sum\_{t=1}^T \\log p\_\\theta (X\_{z_t} = x \mid \mathbf{x}\_{\mathbf{z}\_{<{t}}})\\Big\] \\ &= - \mathbb{E}\_{\mathbf{z} \\sim \mathcal{Z}\_T} \\Big\[ \\log \frac{ \\exp(e(x)^\top \\color{red}{h\_\\theta (\mathbf{x}\_{\mathbf{z}\_{<{t}}})}) }{ \sum\_{x'} \\exp(e(x')^\top \\color{red}{h\_\\theta (\mathbf{x}\_{\mathbf{z}\_{<{t}}})}) } \\Big\] \\ &= - \mathbb{E}\_{\mathbf{z} \\sim \mathcal{Z}\_T} \\Big\[ \\log \frac{ \\exp(e(x)^\top \\color{blue}{g\_\\theta (\mathbf{x}\_{\mathbf{z}\_{<{t}}}, z_t)}) }{ \sum\_{x'} \\exp(e(x')^\top \\color{blue}{g\_\\theta (\mathbf{x}\_{\mathbf{z}\_{<{t}}}, z_t)}) } \\Big\] \end{aligned} $$
+$$ \begin{aligned} \mathcal{L}\_\text{XLNet} &= - \mathbb{E}\_{\mathbf{z} \\sim \mathcal{Z}\_T} \\Big\[ \sum\_{t=1}^T \\log p\_\\theta (X\_{z_t} = x \mid \mathbf{x}\_{\mathbf{z}\_{<{t}}})\\Big\] \\ &= - \mathbb{E}\_{\mathbf{z} \\sim \mathcal{Z}\_T} \\Big\[ \\log \frac{ \exp(e(x)^\top \\color{red}{h\_\\theta (\mathbf{x}\_{\mathbf{z}\_{<{t}}})}) }{ \sum\_{x'} \exp(e(x')^\top \\color{red}{h\_\\theta (\mathbf{x}\_{\mathbf{z}\_{<{t}}})}) } \\Big\] \\ &= - \mathbb{E}\_{\mathbf{z} \\sim \mathcal{Z}\_T} \\Big\[ \\log \frac{ \exp(e(x)^\top \\color{blue}{g\_\\theta (\mathbf{x}\_{\mathbf{z}\_{<{t}}}, z_t)}) }{ \sum\_{x'} \exp(e(x')^\top \\color{blue}{g\_\\theta (\mathbf{x}\_{\mathbf{z}\_{<{t}}}, z_t)}) } \\Big\] \end{aligned} $$
 
 where $\mathcal{Z}\_T$ is a set of all possible permutation of length $T$; $z\_t$ and $\mathbf{z}\_{<t}$ denote the $t$-th element and the first $t-1$ elements of a permutation $\mathbf{z} \in \mathcal{Z}\_T$.
 
@@ -469,7 +469,7 @@ Note that the naive representation of the hidden state of the context, $h\_\\the
 However, two different requirements on $g\_\\theta (\mathbf{x}\_{\mathbf{z}\_{<t}}, z\_t)$ lead to a two-stream self-attention design to accommodate:
 
 1.  When predicting $x\_{z\_t}$, it should only encode the position $z\_t$ but not the content $x\_{z\_t}$; otherwise it is trivial. This is wrapped into the “query representation” $g\_{z\_t} = g\_\\theta (\mathbf{x}\_{\mathbf{z}\_{<t}}, z\_t)$ does not encode $x\_{z\_t}$.
-2.  When predicting $x\_j$ where $j > t$, it should encode the content $x\_{z\_t}$ as well to provide the full context. This is the “content representation” $h\_{z\_t} = h\_\\theta(\mathbf{x}\_{\\leq t})$.
+2.  When predicting $x\_j$ where $j > t$, it should encode the content $x\_{z\_t}$ as well to provide the full context. This is the “content representation” $h\_{z\_t} = h\_\\theta(\mathbf{x}\_{\leq t})$.
 
 ![](XLNet-two-stream-attention.png)
 
@@ -477,7 +477,7 @@ Fig. 16. The illustration of two-stream self-attention mechanism in XLNet. (Imag
 
 Conceptually, the two streams of representations are updated as follows,
 
-$$ \begin{aligned} g\_{z_t}^{(m)} &\\gets \text{Attention}(Q = g^{(m-1)}\_{z_t}, KV=\mathbf{h}^{(m-1)}\_{\\color{red}{\mathbf{z}\_{<{t}}}}; \\theta) &\text{(query stream: use }z_t\text{ but cannot see }x\_{z_t}\text{)}\\ h\_{z_t}^{(m)} &\\gets \text{Attention}(Q = h^{(m-1)}\_{z_t}, KV=\mathbf{h}^{(m-1)}\_{\\color{blue}{\mathbf{z}\_{\\leq t}}}; \\theta) &\text{(content stream: use both }x\_{z_t}\text{ and }x\_{z_t}\text{)}\\ \end{aligned} $$
+$$ \begin{aligned} g\_{z_t}^{(m)} &\\gets \text{Attention}(Q = g^{(m-1)}\_{z_t}, KV=\mathbf{h}^{(m-1)}\_{\\color{red}{\mathbf{z}\_{<{t}}}}; \\theta) &\text{(query stream: use }z_t\text{ but cannot see }x\_{z_t}\text{)}\\ h\_{z_t}^{(m)} &\\gets \text{Attention}(Q = h^{(m-1)}\_{z_t}, KV=\mathbf{h}^{(m-1)}\_{\\color{blue}{\mathbf{z}\_{\leq t}}}; \\theta) &\text{(content stream: use both }x\_{z_t}\text{ and }x\_{z_t}\text{)}\\ \end{aligned} $$
 
 Given the difficulty of optimization in permutation language modeling, XLNet is set to only predict the last chunk of tokens in a factorization order.
 

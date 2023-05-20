@@ -302,7 +302,7 @@ The WGAN paper exemplified the idea with a simple example.
 
 Suppose we have two probability distributions, $P$ and $Q$:
 
-$$ \\forall (x, y) \in P, x = 0 \text{ and } y \\sim U(0, 1)\\ \\forall (x, y) \in Q, x = \\theta, 0 \\leq \\theta \\leq 1 \text{ and } y \\sim U(0, 1)\\ $$
+$$ \\forall (x, y) \in P, x = 0 \text{ and } y \\sim U(0, 1)\\ \\forall (x, y) \in Q, x = \\theta, 0 \leq \\theta \leq 1 \text{ and } y \\sim U(0, 1)\\ $$
 
 ![](wasserstein_simple_example.png)
 
@@ -322,17 +322,17 @@ $D\_{KL}$ gives us inifity when two distributions are disjoint. The value of $D\
 
 It is intractable to exhaust all the possible joint distributions in $\\Pi(p\_r, p\_g)$ to compute $\inf\_{\\gamma \\sim \\Pi(p\_r, p\_g)}$. Thus the authors proposed a smart transformation of the formula based on the Kantorovich-Rubinstein duality to:
 
-$$ W(p_r, p_g) = \frac{1}{K} \\sup\_{\\| f \\|\_L \\leq K} \mathbb{E}\_{x \\sim p_r}\[f(x)\] - \mathbb{E}\_{x \\sim p_g}\[f(x)\] $$
+$$ W(p_r, p_g) = \frac{1}{K} \\sup\_{\\| f \\|\_L \leq K} \mathbb{E}\_{x \\sim p_r}\[f(x)\] - \mathbb{E}\_{x \\sim p_g}\[f(x)\] $$
 
 where $\\sup$ ([supremum](https://en.wikipedia.org/wiki/Infimum_and_supremum)) is the opposite of $inf$ (infimum); we want to measure the least upper bound or, in even simpler words, the maximum value.
 
 **Lipschitz continuity?**
 
-The function $f$ in the new form of Wasserstein metric is demanded to satisfy $| f |\_L \\leq K$, meaning it should be [K-Lipschitz continuous](https://en.wikipedia.org/wiki/Lipschitz_continuity).
+The function $f$ in the new form of Wasserstein metric is demanded to satisfy $| f |\_L \leq K$, meaning it should be [K-Lipschitz continuous](https://en.wikipedia.org/wiki/Lipschitz_continuity).
 
 A real-valued function $f: \mathbb{R} \\rightarrow \mathbb{R}$ is called $K$-Lipschitz continuous if there exists a real constant $K \\geq 0$ such that, for all $x\_1, x\_2 \in \mathbb{R}$,
 
-$$ \\lvert f(x_1) - f(x_2) \\rvert \\leq K \\lvert x_1 - x_2 \\rvert $$
+$$ \\lvert f(x_1) - f(x_2) \\rvert \leq K \\lvert x_1 - x_2 \\rvert $$
 
 Here $K$ is known as a Lipschitz constant for function $f(.)$. Functions that are everywhere continuously differentiable is Lipschitz continuous, because the derivative, estimated as $\frac{\\lvert f(x\_1) - f(x\_2) \\rvert}{\\lvert x\_1 - x\_2 \\rvert}$, has bounds. However, a Lipschitz continuous function may not be everywhere differentiable, such as $f(x) = \\lvert x \\rvert$.
 

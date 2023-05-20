@@ -110,7 +110,7 @@ where $\mathcal{P}$ contains the set of positive pairs and $\mathcal{N}$ is the 
 
 The red part in $\mathcal{L}\_\text{struct}^{(ij)}$ is used for mining hard negatives. However, it is not smooth and may cause the convergence to a bad local optimum in practice. Thus, it is relaxed to be:
 
-$$ \mathcal{L}\_\text{struct}^{(ij)} = D\_{ij} + \\log \\Big( \sum\_{(i,k)\in\mathcal{N}} \\exp(\\epsilon - D\_{ik}) + \sum\_{(j,l)\in\mathcal{N}} \\exp(\\epsilon - D\_{jl}) \\Big) $$
+$$ \mathcal{L}\_\text{struct}^{(ij)} = D\_{ij} + \\log \\Big( \sum\_{(i,k)\in\mathcal{N}} \exp(\\epsilon - D\_{ik}) + \sum\_{(j,l)\in\mathcal{N}} \exp(\\epsilon - D\_{jl}) \\Big) $$
 
 In the paper, they also proposed to enhance the quality of negative samples in each batch by actively incorporating difficult negative samples given a few random positive pairs.
 
@@ -120,7 +120,7 @@ In the paper, they also proposed to enhance the quality of negative samples in e
 
 Given a $(N + 1)$-tuplet of training samples, $\{ \mathbf{x}, \mathbf{x}^+, \mathbf{x}^-\_1, \dots, \mathbf{x}^-\_{N-1} \}$, including one positive and $N-1$ negative ones, N-pair loss is defined as:
 
-$$ \begin{aligned} \mathcal{L}\_\text{N-pair}(\mathbf{x}, \mathbf{x}^+, \{\mathbf{x}^-\_i\}^{N-1}\_{i=1}) &= \\log\\big(1 + \sum\_{i=1}^{N-1} \\exp(f(\mathbf{x})^\top f(\mathbf{x}^-\_i) - f(\mathbf{x})^\top f(\mathbf{x}^+))\\big) \\ &= -\\log\frac{\\exp(f(\mathbf{x})^\top f(\mathbf{x}^+))}{\\exp(f(\mathbf{x})^\top f(\mathbf{x}^+)) + \sum\_{i=1}^{N-1} \\exp(f(\mathbf{x})^\top f(\mathbf{x}^-\_i))} \end{aligned} $$
+$$ \begin{aligned} \mathcal{L}\_\text{N-pair}(\mathbf{x}, \mathbf{x}^+, \{\mathbf{x}^-\_i\}^{N-1}\_{i=1}) &= \\log\\big(1 + \sum\_{i=1}^{N-1} \exp(f(\mathbf{x})^\top f(\mathbf{x}^-\_i) - f(\mathbf{x})^\top f(\mathbf{x}^+))\\big) \\ &= -\\log\frac{\exp(f(\mathbf{x})^\top f(\mathbf{x}^+))}{\exp(f(\mathbf{x})^\top f(\mathbf{x}^+)) + \sum\_{i=1}^{N-1} \exp(f(\mathbf{x})^\top f(\mathbf{x}^-\_i))} \end{aligned} $$
 
 If we only sample one negative sample per class, it is equivalent to the softmax loss for multi-class classification.
 
@@ -132,9 +132,9 @@ Let $\mathbf{x}$ be the target sample $\\sim P(\mathbf{x} \vert C=1; \\theta) = 
 
 $$ \ell\_\\theta(\mathbf{u}) = \\log \frac{p\_\\theta(\mathbf{u})}{q(\mathbf{u})} = \\log p\_\\theta(\mathbf{u}) - \\log q(\mathbf{u}) $$
 
-After converting logits into probabilities with sigmoid $\\sigma(.)$, we can apply cross entropy loss:
+After converting logits into probabilities with sigmoid $\sigma(.)$, we can apply cross entropy loss:
 
-$$ \begin{aligned} \mathcal{L}\_\text{NCE} &= - \frac{1}{N} \sum\_{i=1}^N \\big\[ \\log \\sigma (\ell\_\\theta(\mathbf{x}\_i)) + \\log (1 - \\sigma (\ell\_\\theta(\\tilde{\mathbf{x}}\_i))) \\big\] \\ \text{ where }\\sigma(\ell) &= \frac{1}{1 + \\exp(-\ell)} = \frac{p\_\\theta}{p\_\\theta + q} \end{aligned} $$
+$$ \begin{aligned} \mathcal{L}\_\text{NCE} &= - \frac{1}{N} \sum\_{i=1}^N \\big\[ \\log \sigma (\ell\_\\theta(\mathbf{x}\_i)) + \\log (1 - \sigma (\ell\_\\theta(\\tilde{\mathbf{x}}\_i))) \\big\] \\ \text{ where }\sigma(\ell) &= \frac{1}{1 + \exp(-\ell)} = \frac{p\_\\theta}{p\_\\theta + q} \end{aligned} $$
 
 Here I listed the original form of NCE loss which works with only one positive and one noise sample. In many follow-up works, contrastive loss incorporating multiple negative samples is also broadly referred to as NCE.
 
@@ -160,7 +160,7 @@ where the logarithmic term in blue is estimated by $f$.
 
 For sequence prediction tasks, rather than modeling the future observations $p\_k(\mathbf{x}\_{t+k} \vert \mathbf{c}\_t)$ directly (which could be fairly expensive), CPC models a density function to preserve the mutual information between $\mathbf{x}\_{t+k}$ and $\mathbf{c}\_t$:
 
-$$ f_k(\mathbf{x}\_{t+k}, \mathbf{c}\_t) = \\exp(\mathbf{z}\_{t+k}^\top \mathbf{W}\_k \mathbf{c}\_t) \\propto \frac{p(\mathbf{x}\_{t+k}\vert\mathbf{c}\_t)}{p(\mathbf{x}\_{t+k})} $$
+$$ f_k(\mathbf{x}\_{t+k}, \mathbf{c}\_t) = \exp(\mathbf{z}\_{t+k}^\top \mathbf{W}\_k \mathbf{c}\_t) \\propto \frac{p(\mathbf{x}\_{t+k}\vert\mathbf{c}\_t)}{p(\mathbf{x}\_{t+k})} $$
 
 where $\mathbf{z}\_{t+k}$ is the encoded input and $\mathbf{W}\_k$ is a trainable weight matrix.
 
@@ -168,11 +168,11 @@ where $\mathbf{z}\_{t+k}$ is the encoded input and $\mathbf{W}\_k$ is a trainabl
 
 **Soft-Nearest Neighbors Loss** ([Salakhutdinov & Hinton 2007](http://proceedings.mlr.press/v2/salakhutdinov07a.html), [Frosst et al. 2019](https://arxiv.org/abs/1902.01889)) extends it to include multiple positive samples.
 
-Given a batch of samples, $\{\mathbf{x}\_i, y\_i)\}^B\_{i=1}$ where $y\_i$ is the class label of $\mathbf{x}\_i$ and a function $f(.,.)$ for measuring similarity between two inputs, the soft nearest neighbor loss at temperature $\\tau$ is defined as:
+Given a batch of samples, $\{\mathbf{x}\_i, y\_i)\}^B\_{i=1}$ where $y\_i$ is the class label of $\mathbf{x}\_i$ and a function $f(.,.)$ for measuring similarity between two inputs, the soft nearest neighbor loss at temperature $\tau$ is defined as:
 
-$$ \mathcal{L}\_\text{snn} = -\frac{1}{B}\sum\_{i=1}^B \\log \frac{\sum\_{i\\neq j, y_i = y_j, j=1,\dots,B} \\exp(- f(\mathbf{x}\_i, \mathbf{x}\_j) / \\tau)}{\sum\_{i\\neq k, k=1,\dots,B} \\exp(- f(\mathbf{x}\_i, \mathbf{x}\_k) /\\tau)} $$
+$$ \mathcal{L}\_\text{snn} = -\frac{1}{B}\sum\_{i=1}^B \\log \frac{\sum\_{i\\neq j, y_i = y_j, j=1,\dots,B} \exp(- f(\mathbf{x}\_i, \mathbf{x}\_j) / \tau)}{\sum\_{i\\neq k, k=1,\dots,B} \exp(- f(\mathbf{x}\_i, \mathbf{x}\_k) /\tau)} $$
 
-The temperature $\\tau$ is used for tuning how concentrated the features are in the representation space. For example, when at low temperature, the loss is dominated by the small distances and widely separated representations cannot contribute much and become irrelevant.
+The temperature $\tau$ is used for tuning how concentrated the features are in the representation space. For example, when at low temperature, the loss is dominated by the small distances and widely separated representations cannot contribute much and become irrelevant.
 
 ## Common Setup[#](#common-setup)
 
@@ -185,7 +185,7 @@ Most recent studies follow the following definition of contrastive learning obje
 
 To learn an encoder $f(\mathbf{x})$ to learn a _L2-normalized feature vector_, the contrastive learning objective is:
 
-$$ \begin{aligned} \mathcal{L}\_\text{contrastive} &= \mathbb{E}\_{(\mathbf{x},\mathbf{x}^+)\\sim p\_\texttt{pos}, \{\mathbf{x}^-\_i\}^M\_{i=1} \\overset{\text{i.i.d}}{\\sim} p\_\texttt{data} } \\Big\[ -\\log\frac{\\exp(f(\mathbf{x})^\top f(\mathbf{x}^+) / \\tau)}{ \\exp(f(\mathbf{x})^\top f(\mathbf{x}^+) / \\tau) + \sum\_{i=1}^M \\exp(f(\mathbf{x})^\top f(\mathbf{x}\_i^-) / \\tau)} \\Big\] & \\ &\\approx \mathbb{E}\_{(\mathbf{x},\mathbf{x}^+)\\sim p\_\texttt{pos}, \{\mathbf{x}^-\_i\}^M\_{i=1} \\overset{\text{i.i.d}}{\\sim} p\_\texttt{data} }\\Big\[ - f(\mathbf{x})^\top f(\mathbf{x}^+) / \\tau + \\log\\big(\sum\_{i=1}^M \\exp(f(\mathbf{x})^\top f(\mathbf{x}\_i^-) / \\tau)\\big) \\Big\] & \\scriptstyle{\text{; Assuming infinite negatives}} \\ &= -\frac{1}{\\tau}\mathbb{E}\_{(\mathbf{x},\mathbf{x}^+)\\sim p\_\texttt{pos}}f(\mathbf{x})^\top f(\mathbf{x}^+) + \mathbb{E}\_{ \mathbf{x} \\sim p\_\texttt{data}} \\Big\[ \\log \mathbb{E}\_{\mathbf{x}^- \\sim p\_\texttt{data}} \\big\[ \sum\_{i=1}^M \\exp(f(\mathbf{x})^\top f(\mathbf{x}\_i^-) / \\tau)\\big\] \\Big\] & \end{aligned} $$
+$$ \begin{aligned} \mathcal{L}\_\text{contrastive} &= \mathbb{E}\_{(\mathbf{x},\mathbf{x}^+)\\sim p\_\texttt{pos}, \{\mathbf{x}^-\_i\}^M\_{i=1} \\overset{\text{i.i.d}}{\\sim} p\_\texttt{data} } \\Big\[ -\\log\frac{\exp(f(\mathbf{x})^\top f(\mathbf{x}^+) / \tau)}{ \exp(f(\mathbf{x})^\top f(\mathbf{x}^+) / \tau) + \sum\_{i=1}^M \exp(f(\mathbf{x})^\top f(\mathbf{x}\_i^-) / \tau)} \\Big\] & \\ &\\approx \mathbb{E}\_{(\mathbf{x},\mathbf{x}^+)\\sim p\_\texttt{pos}, \{\mathbf{x}^-\_i\}^M\_{i=1} \\overset{\text{i.i.d}}{\\sim} p\_\texttt{data} }\\Big\[ - f(\mathbf{x})^\top f(\mathbf{x}^+) / \tau + \\log\\big(\sum\_{i=1}^M \exp(f(\mathbf{x})^\top f(\mathbf{x}\_i^-) / \tau)\\big) \\Big\] & \\scriptstyle{\text{; Assuming infinite negatives}} \\ &= -\frac{1}{\tau}\mathbb{E}\_{(\mathbf{x},\mathbf{x}^+)\\sim p\_\texttt{pos}}f(\mathbf{x})^\top f(\mathbf{x}^+) + \mathbb{E}\_{ \mathbf{x} \\sim p\_\texttt{data}} \\Big\[ \\log \mathbb{E}\_{\mathbf{x}^- \\sim p\_\texttt{data}} \\big\[ \sum\_{i=1}^M \exp(f(\mathbf{x})^\top f(\mathbf{x}\_i^-) / \tau)\\big\] \\Big\] & \end{aligned} $$
 
 # Key Ingredients[#](#key-ingredients)
 
@@ -218,15 +218,15 @@ When we are sampling $\mathbf{x}^-$ , we cannot access the true $p^-\_x(\mathbf{
 
 $$ p(\mathbf{x}') = \\eta^+ p^+\_x(\mathbf{x}') + \\eta^- p_x^-(\mathbf{x}') $$
 
-Thus we can use $p^-\_x(\mathbf{x}') = (p(\mathbf{x}') - \\eta^+ p^+\_x(\mathbf{x}'))/\\eta^-$ for sampling $\mathbf{x}^-$ to debias the loss. With $N$ samples $\{\mathbf{u}\_i\}^N\_{i=1}$ from $p$ and $M$ samples $\{ \mathbf{v}\_i \}\_{i=1}^M$ from $p^+\_x$ , we can estimate the expectation of the second term $\mathbb{E}\_{\mathbf{x}^-\\sim p^-\_x}\[\\exp(f(\mathbf{x})^\top f(\mathbf{x}^-))\]$ in the denominator of contrastive learning loss:
+Thus we can use $p^-\_x(\mathbf{x}') = (p(\mathbf{x}') - \\eta^+ p^+\_x(\mathbf{x}'))/\\eta^-$ for sampling $\mathbf{x}^-$ to debias the loss. With $N$ samples $\{\mathbf{u}\_i\}^N\_{i=1}$ from $p$ and $M$ samples $\{ \mathbf{v}\_i \}\_{i=1}^M$ from $p^+\_x$ , we can estimate the expectation of the second term $\mathbb{E}\_{\mathbf{x}^-\\sim p^-\_x}\[\exp(f(\mathbf{x})^\top f(\mathbf{x}^-))\]$ in the denominator of contrastive learning loss:
 
-$$ g(\mathbf{x}, \{\mathbf{u}\_i\}^N\_{i=1}, \{\mathbf{v}\_i\}\_{i=1}^M) = \max\\Big\{ \frac{1}{\\eta^-}\\Big( \frac{1}{N}\sum\_{i=1}^N \\exp(f(\mathbf{x})^\top f(\mathbf{u}\_i)) - \frac{\\eta^+}{M}\sum\_{i=1}^M \\exp(f(\mathbf{x})^\top f(\mathbf{v}\_i)) \\Big), \\exp(-1/\\tau) \\Big\} $$
+$$ g(\mathbf{x}, \{\mathbf{u}\_i\}^N\_{i=1}, \{\mathbf{v}\_i\}\_{i=1}^M) = \max\\Big\{ \frac{1}{\\eta^-}\\Big( \frac{1}{N}\sum\_{i=1}^N \exp(f(\mathbf{x})^\top f(\mathbf{u}\_i)) - \frac{\\eta^+}{M}\sum\_{i=1}^M \exp(f(\mathbf{x})^\top f(\mathbf{v}\_i)) \\Big), \exp(-1/\tau) \\Big\} $$
 
-where $\\tau$ is the temperature and $\\exp(-1/\\tau)$ is the theoretical lower bound of $\mathbb{E}\_{\mathbf{x}^-\\sim p^-\_x}\[\\exp(f(\mathbf{x})^\top f(\mathbf{x}^-))\]$.
+where $\tau$ is the temperature and $\exp(-1/\tau)$ is the theoretical lower bound of $\mathbb{E}\_{\mathbf{x}^-\\sim p^-\_x}\[\exp(f(\mathbf{x})^\top f(\mathbf{x}^-))\]$.
 
 The final debiased contrastive loss looks like:
 
-$$ \mathcal{L}^{N,M}\_\text{debias}(f) = \mathbb{E}\_{\mathbf{x},\{\mathbf{u}\_i\}^N\_{i=1}\\sim p;\\;\mathbf{x}^+, \{\mathbf{v}\_i\}\_{i=1}^M\\sim p^+} \\Big\[ -\\log\frac{\\exp(f(\mathbf{x})^\top f(\mathbf{x}^+)}{\\exp(f(\mathbf{x})^\top f(\mathbf{x}^+) + N g(x,\{\mathbf{u}\_i\}^N\_{i=1}, \{\mathbf{v}\_i\}\_{i=1}^M)} \\Big\] $$
+$$ \mathcal{L}^{N,M}\_\text{debias}(f) = \mathbb{E}\_{\mathbf{x},\{\mathbf{u}\_i\}^N\_{i=1}\\sim p;\\;\mathbf{x}^+, \{\mathbf{v}\_i\}\_{i=1}^M\\sim p^+} \\Big\[ -\\log\frac{\exp(f(\mathbf{x})^\top f(\mathbf{x}^+)}{\exp(f(\mathbf{x})^\top f(\mathbf{x}^+) + N g(x,\{\mathbf{u}\_i\}^N\_{i=1}, \{\mathbf{v}\_i\}\_{i=1}^M)} \\Big\] $$
 
 ![](contrastive-debias-t-SNE.png)
 
@@ -234,13 +234,13 @@ Fig. 4. t-SNE visualization of learned representation with debiased contrastive 
 
 Following the above annotation, [Robinson et al. (2021)](https://arxiv.org/abs/2010.04592) modified the sampling probabilities to target at hard negatives by up-weighting the probability $p^-\_x(x')$ to be proportional to its similarity to the anchor sample. The new sampling probability $q\_\\beta(x^-)$ is:
 
-$$ q\_\\beta(\mathbf{x}^-) \\propto \\exp(\\beta f(\mathbf{x})^\top f(\mathbf{x}^-)) \cdot p(\mathbf{x}^-) $$
+$$ q\_\\beta(\mathbf{x}^-) \\propto \exp(\\beta f(\mathbf{x})^\top f(\mathbf{x}^-)) \cdot p(\mathbf{x}^-) $$
 
 where $\\beta$ is a hyperparameter to tune.
 
-We can estimate the second term in the denominator $\mathbb{E}\_{\mathbf{x}^- \\sim q\_\\beta} \[\\exp(f(\mathbf{x})^\top f(\mathbf{x}^-))\]$ using importance sampling where both the partition functions $Z\_\\beta, Z^+\_\\beta$ can be estimated empirically.
+We can estimate the second term in the denominator $\mathbb{E}\_{\mathbf{x}^- \\sim q\_\\beta} \[\exp(f(\mathbf{x})^\top f(\mathbf{x}^-))\]$ using importance sampling where both the partition functions $Z\_\\beta, Z^+\_\\beta$ can be estimated empirically.
 
-$$ \begin{aligned} \mathbb{E}\_{\mathbf{u} \\sim q\_\\beta} \[\\exp(f(\mathbf{x})^\top f(\mathbf{u}))\] &= \mathbb{E}\_{\mathbf{u} \\sim p} \[\frac{q\_\\beta}{p}\\exp(f(\mathbf{x})^\top f(\mathbf{u}))\] = \mathbb{E}\_{\mathbf{u} \\sim p} \[\frac{1}{Z\_\\beta}\\exp((\\beta + 1)f(\mathbf{x})^\top f(\mathbf{u}))\] \\ \mathbb{E}\_{\mathbf{v} \\sim q^+\_\\beta} \[\\exp(f(\mathbf{x})^\top f(\mathbf{v}))\] &= \mathbb{E}\_{\mathbf{v} \\sim p^+} \[\frac{q^+\_\\beta}{p}\\exp(f(\mathbf{x})^\top f(\mathbf{v}))\] = \mathbb{E}\_{\mathbf{v} \\sim p} \[\frac{1}{Z^+\_\\beta}\\exp((\\beta + 1)f(\mathbf{x})^\top f(\mathbf{v}))\] \end{aligned} $$
+$$ \begin{aligned} \mathbb{E}\_{\mathbf{u} \\sim q\_\\beta} \[\exp(f(\mathbf{x})^\top f(\mathbf{u}))\] &= \mathbb{E}\_{\mathbf{u} \\sim p} \[\frac{q\_\\beta}{p}\exp(f(\mathbf{x})^\top f(\mathbf{u}))\] = \mathbb{E}\_{\mathbf{u} \\sim p} \[\frac{1}{Z\_\\beta}\exp((\\beta + 1)f(\mathbf{x})^\top f(\mathbf{u}))\] \\ \mathbb{E}\_{\mathbf{v} \\sim q^+\_\\beta} \[\exp(f(\mathbf{x})^\top f(\mathbf{v}))\] &= \mathbb{E}\_{\mathbf{v} \\sim p^+} \[\frac{q^+\_\\beta}{p}\exp(f(\mathbf{x})^\top f(\mathbf{v}))\] = \mathbb{E}\_{\mathbf{v} \\sim p} \[\frac{1}{Z^+\_\\beta}\exp((\\beta + 1)f(\mathbf{x})^\top f(\mathbf{v}))\] \end{aligned} $$
 
 ![](contrastive-hard-negatives-code.png)
 
@@ -306,7 +306,7 @@ $$ \mathbf{h}\_i = f(\\tilde{\mathbf{x}}\_i),\quad \mathbf{h}\_j = f(\\tilde{\ma
 
 3.  The contrastive learning loss is defined using cosine similarity $\text{sim}(.,.)$. Note that the loss operates on an extra projection layer of the representation $g(.)$ rather than on the representation space directly. But only the representation $\mathbf{h}$ is used for downstream tasks.
 
-$$ \begin{aligned} \mathbf{z}\_i &= g(\mathbf{h}\_i),\quad \mathbf{z}\_j = g(\mathbf{h}\_j) \\ \mathcal{L}\_\text{SimCLR}^{(i,j)} &= - \\log\frac{\\exp(\text{sim}(\mathbf{z}\_i, \mathbf{z}\_j) / \\tau)}{\sum\_{k=1}^{2N} \mathbb{1}\_{\[k \\neq i\]} \\exp(\text{sim}(\mathbf{z}\_i, \mathbf{z}\_k) / \\tau)} \end{aligned} $$
+$$ \begin{aligned} \mathbf{z}\_i &= g(\mathbf{h}\_i),\quad \mathbf{z}\_j = g(\mathbf{h}\_j) \\ \mathcal{L}\_\text{SimCLR}^{(i,j)} &= - \\log\frac{\exp(\text{sim}(\mathbf{z}\_i, \mathbf{z}\_j) / \tau)}{\sum\_{k=1}^{2N} \mathbb{1}\_{\[k \\neq i\]} \exp(\text{sim}(\mathbf{z}\_i, \mathbf{z}\_k) / \tau)} \end{aligned} $$
 
 where $\mathbb{1}\_{\[k \\neq i\]}$ is an indicator function: 1 if $k\\neq i$ 0 otherwise.
 
@@ -336,7 +336,7 @@ Fig. 9. Algorithm of Barlow Twins in Pytorch style pseudo code. (Image source: [
 
 ### BYOL[#](#byol)
 
-Different from the above approaches, interestingly, **BYOL** (Bootstrap Your Own Latent; [Grill, et al 2020](https://arxiv.org/abs/2006.07733)) claims to achieve a new state-of-the-art results _without using egative samples_. It relies on two neural networks, referred to as _online_ and _target_ networks that interact and learn from each other. The target network (parameterized by $\\xi$) has the same architecture as the online one (parameterized by $\\theta$), but with polyak averaged weights, $\\xi \\leftarrow \\tau \\xi + (1-\\tau) \\theta$.
+Different from the above approaches, interestingly, **BYOL** (Bootstrap Your Own Latent; [Grill, et al 2020](https://arxiv.org/abs/2006.07733)) claims to achieve a new state-of-the-art results _without using egative samples_. It relies on two neural networks, referred to as _online_ and _target_ networks that interact and learn from each other. The target network (parameterized by $\\xi$) has the same architecture as the online one (parameterized by $\\theta$), but with polyak averaged weights, $\\xi \\leftarrow \tau \\xi + (1-\tau) \\theta$.
 
 The goal is to learn a presentation $y$ that can be used in downstream tasks. The online network parameterized by $\\theta$ contains:
 
@@ -344,7 +344,7 @@ The goal is to learn a presentation $y$ that can be used in downstream tasks. Th
 - A projector $g\_\\theta$;
 - A predictor $q\_\\theta$.
 
-The target network has the same network architecture, but with different parameter $\\xi$, updated by polyak averaging $\\theta$: $\\xi \\leftarrow \\tau \\xi + (1-\\tau) \\theta$.
+The target network has the same network architecture, but with different parameter $\\xi$, updated by polyak averaging $\\theta$: $\\xi \\leftarrow \tau \\xi + (1-\tau) \\theta$.
 
 ![](BYOL.png)
 
@@ -380,15 +380,15 @@ Computing embeddings for a large number of negative samples in every batch is ex
 
 Fig. 11. The training pipeline of instance-level contrastive learning. The learned embedding is L2-normalized. (Image source: [Wu et al, 2018](https://arxiv.org/abs/1805.01978v1))
 
-Let $\mathbf{v} = f\_\\theta(x)$ be an embedding function to learn and the vector is normalized to have $|\mathbf{v}|=1$. A non-parametric classifier predicts the probability of a sample $\mathbf{v}$ belonging to class $i$ with a temperature parameter $\\tau$:
+Let $\mathbf{v} = f\_\\theta(x)$ be an embedding function to learn and the vector is normalized to have $|\mathbf{v}|=1$. A non-parametric classifier predicts the probability of a sample $\mathbf{v}$ belonging to class $i$ with a temperature parameter $\tau$:
 
-$$ P(C=i\vert \mathbf{v}) = \frac{\\exp(\mathbf{v}\_i^\top \mathbf{v} / \\tau)}{\sum\_{j=1}^n \\exp(\mathbf{v}\_j^\top \mathbf{v} / \\tau)} $$
+$$ P(C=i\vert \mathbf{v}) = \frac{\exp(\mathbf{v}\_i^\top \mathbf{v} / \tau)}{\sum\_{j=1}^n \exp(\mathbf{v}\_j^\top \mathbf{v} / \tau)} $$
 
 Instead of computing the representations for all the samples every time, they implement an **Memory Bank** for storing sample representation in the database from past iterations. Let $V=\{ \mathbf{v}\_i \}$ be the memory bank and $\mathbf{f}\_i = f\_\\theta(\mathbf{x}\_i)$ be the feature generated by forwarding the network. We can use the representation from the memory bank $\mathbf{v}\_i$ instead of the feature forwarded from the network $\mathbf{f}\_i$ when comparing pairwise similarity.
 
 The denominator theoretically requires access to the representations of all the samples, but that is too expensive in practice. Instead we can estimate it via Monte Carlo approximation using a random subset of $M$ indices $\{j\_k\}\_{k=1}^M$.
 
-$$ P(i\vert \mathbf{v}) = \frac{\\exp(\mathbf{v}^\top \mathbf{f}\_i / \\tau)}{\sum\_{j=1}^N \\exp(\mathbf{v}\_j^\top \mathbf{f}\_i / \\tau)} \\simeq \frac{\\exp(\mathbf{v}^\top \mathbf{f}\_i / \\tau)}{\frac{N}{M} \sum\_{k=1}^M \\exp(\mathbf{v}\_{j_k}^\top \mathbf{f}\_i / \\tau)} $$
+$$ P(i\vert \mathbf{v}) = \frac{\exp(\mathbf{v}^\top \mathbf{f}\_i / \tau)}{\sum\_{j=1}^N \exp(\mathbf{v}\_j^\top \mathbf{f}\_i / \tau)} \\simeq \frac{\exp(\mathbf{v}^\top \mathbf{f}\_i / \tau)}{\frac{N}{M} \sum\_{k=1}^M \exp(\mathbf{v}\_{j_k}^\top \mathbf{f}\_i / \tau)} $$
 
 Because there is only one instance per class, the training is unstable and fluctuates a lot. To improve the training smoothness, they introduced an extra term for positive samples in the loss function based on the [proximal optimization method](https://web.stanford.edu/~boyd/papers/prox_algs.html). The final NCE loss objective looks like:
 
@@ -400,9 +400,9 @@ where $\{ \mathbf{v}^{(t-1)} \}$ are embeddings stored in the memory bank from t
 
 **Momentum Contrast** (**MoCo**; [He et al, 2019](https://arxiv.org/abs/1911.05722)) provides a framework of unsupervised learning visual representation as a _dynamic dictionary look-up_. The dictionary is structured as a large FIFO queue of encoded representations of data samples.
 
-Given a query sample $\mathbf{x}\_q$, we get a query representation through an encoder $\mathbf{q} = f\_q(\mathbf{x}\_q)$. A list of key representations $\{\mathbf{k}\_1, \mathbf{k}\_2, \dots \}$ in the dictionary are encoded by a momentum encoder $\mathbf{k}\_i = f\_k (\mathbf{x}^k\_i)$. Let's assume among them there is a single _positive_ key $\mathbf{k}^+$ in the dictionary that matches $\mathbf{q}$. In the paper, they create $\mathbf{k}^+$ using a noise copy of $\mathbf{x}\_q$ with different [augmentation](#image-augmentations). Then the [InfoNCE](#infonce) contrastive loss with temperature $\\tau$ is used over one positive and $N-1$ negative samples:
+Given a query sample $\mathbf{x}\_q$, we get a query representation through an encoder $\mathbf{q} = f\_q(\mathbf{x}\_q)$. A list of key representations $\{\mathbf{k}\_1, \mathbf{k}\_2, \dots \}$ in the dictionary are encoded by a momentum encoder $\mathbf{k}\_i = f\_k (\mathbf{x}^k\_i)$. Let's assume among them there is a single _positive_ key $\mathbf{k}^+$ in the dictionary that matches $\mathbf{q}$. In the paper, they create $\mathbf{k}^+$ using a noise copy of $\mathbf{x}\_q$ with different [augmentation](#image-augmentations). Then the [InfoNCE](#infonce) contrastive loss with temperature $\tau$ is used over one positive and $N-1$ negative samples:
 
-$$ \mathcal{L}\_\text{MoCo} = - \\log \frac{\\exp(\mathbf{q} \cdot \mathbf{k}^+ / \\tau)}{\sum\_{i=1}^N \\exp(\mathbf{q} \cdot \mathbf{k}\_i / \\tau)} $$
+$$ \mathcal{L}\_\text{MoCo} = - \\log \frac{\exp(\mathbf{q} \cdot \mathbf{k}^+ / \tau)}{\sum\_{i=1}^N \exp(\mathbf{q} \cdot \mathbf{k}\_i / \tau)} $$
 
 Compared to the [memory bank](#instance-discrimination-with-memoy-bank), a queue-based dictionary in MoCo enables us to reuse representations of immediately preceding mini-batches of data.
 
@@ -454,7 +454,7 @@ $$ \mathcal{L}\_\text{SwAV}(\mathbf{z}\_t, \mathbf{z}\_s) = \ell(\mathbf{z}\_t, 
 
 The swapped fit prediction depends on the cross entropy between the predicted code and a set of $K$ trainable prototype vectors $\mathbf{C} = \{\mathbf{c}\_1, \dots, \mathbf{c}\_K\}$. The prototype vector matrix is shared across different batches and represents _anchor clusters_ that each instance should be clustered to.
 
-$$ \ell(\mathbf{z}\_t, \mathbf{q}\_s) = - \sum_k \mathbf{q}^{(k)}\_s\\log\mathbf{p}^{(k)}\_t \text{ where } \mathbf{p}^{(k)}\_t = \frac{\\exp(\mathbf{z}\_t^\top\mathbf{c}\_k / \\tau)}{\sum\_{k'}\\exp(\mathbf{z}\_t^\top \mathbf{c}\_{k'} / \\tau)} $$
+$$ \ell(\mathbf{z}\_t, \mathbf{q}\_s) = - \sum_k \mathbf{q}^{(k)}\_s\\log\mathbf{p}^{(k)}\_t \text{ where } \mathbf{p}^{(k)}\_t = \frac{\exp(\mathbf{z}\_t^\top\mathbf{c}\_k / \tau)}{\sum\_{k'}\exp(\mathbf{z}\_t^\top \mathbf{c}\_{k'} / \tau)} $$
 
 In a mini-batch containing $B$ feature vectors $\mathbf{Z} = \[\mathbf{z}\_1, \dots, \mathbf{z}\_B\]$, the mapping matrix between features and prototype vectors is defined as $\mathbf{Q} = \[\mathbf{q}\_1, \dots, \mathbf{q}\_B\] \in \mathbb{R}\_+^{K\\times B}$. We would like to maximize the similarity between the features and the prototypes:
 
@@ -502,7 +502,7 @@ Given a set of randomly sampled $n$ (image, label) pairs, $\{\mathbf{x}\_i, y\_i
 
 Supervised contrastive loss $\mathcal{L}\_\text{supcon}$ utilizes multiple positive and negative samples, very similar to [soft nearest-neighbor loss](#soft-nearest-neighbors-loss):
 
-$$ \mathcal{L}\_\text{supcon} = - \sum\_{i=1}^{2n} \frac{1}{2 \vert N_i \vert - 1} \sum\_{j \in N(y_i), j \\neq i} \\log \frac{\\exp(\mathbf{z}\_i \cdot \mathbf{z}\_j / \\tau)}{\sum\_{k \in I, k \\neq i}\\exp({\mathbf{z}\_i \cdot \mathbf{z}\_k / \\tau})} $$
+$$ \mathcal{L}\_\text{supcon} = - \sum\_{i=1}^{2n} \frac{1}{2 \vert N_i \vert - 1} \sum\_{j \in N(y_i), j \\neq i} \\log \frac{\exp(\mathbf{z}\_i \cdot \mathbf{z}\_j / \tau)}{\sum\_{k \in I, k \\neq i}\exp({\mathbf{z}\_i \cdot \mathbf{z}\_k / \tau})} $$
 
 where $\mathbf{z}\_k=P(E(\\tilde{\mathbf{x}\_k}))$, in which $E(.)$ is an encoder network (augmented image mapped to vector) $P(.)$ is a projection network (one vector mapped to another). $N\_i= \{j \in I: \\tilde{y}\_j = \\tilde{y}\_i \}$ contains a set of indices of samples with label $y\_i$. Including more positive samples into the set $N\_i$ leads to improved results.
 
@@ -581,7 +581,7 @@ The pre-trained BERT sentence embedding without any fine-tuning has been found t
 
 They experimented with a few different prediction heads on top of BERT model:
 
-- Softmax classification objective: The classification head of the siamese network is built on the concatenation of two embeddings $f(\mathbf{x}), f(\mathbf{x}')$ and $\vert f(\mathbf{x}) - f(\mathbf{x}') \vert$. The predicted output is $\\hat{y}=\text{softmax}(\mathbf{W}\_t \[f(\mathbf{x}); f(\mathbf{x}'); \vert f(\mathbf{x}) - f(\mathbf{x}') \vert\])$. They showed that the most important component is the element-wise difference $\vert f(\mathbf{x}) - f(\mathbf{x}') \vert$.
+- Softmax classification objective: The classification head of the siamese network is built on the concatenation of two embeddings $f(\mathbf{x}), f(\mathbf{x}')$ and $\vert f(\mathbf{x}) - f(\mathbf{x}') \vert$. The predicted output is $\hat{y}=\text{softmax}(\mathbf{W}\_t \[f(\mathbf{x}); f(\mathbf{x}'); \vert f(\mathbf{x}) - f(\mathbf{x}') \vert\])$. They showed that the most important component is the element-wise difference $\vert f(\mathbf{x}) - f(\mathbf{x}') \vert$.
 - Regression objective: This is the regression loss on $\\cos(f(\mathbf{x}), f(\mathbf{x}'))$, in which the pooling strategy has a big impact. In the experiments, they observed that `max` performs much worse than `mean` and `CLS`\-token.
 - Triplet objective: $\max(0, |f(\mathbf{x}) - f(\mathbf{x}^+)|- |f(\mathbf{x}) - f(\mathbf{x}^-)| + \\epsilon)$, where $\mathbf{x}, \mathbf{x}^+, \mathbf{x}^-$ are embeddings of the anchor, positive and negative sentences.
 
@@ -623,11 +623,11 @@ BERT-flow was shown to improve the performance on most STS tasks either with or 
 
 [Su et al. (2021)](https://arxiv.org/abs/2103.15316) applied **whitening** operation to improve the [isotropy](#isotropy) of the learned representation and also to reduce the dimensionality of sentence embedding.
 
-They transform the mean value of the sentence vectors to 0 and the covariance matrix to the identity matrix. Given a set of samples $\{\mathbf{x}\_i\}\_{i=1}^N$, let $\\tilde{\mathbf{x}}\_i$ and $\\tilde{\\Sigma}$ be the transformed samples and corresponding covariance matrix:
+They transform the mean value of the sentence vectors to 0 and the covariance matrix to the identity matrix. Given a set of samples $\{\mathbf{x}\_i\}\_{i=1}^N$, let $\\tilde{\mathbf{x}}\_i$ and $\\tilde{\sigma}$ be the transformed samples and corresponding covariance matrix:
 
-$$ \begin{aligned} \\mu &= \frac{1}{N}\sum\_{i=1}^N \mathbf{x}\_i \quad \\Sigma = \frac{1}{N}\sum\_{i=1}^N (\mathbf{x}\_i - \\mu)^\top (\mathbf{x}\_i - \\mu) \\ \\tilde{\mathbf{x}}\_i &= (\mathbf{x}\_i - \\mu)W \quad \\tilde{\\Sigma} = W^\top\\Sigma W = I \text{ thus } \\Sigma = (W^{-1})^\top W^{-1} \end{aligned} $$
+$$ \begin{aligned} \\mu &= \frac{1}{N}\sum\_{i=1}^N \mathbf{x}\_i \quad \sigma = \frac{1}{N}\sum\_{i=1}^N (\mathbf{x}\_i - \\mu)^\top (\mathbf{x}\_i - \\mu) \\ \\tilde{\mathbf{x}}\_i &= (\mathbf{x}\_i - \\mu)W \quad \\tilde{\sigma} = W^\top\sigma W = I \text{ thus } \sigma = (W^{-1})^\top W^{-1} \end{aligned} $$
 
-If we get [SVD](https://en.wikipedia.org/wiki/Singular_value_decomposition) decomposition of $\\Sigma = U\\Lambda U^\top$, we will have $W^{-1}=\\sqrt{\\Lambda} U^\top$ and $W=U\\sqrt{\\Lambda^{-1}}$. Note that within SVD, $U$ is an orthogonal matrix with column vectors as eigenvectors and $\\Lambda$ is a diagonal matrix with all positive elements as sorted eigenvalues.
+If we get [SVD](https://en.wikipedia.org/wiki/Singular_value_decomposition) decomposition of $\sigma = U\\Lambda U^\top$, we will have $W^{-1}=\\sqrt{\\Lambda} U^\top$ and $W=U\\sqrt{\\Lambda^{-1}}$. Note that within SVD, $U$ is an orthogonal matrix with column vectors as eigenvectors and $\\Lambda$ is a diagonal matrix with all positive elements as sorted eigenvalues.
 
 A dimensionality reduction strategy can be applied by only taking the first $k$ columns of $W$, named `Whitening`\-$k$.
 
@@ -649,7 +649,7 @@ Fig. 28. Illustration of how Quick-Thought sentence embedding vectors are learne
 
 Let $f(.)$ and $g(.)$ be two functions that encode a sentence $s$ into a fixed-length vector. Let $C(s)$ be the set of sentences in the context of $s$ and $S(s)$ be the set of candidate sentences including only one sentence $s\_c \in C(s)$ and many other non-context negative sentences. Quick Thoughts model learns to optimize the probability of predicting the only true context sentence $s\_c \in S(s)$. It is essentially NCE loss when considering the sentence $(s, s\_c)$ as the positive pairs while other pairs $(s, s')$ where $s' \in S(s), s'\\neq s\_c$ as negatives.
 
-$$ \mathcal{L}\_\text{QT} = - \sum\_{s \in \mathcal{D}} \sum\_{s_c \in C(s)} \\log p(s_c \vert s, S(s)) = - \sum\_{s \in \mathcal{D}} \sum\_{s_c \in C(s)}\frac{\\exp(f(s)^\top g(s_c))}{\sum\_{s'\in S(s)} \\exp(f(s)^\top g(s'))} $$
+$$ \mathcal{L}\_\text{QT} = - \sum\_{s \in \mathcal{D}} \sum\_{s_c \in C(s)} \\log p(s_c \vert s, S(s)) = - \sum\_{s \in \mathcal{D}} \sum\_{s_c \in C(s)}\frac{\exp(f(s)^\top g(s_c))}{\sum\_{s'\in S(s)} \exp(f(s)^\top g(s'))} $$
 
 ### Mutual Information Maximization[#](#mutual-information-maximization)
 

@@ -62,9 +62,9 @@ The determinant is one real number computed as a function of all the elements in
 
 The determinant of a nxn matrix $M$ is:
 
-$$ \\det M = \\det \begin{bmatrix} a\_{11} & a\_{12} & \dots & a\_{1n} \\ a\_{21} & a\_{22} & \dots & a\_{2n} \\ \\vdots & \\vdots & & \\vdots \\ a\_{n1} & a\_{n2} & \dots & a\_{nn} \\ \end{bmatrix} = \sum\_{j_1 j_2 \dots j_n} (-1)^{\\tau(j_1 j_2 \dots j_n)} a\_{1j_1} a\_{2j_2} \dots a\_{nj_n} $$
+$$ \\det M = \\det \begin{bmatrix} a\_{11} & a\_{12} & \dots & a\_{1n} \\ a\_{21} & a\_{22} & \dots & a\_{2n} \\ \\vdots & \\vdots & & \\vdots \\ a\_{n1} & a\_{n2} & \dots & a\_{nn} \\ \end{bmatrix} = \sum\_{j_1 j_2 \dots j_n} (-1)^{\tau(j_1 j_2 \dots j_n)} a\_{1j_1} a\_{2j_2} \dots a\_{nj_n} $$
 
-where the subscript under the summation $j\_1 j\_2 \dots j\_n$ are all permutations of the set {1, 2, …, n}, so there are $n!$ items in total; $\\tau(.)$ indicates the [signature](https://en.wikipedia.org/wiki/Parity_of_a_permutation) of a permutation.
+where the subscript under the summation $j\_1 j\_2 \dots j\_n$ are all permutations of the set {1, 2, …, n}, so there are $n!$ items in total; $\tau(.)$ indicates the [signature](https://en.wikipedia.org/wiki/Parity_of_a_permutation) of a permutation.
 
 The determinant of a square matrix $M$ detects whether it is invertible: If $\\det(M)=0$ then $M$ is not invertible (a _singular_ matrix with linearly dependent rows or columns; or any row or column is all 0); otherwise, if $\\det(M)\\neq 0$, $M$ is invertible.
 
@@ -132,7 +132,7 @@ The **RealNVP** (Real-valued Non-Volume Preserving; [Dinh et al., 2017](https://
 - The first $d$ dimensions stay same;
 - The second part, $d+1$ to $D$ dimensions, undergo an affine transformation (“scale-and-shift”) and both the scale and shift parameters are functions of the first $d$ dimensions.
 
-$$ \begin{aligned} \mathbf{y}\_{1:d} &= \mathbf{x}\_{1:d} \\ \mathbf{y}\_{d+1:D} &= \mathbf{x}\_{d+1:D} \\odot \\exp({s(\mathbf{x}\_{1:d})}) + t(\mathbf{x}\_{1:d}) \end{aligned} $$
+$$ \begin{aligned} \mathbf{y}\_{1:d} &= \mathbf{x}\_{1:d} \\ \mathbf{y}\_{d+1:D} &= \mathbf{x}\_{d+1:D} \\odot \exp({s(\mathbf{x}\_{1:d})}) + t(\mathbf{x}\_{1:d}) \end{aligned} $$
 
 where $s(.)$ and $t(.)$ are _scale_ and _translation_ functions and both map $\mathbb{R}^d \\mapsto \mathbb{R}^{D-d}$. The $\\odot$ operation is the element-wise product.
 
@@ -142,17 +142,17 @@ Now let's check whether this transformation satisfy two basic properties for a f
 
 Yes and it is fairly straightforward.
 
-$$ \begin{cases} \mathbf{y}\_{1:d} &= \mathbf{x}\_{1:d} \\ \mathbf{y}\_{d+1:D} &= \mathbf{x}\_{d+1:D} \\odot \\exp({s(\mathbf{x}\_{1:d})}) + t(\mathbf{x}\_{1:d}) \end{cases} \\Leftrightarrow \begin{cases} \mathbf{x}\_{1:d} &= \mathbf{y}\_{1:d} \\ \mathbf{x}\_{d+1:D} &= (\mathbf{y}\_{d+1:D} - t(\mathbf{y}\_{1:d})) \\odot \\exp(-s(\mathbf{y}\_{1:d})) \end{cases} $$
+$$ \begin{cases} \mathbf{y}\_{1:d} &= \mathbf{x}\_{1:d} \\ \mathbf{y}\_{d+1:D} &= \mathbf{x}\_{d+1:D} \\odot \exp({s(\mathbf{x}\_{1:d})}) + t(\mathbf{x}\_{1:d}) \end{cases} \\Leftrightarrow \begin{cases} \mathbf{x}\_{1:d} &= \mathbf{y}\_{1:d} \\ \mathbf{x}\_{d+1:D} &= (\mathbf{y}\_{d+1:D} - t(\mathbf{y}\_{1:d})) \\odot \exp(-s(\mathbf{y}\_{1:d})) \end{cases} $$
 
 **Condition 2**: “Its Jacobian determinant is easy to compute.”
 
 Yes. It is not hard to get the Jacobian matrix and determinant of this transformation. The Jacobian is a lower triangular matrix.
 
-$$ \mathbf{J} = \begin{bmatrix} \mathbb{I}\_d & \mathbf{0}\_{d\\times(D-d)} \\\[5pt\] \frac{\\partial \mathbf{y}\_{d+1:D}}{\\partial \mathbf{x}\_{1:d}} & \text{diag}(\\exp(s(\mathbf{x}\_{1:d}))) \end{bmatrix} $$
+$$ \mathbf{J} = \begin{bmatrix} \mathbb{I}\_d & \mathbf{0}\_{d\\times(D-d)} \\\[5pt\] \frac{\\partial \mathbf{y}\_{d+1:D}}{\\partial \mathbf{x}\_{1:d}} & \text{diag}(\exp(s(\mathbf{x}\_{1:d}))) \end{bmatrix} $$
 
 Hence the determinant is simply the product of terms on the diagonal.
 
-$$ \\det(\mathbf{J}) = \\prod\_{j=1}^{D-d}\\exp(s(\mathbf{x}\_{1:d}))\_j = \\exp(\sum\_{j=1}^{D-d} s(\mathbf{x}\_{1:d})\_j) $$
+$$ \\det(\mathbf{J}) = \\prod\_{j=1}^{D-d}\exp(s(\mathbf{x}\_{1:d}))\_j = \exp(\sum\_{j=1}^{D-d} s(\mathbf{x}\_{1:d})\_j) $$
 
 So far, the affine coupling layer looks perfect for constructing a normalizing flow :)
 
@@ -218,11 +218,11 @@ This section starts with several classic autoregressive models (MADE, PixelRNN, 
 
 **MADE** (Masked Autoencoder for Distribution Estimation; [Germain et al., 2015](https://arxiv.org/abs/1502.03509)) is a specially designed architecture to enforce the autoregressive property in the autoencoder _efficiently_. When using an autoencoder to predict the conditional probabilities, rather than feeding the autoencoder with input of different observation windows $D$ times, MADE removes the contribution from certain hidden units by multiplying binary mask matrices so that each input dimension is reconstructed only from previous dimensions in a _given_ ordering in a _single pass_.
 
-In a multilayer fully-connected neural network, say, we have $L$ hidden layers with weight matrices $\mathbf{W}^1, \dots, \mathbf{W}^L$ and an output layer with weight matrix $\mathbf{V}$. The output $\\hat{\mathbf{x}}$ has each dimension $\\hat{x}\_i = p(x\_i\vert x\_{1:i-1})$.
+In a multilayer fully-connected neural network, say, we have $L$ hidden layers with weight matrices $\mathbf{W}^1, \dots, \mathbf{W}^L$ and an output layer with weight matrix $\mathbf{V}$. The output $\hat{\mathbf{x}}$ has each dimension $\hat{x}\_i = p(x\_i\vert x\_{1:i-1})$.
 
 Without any mask, the computation through layers looks like the following:
 
-$$ \begin{aligned} \mathbf{h}^0 &= \mathbf{x} \\ \mathbf{h}^l &= \text{activation}^l(\mathbf{W}^l\mathbf{h}^{l-1} + \mathbf{b}^l) \\ \\hat{\mathbf{x}} &= \\sigma(\mathbf{V}\mathbf{h}^L + \mathbf{c}) \end{aligned} $$
+$$ \begin{aligned} \mathbf{h}^0 &= \mathbf{x} \\ \mathbf{h}^l &= \text{activation}^l(\mathbf{W}^l\mathbf{h}^{l-1} + \mathbf{b}^l) \\ \hat{\mathbf{x}} &= \sigma(\mathbf{V}\mathbf{h}^L + \mathbf{c}) \end{aligned} $$
 
 ![](MADE.png)
 
@@ -230,7 +230,7 @@ Fig. 5. Demonstration of how MADE works in a three-layer feed-forward neural net
 
 To zero out some connections between layers, we can simply element-wise multiply every weight matrix by a binary mask matrix. Each hidden node is assigned with a random “connectivity integer” between $1$ and $D-1$; the assigned value for the $k$-th unit in the $l$-th layer is denoted by $m^l\_k$. The binary mask matrix is determined by element-wise comparing values of two nodes in two layers.
 
-$$ \begin{aligned} \mathbf{h}^l &= \text{activation}^l((\mathbf{W}^l \\color{red}{\\odot \mathbf{M}^{\mathbf{W}^l}}) \mathbf{h}^{l-1} + \mathbf{b}^l) \\ \\hat{\mathbf{x}} &= \\sigma((\mathbf{V} \\color{red}{\\odot \mathbf{M}^{\mathbf{V}}}) \mathbf{h}^L + \mathbf{c}) \\ M^{\mathbf{W}^l}\_{k', k} &= \mathbf{1}\_{m^l\_{k'} \\geq m^{l-1}\_k} = \begin{cases} 1, & \text{if } m^l\_{k'} \\geq m^{l-1}\_k\\ 0, & \text{otherwise} \end{cases} \\ M^{\mathbf{V}}\_{d, k} &= \mathbf{1}\_{d \\geq m^L_k} = \begin{cases} 1, & \text{if } d > m^L_k\\ 0, & \text{otherwise} \end{cases} \end{aligned} $$
+$$ \begin{aligned} \mathbf{h}^l &= \text{activation}^l((\mathbf{W}^l \\color{red}{\\odot \mathbf{M}^{\mathbf{W}^l}}) \mathbf{h}^{l-1} + \mathbf{b}^l) \\ \hat{\mathbf{x}} &= \sigma((\mathbf{V} \\color{red}{\\odot \mathbf{M}^{\mathbf{V}}}) \mathbf{h}^L + \mathbf{c}) \\ M^{\mathbf{W}^l}\_{k', k} &= \mathbf{1}\_{m^l\_{k'} \\geq m^{l-1}\_k} = \begin{cases} 1, & \text{if } m^l\_{k'} \\geq m^{l-1}\_k\\ 0, & \text{otherwise} \end{cases} \\ M^{\mathbf{V}}\_{d, k} &= \mathbf{1}\_{d \\geq m^L_k} = \begin{cases} 1, & \text{if } d > m^L_k\\ 0, & \text{otherwise} \end{cases} \end{aligned} $$
 
 A unit in the current layer can only be connected to other units with equal or smaller numbers in the previous layer and this type of dependency easily propagates through the network up to the output layer. Once the numbers are assigned to all the units and layers, the ordering of input dimensions is fixed and the conditional probability is produced with respect to it. See a great illustration in Fig. 5. To make sure all the hidden units are connected to the input and output layers through some paths, the $m^l\_k$ is sampled to be equal or greater than the minimal connectivity integer in the previous layer, $\min\_{k'} m\_{k'}^{l-1}$.
 
@@ -257,7 +257,7 @@ One implementation that could capture the entire context is the _Diagonal BiLSTM
 
 Fig. 7. (a) PixelRNN with diagonal BiLSTM. (b) Skewing operation that offsets each row in the feature map by one with regards to the row above. (Image source: [Oord et al, 2016](https://arxiv.org/abs/1601.06759))
 
-$$ \begin{aligned} \\lbrack \mathbf{o}\_i, \mathbf{f}\_i, \mathbf{i}\_i, \mathbf{g}\_i \\rbrack &= \\sigma(\mathbf{K}^{ss} \\circledast \mathbf{h}\_{i-1} + \mathbf{K}^{is} \\circledast \mathbf{x}\_i) & \\scriptstyle{\text{; }\\sigma\\scriptstyle{\text{ is tanh for g, but otherwise sigmoid; }}\\circledast\\scriptstyle{\text{ is convolution operation.}}} \\ \mathbf{c}\_i &= \mathbf{f}\_i \\odot \mathbf{c}\_{i-1} + \mathbf{i}\_i \\odot \mathbf{g}\_i & \\scriptstyle{\text{; }}\\odot\\scriptstyle{\text{ is elementwise product.}}\\ \mathbf{h}\_i &= \mathbf{o}\_i \\odot \\tanh(\mathbf{c}\_i) \end{aligned} $$
+$$ \begin{aligned} \\lbrack \mathbf{o}\_i, \mathbf{f}\_i, \mathbf{i}\_i, \mathbf{g}\_i \\rbrack &= \sigma(\mathbf{K}^{ss} \\circledast \mathbf{h}\_{i-1} + \mathbf{K}^{is} \\circledast \mathbf{x}\_i) & \\scriptstyle{\text{; }\sigma\\scriptstyle{\text{ is tanh for g, but otherwise sigmoid; }}\\circledast\\scriptstyle{\text{ is convolution operation.}}} \\ \mathbf{c}\_i &= \mathbf{f}\_i \\odot \mathbf{c}\_{i-1} + \mathbf{i}\_i \\odot \mathbf{g}\_i & \\scriptstyle{\text{; }}\\odot\\scriptstyle{\text{ is elementwise product.}}\\ \mathbf{h}\_i &= \mathbf{o}\_i \\odot \tanh(\mathbf{c}\_i) \end{aligned} $$
 
 where $\\circledast$ denotes the convolution operation and $\\odot$ is the element-wise multiplication. The input-to-state component $\mathbf{K}^{is}$ is a 1x1 convolution, while the state-to-state recurrent component is computed with a column-wise convolution $\mathbf{K}^{ss}$ with a kernel of size 2x1.
 
@@ -279,7 +279,7 @@ Fig. 9. Visualization of WaveNet models with a stack of (top) causal convolution
 
 WaveNet uses the gated activation unit as the non-linear layer, as it is found to work significantly better than ReLU for modeling 1-D audio data. The residual connection is applied after the gated activation.
 
-$$ \mathbf{z} = \\tanh(\mathbf{W}\_{f,k}\\circledast\mathbf{x})\\odot\\sigma(\mathbf{W}\_{g,k}\\circledast\mathbf{x}) $$
+$$ \mathbf{z} = \tanh(\mathbf{W}\_{f,k}\\circledast\mathbf{x})\\odot\sigma(\mathbf{W}\_{g,k}\\circledast\mathbf{x}) $$
 
 where $\mathbf{W}\_{f,k}$ and $\mathbf{W}\_{g,k}$ are convolution filter and gate weight matrix of the $k$-th layer, respectively; both are learnable.
 
@@ -293,7 +293,7 @@ Precisely the conditional probability is an affine transformation of $\mathbf{z}
 
 - Data generation, producing a new $\mathbf{x}$:
 
-$x\_i \\sim p(x\_i\vert\mathbf{x}\_{1:i-1}) = z\_i \\odot \\sigma\_i(\mathbf{x}\_{1:i-1}) + \\mu\_i(\mathbf{x}\_{1:i-1})\text{, where }\mathbf{z} \\sim \\pi(\mathbf{z})$
+$x\_i \\sim p(x\_i\vert\mathbf{x}\_{1:i-1}) = z\_i \\odot \sigma\_i(\mathbf{x}\_{1:i-1}) + \\mu\_i(\mathbf{x}\_{1:i-1})\text{, where }\mathbf{z} \\sim \\pi(\mathbf{z})$
 
 - Density estimation, given a known $\mathbf{x}$:
 
@@ -307,15 +307,15 @@ Similar to MAF, **Inverse autoregressive flow** (**IAF**; [Kingma et al., 2016](
 
 First, let's reverse the affine transformation in MAF:
 
-$$ z_i = \frac{x_i - \\mu_i(\mathbf{x}\_{1:i-1})}{\\sigma_i(\mathbf{x}\_{1:i-1})} = -\frac{\\mu_i(\mathbf{x}\_{1:i-1})}{\\sigma_i(\mathbf{x}\_{1:i-1})} + x_i \\odot \frac{1}{\\sigma_i(\mathbf{x}\_{1:i-1})} $$
+$$ z_i = \frac{x_i - \\mu_i(\mathbf{x}\_{1:i-1})}{\sigma_i(\mathbf{x}\_{1:i-1})} = -\frac{\\mu_i(\mathbf{x}\_{1:i-1})}{\sigma_i(\mathbf{x}\_{1:i-1})} + x_i \\odot \frac{1}{\sigma_i(\mathbf{x}\_{1:i-1})} $$
 
 If let:
 
-$$ \begin{aligned} & \\tilde{\mathbf{x}} = \mathbf{z}\text{, }\\tilde{p}(.) = \\pi(.)\text{, }\\tilde{\mathbf{x}} \\sim \\tilde{p}(\\tilde{\mathbf{x}}) \\ & \\tilde{\mathbf{z}} = \mathbf{x} \text{, }\\tilde{\\pi}(.) = p(.)\text{, }\\tilde{\mathbf{z}} \\sim \\tilde{\\pi}(\\tilde{\mathbf{z}})\\ & \\tilde{\\mu}\_i(\\tilde{\mathbf{z}}\_{1:i-1}) = \\tilde{\\mu}\_i(\mathbf{x}\_{1:i-1}) = -\frac{\\mu_i(\mathbf{x}\_{1:i-1})}{\\sigma_i(\mathbf{x}\_{1:i-1})} \\ & \\tilde{\\sigma}(\\tilde{\mathbf{z}}\_{1:i-1}) = \\tilde{\\sigma}(\mathbf{x}\_{1:i-1}) = \frac{1}{\\sigma_i(\mathbf{x}\_{1:i-1})} \end{aligned} $$
+$$ \begin{aligned} & \\tilde{\mathbf{x}} = \mathbf{z}\text{, }\\tilde{p}(.) = \\pi(.)\text{, }\\tilde{\mathbf{x}} \\sim \\tilde{p}(\\tilde{\mathbf{x}}) \\ & \\tilde{\mathbf{z}} = \mathbf{x} \text{, }\\tilde{\\pi}(.) = p(.)\text{, }\\tilde{\mathbf{z}} \\sim \\tilde{\\pi}(\\tilde{\mathbf{z}})\\ & \\tilde{\\mu}\_i(\\tilde{\mathbf{z}}\_{1:i-1}) = \\tilde{\\mu}\_i(\mathbf{x}\_{1:i-1}) = -\frac{\\mu_i(\mathbf{x}\_{1:i-1})}{\sigma_i(\mathbf{x}\_{1:i-1})} \\ & \\tilde{\sigma}(\\tilde{\mathbf{z}}\_{1:i-1}) = \\tilde{\sigma}(\mathbf{x}\_{1:i-1}) = \frac{1}{\sigma_i(\mathbf{x}\_{1:i-1})} \end{aligned} $$
 
 Then we would have,
 
-$$ \\tilde{x}\_i \\sim p(\\tilde{x}\_i\vert\\tilde{\mathbf{z}}\_{1:i}) = \\tilde{z}\_i \\odot \\tilde{\\sigma}\_i(\\tilde{\mathbf{z}}\_{1:i-1}) + \\tilde{\\mu}\_i(\\tilde{\mathbf{z}}\_{1:i-1}) \text{, where }\\tilde{\mathbf{z}} \\sim \\tilde{\\pi}(\\tilde{\mathbf{z}}) $$
+$$ \\tilde{x}\_i \\sim p(\\tilde{x}\_i\vert\\tilde{\mathbf{z}}\_{1:i}) = \\tilde{z}\_i \\odot \\tilde{\sigma}\_i(\\tilde{\mathbf{z}}\_{1:i-1}) + \\tilde{\\mu}\_i(\\tilde{\mathbf{z}}\_{1:i-1}) \text{, where }\\tilde{\mathbf{z}} \\sim \\tilde{\\pi}(\\tilde{\mathbf{z}}) $$
 
 IAF intends to estimate the probability density function of $\\tilde{\mathbf{x}}$ given that $\\tilde{\\pi}(\\tilde{\mathbf{z}})$ is already known. The inverse flow is an autoregressive affine transformation too, same as in MAF, but the scale and shift terms are autoregressive functions of observed variables from the known distribution $\\tilde{\\pi}(\\tilde{\mathbf{z}})$. See the comparison between MAF and IAF in Fig. 10.
 
@@ -323,7 +323,7 @@ IAF intends to estimate the probability density function of $\\tilde{\mathbf{x}}
 
 Fig. 10. Comparison of MAF and IAF. The variable with known density is in green while the unknown one is in red.
 
-Computations of the individual elements $\\tilde{x}\_i$ do not depend on each other, so they are easily parallelizable (only one pass using MADE). The density estimation for a known $\\tilde{\mathbf{x}}$ is not efficient, because we have to recover the value of $\\tilde{z}\_i$ in a sequential order, $\\tilde{z}\_i = (\\tilde{x}\_i - \\tilde{\\mu}\_i(\\tilde{\mathbf{z}}\_{1:i-1})) / \\tilde{\\sigma}\_i(\\tilde{\mathbf{z}}\_{1:i-1})$, thus D times in total.
+Computations of the individual elements $\\tilde{x}\_i$ do not depend on each other, so they are easily parallelizable (only one pass using MADE). The density estimation for a known $\\tilde{\mathbf{x}}$ is not efficient, because we have to recover the value of $\\tilde{z}\_i$ in a sequential order, $\\tilde{z}\_i = (\\tilde{x}\_i - \\tilde{\\mu}\_i(\\tilde{\mathbf{z}}\_{1:i-1})) / \\tilde{\sigma}\_i(\\tilde{\mathbf{z}}\_{1:i-1})$, thus D times in total.
 
 Base distribution
 
@@ -341,7 +341,7 @@ $\mathbf{z}\\sim\\pi(\mathbf{z})$
 
 $\mathbf{x}\\sim p(\mathbf{x})$
 
-$x\_i = z\_i \\odot \\sigma\_i(\mathbf{x}\_{1:i-1}) + \\mu\_i(\mathbf{x}\_{1:i-1})$
+$x\_i = z\_i \\odot \sigma\_i(\mathbf{x}\_{1:i-1}) + \\mu\_i(\mathbf{x}\_{1:i-1})$
 
 Sequential; slow
 
@@ -353,7 +353,7 @@ $\\tilde{\mathbf{z}}\\sim\\tilde{\\pi}(\\tilde{\mathbf{z}})$
 
 $\\tilde{\mathbf{x}}\\sim\\tilde{p}(\\tilde{\mathbf{x}})$
 
-$\\tilde{x}\_i = \\tilde{z}\_i \\odot \\tilde{\\sigma}\_i(\\tilde{\mathbf{z}}\_{1:i-1}) + \\tilde{\\mu}\_i(\\tilde{\mathbf{z}}\_{1:i-1})$
+$\\tilde{x}\_i = \\tilde{z}\_i \\odot \\tilde{\sigma}\_i(\\tilde{\mathbf{z}}\_{1:i-1}) + \\tilde{\\mu}\_i(\\tilde{\mathbf{z}}\_{1:i-1})$
 
 One pass; fast
 
@@ -373,7 +373,7 @@ Sequential; slow
 
 # VAE + Flows[#](#vae--flows)
 
-In [Variational Autoencoder](https://lilianweng.github.io/posts/2018-08-12-vae/#vae-variational-autoencoder), if we want to model the posterior $p(\mathbf{z}\vert\mathbf{x})$ as a more complicated distribution rather than simple Gaussian. Intuitively we can use normalizing flow to transform the base Gaussian for better density approximation. The encoder then would predict a set of scale and shift terms $(\\mu\_i, \\sigma\_i)$ which are all functions of input $\mathbf{x}$. Read the [paper](https://arxiv.org/abs/1809.05861) for more details if interested.
+In [Variational Autoencoder](https://lilianweng.github.io/posts/2018-08-12-vae/#vae-variational-autoencoder), if we want to model the posterior $p(\mathbf{z}\vert\mathbf{x})$ as a more complicated distribution rather than simple Gaussian. Intuitively we can use normalizing flow to transform the base Gaussian for better density approximation. The encoder then would predict a set of scale and shift terms $(\\mu\_i, \sigma\_i)$ which are all functions of input $\mathbf{x}$. Read the [paper](https://arxiv.org/abs/1809.05861) for more details if interested.
 
 ---
 

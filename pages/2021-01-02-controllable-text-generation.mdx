@@ -53,7 +53,7 @@ By adopting different decoding methods, we can place restrictions or preferences
 
 Since the final layer of the model predicts logits $o$ over the vocabulary space, the next token can be sampled by applying softmax with temperature $T$. The probability of sampling the $i$-th token is
 
-$$ p_i \\propto \frac{\\exp(o_i / T)}{\sum_j \\exp(o_j/T)} $$
+$$ p_i \\propto \frac{\exp(o_i / T)}{\sum_j \exp(o_j/T)} $$
 
 A low temperature would make the distribution sharper and a high value makes it softer.
 
@@ -75,7 +75,7 @@ Both top-k and nucleus sampling have less repetitions with a proper set of hyper
 
 **Penalized sampling** ([Keskar et al. 2019](https://arxiv.org/abs/1909.05858)): To avoid the common failure case of generating duplicate substrings, the [CTRL](https://arxiv.org/abs/1909.05858) paper proposed a new sampling method to penalize repetitions by discounting the scores of previously generated tokens. The probability distribution for the next token with repetition penalty is defined as:
 
-$$ p_i = \frac{\\exp(o_i / (T \cdot \mathbb{1}(i \in g)))}{\sum_j \\exp(o_j / (T \cdot \mathbb{1}(j \in g)))} \quad \mathbb{1}(c) = \\theta \text{ if the condition }c\text{ is True else }1 $$
+$$ p_i = \frac{\exp(o_i / (T \cdot \mathbb{1}(i \in g)))}{\sum_j \exp(o_j / (T \cdot \mathbb{1}(j \in g)))} \quad \mathbb{1}(c) = \\theta \text{ if the condition }c\text{ is True else }1 $$
 
 where $g$ contains a set of previously generated tokens, $\mathbb{1}(.)$ is an identity function. $\\theta=1.2$ is found to yield a good balance between less repetition and truthful generation.
 
@@ -96,7 +96,7 @@ where $\\log p(x\_{t+1})$ is the log-likelihood predicted by LM. $\text{score}(b
 
 Similar to Hafez, [Baheti et al. (2018)](https://arxiv.org/abs/1809.01215) manually designed features for ranking and altered the sampling distribution by appending similarity scores between topic distribution or embeddings of the context and the completion.
 
-[Holtzman et al. (2018)](https://arxiv.org/abs/1805.06087) adopted a set of learned discriminators, each specializing in a different principle of communication guided by [Grice's maxims](https://en.wikipedia.org/wiki/Cooperative_principle): quality, quantity, relation and manner. The discriminators learn to encode these desired principles by measuring repetition, entailment, relevance, and lexical diversity, respectively. Given some ground truth completion, all the discriminator models are trained to minimize the ranking log-likelihood, $\\log\\sigma(f\_i(y\_g) - f\_i(y))$, because the gold continuation $y\_g$ is expected to obtain a higher score than the generated one $y$. Here the weight coefficients $\\alpha\_i$ are also learned to minimize the score difference between the golden standard and the generated completion. Discriminative Adversarial Search (DAS; [Scialom et al., 2020](https://arxiv.org/abs/2002.10375)) is inspired by GAN and trains the discriminator to tell apart human created text from machine generated text. The discriminator predicts a label for each token instead of for the entire sequence. The discriminator logprob is added to the score to guide sampling towards the human-written style.
+[Holtzman et al. (2018)](https://arxiv.org/abs/1805.06087) adopted a set of learned discriminators, each specializing in a different principle of communication guided by [Grice's maxims](https://en.wikipedia.org/wiki/Cooperative_principle): quality, quantity, relation and manner. The discriminators learn to encode these desired principles by measuring repetition, entailment, relevance, and lexical diversity, respectively. Given some ground truth completion, all the discriminator models are trained to minimize the ranking log-likelihood, $\\log\sigma(f\_i(y\_g) - f\_i(y))$, because the gold continuation $y\_g$ is expected to obtain a higher score than the generated one $y$. Here the weight coefficients $\\alpha\_i$ are also learned to minimize the score difference between the golden standard and the generated completion. Discriminative Adversarial Search (DAS; [Scialom et al., 2020](https://arxiv.org/abs/2002.10375)) is inspired by GAN and trains the discriminator to tell apart human created text from machine generated text. The discriminator predicts a label for each token instead of for the entire sequence. The discriminator logprob is added to the score to guide sampling towards the human-written style.
 
 [Meister et al. (2020)](https://arxiv.org/abs/2010.02650) studied beam search in a regularized decoding framework:
 
@@ -156,25 +156,25 @@ $$ w\_\\phi(\mathbf{x}) = \frac{p(\mathbf{x})}{p\_\\theta(\mathbf{x})} = \frac{q
 
 where $\\gamma = \frac{q(y=0)}{q(y=1)} > 0$ is a fixed odd ratio.
 
-Since we cannot learn a perfect optimal classifier, the importance weight would be an estimation $\\hat{w}\_\\phi$. A couple of practical tricks can be applied to offset cases when the classifier exploits artifacts in the generated samples to make very confident predictions (i.e. very small importance weights):
+Since we cannot learn a perfect optimal classifier, the importance weight would be an estimation $\hat{w}\_\\phi$. A couple of practical tricks can be applied to offset cases when the classifier exploits artifacts in the generated samples to make very confident predictions (i.e. very small importance weights):
 
-1.  Self-normalization: normalize the weight by the sum $\\hat{w}\_\\phi(\mathbf{x}\_i) / \sum\_{j=1}^N \\hat{w}\_\\phi(\mathbf{x}\_j)$.
-2.  Flattening: add a power scaling parameter $\\alpha > 0$, $\\hat{w}\_\\phi(\mathbf{x}\_i)^\\alpha$.
-3.  Clipping: specify a lower bound $\max(\\hat{w}\_\\phi(\mathbf{x}\_i), \\beta)$.
+1.  Self-normalization: normalize the weight by the sum $\hat{w}\_\\phi(\mathbf{x}\_i) / \sum\_{j=1}^N \hat{w}\_\\phi(\mathbf{x}\_j)$.
+2.  Flattening: add a power scaling parameter $\\alpha > 0$, $\hat{w}\_\\phi(\mathbf{x}\_i)^\\alpha$.
+3.  Clipping: specify a lower bound $\max(\hat{w}\_\\phi(\mathbf{x}\_i), \\beta)$.
 
-To sample from an importance resampled generative model, $\mathbf{x}\\sim p\_{\\theta, \\phi}(\mathbf{x}) \\propto p\_\\theta(\mathbf{x})\\hat{w}\_\\phi(\mathbf{x})$, they adopt SIR (Sampling-Importance-Resampling),
+To sample from an importance resampled generative model, $\mathbf{x}\\sim p\_{\\theta, \\phi}(\mathbf{x}) \\propto p\_\\theta(\mathbf{x})\hat{w}\_\\phi(\mathbf{x})$, they adopt SIR (Sampling-Importance-Resampling),
 
 ![](SIR-importance-resampling.png)
 
-Fig. 4. The algorithm for sampling from a generative model according to importance weights $\\hat{w}(\mathbf{x}\\\_i)$ using SIR. (Image source: [Grover et al., 2019)](https://arxiv.org/abs/1906.09531))
+Fig. 4. The algorithm for sampling from a generative model according to importance weights $\hat{w}(\mathbf{x}\\\_i)$ using SIR. (Image source: [Grover et al., 2019)](https://arxiv.org/abs/1906.09531))
 
-[Deng et al., 2020](https://arxiv.org/abs/2004.11714) proposed to learn a EBM to steer a LM in the [residual space](https://arxiv.org/abs/1906.03351), $P\_\\theta(x) \\propto P\_\text{LM}(x)\\exp(-E\_\\theta(x))$, where $P\_\\theta$ is the joint model; $E\_\\theta$ is the residual energy function to be learned. If we know the partition function $Z$, we can model the generative model for generative a sequence $x\_{p+1}, \dots, x\_T$ as:
+[Deng et al., 2020](https://arxiv.org/abs/2004.11714) proposed to learn a EBM to steer a LM in the [residual space](https://arxiv.org/abs/1906.03351), $P\_\\theta(x) \\propto P\_\text{LM}(x)\exp(-E\_\\theta(x))$, where $P\_\\theta$ is the joint model; $E\_\\theta$ is the residual energy function to be learned. If we know the partition function $Z$, we can model the generative model for generative a sequence $x\_{p+1}, \dots, x\_T$ as:
 
-$$ P\_\\theta(x\_{p+1:T}\vert x\_{1:p}) = \frac{P\_\text{LM}(x\_{p+1:T}\vert x\_{1:p}) \\exp(-E\_\\theta(x\_{1:T}))}{Z\_\\theta(x\_{1:p})} $$
+$$ P\_\\theta(x\_{p+1:T}\vert x\_{1:p}) = \frac{P\_\text{LM}(x\_{p+1:T}\vert x\_{1:p}) \exp(-E\_\\theta(x\_{1:T}))}{Z\_\\theta(x\_{1:p})} $$
 
 The goal is to learn the parameters of the energy function $E\_\\theta$ such that the joint model $P\_\\theta$ gets closer to the desired data distribution. The residual energy function is trained by noise contrastive estimation ([NCE](https://www.kdnuggets.com/2019/07/introduction-noise-contrastive-estimation.html)), considering $P\_\\theta$ as the model distribution and $P\_\text{LM}$ as the noise distribution:
 
-$$ \\theta = \arg\max\_{\\theta} \mathbb{E}\_{x^+ \\sim P\_\text{data}} \\log\frac{1}{1+\\exp(E\_\\theta(x^+))} + \mathbb{E}\_{x^- \\sim P\_\text{LM}} \\log\frac{1}{1+\\exp(-E\_\\theta(x^-))} $$
+$$ \\theta = \arg\max\_{\\theta} \mathbb{E}\_{x^+ \\sim P\_\text{data}} \\log\frac{1}{1+\exp(E\_\\theta(x^+))} + \mathbb{E}\_{x^- \\sim P\_\text{LM}} \\log\frac{1}{1+\exp(-E\_\\theta(x^-))} $$
 
 However, the partition function is intractable in practice. The paper proposed a simple way to first sample from the original LM and then to resample from them according to the energy function. This is unfortunately quite expensive.
 
@@ -293,7 +293,7 @@ Paraphrasing is a quick way to explore more prompts similar to the known version
 
 [Ribeiro et al (2018)](https://www.aclweb.org/anthology/P18-1079/) identified _semantically equivalent adversaries (SEA)_ by generating a variety of paraphrases $\{x'\}$ of input $x$ until it triggers a different prediction of target function $f$:
 
-$$ \begin{aligned} SEA(x, x') &= \mathbb{1}\[\text{SemEq}(x, x') \\land f(x) \\neq f(x')\] \\ \text{where SemEq}(x, x') &= \mathbb{1}\[\min\\Big(1, \frac{p(x'\vert x)}{p(x\vert x)} \\Big) \\geq \\tau\] \end{aligned} $$
+$$ \begin{aligned} SEA(x, x') &= \mathbb{1}\[\text{SemEq}(x, x') \\land f(x) \\neq f(x')\] \\ \text{where SemEq}(x, x') &= \mathbb{1}\[\min\\Big(1, \frac{p(x'\vert x)}{p(x\vert x)} \\Big) \\geq \tau\] \end{aligned} $$
 
 The rules extracted from SEA are considered as “bugs” in the model. Applying those rules as data augmentation in model training helps robustify the model and fix bugs.
 
@@ -343,9 +343,9 @@ $$ \mathcal{L}\_\text{RL} = - \sum\_{(x, y^\*)\\sim\mathcal{D}} \mathbb{E}\_{y\\
 
 where $y$ is the predicted sequence and $y^\*$ is the ground truth.
 
-[Paulus et al (2017)](https://arxiv.org/abs/1705.04304) added an extra weighting term based on the reward difference between two output sequences, $y$ by sampling the next token according to the predicted probability and $\\hat{y}$ by greedily taking the most likely token. This RL loss maximizes the conditional likelihood of the sampled sequence $y$ if it obtains a higher reward than the greedy baseline $\\hat{y}$:
+[Paulus et al (2017)](https://arxiv.org/abs/1705.04304) added an extra weighting term based on the reward difference between two output sequences, $y$ by sampling the next token according to the predicted probability and $\hat{y}$ by greedily taking the most likely token. This RL loss maximizes the conditional likelihood of the sampled sequence $y$ if it obtains a higher reward than the greedy baseline $\hat{y}$:
 
-$$ \mathcal{L}\_\text{RL} = \sum\_{(x, y^\*)\\sim\mathcal{D}} (R(\\hat{y}, y^\*) - R(y, y^\*)) \sum\_{t=1}^{n'} \\log p(y_t \vert y\_{<{t}}, x) $$
+$$ \mathcal{L}\_\text{RL} = \sum\_{(x, y^\*)\\sim\mathcal{D}} (R(\hat{y}, y^\*) - R(y, y^\*)) \sum\_{t=1}^{n'} \\log p(y_t \vert y\_{<{t}}, x) $$
 
 ## RL Fine-tuning with Human Preferences[#](#rl-fine-tuning-with-human-preferences)
 
@@ -363,7 +363,7 @@ $$ \mathcal{L}^\text{MSE}\_\text{rm} = \[R^\*(x, y) - R\_\\psi(x, y)\]^2 $$
 
 (2) Preference loss: learning to agree with the ground truth reward,
 
-$$ \begin{aligned} \mathcal{L}^\text{pref}\_\text{rm} =& - \sum\_{i,j} \\big(\mathbb{1}\[R^\*(x, y_i) > R^\*(x, y_j)\] \\log P(y_i \\succ y_j) + \\ &\mathbb{1}\[R^\*(x, y_j) > R^\*(x, y_i)\] \\log P(y_j \\succ y_i) \\big)\\ \text{where }P(y_i \\succ y_j) =& \frac{\\exp(R\_\\psi(x, y_i))}{\\exp(R\_\\psi(x, y_i)) + \\exp(R\_\\psi(x, y_j))} \end{aligned} $$
+$$ \begin{aligned} \mathcal{L}^\text{pref}\_\text{rm} =& - \sum\_{i,j} \\big(\mathbb{1}\[R^\*(x, y_i) > R^\*(x, y_j)\] \\log P(y_i \\succ y_j) + \\ &\mathbb{1}\[R^\*(x, y_j) > R^\*(x, y_i)\] \\log P(y_j \\succ y_i) \\big)\\ \text{where }P(y_i \\succ y_j) =& \frac{\exp(R\_\\psi(x, y_i))}{\exp(R\_\\psi(x, y_i)) + \exp(R\_\\psi(x, y_j))} \end{aligned} $$
 
 Their experiments showed that the _preference loss_ achieves the best performance, where the reward model is a thin MLP layer on top of BERT sentence embedding.
 
@@ -375,7 +375,7 @@ Fig. 18. The overview of the training framework for fine-tuning a language model
 
 The reward model is implemented by a pretrained language model with an extra random linear layer of the final embedding output. It it trained to minimize the loss:
 
-$$ \mathcal{L}\_\text{rm} = -\mathbb{E}\_{(x, \{y_i\}, b) \\sim \mathcal{D}} \\Big\[ \\log \frac{\\exp(R\_\\psi(x, y_b))}{\sum_i \\exp(R\_\\psi(x, y_i))} \\Big\] $$
+$$ \mathcal{L}\_\text{rm} = -\mathbb{E}\_{(x, \{y_i\}, b) \\sim \mathcal{D}} \\Big\[ \\log \frac{\exp(R\_\\psi(x, y_b))}{\sum_i \exp(R\_\\psi(x, y_i))} \\Big\] $$
 
 To keep the scale consistent during training, the reward model is normalized to have mean 0 and variance 1.
 
@@ -387,7 +387,7 @@ If running online data collection, human label collection process is continued d
 
 In the following work ([Stiennon et al., 2020](https://arxiv.org/abs/2009.01325)), the human label collection was further simplified to select the best option between a pair of summaries, $y\_b \in\{y\_0, y\_1\}$ The reward model loss was updated to optimize the log odds of the selected summary:
 
-$$ \mathcal{L}\_\text{rm} = \mathbb{E}\_{(x, y_0, y_1, b)\\sim\mathcal{D}} \[\\log(\\sigma(r\_\\theta(x, y_b) − r\_\\theta(x, y\_{1−b})))\] $$
+$$ \mathcal{L}\_\text{rm} = \mathbb{E}\_{(x, y_0, y_1, b)\\sim\mathcal{D}} \[\\log(\sigma(r\_\\theta(x, y_b) − r\_\\theta(x, y\_{1−b})))\] $$
 
 ![](summarize-human-feedback.png)
 
@@ -466,9 +466,9 @@ $$ p(x_t\vert x\_{<{t}}, z) = \text{softmax}(\text{logits}\_\text{LM}(x_t \vert 
 
 By Bayesian rule, we have
 
-$$ p(x_t\vert x\_{<{t}}, z) = \frac{p(z \vert x\_{\\leq t})}{p(z)} p(x_t \vert x\_{<{t}}) \\propto p(z \vert x\_{\\leq t}) p(x_t \vert x\_{<{t}}) $$
+$$ p(x_t\vert x\_{<{t}}, z) = \frac{p(z \vert x\_{\leq t})}{p(z)} p(x_t \vert x\_{<{t}}) \\propto p(z \vert x\_{\leq t}) p(x_t \vert x\_{<{t}}) $$
 
-And therefore the auxiliary model $\text{logits}\_\text{aux}(x\_t \vert x\_{<t}, z))$ effectively should learn to predict $p(z \vert x\_{\\leq t})$. In the experiments of [Zeldes et al., 2020](https://arxiv.org/abs/2006.16823), the auxiliary model can re-use the intermediate layers of the pre-trained LM for feature extraction.
+And therefore the auxiliary model $\text{logits}\_\text{aux}(x\_t \vert x\_{<t}, z))$ effectively should learn to predict $p(z \vert x\_{\leq t})$. In the experiments of [Zeldes et al., 2020](https://arxiv.org/abs/2006.16823), the auxiliary model can re-use the intermediate layers of the pre-trained LM for feature extraction.
 
 ![](side-auxiliary.png)
 
@@ -481,9 +481,9 @@ Fig. 23. The auxiliary model is trained by reusing features extracted from multi
 
 GeDi relies on the contract between $p\_\\theta(x\_{1:t} \vert z)$ and $p\_\\theta(x\_{1:t} \vert \\bar{z})$ to compute the probability of the sequence belonging to the desired class. The discriminator loss is to maximize the probability of desired attribute $z$:
 
-$$ \begin{aligned} p\_\\theta(z \vert x\_{1:t}) &= \frac{p(z) p\_\\theta(x\_{1:\\tau} \vert z)^{\\alpha/\\tau}}{\sum\_{z' \in \{z, \\bar{z}\}} p(z') p\_\\theta(x\_{1:\\tau} \vert z')^{\\alpha/\\tau} } \\ \mathcal{L}\_\text{desc} &= -\frac{1}{N} \sum\_{i=1}^N \\log p\_\\theta(z^{(i)} \vert x^{(i)}\_{1:\\tau_i}) \\ &= -\frac{1}{N} \sum\_{i=1}^N \\log \frac{p(z) p\_\\theta(x^{(i)}\_{1:\\tau_i} \vert z^{(i)})^{\\alpha/t_i}}{\sum\_{z' \in \{z, \\bar{z}\} } p(z')p\_\\theta(x^{(i)}\_{1:\\tau_i} \vert z')^{\\alpha/\\tau_i}} \end{aligned} $$
+$$ \begin{aligned} p\_\\theta(z \vert x\_{1:t}) &= \frac{p(z) p\_\\theta(x\_{1:\tau} \vert z)^{\\alpha/\tau}}{\sum\_{z' \in \{z, \\bar{z}\}} p(z') p\_\\theta(x\_{1:\tau} \vert z')^{\\alpha/\tau} } \\ \mathcal{L}\_\text{desc} &= -\frac{1}{N} \sum\_{i=1}^N \\log p\_\\theta(z^{(i)} \vert x^{(i)}\_{1:\tau_i}) \\ &= -\frac{1}{N} \sum\_{i=1}^N \\log \frac{p(z) p\_\\theta(x^{(i)}\_{1:\tau_i} \vert z^{(i)})^{\\alpha/t_i}}{\sum\_{z' \in \{z, \\bar{z}\} } p(z')p\_\\theta(x^{(i)}\_{1:\tau_i} \vert z')^{\\alpha/\tau_i}} \end{aligned} $$
 
-where $p(z) = \\exp(b\_z) / \sum\_{z'} \\exp(b\_{z'})$ and $b\_z$ is a learned class prior. The probabilities are normalized by the current sequence length $\\tau$ to robustify generation sequences of variable lengths. $\\tau\_i$ is the sequence length of the $i$-th input $x^{(i)}$ in the dataset.
+where $p(z) = \exp(b\_z) / \sum\_{z'} \exp(b\_{z'})$ and $b\_z$ is a learned class prior. The probabilities are normalized by the current sequence length $\tau$ to robustify generation sequences of variable lengths. $\tau\_i$ is the sequence length of the $i$-th input $x^{(i)}$ in the dataset.
 
 ![](GeDi.png)
 
@@ -511,13 +511,13 @@ where $\mathcal{C}$ is the set of all distributions over $X$ that satisfy the mo
 
 According to theorems in Information Geometry, $p$ can be approximated by an EBM (energy-based model; an unnormalized probability distribution) $P$ in the form of exponential function, such that $p(x) \\propto P(x)$ and $p(x)=\frac{1}{Z}P(x)$ where $Z=\sum\_x P(x)$. The energy-based model can be approximated by:
 
-$$ P(x)=a(x)\\exp\\big(\sum_i \\lambda_i \\phi_i(x)\\big)=a(x)\\exp(\\boldsymbol{\\lambda}\cdot\\boldsymbol{\\phi}(x)) $$
+$$ P(x)=a(x)\exp\\big(\sum_i \\lambda_i \\phi_i(x)\\big)=a(x)\exp(\\boldsymbol{\\lambda}\cdot\\boldsymbol{\\phi}(x)) $$
 
-Let's define _importance weight_ $w(x, \\boldsymbol{\\lambda}) = \frac{P(x)}{a(x)} = \\exp\langle\\boldsymbol{\\lambda}\cdot\\boldsymbol{\\phi}(x)\rangle$. Given a large number of sequences sampled from the pretrained model $x\_1, \dots, x\_N \\sim a(x)$,
+Let's define _importance weight_ $w(x, \\boldsymbol{\\lambda}) = \frac{P(x)}{a(x)} = \exp\langle\\boldsymbol{\\lambda}\cdot\\boldsymbol{\\phi}(x)\rangle$. Given a large number of sequences sampled from the pretrained model $x\_1, \dots, x\_N \\sim a(x)$,
 
-$$ \begin{aligned} \\mu(\\boldsymbol{\\lambda}) &= \mathbb{E}\_{x\\sim p}\\boldsymbol{\\phi}(x) = \mathbb{E}\_{x\\sim a} \frac{p(x)}{a(x)}\\boldsymbol{\\phi}(x) = \frac{1}{Z}\mathbb{E}\_{x\\sim a} w(x, \\boldsymbol{\\lambda}) \\boldsymbol{\\phi}(x) \\ &= \frac{\mathbb{E}\_{x\\sim a} w(x, \\boldsymbol{\\lambda}) \\boldsymbol{\\phi}(x)}{\sum\_{x\in X} P(x)} = \frac{\mathbb{E}\_{x\\sim a} w(x, \\boldsymbol{\\lambda}) \\boldsymbol{\\phi}(x)}{\sum\_{x\in X} w(x, \\boldsymbol{\\lambda})a(x)} = \frac{\mathbb{E}\_{x\\sim a} w(x, \\boldsymbol{\\lambda}) \\boldsymbol{\\phi}(x)}{\mathbb{E}\_{x\\sim a} w(x, \\boldsymbol{\\lambda})} \\ &\\simeq \frac{\sum\_{i=1}^N w(x_i,\\boldsymbol{\\lambda}) \\boldsymbol{\\phi}(x_i)}{\sum\_{i=1}^N w(x_i, \\boldsymbol{\\lambda})} = \frac{\sum\_{i=1}^N \\exp\langle\\boldsymbol{\\lambda}\cdot\\boldsymbol{\\phi}(x)\rangle \\boldsymbol{\\phi}(x_i)}{\sum\_{i=1}^N \\exp\langle\\boldsymbol{\\lambda}\cdot\\boldsymbol{\\phi}(x)\rangle} \end{aligned} $$
+$$ \begin{aligned} \\mu(\\boldsymbol{\\lambda}) &= \mathbb{E}\_{x\\sim p}\\boldsymbol{\\phi}(x) = \mathbb{E}\_{x\\sim a} \frac{p(x)}{a(x)}\\boldsymbol{\\phi}(x) = \frac{1}{Z}\mathbb{E}\_{x\\sim a} w(x, \\boldsymbol{\\lambda}) \\boldsymbol{\\phi}(x) \\ &= \frac{\mathbb{E}\_{x\\sim a} w(x, \\boldsymbol{\\lambda}) \\boldsymbol{\\phi}(x)}{\sum\_{x\in X} P(x)} = \frac{\mathbb{E}\_{x\\sim a} w(x, \\boldsymbol{\\lambda}) \\boldsymbol{\\phi}(x)}{\sum\_{x\in X} w(x, \\boldsymbol{\\lambda})a(x)} = \frac{\mathbb{E}\_{x\\sim a} w(x, \\boldsymbol{\\lambda}) \\boldsymbol{\\phi}(x)}{\mathbb{E}\_{x\\sim a} w(x, \\boldsymbol{\\lambda})} \\ &\\simeq \frac{\sum\_{i=1}^N w(x_i,\\boldsymbol{\\lambda}) \\boldsymbol{\\phi}(x_i)}{\sum\_{i=1}^N w(x_i, \\boldsymbol{\\lambda})} = \frac{\sum\_{i=1}^N \exp\langle\\boldsymbol{\\lambda}\cdot\\boldsymbol{\\phi}(x)\rangle \\boldsymbol{\\phi}(x_i)}{\sum\_{i=1}^N \exp\langle\\boldsymbol{\\lambda}\cdot\\boldsymbol{\\phi}(x)\rangle} \end{aligned} $$
 
-Using SGD over the objective $|\\boldsymbol{\\mu}(\\boldsymbol{\\lambda}) - \\bar{\\boldsymbol{\\mu}}|^2\_2$, we can obtain an estimated value for $\\boldsymbol{\\lambda}$ and a representation of $P(x)=a(x)\\exp\langle\\boldsymbol{\\lambda}\cdot\\boldsymbol{\\phi}(x)\rangle$. $P(x)$ is a sequential EBM because $a$ is an autoregressive model.
+Using SGD over the objective $|\\boldsymbol{\\mu}(\\boldsymbol{\\lambda}) - \\bar{\\boldsymbol{\\mu}}|^2\_2$, we can obtain an estimated value for $\\boldsymbol{\\lambda}$ and a representation of $P(x)=a(x)\exp\langle\\boldsymbol{\\lambda}\cdot\\boldsymbol{\\phi}(x)\rangle$. $P(x)$ is a sequential EBM because $a$ is an autoregressive model.
 
 **Step 2: Learn the target probability distribution**
 
@@ -568,7 +568,7 @@ One approach for constructing $\mathcal{C}^t$ is to randomly select candidates f
 
 The unlikelihood training can be extended to be on the _sequence_\-level, where the negative continuation is defined by a sequence of per-step negative candidate sets. They should be designed to penalize properties that we don't like. For example, we can penalize repeating n-grams as follows:
 
-$$ \mathcal{C}^t\_\text{repeat-n} = \{x_t\} \text{ if }(x\_{t-i}, \dots, x\_{t+j}) \in x\_{<{t-i}} \text{ for any } (j-i)=n, i\\leq n \\leq j. $$
+$$ \mathcal{C}^t\_\text{repeat-n} = \{x_t\} \text{ if }(x\_{t-i}, \dots, x\_{t+j}) \in x\_{<{t-i}} \text{ for any } (j-i)=n, i\leq n \leq j. $$
 
 Their experiments used unlikelihood training to avoid repetitions in language model outputs and indeed showed better results on less repetition and more unique tokens compared to standard MLE training.
 
