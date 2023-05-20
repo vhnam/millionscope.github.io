@@ -63,7 +63,7 @@ In this post, we focus on the case when each desired task is a supervised learni
 
 A good meta-learning model should be trained over a variety of learning tasks and optimized for the best performance on a distribution of tasks, including potentially unseen tasks. Each task is associated with a dataset $\mathcal{D}$, containing both feature vectors and true labels. The optimal model parameters are:
 
-$$\theta^\* = \arg\min_\theta \mathbb{E}_{\mathcal{D}\sim p(\mathcal{D})} \[\mathcal{L}_\theta(\mathcal{D})\]$$
+$$\theta^\* = \arg\min_\theta \mathbb{E}_{\mathcal{D}\sim p(\mathcal{D})} [\mathcal{L}_\theta(\mathcal{D})]$$
 
 It looks very similar to a normal learning task, but _one dataset_ is considered as _one data sample_.
 
@@ -79,7 +79,7 @@ A dataset $\mathcal{D}$ contains pairs of feature vectors and labels, $\mathcal{
 
 The optimal parameters should maximize the probability of true labels across multiple training batches $B \subset \mathcal{D}$:
 
-$$\begin{aligned} \theta^\* &= {\arg\max}_{\theta} \mathbb{E}_{(\mathbf{x}, y)\in \mathcal{D}}\[P_\theta(y \vert \mathbf{x})\] &\\ \theta^\* &= {\arg\max}_{\theta} \mathbb{E}_{B\subset \mathcal{D}}\[\sum_{(\mathbf{x}, y)\in B}P_\theta(y \vert \mathbf{x})\] & \\scriptstyle{\text{; trained with mini-batches.}} \end{aligned}$$
+$$\begin{aligned} \theta^\* &= {\arg\max}_{\theta} \mathbb{E}_{(\mathbf{x}, y)\in \mathcal{D}}[P_\theta(y \vert \mathbf{x})] &\\ \theta^\* &= {\arg\max}_{\theta} \mathbb{E}_{B\subset \mathcal{D}}[\sum_{(\mathbf{x}, y)\in B}P_\theta(y \vert \mathbf{x})] & \\scriptstyle{\text{; trained with mini-batches.}} \end{aligned}$$
 
 In few-shot classification, the goal is to reduce the prediction error on data samples with unknown labels given a small support set for "fast learning" (think of how "fine-tuning" works). To make the training process mimics what happens during inference, we would like to "fake" datasets with a subset of labels to avoid exposing all the labels to the model and modify the optimization procedure accordingly to encourage fast learning:
 
@@ -90,7 +90,7 @@ In few-shot classification, the goal is to reduce the prediction error on data s
 
 You may consider each pair of sampled dataset $(S^L, B^L)$ as one data point. The model is trained such that it can generalize to other datasets. Symbols in red are added for meta-learning in addition to the supervised learning objective.
 
-$$\theta = \arg\max_\theta \color{red}{E_{L\subset\mathcal{L}}\[} E_{\color{red}{S^L \subset\mathcal{D}, }B^L \subset\mathcal{D}} \[\sum_{(x, y)\in B^L} P_\theta(x, y\color{red}{, S^L})\] \color{red}{\]}$$
+$$\theta = \arg\max_\theta \color{red}{E_{L\subset\mathcal{L}}[} E_{\color{red}{S^L \subset\mathcal{D}, }B^L \subset\mathcal{D}} [\sum_{(x, y)\in B^L} P_\theta(x, y\color{red}{, S^L})] \color{red}{]}$$
 
 The idea is to some extent similar to using a pre-trained model in image classification (ImageNet) or language modeling (big text corpora) when only a limited set of task-specific data samples are available. Meta-learning takes this idea one step further, rather than fine-tuning according to one down-steam task, it optimizes the model to be good at many, if not all.
 
@@ -103,7 +103,7 @@ Another popular view of meta-learning decomposes the model update into two stage
 
 Then in final optimization step, we need to update both $\theta$ and $\phi$ to maximize:
 
-$$\mathbb{E}_{L\subset\mathcal{L}}\[ \mathbb{E}_{S^L \subset\mathcal{D}, B^L \subset\mathcal{D}} \[\sum_{(\mathbf{x}, y)\in B^L} P_{g_\phi(\theta, S^L)}(y \vert \mathbf{x})\]\]$$
+$$\mathbb{E}_{L\subset\mathcal{L}}[ \mathbb{E}_{S^L \subset\mathcal{D}, B^L \subset\mathcal{D}} [\sum_{(\mathbf{x}, y)\in B^L} P_{g_\phi(\theta, S^L)}(y \vert \mathbf{x})]]$$
 
 ## Common Approaches[#](#common-approaches)
 
@@ -202,7 +202,7 @@ The embedding vectors are critical inputs for building a good classifier. Taking
   1.  First the test sample goes through a simple neural network, such as a CNN, to extract basic features, $f'(\mathbf{x})$.
   2.  Then an LSTM is trained with a read attention vector over the support set as part of the hidden state:
 
-$$\begin{aligned} \hat{\mathbf{h}}_t, \mathbf{c}_t &= \text{LSTM}(f'(\mathbf{x}), \[\mathbf{h}_{t-1}, \mathbf{r}_{t-1}\], \mathbf{c}_{t-1}) \\ \mathbf{h}_t &= \hat{\mathbf{h}}_t + f'(\mathbf{x}) \\ \mathbf{r}_{t-1} &= \sum_{i=1}^k a(\mathbf{h}_{t-1}, g(\mathbf{x}_i)) g(\mathbf{x}_i) \\ a(\mathbf{h}_{t-1}, g(\mathbf{x}_i)) &= \text{softmax}(\mathbf{h}_{t-1}^\top g(\mathbf{x}_i)) = \frac{\exp(\mathbf{h}_{t-1}^\top g(\mathbf{x}_i))}{\sum_{j=1}^k \exp(\mathbf{h}_{t-1}^\top g(\mathbf{x}_j))} \end{aligned}$$
+$$\begin{aligned} \hat{\mathbf{h}}_t, \mathbf{c}_t &= \text{LSTM}(f'(\mathbf{x}), [\mathbf{h}_{t-1}, \mathbf{r}_{t-1}], \mathbf{c}_{t-1}) \\ \mathbf{h}_t &= \hat{\mathbf{h}}_t + f'(\mathbf{x}) \\ \mathbf{r}_{t-1} &= \sum_{i=1}^k a(\mathbf{h}_{t-1}, g(\mathbf{x}_i)) g(\mathbf{x}_i) \\ a(\mathbf{h}_{t-1}, g(\mathbf{x}_i)) &= \text{softmax}(\mathbf{h}_{t-1}^\top g(\mathbf{x}_i)) = \frac{\exp(\mathbf{h}_{t-1}^\top g(\mathbf{x}_i))}{\sum_{j=1}^k \exp(\mathbf{h}_{t-1}^\top g(\mathbf{x}_j))} \end{aligned}$$
 
 3.  Eventually $f(\mathbf{x}, S)=\mathbf{h}_K$ if we do K steps of "read".
 
@@ -210,13 +210,13 @@ This embedding method is called "Full Contextual Embeddings (FCE)". Interestingl
 
 The training process in Matching Networks is designed to match inference at test time, see the details in the earlier [section](#training-in-the-same-way-as-testing). It is worthy of mentioning that the Matching Networks paper refined the idea that training and testing conditions should match.
 
-$$\theta^\* = \arg\max_\theta \mathbb{E}_{L\subset\mathcal{L}}\[ \mathbb{E}_{S^L \subset\mathcal{D}, B^L \subset\mathcal{D}} \[\sum_{(\mathbf{x}, y)\in B^L} P_\theta(y\vert\mathbf{x}, S^L)\]\]$$
+$$\theta^\* = \arg\max_\theta \mathbb{E}_{L\subset\mathcal{L}}[ \mathbb{E}_{S^L \subset\mathcal{D}, B^L \subset\mathcal{D}} [\sum_{(\mathbf{x}, y)\in B^L} P_\theta(y\vert\mathbf{x}, S^L)]]$$
 
 ## Relation Network[#](#relation-network)
 
 **Relation Network (RN)** ([Sung et al., 2018](http://openaccess.thecvf.com/content_cvpr_2018/papers_backup/Sung_Learning_to_Compare_CVPR_2018_paper.pdf)) is similar to [siamese network](#convolutional-siamese-neural-network) but with a few differences:
 
-1.  The relationship is not captured by a simple L1 distance in the feature space, but predicted by a CNN classifier $g_\phi$. The relation score between a pair of inputs, $\mathbf{x}_i$ and $\mathbf{x}_j$, is $r_{ij} = g_\phi(\[\mathbf{x}_i, \mathbf{x}_j\])$ where $\[.,.\]$ is concatenation.
+1.  The relationship is not captured by a simple L1 distance in the feature space, but predicted by a CNN classifier $g_\phi$. The relation score between a pair of inputs, $\mathbf{x}_i$ and $\mathbf{x}_j$, is $r_{ij} = g_\phi([\mathbf{x}_i, \mathbf{x}_j])$ where $[.,.]$ is concatenation.
 2.  The objective function is MSE loss instead of cross-entropy, because conceptually RN focuses more on predicting relation scores which is more like regression, rather than binary classification, $\mathcal{L}(B) = \sum_{(\mathbf{x}_i, \mathbf{x}_j, y_i, y_j)\in B} (r_{ij} - \mathbf{1}_{y_i=y_j})^2$.
 
 ![](assets/images/2018-11-30-meta-learning/relation-network.png)
@@ -367,7 +367,7 @@ Fig.9. The MetaNet architecture.
     - a. Encode the test sample into a task-specific input representation: $r_j = f_{\theta, \theta^+}(\mathbf{x}_j)$
     - b. The fast weights are computed by attending to representations of support set samples in memory $\mathbf{R}$. The attention function is of your choice. Here MetaNet uses cosine similarity:
 
-$$\begin{aligned} a_j &= \text{cosine}(\mathbf{R}, r_j) = \[\frac{r'_1\cdot r_j}{\|r'_1\|\cdot\|r_j\|}, \dots, \frac{r'_N\cdot r_j}{\|r'_N\|\cdot\|r_j\|}\]\\ \phi^+_j &= \text{softmax}(a_j)^\top \mathbf{M} \end{aligned}$$
+$$\begin{aligned} a_j &= \text{cosine}(\mathbf{R}, r_j) = [\frac{r'_1\cdot r_j}{\|r'_1\|\cdot\|r_j\|}, \dots, \frac{r'_N\cdot r_j}{\|r'_N\|\cdot\|r_j\|}]\\ \phi^+_j &= \text{softmax}(a_j)^\top \mathbf{M} \end{aligned}$$
 
     - c. Update the training loss: $\mathcal{L}_\text{train} \\leftarrow \mathcal{L}_\text{train} + \mathcal{L}^\text{task}(g_{\phi, \phi^+}(\mathbf{x}_i), y_i) $
 
@@ -400,7 +400,7 @@ $$\begin{aligned} c_t &= f_t \odot c_{t-1} + i_t \odot \tilde{c}_t\\ &= \theta_{
 
 While fixing $f_t=1$ and $i_t=\alpha_t$ might not be the optimal, both of them can be learnable and adaptable to different datasets.
 
-$$\begin{aligned} f_t &= \sigma(\mathbf{W}_f \cdot \[\nabla_{\theta_{t-1}}\mathcal{L}_t, \mathcal{L}_t, \theta_{t-1}, f_{t-1}\] + \mathbf{b}_f) & \\scriptstyle{\text{; how much to forget the old value of parameters.}}\\ i_t &= \sigma(\mathbf{W}_i \cdot \[\nabla_{\theta_{t-1}}\mathcal{L}_t, \mathcal{L}_t, \theta_{t-1}, i_{t-1}\] + \mathbf{b}_i) & \\scriptstyle{\text{; corresponding to the learning rate at time step t.}}\\ \tilde{\theta}_t &= -\nabla_{\theta_{t-1}}\mathcal{L}_t &\\ \theta_t &= f_t \odot \theta_{t-1} + i_t \odot \tilde{\theta}_t &\\ \end{aligned}$$
+$$\begin{aligned} f_t &= \sigma(\mathbf{W}_f \cdot [\nabla_{\theta_{t-1}}\mathcal{L}_t, \mathcal{L}_t, \theta_{t-1}, f_{t-1}] + \mathbf{b}_f) & \\scriptstyle{\text{; how much to forget the old value of parameters.}}\\ i_t &= \sigma(\mathbf{W}_i \cdot [\nabla_{\theta_{t-1}}\mathcal{L}_t, \mathcal{L}_t, \theta_{t-1}, i_{t-1}] + \mathbf{b}_i) & \\scriptstyle{\text{; corresponding to the learning rate at time step t.}}\\ \tilde{\theta}_t &= -\nabla_{\theta_{t-1}}\mathcal{L}_t &\\ \theta_t &= f_t \odot \theta_{t-1} + i_t \odot \tilde{\theta}_t &\\ \end{aligned}$$
 
 ### Model Setup[#](#model-setup)
 
@@ -449,7 +449,7 @@ $$\begin{aligned} \theta_0 &= \theta_\text{meta}\\ \theta_1 &= \theta_0 - \alpha
 
 Then in the outer loop, we sample a new data batch for updating the meta-objective.
 
-$$\begin{aligned} \theta_\text{meta} &\\leftarrow \theta_\text{meta} - \beta g_\text{MAML} & \\scriptstyle{\text{; update for meta-objective}} \\\[2mm\] \text{where } g_\text{MAML} &= \nabla_{\theta} \mathcal{L}^{(1)}(\theta_k) &\\\[2mm\] &= \nabla_{\theta_k} \mathcal{L}^{(1)}(\theta_k) \cdot (\nabla_{\theta_{k-1}} \theta_k) \dots (\nabla_{\theta_0} \theta_1) \cdot (\nabla_{\theta} \theta_0) & \\scriptstyle{\text{; following the chain rule}} \\ &= \nabla_{\theta_k} \mathcal{L}^{(1)}(\theta_k) \cdot \Big( \prod_{i=1}^k \nabla_{\theta_{i-1}} \theta_i \Big) \cdot I & \\ &= \nabla_{\theta_k} \mathcal{L}^{(1)}(\theta_k) \cdot \prod_{i=1}^k \nabla_{\theta_{i-1}} (\theta_{i-1} - \alpha\nabla_\theta\mathcal{L}^{(0)}(\theta_{i-1})) & \\ &= \nabla_{\theta_k} \mathcal{L}^{(1)}(\theta_k) \cdot \prod_{i=1}^k (I - \alpha\nabla_{\theta_{i-1}}(\nabla_\theta\mathcal{L}^{(0)}(\theta_{i-1}))) & \end{aligned}$$
+$$\begin{aligned} \theta_\text{meta} &\\leftarrow \theta_\text{meta} - \beta g_\text{MAML} & \\scriptstyle{\text{; update for meta-objective}} \\[2mm] \text{where } g_\text{MAML} &= \nabla_{\theta} \mathcal{L}^{(1)}(\theta_k) &\\[2mm] &= \nabla_{\theta_k} \mathcal{L}^{(1)}(\theta_k) \cdot (\nabla_{\theta_{k-1}} \theta_k) \dots (\nabla_{\theta_0} \theta_1) \cdot (\nabla_{\theta} \theta_0) & \\scriptstyle{\text{; following the chain rule}} \\ &= \nabla_{\theta_k} \mathcal{L}^{(1)}(\theta_k) \cdot \Big( \prod_{i=1}^k \nabla_{\theta_{i-1}} \theta_i \Big) \cdot I & \\ &= \nabla_{\theta_k} \mathcal{L}^{(1)}(\theta_k) \cdot \prod_{i=1}^k \nabla_{\theta_{i-1}} (\theta_{i-1} - \alpha\nabla_\theta\mathcal{L}^{(0)}(\theta_{i-1})) & \\ &= \nabla_{\theta_k} \mathcal{L}^{(1)}(\theta_k) \cdot \prod_{i=1}^k (I - \alpha\nabla_{\theta_{i-1}}(\nabla_\theta\mathcal{L}^{(0)}(\theta_{i-1}))) & \end{aligned}$$
 
 The MAML gradient is:
 
@@ -475,13 +475,13 @@ See the algorithm below: $\text{SGD}(\mathcal{L}_{\tau_i}, \theta, k)$ performs 
 
 Fig. 13. The batched version of Reptile algorithm. (Image source: [original paper](https://arxiv.org/abs/1803.02999))
 
-At a glance, the algorithm looks a lot like an ordinary SGD. However, because the task-specific optimization can take more than one step. it eventually makes$$\text{SGD}(\mathbb{E} _\tau\[\mathcal{L}_{\tau}\], \theta, k)$ diverge from $\mathbb{E}_\tau \[\text{SGD}(\mathcal{L}_{\tau}, \theta, k)\]$$when k > 1.
+At a glance, the algorithm looks a lot like an ordinary SGD. However, because the task-specific optimization can take more than one step. it eventually makes$$\text{SGD}(\mathbb{E} _\tau[\mathcal{L}_{\tau}], \theta, k)$ diverge from $\mathbb{E}_\tau [\text{SGD}(\mathcal{L}_{\tau}, \theta, k)]$$when k > 1.
 
 ### The Optimization Assumption[#](#the-optimization-assumption)
 
 Assuming that a task $\tau \sim p(\tau)$ has a manifold of optimal network configuration, $\mathcal{W}_{\tau}^\*$. The model $f_\theta$ achieves the best performance for task $\tau$ when $\theta$ lays on the surface of $\mathcal{W}_{\tau}^\*$. To find a solution that is good across tasks, we would like to find a parameter close to all the optimal manifolds of all tasks:
 
-$$\theta^\* = \arg\min_\theta \mathbb{E}_{\tau \sim p(\tau)} \[\frac{1}{2} \text{dist}(\theta, \mathcal{W}_\tau^\*)^2\]$$
+$$\theta^\* = \arg\min_\theta \mathbb{E}_{\tau \sim p(\tau)} [\frac{1}{2} \text{dist}(\theta, \mathcal{W}_\tau^\*)^2]$$
 
 ![](assets/images/2018-11-30-meta-learning/reptile-optim.png)
 
@@ -493,13 +493,13 @@ $$\text{dist}(\theta, \mathcal{W}_{\tau}^\*) = \text{dist}(\theta, W_{\tau}^\*(\
 
 The gradient of the squared euclidean distance is:
 
-$$\begin{aligned} \nabla_\theta\[\frac{1}{2}\text{dist}(\theta, \mathcal{W}_{\tau_i}^\*)^2\] &= \nabla_\theta\[\frac{1}{2}\text{dist}(\theta, W_{\tau_i}^\*(\theta))^2\] & \\ &= \nabla_\theta\[\frac{1}{2}(\theta - W_{\tau_i}^\*(\theta))^2\] & \\ &= \theta - W_{\tau_i}^\*(\theta) & \\scriptstyle{\text{; See notes.}} \end{aligned}$$
+$$\begin{aligned} \nabla_\theta[\frac{1}{2}\text{dist}(\theta, \mathcal{W}_{\tau_i}^\*)^2] &= \nabla_\theta[\frac{1}{2}\text{dist}(\theta, W_{\tau_i}^\*(\theta))^2] & \\ &= \nabla_\theta[\frac{1}{2}(\theta - W_{\tau_i}^\*(\theta))^2] & \\ &= \theta - W_{\tau_i}^\*(\theta) & \\scriptstyle{\text{; See notes.}} \end{aligned}$$
 
 Notes: According to the Reptile paper, "_the gradient of the squared euclidean distance between a point Θ and a set S is the vector 2(Θ − p), where p is the closest point in S to Θ_". Technically the closest point in S is also a function of Θ, but I'm not sure why the gradient does not need to worry about the derivative of p. (Please feel free to leave me a comment or send me an email about this if you have ideas.)
 
 Thus the update rule for one stochastic gradient step is:
 
-$$\theta = \theta - \alpha \nabla_\theta\[\frac{1}{2} \text{dist}(\theta, \mathcal{W}_{\tau_i}^\*)^2\] = \theta - \alpha(\theta - W_{\tau_i}^\*(\theta)) = (1-\alpha)\theta + \alpha W_{\tau_i}^\*(\theta)$$
+$$\theta = \theta - \alpha \nabla_\theta[\frac{1}{2} \text{dist}(\theta, \mathcal{W}_{\tau_i}^\*)^2] = \theta - \alpha(\theta - W_{\tau_i}^\*(\theta)) = (1-\alpha)\theta + \alpha W_{\tau_i}^\*(\theta)$$
 
 The closest point on the optimal task manifold $W_{\tau_i}^\*(\theta)$ cannot be computed exactly, but Reptile approximates it using $\text{SGD}(\mathcal{L}_\tau, \theta, k)$.
 
@@ -549,12 +549,12 @@ During training, we often average over multiple data batches. In our example, th
 
 Let,
 
-- $A = \mathbb{E}_{\tau,0,1} \[g_0^{(0)}\] = \mathbb{E}_{\tau,0,1} \[g_0^{(1)}\]$; it is the average gradient of task loss. We expect to improve the model parameter to achieve better task performance by following this direction pointed by $A$.
-- $B = \mathbb{E}_{\tau,0,1} \[H^{(1)}_0 g_0^{(0)}\] = \frac{1}{2}\mathbb{E}_{\tau,0,1} \[H^{(1)}_0 g_0^{(0)} + H^{(0)}_0 g_0^{(1)}\] = \frac{1}{2}\mathbb{E}_{\tau,0,1} \[\nabla_\theta(g^{(0)}_0 g_0^{(1)})\]$; it is the direction (gradient) that increases the inner product of gradients of two different mini batches for the same task. We expect to improve the model parameter to achieve better generalization over different data by following this direction pointed by $B$.
+- $A = \mathbb{E}_{\tau,0,1} [g_0^{(0)}] = \mathbb{E}_{\tau,0,1} [g_0^{(1)}]$; it is the average gradient of task loss. We expect to improve the model parameter to achieve better task performance by following this direction pointed by $A$.
+- $B = \mathbb{E}_{\tau,0,1} [H^{(1)}_0 g_0^{(0)}] = \frac{1}{2}\mathbb{E}_{\tau,0,1} [H^{(1)}_0 g_0^{(0)} + H^{(0)}_0 g_0^{(1)}] = \frac{1}{2}\mathbb{E}_{\tau,0,1} [\nabla_\theta(g^{(0)}_0 g_0^{(1)})]$; it is the direction (gradient) that increases the inner product of gradients of two different mini batches for the same task. We expect to improve the model parameter to achieve better generalization over different data by following this direction pointed by $B$.
 
 To conclude, both MAML and Reptile aim to optimize for the same goal, better task performance (guided by A) and better generalization (guided by B), when the gradient update is approximated by first three leading terms.
 
-$$\begin{aligned} \mathbb{E}_{\tau,1,2}\[g_\text{FOMAML}\] &= A - \alpha B + O(\alpha^2)\\ \mathbb{E}_{\tau,1,2}\[g_\text{MAML}\] &= A - 2\alpha B + O(\alpha^2)\\ \mathbb{E}_{\tau,1,2}\[g_\text{Reptile}\] &= 2A - \alpha B + O(\alpha^2) \end{aligned}$$
+$$\begin{aligned} \mathbb{E}_{\tau,1,2}[g_\text{FOMAML}] &= A - \alpha B + O(\alpha^2)\\ \mathbb{E}_{\tau,1,2}[g_\text{MAML}] &= A - 2\alpha B + O(\alpha^2)\\ \mathbb{E}_{\tau,1,2}[g_\text{Reptile}] &= 2A - \alpha B + O(\alpha^2) \end{aligned}$$
 
 It is not clear to me whether the ignored term $O(\alpha^2)$ might play a big impact on the parameter learning. But given that FOMAML is able to obtain a similar performance as the full version of MAML, it might be safe to say higher-level derivatives would not be critical during gradient descent update.
 
@@ -572,30 +572,30 @@ Cited as:
 ```
 # Reference[#](#reference)
 
-\[1\] Brenden M. Lake, Ruslan Salakhutdinov, and Joshua B. Tenenbaum. ["Human-level concept learning through probabilistic program induction."](https://www.cs.cmu.edu/~rsalakhu/papers/LakeEtAl2015Science.pdf) Science 350.6266 (2015): 1332-1338.
+[1] Brenden M. Lake, Ruslan Salakhutdinov, and Joshua B. Tenenbaum. ["Human-level concept learning through probabilistic program induction."](https://www.cs.cmu.edu/~rsalakhu/papers/LakeEtAl2015Science.pdf) Science 350.6266 (2015): 1332-1338.
 
-\[2\] Oriol Vinyals' talk on ["Model vs Optimization Meta Learning"](http://metalearning-symposium.ml/files/vinyals.pdf)
+[2] Oriol Vinyals' talk on ["Model vs Optimization Meta Learning"](http://metalearning-symposium.ml/files/vinyals.pdf)
 
-\[3\] Gregory Koch, Richard Zemel, and Ruslan Salakhutdinov. ["Siamese neural networks for one-shot image recognition."](http://www.cs.toronto.edu/~rsalakhu/papers/oneshot1.pdf) ICML Deep Learning Workshop. 2015.
+[3] Gregory Koch, Richard Zemel, and Ruslan Salakhutdinov. ["Siamese neural networks for one-shot image recognition."](http://www.cs.toronto.edu/~rsalakhu/papers/oneshot1.pdf) ICML Deep Learning Workshop. 2015.
 
-\[4\] Oriol Vinyals, et al. ["Matching networks for one shot learning."](http://papers.nips.cc/paper/6385-matching-networks-for-one-shot-learning.pdf) NIPS. 2016.
+[4] Oriol Vinyals, et al. ["Matching networks for one shot learning."](http://papers.nips.cc/paper/6385-matching-networks-for-one-shot-learning.pdf) NIPS. 2016.
 
-\[5\] Flood Sung, et al. ["Learning to compare: Relation network for few-shot learning."](http://openaccess.thecvf.com/content_cvpr_2018/papers_backup/Sung_Learning_to_Compare_CVPR_2018_paper.pdf) CVPR. 2018.
+[5] Flood Sung, et al. ["Learning to compare: Relation network for few-shot learning."](http://openaccess.thecvf.com/content_cvpr_2018/papers_backup/Sung_Learning_to_Compare_CVPR_2018_paper.pdf) CVPR. 2018.
 
-\[6\] Jake Snell, Kevin Swersky, and Richard Zemel. ["Prototypical Networks for Few-shot Learning."](http://papers.nips.cc/paper/6996-prototypical-networks-for-few-shot-learning.pdf) CVPR. 2018.
+[6] Jake Snell, Kevin Swersky, and Richard Zemel. ["Prototypical Networks for Few-shot Learning."](http://papers.nips.cc/paper/6996-prototypical-networks-for-few-shot-learning.pdf) CVPR. 2018.
 
-\[7\] Adam Santoro, et al. ["Meta-learning with memory-augmented neural networks."](http://proceedings.mlr.press/v48/santoro16.pdf) ICML. 2016.
+[7] Adam Santoro, et al. ["Meta-learning with memory-augmented neural networks."](http://proceedings.mlr.press/v48/santoro16.pdf) ICML. 2016.
 
-\[8\] Alex Graves, Greg Wayne, and Ivo Danihelka. ["Neural turing machines."](https://arxiv.org/abs/1410.5401) arXiv preprint arXiv:1410.5401 (2014).
+[8] Alex Graves, Greg Wayne, and Ivo Danihelka. ["Neural turing machines."](https://arxiv.org/abs/1410.5401) arXiv preprint arXiv:1410.5401 (2014).
 
-\[9\] Tsendsuren Munkhdalai and Hong Yu. ["Meta Networks."](https://arxiv.org/abs/1703.00837) ICML. 2017.
+[9] Tsendsuren Munkhdalai and Hong Yu. ["Meta Networks."](https://arxiv.org/abs/1703.00837) ICML. 2017.
 
-\[10\] Sachin Ravi and Hugo Larochelle. ["Optimization as a Model for Few-Shot Learning."](https://openreview.net/pdf?id=rJY0-Kcll) ICLR. 2017.
+[10] Sachin Ravi and Hugo Larochelle. ["Optimization as a Model for Few-Shot Learning."](https://openreview.net/pdf?id=rJY0-Kcll) ICLR. 2017.
 
-\[11\] Chelsea Finn's BAIR blog on ["Learning to Learn"](https://bair.berkeley.edu/blog/2017/07/18/learning-to-learn/).
+[11] Chelsea Finn's BAIR blog on ["Learning to Learn"](https://bair.berkeley.edu/blog/2017/07/18/learning-to-learn/).
 
-\[12\] Chelsea Finn, Pieter Abbeel, and Sergey Levine. ["Model-agnostic meta-learning for fast adaptation of deep networks."](https://arxiv.org/abs/1703.03400) ICML 2017.
+[12] Chelsea Finn, Pieter Abbeel, and Sergey Levine. ["Model-agnostic meta-learning for fast adaptation of deep networks."](https://arxiv.org/abs/1703.03400) ICML 2017.
 
-\[13\] Alex Nichol, Joshua Achiam, John Schulman. ["On First-Order Meta-Learning Algorithms."](https://arxiv.org/abs/1803.02999) arXiv preprint arXiv:1803.02999 (2018).
+[13] Alex Nichol, Joshua Achiam, John Schulman. ["On First-Order Meta-Learning Algorithms."](https://arxiv.org/abs/1803.02999) arXiv preprint arXiv:1803.02999 (2018).
 
-\[14\] [Slides on Reptile](https://www.slideshare.net/YoonhoLee4/on-firstorder-metalearning-algorithms) by Yoonho Lee.
+[14] [Slides on Reptile](https://www.slideshare.net/YoonhoLee4/on-firstorder-metalearning-algorithms) by Yoonho Lee.

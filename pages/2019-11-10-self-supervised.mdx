@@ -75,7 +75,7 @@ We expect small distortion on an image does not modify its original semantic mea
 
 Fig. 2. The original patch of a cute deer is in the top left corner. Random transformations are applied, resulting in a variety of distorted patches. All of them should be classified into the same class in the pretext task. (Image source: [Dosovitskiy et al., 2015](https://arxiv.org/abs/1406.6909))
 
-**Rotation** of an entire image ([Gidaris et al. 2018](https://arxiv.org/abs/1803.07728) is another interesting and cheap way to modify an input image while the semantic content stays unchanged. Each input image is first rotated by a multiple of $90^\circ$ at random, corresponding to $\[0^\circ, 90^\circ, 180^\circ, 270^\circ\]$. The model is trained to predict which rotation has been applied, thus a 4-class classification problem.
+**Rotation** of an entire image ([Gidaris et al. 2018](https://arxiv.org/abs/1803.07728) is another interesting and cheap way to modify an input image while the semantic content stays unchanged. Each input image is first rotated by a multiple of $90^\circ$ at random, corresponding to $[0^\circ, 90^\circ, 180^\circ, 270^\circ]$. The model is trained to predict which rotation has been applied, thus a 4-class classification problem.
 
 In order to identify the same image with different rotations, the model has to learn to recognize high level object parts, such as heads, noses, and eyes, and the relative positions of these parts, rather than local patterns. This pretext task drives the model to learn semantic concepts of objects in this way.
 
@@ -168,7 +168,7 @@ The **denoising autoencoder** ([Vincent, et al, 2008](https://www.cs.toronto.edu
 
 The **context encoder** ([Pathak, et al., 2016](https://arxiv.org/abs/1604.07379)) is trained to fill in a missing piece in the image. Let $\hat{M}$ be a binary mask, 0 for dropped pixels and 1 for remaining input pixels. The model is trained with a combination of the reconstruction (L2) loss and the adversarial loss. The removed regions defined by the mask could be of any shape.
 
-$$\begin{aligned} \mathcal{L}(\mathbf{x}) &= \mathcal{L}_\text{recon}(\mathbf{x}) + \mathcal{L}_\text{adv}(\mathbf{x})\\ \mathcal{L}_\text{recon}(\mathbf{x}) &= \|(1 - \hat{M}) \odot (\mathbf{x} - E(\hat{M} \odot \mathbf{x})) \|_2^2 \\ \mathcal{L}_\text{adv}(\mathbf{x}) &= \max_D \mathbb{E}_{\mathbf{x}} \[\log D(\mathbf{x}) + \log(1 - D(E(\hat{M} \odot \mathbf{x})))\] \end{aligned}$$
+$$\begin{aligned} \mathcal{L}(\mathbf{x}) &= \mathcal{L}_\text{recon}(\mathbf{x}) + \mathcal{L}_\text{adv}(\mathbf{x})\\ \mathcal{L}_\text{recon}(\mathbf{x}) &= \|(1 - \hat{M}) \odot (\mathbf{x} - E(\hat{M} \odot \mathbf{x})) \|_2^2 \\ \mathcal{L}_\text{adv}(\mathbf{x}) &= \max_D \mathbb{E}_{\mathbf{x}} [\log D(\mathbf{x}) + \log(1 - D(E(\hat{M} \odot \mathbf{x})))] \end{aligned}$$
 
 where $E(.)$ is the encoder and $D(.)$ is the decoder.
 
@@ -188,7 +188,7 @@ The generative adversarial networks (GANs) are able to learn to map from simple 
 
 **Bidirectional GANs** ([Donahue, et al, 2017](https://arxiv.org/abs/1605.09782)) introduces an additional encoder $E(.)$ to learn the mappings from the input to the latent variable $\mathbf{z}$. The discriminator $D(.)$ predicts in the joint space of the input data and latent representation, $(\mathbf{x}, \mathbf{z})$, to tell apart the generated pair $(\mathbf{x}, E(\mathbf{x}))$ from the real one $(G(\mathbf{z}), \mathbf{z})$. The model is trained to optimize the objective: $\min_{G, E} \max_D V(D, E, G)$, where the generator $G$ and the encoder $E$ learn to generate data and latent variables that are realistic enough to confuse the discriminator and at the same time the discriminator $D$ tries to differentiate real and generated data.
 
-$$V(D, E, G) = \mathbb{E}_{\mathbf{x} \sim p_\mathbf{x}} \[ \underbrace{\mathbb{E}_{\mathbf{z} \sim p_E(.\vert\mathbf{x})}\[\log D(\mathbf{x}, \mathbf{z})\]}_{\log D(\text{real})} \] + \mathbb{E}_{\mathbf{z} \sim p_\mathbf{z}} \[ \underbrace{\mathbb{E}_{\mathbf{x} \sim p_G(.\vert\mathbf{z})}\[\log 1 - D(\mathbf{x}, \mathbf{z})\]}_{\log(1- D(\text{fake}))}) \]$$
+$$V(D, E, G) = \mathbb{E}_{\mathbf{x} \sim p_\mathbf{x}} [ \underbrace{\mathbb{E}_{\mathbf{z} \sim p_E(.\vert\mathbf{x})}[\log D(\mathbf{x}, \mathbf{z})]}_{\log D(\text{real})} ] + \mathbb{E}_{\mathbf{z} \sim p_\mathbf{z}} [ \underbrace{\mathbb{E}_{\mathbf{x} \sim p_G(.\vert\mathbf{z})}[\log 1 - D(\mathbf{x}, \mathbf{z})]}_{\log(1- D(\text{fake}))}) ]$$
 
 ![](assets/images/2019-11-10-self-supervised/bi-GAN.png)
 
@@ -216,7 +216,7 @@ where $f_k$ can be unnormalized and a linear transformation $W_k^\top c_t$ is us
 
 Given a set of $N$ random samples $X = \{x_1, \dots, x_N\}$ containing only one positive sample $x_t \sim p(x_{t+k} \vert c_t)$ and $N-1$ negative samples $x_{i \\neq t} \sim p(x_{t+k})$, the cross-entropy loss for classifying the positive sample (where $\frac{f_k}{\sum f_k}$ is the prediction) correctly is:
 
-$$\mathcal{L}_N = - \mathbb{E}_X \Big\[\log \frac{f_k(x_{t+k}, c_t)}{\sum_{i=1}^N f_k (x_i, c_t)}\Big\]$$
+$$\mathcal{L}_N = - \mathbb{E}_X \Big[\log \frac{f_k(x_{t+k}, c_t)}{\sum_{i=1}^N f_k (x_i, c_t)}\Big]$$
 
 ![](assets/images/2019-11-10-self-supervised/CPC-image.png)
 
@@ -411,7 +411,7 @@ The task is to control a robot arm to push a small puck on a table to a desired 
 
 Let's say a [$\beta$-VAE](https://lilianweng.github.io/posts/2018-08-12-vae/#beta-vae) has an encoder $q_\phi$ mapping input states to latent variable $z$ which is modeled by a Gaussian distribution and a decoder $p_\\psi$ mapping $z$ back to the states. The state encoder in RIG is set to be the mean of $\beta$-VAE encoder.
 
-$$\begin{aligned} z &\sim q_\phi(z \vert s) = \mathcal{N}(z; \mu_\phi(s), \sigma^2_\phi(s)) \\ \mathcal{L}_{\beta\text{-VAE}} &= - \mathbb{E}_{z \sim q_\phi(z \vert s)} \[\log p_\\psi (s \vert z)\] + \beta D_\text{KL}(q_\phi(z \vert s) \| p_\\psi(s)) \\ e(s) &\\triangleq \mu_\phi(s) \end{aligned}$$
+$$\begin{aligned} z &\sim q_\phi(z \vert s) = \mathcal{N}(z; \mu_\phi(s), \sigma^2_\phi(s)) \\ \mathcal{L}_{\beta\text{-VAE}} &= - \mathbb{E}_{z \sim q_\phi(z \vert s)} [\log p_\\psi (s \vert z)] + \beta D_\text{KL}(q_\phi(z \vert s) \| p_\\psi(s)) \\ e(s) &\\triangleq \mu_\phi(s) \end{aligned}$$
 
 The reward is the Euclidean distance between state and goal embedding vectors: $r(s, g) = -|e(s) - e(g)|$. Similar to [grasp2vec](#grasp2vec), RIG applies data augmentation as well by latent goal relabeling: precisely half of the goals are generated from the prior at random and the other half are selected using HER. Also same as grasp2vec, rewards do not depend on any ground truth states but only the learned state encoding, so it can be used for training on real robots.
 
@@ -427,7 +427,7 @@ Fig. 24. The workflow of context-conditioned RIG. (Image source: [Nair, et al., 
 
 A CVAE conditions on a context variable $c$. It trains an encoder $q_\phi(z \vert s, c)$ and a decoder $p_\\psi (s \vert z, c)$ and note that both have access to $c$. The CVAE loss penalizes information passing from the input state $s$ through an information bottleneck but allows for _unrestricted_ information flow from $c$ to both encoder and decoder.
 
-$$\mathcal{L}_\text{CVAE} = - \mathbb{E}_{z \sim q_\phi(z \vert s,c)} \[\log p_\\psi (s \vert z, c)\] + \beta D_\text{KL}(q_\phi(z \vert s, c) \| p_\\psi(s))$$
+$$\mathcal{L}_\text{CVAE} = - \mathbb{E}_{z \sim q_\phi(z \vert s,c)} [\log p_\\psi (s \vert z, c)] + \beta D_\text{KL}(q_\phi(z \vert s, c) \| p_\\psi(s))$$
 
 To create plausible goals, CC-VAE conditions on a starting state $s_0$ so that the generated goal presents a consistent type of object as in $s_0$. This goal consistency is necessary; e.g. if the current scene contains a red puck but the goal has a blue block, it would confuse the policy.
 
@@ -470,9 +470,9 @@ where $\phi(s)$ is the embedding of state $s$; symbols with bar are functions (r
 
 The function $D$ quantifies the distance between two probability distributions and should be chosen carefully. DeepMDP focuses on _Wasserstein-1_ metric (also known as ["earth-mover distance"](https://lilianweng.github.io/posts/2017-08-20-gan/#what-is-wasserstein-distance)). The Wasserstein-1 distance between distributions $P$ and $Q$ on a metric space $(M, d)$ (i.e., $d: M \times M \to \mathbb{R}$) is:
 
-$$W_d (P, Q) = \inf_{\lambda \in \\Pi(P, Q)} \int_{M \times M} d(x, y) \lambda(x, y) \\; \\mathrm{d}x \\mathrm{d}y$$
+$$W_d (P, Q) = \inf_{\lambda \in \Pi(P, Q)} \int_{M \times M} d(x, y) \lambda(x, y) \\; \\mathrm{d}x \\mathrm{d}y$$
 
-where $\\Pi(P, Q)$ is the set of all [couplings](<https://en.wikipedia.org/wiki/Coupling_(probability)>) of $P$ and $Q$. $d(x, y)$ defines the cost of moving a particle from point $x$ to point $y$.
+where $\Pi(P, Q)$ is the set of all [couplings](<https://en.wikipedia.org/wiki/Coupling_(probability)>) of $P$ and $Q$. $d(x, y)$ defines the cost of moving a particle from point $x$ to point $y$.
 
 The Wasserstein metric has a dual form according to the Monge-Kantorovich duality:
 
@@ -496,7 +496,7 @@ Similar to DeepMDP, DBC models the dynamics by learning a reward model and a tra
 >
 > Then, $\mathcal{F}$ has a unique fixed point $\tilde{d}$ which is a $\pi^\*$-bisimulation metric and $\tilde{d}(s_i, s_j) = 0 \\iff s_i \sim s_j$.
 
-\[The proof is not trivial. I may or may not add it in the future _(:3」∠)_ …\]
+[The proof is not trivial. I may or may not add it in the future _(:3」∠)_ …]
 
 Given batches of observations pairs, the training loss for $\phi$, $J(\phi)$, minimizes the mean square error between the on-policy bisimulation metric and Euclidean distance in the latent space:
 
@@ -526,66 +526,66 @@ Cited as:
 
 # References[#](#references)
 
-\[1\] Alexey Dosovitskiy, et al. ["Discriminative unsupervised feature learning with exemplar convolutional neural networks."](https://arxiv.org/abs/1406.6909) IEEE transactions on pattern analysis and machine intelligence 38.9 (2015): 1734-1747.
+[1] Alexey Dosovitskiy, et al. ["Discriminative unsupervised feature learning with exemplar convolutional neural networks."](https://arxiv.org/abs/1406.6909) IEEE transactions on pattern analysis and machine intelligence 38.9 (2015): 1734-1747.
 
-\[2\] Spyros Gidaris, Praveer Singh & Nikos Komodakis. ["Unsupervised Representation Learning by Predicting Image Rotations"](https://arxiv.org/abs/1803.07728) ICLR 2018.
+[2] Spyros Gidaris, Praveer Singh & Nikos Komodakis. ["Unsupervised Representation Learning by Predicting Image Rotations"](https://arxiv.org/abs/1803.07728) ICLR 2018.
 
-\[3\] Carl Doersch, Abhinav Gupta, and Alexei A. Efros. ["Unsupervised visual representation learning by context prediction."](https://arxiv.org/abs/1505.05192) ICCV. 2015.
+[3] Carl Doersch, Abhinav Gupta, and Alexei A. Efros. ["Unsupervised visual representation learning by context prediction."](https://arxiv.org/abs/1505.05192) ICCV. 2015.
 
-\[4\] Mehdi Noroozi & Paolo Favaro. ["Unsupervised learning of visual representations by solving jigsaw puzzles."](https://arxiv.org/abs/1603.09246) ECCV, 2016.
+[4] Mehdi Noroozi & Paolo Favaro. ["Unsupervised learning of visual representations by solving jigsaw puzzles."](https://arxiv.org/abs/1603.09246) ECCV, 2016.
 
-\[5\] Mehdi Noroozi, Hamed Pirsiavash, and Paolo Favaro. ["Representation learning by learning to count."](https://arxiv.org/abs/1708.06734) ICCV. 2017.
+[5] Mehdi Noroozi, Hamed Pirsiavash, and Paolo Favaro. ["Representation learning by learning to count."](https://arxiv.org/abs/1708.06734) ICCV. 2017.
 
-\[6\] Richard Zhang, Phillip Isola & Alexei A. Efros. ["Colorful image colorization."](https://arxiv.org/abs/1603.08511) ECCV, 2016.
+[6] Richard Zhang, Phillip Isola & Alexei A. Efros. ["Colorful image colorization."](https://arxiv.org/abs/1603.08511) ECCV, 2016.
 
-\[7\] Pascal Vincent, et al. ["Extracting and composing robust features with denoising autoencoders."](https://www.cs.toronto.edu/~larocheh/publications/icml-2008-denoising-autoencoders.pdf) ICML, 2008.
+[7] Pascal Vincent, et al. ["Extracting and composing robust features with denoising autoencoders."](https://www.cs.toronto.edu/~larocheh/publications/icml-2008-denoising-autoencoders.pdf) ICML, 2008.
 
-\[8\] Jeff Donahue, Philipp Krähenbühl, and Trevor Darrell. ["Adversarial feature learning."](https://arxiv.org/abs/1605.09782) ICLR 2017.
+[8] Jeff Donahue, Philipp Krähenbühl, and Trevor Darrell. ["Adversarial feature learning."](https://arxiv.org/abs/1605.09782) ICLR 2017.
 
-\[9\] Deepak Pathak, et al. ["Context encoders: Feature learning by inpainting."](https://arxiv.org/abs/1604.07379) CVPR. 2016.
+[9] Deepak Pathak, et al. ["Context encoders: Feature learning by inpainting."](https://arxiv.org/abs/1604.07379) CVPR. 2016.
 
-\[10\] Richard Zhang, Phillip Isola, and Alexei A. Efros. ["Split-brain autoencoders: Unsupervised learning by cross-channel prediction."](https://arxiv.org/abs/1611.09842) CVPR. 2017.
+[10] Richard Zhang, Phillip Isola, and Alexei A. Efros. ["Split-brain autoencoders: Unsupervised learning by cross-channel prediction."](https://arxiv.org/abs/1611.09842) CVPR. 2017.
 
-\[11\] Xiaolong Wang & Abhinav Gupta. ["Unsupervised Learning of Visual Representations using Videos."](https://arxiv.org/abs/1505.00687) ICCV. 2015.
+[11] Xiaolong Wang & Abhinav Gupta. ["Unsupervised Learning of Visual Representations using Videos."](https://arxiv.org/abs/1505.00687) ICCV. 2015.
 
-\[12\] Carl Vondrick, et al. ["Tracking Emerges by Colorizing Videos"](https://arxiv.org/pdf/1806.09594.pdf) ECCV. 2018.
+[12] Carl Vondrick, et al. ["Tracking Emerges by Colorizing Videos"](https://arxiv.org/pdf/1806.09594.pdf) ECCV. 2018.
 
-\[13\] Ishan Misra, C. Lawrence Zitnick, and Martial Hebert. ["Shuffle and learn: unsupervised learning using temporal order verification."](https://arxiv.org/abs/1603.08561) ECCV. 2016.
+[13] Ishan Misra, C. Lawrence Zitnick, and Martial Hebert. ["Shuffle and learn: unsupervised learning using temporal order verification."](https://arxiv.org/abs/1603.08561) ECCV. 2016.
 
-\[14\] Basura Fernando, et al. ["Self-Supervised Video Representation Learning With Odd-One-Out Networks"](https://arxiv.org/abs/1611.06646) CVPR. 2017.
+[14] Basura Fernando, et al. ["Self-Supervised Video Representation Learning With Odd-One-Out Networks"](https://arxiv.org/abs/1611.06646) CVPR. 2017.
 
-\[15\] Donglai Wei, et al. ["Learning and Using the Arrow of Time"](https://www.robots.ox.ac.uk/~vgg/publications/2018/Wei18/wei18.pdf) CVPR. 2018.
+[15] Donglai Wei, et al. ["Learning and Using the Arrow of Time"](https://www.robots.ox.ac.uk/~vgg/publications/2018/Wei18/wei18.pdf) CVPR. 2018.
 
-\[16\] Florian Schroff, Dmitry Kalenichenko and James Philbin. ["FaceNet: A Unified Embedding for Face Recognition and Clustering"](https://arxiv.org/abs/1503.03832) CVPR. 2015.
+[16] Florian Schroff, Dmitry Kalenichenko and James Philbin. ["FaceNet: A Unified Embedding for Face Recognition and Clustering"](https://arxiv.org/abs/1503.03832) CVPR. 2015.
 
-\[17\] Pierre Sermanet, et al. ["Time-Contrastive Networks: Self-Supervised Learning from Video"](https://arxiv.org/abs/1704.06888) CVPR. 2018.
+[17] Pierre Sermanet, et al. ["Time-Contrastive Networks: Self-Supervised Learning from Video"](https://arxiv.org/abs/1704.06888) CVPR. 2018.
 
-\[18\] Debidatta Dwibedi, et al. ["Learning actionable representations from visual observations."](https://arxiv.org/abs/1808.00928) IROS. 2018.
+[18] Debidatta Dwibedi, et al. ["Learning actionable representations from visual observations."](https://arxiv.org/abs/1808.00928) IROS. 2018.
 
-\[19\] Eric Jang & Coline Devin, et al. ["Grasp2Vec: Learning Object Representations from Self-Supervised Grasping"](https://arxiv.org/abs/1811.06964) CoRL. 2018.
+[19] Eric Jang & Coline Devin, et al. ["Grasp2Vec: Learning Object Representations from Self-Supervised Grasping"](https://arxiv.org/abs/1811.06964) CoRL. 2018.
 
-\[20\] Ashvin Nair, et al. ["Visual reinforcement learning with imagined goals"](https://arxiv.org/abs/1807.04742) NeuriPS. 2018.
+[20] Ashvin Nair, et al. ["Visual reinforcement learning with imagined goals"](https://arxiv.org/abs/1807.04742) NeuriPS. 2018.
 
-\[21\] Ashvin Nair, et al. ["Contextual imagined goals for self-supervised robotic learning"](https://arxiv.org/abs/1910.11670) CoRL. 2019.
+[21] Ashvin Nair, et al. ["Contextual imagined goals for self-supervised robotic learning"](https://arxiv.org/abs/1910.11670) CoRL. 2019.
 
-\[22\] Aaron van den Oord, Yazhe Li & Oriol Vinyals. ["Representation Learning with Contrastive Predictive Coding"](https://arxiv.org/abs/1807.03748) arXiv preprint arXiv:1807.03748, 2018.
+[22] Aaron van den Oord, Yazhe Li & Oriol Vinyals. ["Representation Learning with Contrastive Predictive Coding"](https://arxiv.org/abs/1807.03748) arXiv preprint arXiv:1807.03748, 2018.
 
-\[23\] Olivier J. Henaff, et al. ["Data-Efficient Image Recognition with Contrastive Predictive Coding"](https://arxiv.org/abs/1905.09272) arXiv preprint arXiv:1905.09272, 2019.
+[23] Olivier J. Henaff, et al. ["Data-Efficient Image Recognition with Contrastive Predictive Coding"](https://arxiv.org/abs/1905.09272) arXiv preprint arXiv:1905.09272, 2019.
 
-\[24\] Kaiming He, et al. ["Momentum Contrast for Unsupervised Visual Representation Learning."](https://arxiv.org/abs/1911.05722) CVPR 2020.
+[24] Kaiming He, et al. ["Momentum Contrast for Unsupervised Visual Representation Learning."](https://arxiv.org/abs/1911.05722) CVPR 2020.
 
-\[25\] Zhirong Wu, et al. ["Unsupervised Feature Learning via Non-Parametric Instance-level Discrimination."](https://arxiv.org/abs/1805.01978v1) CVPR 2018.
+[25] Zhirong Wu, et al. ["Unsupervised Feature Learning via Non-Parametric Instance-level Discrimination."](https://arxiv.org/abs/1805.01978v1) CVPR 2018.
 
-\[26\] Ting Chen, et al. ["A Simple Framework for Contrastive Learning of Visual Representations."](https://arxiv.org/abs/2002.05709) arXiv preprint arXiv:2002.05709, 2020.
+[26] Ting Chen, et al. ["A Simple Framework for Contrastive Learning of Visual Representations."](https://arxiv.org/abs/2002.05709) arXiv preprint arXiv:2002.05709, 2020.
 
-\[27\] Aravind Srinivas, Michael Laskin & Pieter Abbeel ["CURL: Contrastive Unsupervised Representations for Reinforcement Learning."](https://arxiv.org/abs/2004.04136) arXiv preprint arXiv:2004.04136, 2020.
+[27] Aravind Srinivas, Michael Laskin & Pieter Abbeel ["CURL: Contrastive Unsupervised Representations for Reinforcement Learning."](https://arxiv.org/abs/2004.04136) arXiv preprint arXiv:2004.04136, 2020.
 
-\[28\] Carles Gelada, et al. ["DeepMDP: Learning Continuous Latent Space Models for Representation Learning"](https://arxiv.org/abs/1906.02736) ICML 2019.
+[28] Carles Gelada, et al. ["DeepMDP: Learning Continuous Latent Space Models for Representation Learning"](https://arxiv.org/abs/1906.02736) ICML 2019.
 
-\[29\] Amy Zhang, et al. ["Learning Invariant Representations for Reinforcement Learning without Reconstruction"](https://arxiv.org/abs/2006.10742) arXiv preprint arXiv:2006.10742, 2020.
+[29] Amy Zhang, et al. ["Learning Invariant Representations for Reinforcement Learning without Reconstruction"](https://arxiv.org/abs/2006.10742) arXiv preprint arXiv:2006.10742, 2020.
 
-\[30\] Xinlei Chen, et al. ["Improved Baselines with Momentum Contrastive Learning"](https://arxiv.org/abs/2003.04297) arXiv preprint arXiv:2003.04297, 2020.
+[30] Xinlei Chen, et al. ["Improved Baselines with Momentum Contrastive Learning"](https://arxiv.org/abs/2003.04297) arXiv preprint arXiv:2003.04297, 2020.
 
-\[31\] Jean-Bastien Grill, et al. ["Bootstrap Your Own Latent: A New Approach to Self-Supervised Learning"](https://arxiv.org/abs/2006.07733) arXiv preprint arXiv:2006.07733, 2020.
+[31] Jean-Bastien Grill, et al. ["Bootstrap Your Own Latent: A New Approach to Self-Supervised Learning"](https://arxiv.org/abs/2006.07733) arXiv preprint arXiv:2006.07733, 2020.
 
-\[32\] Abe Fetterman & Josh Albrecht. ["Understanding self-supervised and contrastive learning with Bootstrap Your Own Latent (BYOL)"](https://untitled-ai.github.io/understanding-self-supervised-contrastive-learning.html) Untitled blog. Aug 24, 2020.
+[32] Abe Fetterman & Josh Albrecht. ["Understanding self-supervised and contrastive learning with Bootstrap Your Own Latent (BYOL)"](https://untitled-ai.github.io/understanding-self-supervised-contrastive-learning.html) Untitled blog. Aug 24, 2020.

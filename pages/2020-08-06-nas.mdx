@@ -123,9 +123,9 @@ A hierarchical representation becomes $\Big( \big\{ \{ G_m^{(\ell)} \}_{m=1}^{M_
 
 The $\text{assemble}()$ process is equivalent to sequentially compute the feature map of node $i$ by aggregating all the feature maps of its predecessor node $j$ following the topological ordering:
 
-$$x_i = \text{merge} \big\[ \{ o^{(\ell)}_{G^{(\ell)}_{ij}}(x_j) \}_{j < i} \big\], i = 2, \dots, \vert G^{(\ell)} \vert$$
+$$x_i = \text{merge} \big[ \{ o^{(\ell)}_{G^{(\ell)}_{ij}}(x_j) \}_{j < i} \big], i = 2, \dots, \vert G^{(\ell)} \vert$$
 
-where $\text{merge}\[\]$ is implemented as depth-wise concatenation in the [paper](https://arxiv.org/abs/1711.00436).
+where $\text{merge}[]$ is implemented as depth-wise concatenation in the [paper](https://arxiv.org/abs/1711.00436).
 
 Same as NASNet, experiments in [Liu et al (2017)](https://arxiv.org/abs/1711.00436) focused on discovering good cell architecture within a predefined "macro" structure with repeated modules. They showed that the power of simple search methods (e.g. random search or evolutionary algorithms) can be substantially enhanced using well-designed search spaces.
 
@@ -165,7 +165,7 @@ The controller is trained as a _RL task_ using [REINFORCE](https://lilianweng.gi
 - **Reward**: The accuracy of a child network that can be achieved at convergence is the reward for training the controller, $R$.
 - **Loss**: NAS optimizes the controller parameters $\theta$ with a REINFORCE loss. We want to maximize the expected reward (high accuracy) with the gradient as follows. The nice thing here with policy gradient is that it works even when the reward is non-differentiable.
 
-$$\nabla_{\theta} J(\theta) = \sum_{t=1}^T \mathbb{E}\[\nabla_{\theta} \log P(a_t \vert a_{1:(t-1)}; \theta) R \]$$
+$$\nabla_{\theta} J(\theta) = \sum_{t=1}^T \mathbb{E}[\nabla_{\theta} \log P(a_t \vert a_{1:(t-1)}; \theta) R ]$$
 
 **MetaQNN** ([Baker et al. 2017](https://arxiv.org/abs/1611.02167)) trains an agent to sequentially choose CNN layers using [_Q-learning_](https://lilianweng.github.io/posts/2018-02-19-rl-overview/#q-learning-off-policy-td-control) with an [$\epsilon$-greedy](https://lilianweng.github.io/posts/2018-01-23-multi-armed-bandit/#%CE%B5-greedy-algorithm) exploration strategy and experience replay. The reward is the validation accuracy as well.
 
@@ -362,7 +362,7 @@ Let's continue with the graph representation. In a DAG adjacency matrix $G$ wher
 
 In One-Shot, $m_\mathcal{O}(x)$ is the sum of all the operations. In DARTS, it is a weighted sum where weights are softmax over a real-valued architecture weighting vector $\alpha$ of length $\vert \mathcal{O} \vert$. ProxylessNAS transforms the softmax probabilities of $\alpha$ into a binary gate and uses the binary gate to keep only one operation active at a time.
 
-$$\begin{aligned} m^\text{one-shot}_\mathcal{O}(x) &= \sum_{i=1}^{\vert \mathcal{O} \vert} o_i(x) \\ m^\text{DARTS}_\mathcal{O}(x) &= \sum_{i=1}^{\vert \mathcal{O} \vert} p_i o_i(x) = \sum_{i=1}^{\vert \mathcal{O} \vert} \frac{\exp(\alpha_i)}{\sum_j \exp(\alpha_j)} o_i(x) \\ m^\text{binary}_\mathcal{O}(x) &= \sum_{i=1}^{\vert \mathcal{O} \vert} g_i o_i(x) = \begin{cases} o_1(x) & \text{with probability }p_1, \\ \dots &\\ o_{\vert \mathcal{O} \vert}(x) & \text{with probability }p_{\vert \mathcal{O} \vert} \end{cases} \\ \text{ where } g &= \text{binarize}(p_1, \dots, p_N) = \begin{cases} \[1, 0, \dots, 0\] & \text{with probability }p_1, \\ \dots & \\ \[0, 0, \dots, 1\] & \text{with probability }p_N. \\ \end{cases} \end{aligned}$$
+$$\begin{aligned} m^\text{one-shot}_\mathcal{O}(x) &= \sum_{i=1}^{\vert \mathcal{O} \vert} o_i(x) \\ m^\text{DARTS}_\mathcal{O}(x) &= \sum_{i=1}^{\vert \mathcal{O} \vert} p_i o_i(x) = \sum_{i=1}^{\vert \mathcal{O} \vert} \frac{\exp(\alpha_i)}{\sum_j \exp(\alpha_j)} o_i(x) \\ m^\text{binary}_\mathcal{O}(x) &= \sum_{i=1}^{\vert \mathcal{O} \vert} g_i o_i(x) = \begin{cases} o_1(x) & \text{with probability }p_1, \\ \dots &\\ o_{\vert \mathcal{O} \vert}(x) & \text{with probability }p_{\vert \mathcal{O} \vert} \end{cases} \\ \text{ where } g &= \text{binarize}(p_1, \dots, p_N) = \begin{cases} [1, 0, \dots, 0] & \text{with probability }p_1, \\ \dots & \\ [0, 0, \dots, 1] & \text{with probability }p_N. \\ \end{cases} \end{aligned}$$
 
 ![](assets/images/2020-08-06-nas/proxylessNAS-training.png)
 
@@ -379,7 +379,7 @@ Instead of BinaryConnect, REINFORCE can also be used for parameter updates with 
 
 Computing $\partial \mathcal{L} / \partial g_i$ needs to calculate and store $o_i(x)$, which requires $\vert \mathcal{O} \vert$ times GPU memory. To resolve this issue, they factorize the task of choosing one path out of $N$ into multiple binary selection tasks (Intuition: "if a path is the best choice, it should be better than any other path"). At every update step, only two paths are sampled while others are masked. These two selected paths are updated according to the above equation and then scaled properly so that other path weights are unchanged. After this process, one of the sampled paths is enhanced (path weight increases) and the other is attenuated (path weight decreases), while all other paths stay unaltered.
 
-Besides accuracy, ProxylessNAS also considers _latency_ as an important metric to optimize, as different devices might have very different requirements on inference time latency (e.g. GPU, CPU, mobile). To make latency differentiable, they model latency as a continuous function of the network dimensions. The expected latency of a mixed operation can be written as $\mathbb{E}\[\text{latency}\] = \sum_j p_j F(o_j)$, where $F(.)$ is a latency prediction model:
+Besides accuracy, ProxylessNAS also considers _latency_ as an important metric to optimize, as different devices might have very different requirements on inference time latency (e.g. GPU, CPU, mobile). To make latency differentiable, they model latency as a continuous function of the network dimensions. The expected latency of a mixed operation can be written as $\mathbb{E}[\text{latency}] = \sum_j p_j F(o_j)$, where $F(.)$ is a latency prediction model:
 
 ![](assets/images/2020-08-06-nas/proxylessNAS-latency.png)
 
@@ -567,42 +567,42 @@ Or
 
 # Reference[#](#reference)
 
-\[1\] Thomas Elsken, Jan Hendrik Metzen, Frank Hutter. ["Neural Architecture Search: A Survey"](https://arxiv.org/abs/1808.05377) JMLR 20 (2019) 1-21.
+[1] Thomas Elsken, Jan Hendrik Metzen, Frank Hutter. ["Neural Architecture Search: A Survey"](https://arxiv.org/abs/1808.05377) JMLR 20 (2019) 1-21.
 
-\[2\] Kenneth O. Stanley, et al. ["Designing neural networks through neuroevolution"](https://www.nature.com/articles/s42256-018-0006-z) Nature Machine Intelligence volume 1, pages 24-35 (2019).
+[2] Kenneth O. Stanley, et al. ["Designing neural networks through neuroevolution"](https://www.nature.com/articles/s42256-018-0006-z) Nature Machine Intelligence volume 1, pages 24-35 (2019).
 
-\[3\] Kenneth O. Stanley & Risto Miikkulainen. ["Evolving Neural Networks through Augmenting Topologies"](http://nn.cs.utexas.edu/downloads/papers/stanley.ec02.pdf) Evolutionary Computation 10(2): 99-127 (2002).
+[3] Kenneth O. Stanley & Risto Miikkulainen. ["Evolving Neural Networks through Augmenting Topologies"](http://nn.cs.utexas.edu/downloads/papers/stanley.ec02.pdf) Evolutionary Computation 10(2): 99-127 (2002).
 
-\[4\] Barret Zoph, Quoc V. Le. ["Neural architecture search with reinforcement learning"](https://arxiv.org/abs/1611.01578) ICLR 2017.
+[4] Barret Zoph, Quoc V. Le. ["Neural architecture search with reinforcement learning"](https://arxiv.org/abs/1611.01578) ICLR 2017.
 
-\[5\] Bowen Baker, et al. ["Designing Neural Network Architectures using Reinforcement Learning"](https://arxiv.org/abs/1611.02167) ICLR 2017.
+[5] Bowen Baker, et al. ["Designing Neural Network Architectures using Reinforcement Learning"](https://arxiv.org/abs/1611.02167) ICLR 2017.
 
-\[6\] Bowen Baker, et al. ["Accelerating neural architecture search using performance prediction"](https://arxiv.org/abs/1705.10823) ICLR Workshop 2018.
+[6] Bowen Baker, et al. ["Accelerating neural architecture search using performance prediction"](https://arxiv.org/abs/1705.10823) ICLR Workshop 2018.
 
-\[7\] Barret Zoph, et al. ["Learning transferable architectures for scalable image recognition"](https://arxiv.org/abs/1707.07012) CVPR 2018.
+[7] Barret Zoph, et al. ["Learning transferable architectures for scalable image recognition"](https://arxiv.org/abs/1707.07012) CVPR 2018.
 
-\[8\] Hanxiao Liu, et al. ["Hierarchical representations for efficient architecture search."](https://arxiv.org/abs/1711.00436) ICLR 2018.
+[8] Hanxiao Liu, et al. ["Hierarchical representations for efficient architecture search."](https://arxiv.org/abs/1711.00436) ICLR 2018.
 
-\[9\] Esteban Real, et al. ["Regularized Evolution for Image Classifier Architecture Search"](https://arxiv.org/abs/1802.01548) arXiv:1802.01548 (2018).
+[9] Esteban Real, et al. ["Regularized Evolution for Image Classifier Architecture Search"](https://arxiv.org/abs/1802.01548) arXiv:1802.01548 (2018).
 
-\[10\] Han Cai, et al. \["Efficient architecture search by network transformation"\] AAAI 2018a.
+[10] Han Cai, et al. ["Efficient architecture search by network transformation"] AAAI 2018a.
 
-\[11\] Han Cai, et al. ["Path-Level Network Transformation for Efficient Architecture Search"](https://arxiv.org/abs/1806.02639) ICML 2018b.
+[11] Han Cai, et al. ["Path-Level Network Transformation for Efficient Architecture Search"](https://arxiv.org/abs/1806.02639) ICML 2018b.
 
-\[12\] Han Cai, Ligeng Zhu & Song Han. ["ProxylessNAS: Direct Neural Architecture Search on Target Task and Hardware"](https://arxiv.org/abs/1812.00332) ICLR 2019.
+[12] Han Cai, Ligeng Zhu & Song Han. ["ProxylessNAS: Direct Neural Architecture Search on Target Task and Hardware"](https://arxiv.org/abs/1812.00332) ICLR 2019.
 
-\[13\] Chenxi Liu, et al. ["Progressive neural architecture search"](https://arxiv.org/abs/1712.00559) ECCV 2018.
+[13] Chenxi Liu, et al. ["Progressive neural architecture search"](https://arxiv.org/abs/1712.00559) ECCV 2018.
 
-\[14\] Hieu Pham, et al. ["Efficient neural architecture search via parameter sharing"](https://arxiv.org/abs/1802.03268) ICML 2018.
+[14] Hieu Pham, et al. ["Efficient neural architecture search via parameter sharing"](https://arxiv.org/abs/1802.03268) ICML 2018.
 
-\[15\] Andrew Brock, et al. ["SMASH: One-shot model architecture search through hypernetworks."](https://arxiv.org/abs/1708.05344) ICLR 2018.
+[15] Andrew Brock, et al. ["SMASH: One-shot model architecture search through hypernetworks."](https://arxiv.org/abs/1708.05344) ICLR 2018.
 
-\[16\] Gabriel Bender, et al. ["Understanding and simplifying one-shot architecture search."](http://proceedings.mlr.press/v80/bender18a.html) ICML 2018.
+[16] Gabriel Bender, et al. ["Understanding and simplifying one-shot architecture search."](http://proceedings.mlr.press/v80/bender18a.html) ICML 2018.
 
-\[17\] Hanxiao Liu, Karen Simonyan, Yiming Yang. ["DARTS: Differentiable Architecture Search"](https://arxiv.org/abs/1806.09055) ICLR 2019.
+[17] Hanxiao Liu, Karen Simonyan, Yiming Yang. ["DARTS: Differentiable Architecture Search"](https://arxiv.org/abs/1806.09055) ICLR 2019.
 
-\[18\] Sirui Xie, Hehui Zheng, Chunxiao Liu, Liang Lin. ["SNAS: Stochastic Neural Architecture Search"](https://arxiv.org/abs/1812.09926) ICLR 2019.
+[18] Sirui Xie, Hehui Zheng, Chunxiao Liu, Liang Lin. ["SNAS: Stochastic Neural Architecture Search"](https://arxiv.org/abs/1812.09926) ICLR 2019.
 
-\[19\] Chenxi Liu et al. ["Are Labels Necessary for Neural Architecture Search?"](https://arxiv.org/abs/2003.12056) ECCV 2020.
+[19] Chenxi Liu et al. ["Are Labels Necessary for Neural Architecture Search?"](https://arxiv.org/abs/2003.12056) ECCV 2020.
 
-\[20\] Esteban Real, et al. ["AutoML-Zero: Evolving Machine Learning Algorithms From Scratch"](https://arxiv.org/abs/2003.03384) ICML 2020.
+[20] Esteban Real, et al. ["AutoML-Zero: Evolving Machine Learning Algorithms From Scratch"](https://arxiv.org/abs/2003.03384) ICML 2020.

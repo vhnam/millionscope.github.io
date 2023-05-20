@@ -96,7 +96,7 @@ State-value function measures the expected return of state $s$; $V_w(.)$ is a va
 
 $V^\pi(s)$
 
-The value of state $s$ when we follow a policy $\pi$; $V^\pi (s) = \mathbb{E}_{a\sim \pi} \[G_t \vert S_t = s\]$.
+The value of state $s$ when we follow a policy $\pi$; $V^\pi (s) = \mathbb{E}_{a\sim \pi} [G_t \vert S_t = s]$.
 
 $Q(s, a)$
 
@@ -104,7 +104,7 @@ Action-value function is similar to $V(s)$, but it assesses the expected return 
 
 $Q^\pi(s, a)$
 
-Similar to $V^\pi(.)$, the value of (state, action) pair when we follow a policy $\pi$; $Q^\pi(s, a) = \mathbb{E}_{a\sim \pi} \[G_t \vert S_t = s, A_t = a\]$.
+Similar to $V^\pi(.)$, the value of (state, action) pair when we follow a policy $\pi$; $Q^\pi(s, a) = \mathbb{E}_{a\sim \pi} [G_t \vert S_t = s, A_t = a]$.
 
 $A(s, a)$
 
@@ -150,7 +150,7 @@ This equation has a nice recursive form (see the red parts!) and the future stat
 
 Let's consider the following visitation sequence and label the probability of transitioning from state s to state x with policy $\pi_\theta$ after k step as $\rho^\pi(s \to x, k)$.
 
-$$s \\xrightarrow\[\]{a \sim \pi_\theta(.\vert s)} s' \\xrightarrow\[\]{a \sim \pi_\theta(.\vert s')} s'' \\xrightarrow\[\]{a \sim \pi_\theta(.\vert s'')} \dots$$
+$$s \\xrightarrow[]{a \sim \pi_\theta(.\vert s)} s' \\xrightarrow[]{a \sim \pi_\theta(.\vert s')} s'' \\xrightarrow[]{a \sim \pi_\theta(.\vert s'')} \dots$$
 
 - When k = 0: $\rho^\pi(s \to s, k=0) = 1$.
 - When k = 1, we scan through all possible actions and sum up the transition probabilities to the target state: $\rho^\pi(s \to s', k=1) = \sum_a \pi_\theta(a \vert s) P(s' \vert s, a)$.
@@ -158,7 +158,7 @@ $$s \\xrightarrow\[\]{a \sim \pi_\theta(.\vert s)} s' \\xrightarrow\[\]{a \sim \
 
 Then we go back to unroll the recursive representation of $\nabla_\theta V^\pi(s)$! Let $\phi(s) = \sum_{a \in \mathcal{A}} \nabla_\theta \pi_\theta(a \vert s)Q^\pi(s, a)$ to simplify the maths. If we keep on extending $\nabla_\theta V^\pi(.)$ infinitely, it is easy to find out that we can transition from the starting state s to any state after any number of steps in this unrolling process and by summing up all the visitation probabilities, we get $\nabla_\theta V^\pi(s)$!
 
-$$\begin{aligned} & \color{red}{\nabla_\theta V^\pi(s)} \\ =& \phi(s) + \sum_a \pi_\theta(a \vert s) \sum_{s'} P(s' \vert s,a) \color{red}{\nabla_\theta V^\pi(s')} \\ =& \phi(s) + \sum_{s'} \sum_a \pi_\theta(a \vert s) P(s' \vert s,a) \color{red}{\nabla_\theta V^\pi(s')} \\ =& \phi(s) + \sum_{s'} \rho^\pi(s \to s', 1) \color{red}{\nabla_\theta V^\pi(s')} \\ =& \phi(s) + \sum_{s'} \rho^\pi(s \to s', 1) \color{red}{\nabla_\theta V^\pi(s')} \\ =& \phi(s) + \sum_{s'} \rho^\pi(s \to s', 1) \color{red}{\[ \phi(s') + \sum_{s''} \rho^\pi(s' \to s'', 1) \nabla_\theta V^\pi(s'')\]} \\ =& \phi(s) + \sum_{s'} \rho^\pi(s \to s', 1) \phi(s') + \sum_{s''} \rho^\pi(s \to s'', 2)\color{red}{\nabla_\theta V^\pi(s'')} \\scriptstyle{\text{ ; Consider }s'\text{ as the middle point for }s \to s''}\\ =& \phi(s) + \sum_{s'} \rho^\pi(s \to s', 1) \phi(s') + \sum_{s''} \rho^\pi(s \to s'', 2)\phi(s'') + \sum_{s'''} \rho^\pi(s \to s''', 3)\color{red}{\nabla_\theta V^\pi(s''')} \\ =& \dots \\scriptstyle{\text{; Repeatedly unrolling the part of }\nabla_\theta V^\pi(.)} \\ =& \sum_{x\in\mathcal{S}}\sum_{k=0}^\infty \rho^\pi(s \to x, k) \phi(x) \end{aligned}$$
+$$\begin{aligned} & \color{red}{\nabla_\theta V^\pi(s)} \\ =& \phi(s) + \sum_a \pi_\theta(a \vert s) \sum_{s'} P(s' \vert s,a) \color{red}{\nabla_\theta V^\pi(s')} \\ =& \phi(s) + \sum_{s'} \sum_a \pi_\theta(a \vert s) P(s' \vert s,a) \color{red}{\nabla_\theta V^\pi(s')} \\ =& \phi(s) + \sum_{s'} \rho^\pi(s \to s', 1) \color{red}{\nabla_\theta V^\pi(s')} \\ =& \phi(s) + \sum_{s'} \rho^\pi(s \to s', 1) \color{red}{\nabla_\theta V^\pi(s')} \\ =& \phi(s) + \sum_{s'} \rho^\pi(s \to s', 1) \color{red}{[ \phi(s') + \sum_{s''} \rho^\pi(s' \to s'', 1) \nabla_\theta V^\pi(s'')]} \\ =& \phi(s) + \sum_{s'} \rho^\pi(s \to s', 1) \phi(s') + \sum_{s''} \rho^\pi(s \to s'', 2)\color{red}{\nabla_\theta V^\pi(s'')} \\scriptstyle{\text{ ; Consider }s'\text{ as the middle point for }s \to s''}\\ =& \phi(s) + \sum_{s'} \rho^\pi(s \to s', 1) \phi(s') + \sum_{s''} \rho^\pi(s \to s'', 2)\phi(s'') + \sum_{s'''} \rho^\pi(s \to s''', 3)\color{red}{\nabla_\theta V^\pi(s''')} \\ =& \dots \\scriptstyle{\text{; Repeatedly unrolling the part of }\nabla_\theta V^\pi(.)} \\ =& \sum_{x\in\mathcal{S}}\sum_{k=0}^\infty \rho^\pi(s \to x, k) \phi(x) \end{aligned}$$
 
 The nice rewriting above allows us to exclude the derivative of Q-value function, $\nabla_\theta Q^\pi(s, a)$. By plugging it into the objective function $J(\theta)$, we are getting the following:
 
@@ -166,13 +166,13 @@ $$\begin{aligned} \nabla_\theta J(\theta) &= \nabla_\theta V^\pi(s_0) & \\script
 
 In the episodic case, the constant of proportionality ($\sum_s \eta(s)$) is the average length of an episode; in the continuing case, it is 1 ([Sutton & Barto, 2017](http://incompleteideas.net/book/bookdraft2017nov5.pdf); Sec. 13.2). The gradient can be further written as:
 
-$$\begin{aligned} \nabla_\theta J(\theta) &\\propto \sum_{s \in \mathcal{S}} d^\pi(s) \sum_{a \in \mathcal{A}} Q^\pi(s, a) \nabla_\theta \pi_\theta(a \vert s) &\\ &= \sum_{s \in \mathcal{S}} d^\pi(s) \sum_{a \in \mathcal{A}} \pi_\theta(a \vert s) Q^\pi(s, a) \frac{\nabla_\theta \pi_\theta(a \vert s)}{\pi_\theta(a \vert s)} &\\ &= \mathbb{E}_\pi \[Q^\pi(s, a) \nabla_\theta \\ln \pi_\theta(a \vert s)\] & \\scriptstyle{\text{; Because } (\\ln x)' = 1/x} \end{aligned}$$
+$$\begin{aligned} \nabla_\theta J(\theta) &\\propto \sum_{s \in \mathcal{S}} d^\pi(s) \sum_{a \in \mathcal{A}} Q^\pi(s, a) \nabla_\theta \pi_\theta(a \vert s) &\\ &= \sum_{s \in \mathcal{S}} d^\pi(s) \sum_{a \in \mathcal{A}} \pi_\theta(a \vert s) Q^\pi(s, a) \frac{\nabla_\theta \pi_\theta(a \vert s)}{\pi_\theta(a \vert s)} &\\ &= \mathbb{E}_\pi [Q^\pi(s, a) \nabla_\theta \\ln \pi_\theta(a \vert s)] & \\scriptstyle{\text{; Because } (\\ln x)' = 1/x} \end{aligned}$$
 
 Where $\mathbb{E}_\pi$ refers to $\mathbb{E}_{s \sim d_\pi, a \sim \pi_\theta}$ when both state and action distributions follow the policy $\pi_\theta$ (on policy).
 
 The policy gradient theorem lays the theoretical foundation for various policy gradient algorithms. This vanilla policy gradient update has no bias but high variance. Many following algorithms were proposed to reduce the variance while keeping the bias unchanged.
 
-$$\nabla_\theta J(\theta) = \mathbb{E}_\pi \[Q^\pi(s, a) \nabla_\theta \\ln \pi_\theta(a \vert s)\]$$
+$$\nabla_\theta J(\theta) = \mathbb{E}_\pi [Q^\pi(s, a) \nabla_\theta \\ln \pi_\theta(a \vert s)]$$
 
 Here is a nice summary of a general form of policy gradient methods borrowed from the [GAE](https://arxiv.org/pdf/1506.02438.pdf) (general advantage estimation) paper ([Schulman et al., 2016](https://arxiv.org/abs/1506.02438)) and this [post](https://danieltakeshi.github.io/2017/04/02/notes-on-the-generalized-advantage-estimation-paper/) thoroughly discussed several components in GAE , highly recommended.
 
@@ -188,7 +188,7 @@ Tons of policy gradient algorithms have been proposed during recent years and th
 
 **REINFORCE** (Monte-Carlo policy gradient) relies on an estimated return by [Monte-Carlo](https://lilianweng.github.io/posts/2018-02-19-rl-overview/#monte-carlo-methods) methods using episode samples to update the policy parameter $\theta$. REINFORCE works because the expectation of the sample gradient is equal to the actual gradient:
 
-$$\begin{aligned} \nabla_\theta J(\theta) &= \mathbb{E}_\pi \[Q^\pi(s, a) \nabla_\theta \\ln \pi_\theta(a \vert s)\] & \\ &= \mathbb{E}_\pi \[G_t \nabla_\theta \\ln \pi_\theta(A_t \vert S_t)\] & \\scriptstyle{\text{; Because } Q^\pi(S_t, A_t) = \mathbb{E}_\pi\[G_t \vert S_t, A_t\]} \end{aligned}$$
+$$\begin{aligned} \nabla_\theta J(\theta) &= \mathbb{E}_\pi [Q^\pi(s, a) \nabla_\theta \\ln \pi_\theta(a \vert s)] & \\ &= \mathbb{E}_\pi [G_t \nabla_\theta \\ln \pi_\theta(A_t \vert S_t)] & \\scriptstyle{\text{; Because } Q^\pi(S_t, A_t) = \mathbb{E}_\pi[G_t \vert S_t, A_t]} \end{aligned}$$
 
 Therefore we are able to measure $G_t$ from real sample trajectories and use that to update our policy gradient. It relies on a full trajectory and that's why it is a Monte-Carlo method.
 
@@ -235,13 +235,13 @@ Both REINFORCE and the vanilla version of actor-critic method are on-policy: tra
 
 Now let's see how off-policy policy gradient is computed. The behavior policy for collecting samples is a known policy (predefined just like a hyperparameter), labelled as $\beta(a \vert s)$. The objective function sums up the reward over the state distribution defined by this behavior policy:
 
-$$J(\theta) = \sum_{s \in \mathcal{S}} d^\beta(s) \sum_{a \in \mathcal{A}} Q^\pi(s, a) \pi_\theta(a \vert s) = \mathbb{E}_{s \sim d^\beta} \big\[ \sum_{a \in \mathcal{A}} Q^\pi(s, a) \pi_\theta(a \vert s) \big\]$$
+$$J(\theta) = \sum_{s \in \mathcal{S}} d^\beta(s) \sum_{a \in \mathcal{A}} Q^\pi(s, a) \pi_\theta(a \vert s) = \mathbb{E}_{s \sim d^\beta} \big[ \sum_{a \in \mathcal{A}} Q^\pi(s, a) \pi_\theta(a \vert s) \big]$$
 
 where $d^\beta(s)$ is the stationary distribution of the behavior policy $\beta$; recall that $d^\beta(s) = \\lim_{t \to \infty} P(S_t = s \vert S_0, \beta)$; and $Q^\pi$ is the action-value function estimated with regard to the target policy $\pi$ (not the behavior policy!).
 
 Given that the training observations are sampled by $a \sim \beta(a \vert s)$, we can rewrite the gradient as:
 
-$$\begin{aligned} \nabla_\theta J(\theta) &= \nabla_\theta \mathbb{E}_{s \sim d^\beta} \Big\[ \sum_{a \in \mathcal{A}} Q^\pi(s, a) \pi_\theta(a \vert s) \Big\] & \\ &= \mathbb{E}_{s \sim d^\beta} \Big\[ \sum_{a \in \mathcal{A}} \big( Q^\pi(s, a) \nabla_\theta \pi_\theta(a \vert s) + \color{red}{\pi_\theta(a \vert s) \nabla_\theta Q^\pi(s, a)} \big) \Big\] & \\scriptstyle{\text{; Derivative product rule.}}\\ &\\stackrel{(i)}{\approx} \mathbb{E}_{s \sim d^\beta} \Big\[ \sum_{a \in \mathcal{A}} Q^\pi(s, a) \nabla_\theta \pi_\theta(a \vert s) \Big\] & \\scriptstyle{\text{; Ignore the red part: } \color{red}{\pi_\theta(a \vert s) \nabla_\theta Q^\pi(s, a)}}. \\ &= \mathbb{E}_{s \sim d^\beta} \Big\[ \sum_{a \in \mathcal{A}} \beta(a \vert s) \frac{\pi_\theta(a \vert s)}{\beta(a \vert s)} Q^\pi(s, a) \frac{\nabla_\theta \pi_\theta(a \vert s)}{\pi_\theta(a \vert s)} \Big\] & \\ &= \mathbb{E}_\beta \Big\[\frac{\color{blue}{\pi_\theta(a \vert s)}}{\color{blue}{\beta(a \vert s)}} Q^\pi(s, a) \nabla_\theta \\ln \pi_\theta(a \vert s) \Big\] & \\scriptstyle{\text{; The blue part is the importance weight.}} \end{aligned}$$
+$$\begin{aligned} \nabla_\theta J(\theta) &= \nabla_\theta \mathbb{E}_{s \sim d^\beta} \Big[ \sum_{a \in \mathcal{A}} Q^\pi(s, a) \pi_\theta(a \vert s) \Big] & \\ &= \mathbb{E}_{s \sim d^\beta} \Big[ \sum_{a \in \mathcal{A}} \big( Q^\pi(s, a) \nabla_\theta \pi_\theta(a \vert s) + \color{red}{\pi_\theta(a \vert s) \nabla_\theta Q^\pi(s, a)} \big) \Big] & \\scriptstyle{\text{; Derivative product rule.}}\\ &\\stackrel{(i)}{\approx} \mathbb{E}_{s \sim d^\beta} \Big[ \sum_{a \in \mathcal{A}} Q^\pi(s, a) \nabla_\theta \pi_\theta(a \vert s) \Big] & \\scriptstyle{\text{; Ignore the red part: } \color{red}{\pi_\theta(a \vert s) \nabla_\theta Q^\pi(s, a)}}. \\ &= \mathbb{E}_{s \sim d^\beta} \Big[ \sum_{a \in \mathcal{A}} \beta(a \vert s) \frac{\pi_\theta(a \vert s)}{\beta(a \vert s)} Q^\pi(s, a) \frac{\nabla_\theta \pi_\theta(a \vert s)}{\pi_\theta(a \vert s)} \Big] & \\ &= \mathbb{E}_\beta \Big[\frac{\color{blue}{\pi_\theta(a \vert s)}}{\color{blue}{\beta(a \vert s)}} Q^\pi(s, a) \nabla_\theta \\ln \pi_\theta(a \vert s) \Big] & \\scriptstyle{\text{; The blue part is the importance weight.}} \end{aligned}$$
 
 where $\frac{\pi_\theta(a \vert s)}{\beta(a \vert s)}$ is the [importance weight](http://timvieira.github.io/blog/post/2014/12/21/importance-sampling/). Because $Q^\pi$ is a function of the target policy and thus a function of policy parameter $\theta$, we should take the derivative of $\nabla_\theta Q^\pi(s, a)$ as well according to the product rule. However, it is super hard to compute $\nabla_\theta Q^\pi(s, a)$ in reality. Fortunately if we use an approximated gradient with the gradient of Q ignored, we still guarantee the policy improvement and eventually achieve the true local minimum. This is justified in the proof [here](https://arxiv.org/pdf/1205.4839.pdf) (Degris, White & Sutton, 2012).
 
@@ -249,7 +249,7 @@ In summary, when applying policy gradient in the off-policy setting, we can simp
 
 ## A3C[#](#a3c)
 
-\[[paper](https://arxiv.org/abs/1602.01783)|[code](https://github.com/dennybritz/reinforcement-learning/tree/master/PolicyGradient/a3c)\]
+[[paper](https://arxiv.org/abs/1602.01783)|[code](https://github.com/dennybritz/reinforcement-learning/tree/master/PolicyGradient/a3c)]
 
 **Asynchronous Advantage Actor-Critic** ([Mnih et al., 2016](https://arxiv.org/abs/1602.01783)), short for **A3C**, is a classic policy gradient method with a special focus on parallel training.
 
@@ -280,7 +280,7 @@ A3C enables the parallelism in multiple agent training. The gradient accumulatio
 
 ## A2C[#](#a2c)
 
-\[[paper](https://arxiv.org/abs/1602.01783)|[code](https://github.com/openai/baselines/blob/master/baselines/a2c/a2c.py)\]
+[[paper](https://arxiv.org/abs/1602.01783)|[code](https://github.com/openai/baselines/blob/master/baselines/a2c/a2c.py)]
 
 **A2C** is a synchronous, deterministic version of A3C; that's why it is named as "A2C" with the first "A" ("asynchronous") removed. In A3C each agent talks to the global parameters independently, so it is possible sometimes the thread-specific agents would be playing with policies of different versions and therefore the aggregated update would not be optimal. To resolve the inconsistency, a coordinator in A2C waits for all the parallel actors to finish their work before updating the global parameters and then in the next iteration parallel actors starts from the same policy. The synchronized gradient update keeps the training more cohesive and potentially to make convergence faster.
 
@@ -292,7 +292,7 @@ Fig. 2. The architecture of A3C versus A2C.
 
 ## DPG[#](#dpg)
 
-\[[paper](https://hal.inria.fr/file/index/docid/938992/filename/dpg-icml2014.pdf)|code\]
+[[paper](https://hal.inria.fr/file/index/docid/938992/filename/dpg-icml2014.pdf)|code]
 
 In methods described above, the policy function $\pi(. \vert s)$ is always modeled as a probability distribution over actions $\mathcal{A}$ given the current state and thus it is _stochastic_. **Deterministic policy gradient (DPG)** instead models the policy as a deterministic decision: $a = \mu(s)$. It may look bizarre — how can you calculate the gradient of the action probability when it outputs a single action? Let's look into it step by step.
 
@@ -308,7 +308,7 @@ $$J(\theta) = \int_\mathcal{S} \rho^\mu(s) Q(s, \mu_\theta(s)) ds$$
 
 **Deterministic policy gradient theorem**: Now it is the time to compute the gradient! According to the chain rule, we first take the gradient of Q w.r.t. the action a and then take the gradient of the deterministic policy function $\mu$ w.r.t. $\theta$:
 
-$$\begin{aligned} \nabla_\theta J(\theta) &= \int_\mathcal{S} \rho^\mu(s) \nabla_a Q^\mu(s, a) \nabla_\theta \mu_\theta(s) \\rvert_{a=\mu_\theta(s)} ds \\ &= \mathbb{E}_{s \sim \rho^\mu} \[\nabla_a Q^\mu(s, a) \nabla_\theta \mu_\theta(s) \\rvert_{a=\mu_\theta(s)}\] \end{aligned}$$
+$$\begin{aligned} \nabla_\theta J(\theta) &= \int_\mathcal{S} \rho^\mu(s) \nabla_a Q^\mu(s, a) \nabla_\theta \mu_\theta(s) \\rvert_{a=\mu_\theta(s)} ds \\ &= \mathbb{E}_{s \sim \rho^\mu} [\nabla_a Q^\mu(s, a) \nabla_\theta \mu_\theta(s) \\rvert_{a=\mu_\theta(s)}] \end{aligned}$$
 
 We can consider the deterministic policy as a _special case_ of the stochastic one, when the probability distribution contains only one extreme non-zero value over one action. Actually, in the DPG [paper](https://hal.inria.fr/file/index/docid/938992/filename/dpg-icml2014.pdf), the authors have shown that if the stochastic policy $\pi_{\mu_\theta, \sigma}$ is re-parameterized by a deterministic policy $\mu_\theta$ and a variation variable $\sigma$, the stochastic policy is eventually equivalent to the deterministic case when $\sigma=0$. Compared to the deterministic policy, we expect the stochastic policy to require more samples as it integrates the data over the whole state and action space.
 
@@ -322,13 +322,13 @@ However, unless there is sufficient noise in the environment, it is very hard to
 
 Say, in the off-policy approach, the training trajectories are generated by a stochastic policy $\beta(a \vert s)$ and thus the state distribution follows the corresponding discounted state density $\rho^\beta$:
 
-$$\begin{aligned} J_\beta(\theta) &= \int_\mathcal{S} \rho^\beta Q^\mu(s, \mu_\theta(s)) ds \\ \nabla_\theta J_\beta(\theta) &= \mathbb{E}_{s \sim \rho^\beta} \[\nabla_a Q^\mu(s, a) \nabla_\theta \mu_\theta(s) \\rvert_{a=\mu_\theta(s)} \] \end{aligned}$$
+$$\begin{aligned} J_\beta(\theta) &= \int_\mathcal{S} \rho^\beta Q^\mu(s, \mu_\theta(s)) ds \\ \nabla_\theta J_\beta(\theta) &= \mathbb{E}_{s \sim \rho^\beta} [\nabla_a Q^\mu(s, a) \nabla_\theta \mu_\theta(s) \\rvert_{a=\mu_\theta(s)} ] \end{aligned}$$
 
 Note that because the policy is deterministic, we only need $Q^\mu(s, \mu_\theta(s))$ rather than $\sum_a \pi(a \vert s) Q^\pi(s, a)$ as the estimated reward of a given state s. In the off-policy approach with a stochastic policy, importance sampling is often used to correct the mismatch between behavior and target policies, as what we have described [above](#off-policy-policy-gradient). However, because the deterministic policy gradient removes the integral over actions, we can avoid importance sampling.
 
 ## DDPG[#](#ddpg)
 
-\[[paper](https://arxiv.org/pdf/1509.02971.pdf)|[code](https://github.com/openai/baselines/tree/master/baselines/ddpg)\]
+[[paper](https://arxiv.org/pdf/1509.02971.pdf)|[code](https://github.com/openai/baselines/tree/master/baselines/ddpg)]
 
 **DDPG** ([Lillicrap, et al., 2015](https://arxiv.org/pdf/1509.02971.pdf)), short for **Deep Deterministic Policy Gradient**, is a model-free off-policy actor-critic algorithm, combining [DPG](#dpg) with [DQN](https://lilianweng.github.io/posts/2018-02-19-rl-overview/#deep-q-network). Recall that DQN (Deep Q-Network) stabilizes the learning of Q-function by experience replay and the frozen target network. The original DQN works in discrete space, and DDPG extends it to continuous space with the actor-critic framework while learning a deterministic policy.
 
@@ -346,19 +346,19 @@ Fig 3. DDPG Algorithm. (Image source: [Lillicrap, et al., 2015](https://arxiv.or
 
 ## D4PG[#](#d4pg)
 
-\[[paper](https://openreview.net/forum?id=SyZipzbCb)|code (Search "github d4pg" and you will see a few.)\]
+[[paper](https://openreview.net/forum?id=SyZipzbCb)|code (Search "github d4pg" and you will see a few.)]
 
 **Distributed Distributional DDPG (D4PG)** applies a set of improvements on DDPG to make it run in the distributional fashion.
 
-(1) **Distributional Critic**: The critic estimates the expected Q value as a random variable ~ a distribution $Z_w$ parameterized by $w$ and therefore $Q_w(s, a) = \mathbb{E} Z_w(x, a)$. The loss for learning the distribution parameter is to minimize some measure of the distance between two distributions — distributional TD error: $L(w) = \mathbb{E}\[d(\mathcal{T}_{\mu_\theta}, Z_{w'}(s, a), Z_w(s, a)\]$, where $\mathcal{T}_{\mu_\theta}$ is the Bellman operator.
+(1) **Distributional Critic**: The critic estimates the expected Q value as a random variable ~ a distribution $Z_w$ parameterized by $w$ and therefore $Q_w(s, a) = \mathbb{E} Z_w(x, a)$. The loss for learning the distribution parameter is to minimize some measure of the distance between two distributions — distributional TD error: $L(w) = \mathbb{E}[d(\mathcal{T}_{\mu_\theta}, Z_{w'}(s, a), Z_w(s, a)]$, where $\mathcal{T}_{\mu_\theta}$ is the Bellman operator.
 
 The deterministic policy gradient update becomes:
 
-$$\begin{aligned} \nabla_\theta J(\theta) &\approx \mathbb{E}_{\rho^\mu} \[\nabla_a Q_w(s, a) \nabla_\theta \mu_\theta(s) \\rvert_{a=\mu_\theta(s)}\] & \\scriptstyle{\text{; gradient update in DPG}} \\ &= \mathbb{E}_{\rho^\mu} \[\mathbb{E}\[\nabla_a Z_w(s, a)\] \nabla_\theta \mu_\theta(s) \\rvert_{a=\mu_\theta(s)}\] & \\scriptstyle{\text{; expectation of the Q-value distribution.}} \end{aligned}$$
+$$\begin{aligned} \nabla_\theta J(\theta) &\approx \mathbb{E}_{\rho^\mu} [\nabla_a Q_w(s, a) \nabla_\theta \mu_\theta(s) \\rvert_{a=\mu_\theta(s)}] & \\scriptstyle{\text{; gradient update in DPG}} \\ &= \mathbb{E}_{\rho^\mu} [\mathbb{E}[\nabla_a Z_w(s, a)] \nabla_\theta \mu_\theta(s) \\rvert_{a=\mu_\theta(s)}] & \\scriptstyle{\text{; expectation of the Q-value distribution.}} \end{aligned}$$
 
 (2) **$N$-step returns**: When calculating the TD error, D4PG computes $N$-step TD target rather than one-step to incorporate rewards in more future steps. Thus the new TD target is:
 
-$$r(s_0, a_0) + \mathbb{E}\[\sum_{n=1}^{N-1} r(s_n, a_n) + \gamma^N Q(s_N, \mu_\theta(s_N)) \vert s_0, a_0 \]$$
+$$r(s_0, a_0) + \mathbb{E}[\sum_{n=1}^{N-1} r(s_n, a_n) + \gamma^N Q(s_N, \mu_\theta(s_N)) \vert s_0, a_0 ]$$
 
 (3) **Multiple Distributed Parallel Actors**: D4PG utilizes $K$ independent actors, gathering experience in parallel and feeding data into the same replay buffer.
 
@@ -370,11 +370,11 @@ Fig. 4. D4PG algorithm (Image source: [Barth-Maron, et al. 2018](https://openrev
 
 ## MADDPG[#](#maddpg)
 
-\[[paper](https://arxiv.org/pdf/1706.02275.pdf)|[code](https://github.com/openai/maddpg)\]
+[[paper](https://arxiv.org/pdf/1706.02275.pdf)|[code](https://github.com/openai/maddpg)]
 
 **Multi-agent DDPG** (**MADDPG**) ([Lowe et al., 2017](https://arxiv.org/pdf/1706.02275.pdf)) extends DDPG to an environment where multiple agents are coordinating to complete tasks with only local information. In the viewpoint of one agent, the environment is non-stationary as policies of other agents are quickly upgraded and remain unknown. MADDPG is an actor-critic model redesigned particularly for handling such a changing environment and interactions between agents.
 
-The problem can be formalized in the multi-agent version of MDP, also known as _Markov games_. MADDPG is proposed for partially observable Markov games. Say, there are N agents in total with a set of states $\mathcal{S}$. Each agent owns a set of possible action, $\mathcal{A}_1, \dots, \mathcal{A}_N$, and a set of observation, $\mathcal{O}_1, \dots, \mathcal{O}_N$. The state transition function involves all states, action and observation spaces $\mathcal{T}: \mathcal{S} \times \mathcal{A}_1 \times \dots \mathcal{A}_N \mapsto \mathcal{S}$. Each agent's stochastic policy only involves its own state and action: $\pi_{\theta_i}: \mathcal{O}_i \times \mathcal{A}_i \mapsto \[0, 1\]$, a probability distribution over actions given its own observation, or a deterministic policy: $\mu_{\theta_i}: \mathcal{O}_i \mapsto \mathcal{A}_i$.
+The problem can be formalized in the multi-agent version of MDP, also known as _Markov games_. MADDPG is proposed for partially observable Markov games. Say, there are N agents in total with a set of states $\mathcal{S}$. Each agent owns a set of possible action, $\mathcal{A}_1, \dots, \mathcal{A}_N$, and a set of observation, $\mathcal{O}_1, \dots, \mathcal{O}_N$. The state transition function involves all states, action and observation spaces $\mathcal{T}: \mathcal{S} \times \mathcal{A}_1 \times \dots \mathcal{A}_N \mapsto \mathcal{S}$. Each agent's stochastic policy only involves its own state and action: $\pi_{\theta_i}: \mathcal{O}_i \times \mathcal{A}_i \mapsto [0, 1]$, a probability distribution over actions given its own observation, or a deterministic policy: $\mu_{\theta_i}: \mathcal{O}_i \mapsto \mathcal{A}_i$.
 
 Let $\\vec{o} = {o_1, \dots, o_N}$, $\\vec{\mu} = {\mu_1, \dots, \mu_N}$ and the policies are parameterized by $\\vec{\theta} = {\theta_1, \dots, \theta_N}$.
 
@@ -382,13 +382,13 @@ The critic in MADDPG learns a centralized action-value function $Q^\\vec{\mu}_i(
 
 **Actor update**:
 
-$$\nabla_{\theta_i} J(\theta_i) = \mathbb{E}_{\\vec{o}, a \sim \mathcal{D}} \[\nabla_{a_i} Q^{\\vec{\mu}}_i (\\vec{o}, a_1, \dots, a_N) \nabla_{\theta_i} \mu_{\theta_i}(o_i) \\rvert_{a_i=\mu_{\theta_i}(o_i)} \]$$
+$$\nabla_{\theta_i} J(\theta_i) = \mathbb{E}_{\\vec{o}, a \sim \mathcal{D}} [\nabla_{a_i} Q^{\\vec{\mu}}_i (\\vec{o}, a_1, \dots, a_N) \nabla_{\theta_i} \mu_{\theta_i}(o_i) \\rvert_{a_i=\mu_{\theta_i}(o_i)} ]$$
 
 Where $\mathcal{D}$ is the memory buffer for experience replay, containing multiple episode samples $(\\vec{o}, a_1, \dots, a_N, r_1, \dots, r_N, \\vec{o}')$ — given current observation $\\vec{o}$, agents take action $a_1, \dots, a_N$ and get rewards $r_1, \dots, r_N$, leading to the new observation $\\vec{o}'$.
 
 **Critic update**:
 
-$$\begin{aligned} \mathcal{L}(\theta_i) &= \mathbb{E}_{\\vec{o}, a_1, \dots, a_N, r_1, \dots, r_N, \\vec{o}'}\[ (Q^{\\vec{\mu}}_i(\\vec{o}, a_1, \dots, a_N) - y)^2 \] & \\ \text{where } y &= r_i + \gamma Q^{\\vec{\mu}'}_i (\\vec{o}', a'_1, \dots, a'_N) \\rvert_{a'_j = \mu'_{\theta_j}} & \\scriptstyle{\text{; TD target!}} \end{aligned}$$
+$$\begin{aligned} \mathcal{L}(\theta_i) &= \mathbb{E}_{\\vec{o}, a_1, \dots, a_N, r_1, \dots, r_N, \\vec{o}'}[ (Q^{\\vec{\mu}}_i(\\vec{o}, a_1, \dots, a_N) - y)^2 ] & \\ \text{where } y &= r_i + \gamma Q^{\\vec{\mu}'}_i (\\vec{o}', a'_1, \dots, a'_N) \\rvert_{a'_j = \mu'_{\theta_j}} & \\scriptstyle{\text{; TD target!}} \end{aligned}$$
 
 where $\\vec{\mu}'$ are the target policies with delayed softly-updated parameters.
 
@@ -412,29 +412,29 @@ Fig. 5. The architecture design of MADDPG. (Image source: [Lowe et al., 2017](ht
 
 ## TRPO[#](#trpo)
 
-\[[paper](https://arxiv.org/pdf/1502.05477.pdf)|[code](https://github.com/openai/baselines/tree/master/baselines/trpo_mpi)\]
+[[paper](https://arxiv.org/pdf/1502.05477.pdf)|[code](https://github.com/openai/baselines/tree/master/baselines/trpo_mpi)]
 
 To improve training stability, we should avoid parameter updates that change the policy too much at one step. **Trust region policy optimization (TRPO)** ([Schulman, et al., 2015](https://arxiv.org/pdf/1502.05477.pdf)) carries out this idea by enforcing a [KL divergence](https://lilianweng.github.io/posts/2017-08-20-gan/#kullbackleibler-and-jensenshannon-divergence) constraint on the size of policy update at each iteration.
 
 Consider the case when we are doing off-policy RL, the policy $\beta$ used for collecting trajectories on rollout workers is different from the policy $\pi$ to optimize for. The objective function in an off-policy model measures the total advantage over the state visitation distribution and actions, while the mismatch between the training data distribution and the true policy state distribution is compensated by importance sampling estimator:
 
-$$\begin{aligned} J(\theta) &= \sum_{s \in \mathcal{S}} \rho^{\pi_{\theta_\text{old}}} \sum_{a \in \mathcal{A}} \big( \pi_\theta(a \vert s) \hat{A}_{\theta_\text{old}}(s, a) \big) & \\ &= \sum_{s \in \mathcal{S}} \rho^{\pi_{\theta_\text{old}}} \sum_{a \in \mathcal{A}} \big( \beta(a \vert s) \frac{\pi_\theta(a \vert s)}{\beta(a \vert s)} \hat{A}_{\theta_\text{old}}(s, a) \big) & \\scriptstyle{\text{; Importance sampling}} \\ &= \mathbb{E}_{s \sim \rho^{\pi_{\theta_\text{old}}}, a \sim \beta} \big\[ \frac{\pi_\theta(a \vert s)}{\beta(a \vert s)} \hat{A}_{\theta_\text{old}}(s, a) \big\] & \end{aligned}$$
+$$\begin{aligned} J(\theta) &= \sum_{s \in \mathcal{S}} \rho^{\pi_{\theta_\text{old}}} \sum_{a \in \mathcal{A}} \big( \pi_\theta(a \vert s) \hat{A}_{\theta_\text{old}}(s, a) \big) & \\ &= \sum_{s \in \mathcal{S}} \rho^{\pi_{\theta_\text{old}}} \sum_{a \in \mathcal{A}} \big( \beta(a \vert s) \frac{\pi_\theta(a \vert s)}{\beta(a \vert s)} \hat{A}_{\theta_\text{old}}(s, a) \big) & \\scriptstyle{\text{; Importance sampling}} \\ &= \mathbb{E}_{s \sim \rho^{\pi_{\theta_\text{old}}}, a \sim \beta} \big[ \frac{\pi_\theta(a \vert s)}{\beta(a \vert s)} \hat{A}_{\theta_\text{old}}(s, a) \big] & \end{aligned}$$
 
 where $\theta_\text{old}$ is the policy parameters before the update and thus known to us; $\rho^{\pi_{\theta_\text{old}}}$ is defined in the same way as [above](#dpg); $\beta(a \vert s)$ is the behavior policy for collecting trajectories. Noted that we use an estimated advantage $\hat{A}(.)$ rather than the true advantage function $A(.)$ because the true rewards are usually unknown.
 
 When training on policy, theoretically the policy for collecting data is same as the policy that we want to optimize. However, when rollout workers and optimizers are running in parallel asynchronously, the behavior policy can get stale. TRPO considers this subtle difference: It labels the behavior policy as $\pi_{\theta_\text{old}}(a \vert s)$ and thus the objective function becomes:
 
-$$J(\theta) = \mathbb{E}_{s \sim \rho^{\pi_{\theta_\text{old}}}, a \sim \pi_{\theta_\text{old}}} \big\[ \frac{\pi_\theta(a \vert s)}{\pi_{\theta_\text{old}}(a \vert s)} \hat{A}_{\theta_\text{old}}(s, a) \big\]$$
+$$J(\theta) = \mathbb{E}_{s \sim \rho^{\pi_{\theta_\text{old}}}, a \sim \pi_{\theta_\text{old}}} \big[ \frac{\pi_\theta(a \vert s)}{\pi_{\theta_\text{old}}(a \vert s)} \hat{A}_{\theta_\text{old}}(s, a) \big]$$
 
 TRPO aims to maximize the objective function $J(\theta)$ subject to, _trust region constraint_ which enforces the distance between old and new policies measured by [KL-divergence](https://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence) to be small enough, within a parameter δ:
 
-$$\mathbb{E}_{s \sim \rho^{\pi_{\theta_\text{old}}}} \[D_\text{KL}(\pi_{\theta_\text{old}}(.\vert s) \| \pi_\theta(.\vert s)\] \leq \delta$$
+$$\mathbb{E}_{s \sim \rho^{\pi_{\theta_\text{old}}}} [D_\text{KL}(\pi_{\theta_\text{old}}(.\vert s) \| \pi_\theta(.\vert s)] \leq \delta$$
 
 In this way, the old and new policies would not diverge too much when this hard constraint is met. While still, TRPO can guarantee a monotonic improvement over policy iteration (Neat, right?). Please read the proof in the [paper](https://arxiv.org/pdf/1502.05477.pdf) if interested :)
 
 ## PPO[#](#ppo)
 
-\[[paper](https://arxiv.org/pdf/1707.06347.pdf)|[code](https://github.com/openai/baselines/tree/master/baselines/ppo1)\]
+[[paper](https://arxiv.org/pdf/1707.06347.pdf)|[code](https://github.com/openai/baselines/tree/master/baselines/ppo1)]
 
 Given that TRPO is relatively complicated and we still want to implement a similar constraint, **proximal policy optimization (PPO)** simplifies it by using a clipped surrogate objective while retaining similar performance.
 
@@ -444,17 +444,17 @@ $$r(\theta) = \frac{\pi_\theta(a \vert s)}{\pi_{\theta_\text{old}}(a \vert s)}$$
 
 Then, the objective function of TRPO (on policy) becomes:
 
-$$J^\text{TRPO} (\theta) = \mathbb{E} \[ r(\theta) \hat{A}_{\theta_\text{old}}(s, a) \]$$
+$$J^\text{TRPO} (\theta) = \mathbb{E} [ r(\theta) \hat{A}_{\theta_\text{old}}(s, a) ]$$
 
-Without a limitation on the distance between $\theta_\text{old}$ and $\theta$, to maximize $J^\text{TRPO} (\theta)$ would lead to instability with extremely large parameter updates and big policy ratios. PPO imposes the constraint by forcing $r(\theta)$ to stay within a small interval around 1, precisely $\[1-\epsilon, 1+\epsilon\]$, where $\epsilon$ is a hyperparameter.
+Without a limitation on the distance between $\theta_\text{old}$ and $\theta$, to maximize $J^\text{TRPO} (\theta)$ would lead to instability with extremely large parameter updates and big policy ratios. PPO imposes the constraint by forcing $r(\theta)$ to stay within a small interval around 1, precisely $[1-\epsilon, 1+\epsilon]$, where $\epsilon$ is a hyperparameter.
 
-$$J^\text{CLIP} (\theta) = \mathbb{E} \[ \min( r(\theta) \hat{A}_{\theta_\text{old}}(s, a), \text{clip}(r(\theta), 1 - \epsilon, 1 + \epsilon) \hat{A}_{\theta_\text{old}}(s, a))\]$$
+$$J^\text{CLIP} (\theta) = \mathbb{E} [ \min( r(\theta) \hat{A}_{\theta_\text{old}}(s, a), \text{clip}(r(\theta), 1 - \epsilon, 1 + \epsilon) \hat{A}_{\theta_\text{old}}(s, a))]$$
 
 The function $\text{clip}(r(\theta), 1 - \epsilon, 1 + \epsilon)$ clips the ratio to be no more than $1+\epsilon$ and no less than $1-\epsilon$. The objective function of PPO takes the minimum one between the original value and the clipped version and therefore we lose the motivation for increasing the policy update to extremes for better rewards.
 
 When applying PPO on the network architecture with shared parameters for both policy (actor) and value (critic) functions, in addition to the clipped reward, the objective function is augmented with an error term on the value estimation (formula in red) and an entropy term (formula in blue) to encourage sufficient exploration.
 
-$$J^\text{CLIP'} (\theta) = \mathbb{E} \[ J^\text{CLIP} (\theta) - \color{red}{c_1 (V_\theta(s) - V_\text{target})^2} + \color{blue}{c_2 H(s, \pi_\theta(.))} \]$$
+$$J^\text{CLIP'} (\theta) = \mathbb{E} [ J^\text{CLIP} (\theta) - \color{red}{c_1 (V_\theta(s) - V_\text{target})^2} + \color{blue}{c_2 H(s, \pi_\theta(.))} ]$$
 
 where Both $c_1$ and $c_2$ are two hyperparameter constants.
 
@@ -474,14 +474,14 @@ Discretizing the action space or use Beta distribution helps avoid failure mode 
 
 ## PPG[#](#ppg)
 
-\[[paper](https://arxiv.org/abs/2009.04416)|[code](https://github.com/openai/phasic-policy-gradient)\]
+[[paper](https://arxiv.org/abs/2009.04416)|[code](https://github.com/openai/phasic-policy-gradient)]
 
 Sharing parameters between policy and value networks have pros and cons. It allows policy and value functions to share the learned features with each other, but it may cause conflicts between competing objectives and demands the same data for training two networks at the same time. **Phasic policy gradient** (**PPG**; [Cobbe, et al 2020](https://arxiv.org/abs/2009.04416)) modifies the traditional on-policy [actor-critic](#actor-critic) policy gradient algorithm. precisely [PPO](#ppo), to have separate training phases for policy and value functions. In two alternating phases:
 
 1.  The _policy phase_: updates the policy network by optimizing the PPO [objective](#ppo_loss) $L^\text{CLIP} (\theta)$;
 2.  The _auxiliary phase_: optimizes an auxiliary objective alongside a behavioral cloning loss. In the paper, value function error is the sole auxiliary objective, but it can be quite general and includes any other additional auxiliary losses.
 
-$$\begin{aligned} L^\text{joint} &= L^\text{aux} + \beta_\text{clone} \cdot \mathbb{E}_t\[\text{KL}\[\pi_{\theta_\text{old}}(\cdot\mid s_t), \pi_\theta(\cdot\mid s_t)\]\] \\ L^\text{aux} &= L^\text{value} = \mathbb{E}_t \big\[\frac{1}{2}\big( V_w(s_t) - \hat{V}_t^\text{targ} \big)^2\big\] \end{aligned}$$
+$$\begin{aligned} L^\text{joint} &= L^\text{aux} + \beta_\text{clone} \cdot \mathbb{E}_t[\text{KL}[\pi_{\theta_\text{old}}(\cdot\mid s_t), \pi_\theta(\cdot\mid s_t)]] \\ L^\text{aux} &= L^\text{value} = \mathbb{E}_t \big[\frac{1}{2}\big( V_w(s_t) - \hat{V}_t^\text{targ} \big)^2\big] \end{aligned}$$
 
 where $\beta_\text{clone}$ is a hyperparameter for controlling how much we would like to keep the policy not diverge too much from its original behavior while optimizing the auxiliary objectives.
 
@@ -503,7 +503,7 @@ Fig. 7. The mean normalized performance of PPG vs PPO on the [Procgen](https://a
 
 ## ACER[#](#acer)
 
-\[[paper](https://arxiv.org/pdf/1611.01224.pdf)|[code](https://github.com/openai/baselines/tree/master/baselines/acer)\]
+[[paper](https://arxiv.org/pdf/1611.01224.pdf)|[code](https://github.com/openai/baselines/tree/master/baselines/acer)]
 
 **ACER**, short for **actor-critic with experience replay** ([Wang, et al., 2017](https://arxiv.org/pdf/1611.01224.pdf)), is an off-policy actor-critic model with experience replay, greatly increasing the sample efficiency and decreasing the data correlation. A3C builds up the foundation for ACER, but it is on policy; ACER is A3C's off-policy counterpart. The major obstacle to making A3C off policy is how to control the stability of the off-policy estimator. ACER proposes three designs to overcome it:
 
@@ -534,7 +534,7 @@ ACER uses $Q^\text{ret}$ as the target to train the critic by minimizing the L2 
 
 To reduce the high variance of the policy gradient $\hat{g}$, ACER truncates the importance weights by a constant c, plus a correction term. The label $\hat{g}_t^\text{acer}$ is the ACER policy gradient at time t.
 
-$$\begin{aligned} \hat{g}_t^\text{acer} = & \\omega_t \big( Q^\text{ret}(S_t, A_t) - V_{\theta_v}(S_t) \big) \nabla_\theta \\ln \pi_\theta(A_t \vert S_t) & \\scriptstyle{\text{; Let }\\omega_t=\frac{\pi(A_t \vert S_t)}{\beta(A_t \vert S_t)}} \\ = & \color{blue}{\min(c, \\omega_t) \big( Q^\text{ret}(S_t, A_t) - V_w(S_t) \big) \nabla_\theta \\ln \pi_\theta(A_t \vert S_t)} \\ & + \color{red}{\mathbb{E}_{a \sim \pi} \big\[ \max(0, \frac{\\omega_t(a) - c}{\\omega_t(a)}) \big( Q_w(S_t, a) - V_w(S_t) \big) \nabla_\theta \\ln \pi_\theta(a \vert S_t) \big\]} & \\scriptstyle{\text{; Let }\\omega_t (a) =\frac{\pi(a \vert S_t)}{\beta(a \vert S_t)}} \end{aligned}$$
+$$\begin{aligned} \hat{g}_t^\text{acer} = & \\omega_t \big( Q^\text{ret}(S_t, A_t) - V_{\theta_v}(S_t) \big) \nabla_\theta \\ln \pi_\theta(A_t \vert S_t) & \\scriptstyle{\text{; Let }\\omega_t=\frac{\pi(A_t \vert S_t)}{\beta(A_t \vert S_t)}} \\ = & \color{blue}{\min(c, \\omega_t) \big( Q^\text{ret}(S_t, A_t) - V_w(S_t) \big) \nabla_\theta \\ln \pi_\theta(A_t \vert S_t)} \\ & + \color{red}{\mathbb{E}_{a \sim \pi} \big[ \max(0, \frac{\\omega_t(a) - c}{\\omega_t(a)}) \big( Q_w(S_t, a) - V_w(S_t) \big) \nabla_\theta \\ln \pi_\theta(a \vert S_t) \big]} & \\scriptstyle{\text{; Let }\\omega_t (a) =\frac{\pi(a \vert S_t)}{\beta(a \vert S_t)}} \end{aligned}$$
 
 where $Q_w(.)$ and $V_w(.)$ are value functions predicted by the critic with parameter w. The first term (blue) contains the clipped important weight. The clipping helps reduce the variance, in addition to subtracting state value function $V_w(.)$ as a baseline. The second term (red) makes a correction to achieve unbiased estimation.
 
@@ -546,7 +546,7 @@ The ACER [paper](https://arxiv.org/pdf/1611.01224.pdf) is pretty dense with many
 
 ## ACTKR[#](#actkr)
 
-\[[paper](https://arxiv.org/pdf/1708.05144.pdf)|[code](https://github.com/openai/baselines/tree/master/baselines/acktr)\]
+[[paper](https://arxiv.org/pdf/1708.05144.pdf)|[code](https://github.com/openai/baselines/tree/master/baselines/acktr)]
 
 **ACKTR (actor-critic using Kronecker-factored trust region)** ([Yuhuai Wu, et al., 2017](https://arxiv.org/pdf/1708.05144.pdf)) proposed to use Kronecker-factored approximation curvature ([K-FAC](https://arxiv.org/pdf/1503.05671.pdf)) to do the gradient update for both the critic and actor. K-FAC made an improvement on the computation of _natural gradient_, which is quite different from our _standard gradient_. [Here](http://kvfrans.com/a-intuitive-explanation-of-natural-gradient-descent/) is a nice, intuitive explanation of natural gradient. One sentence summary is probably:
 
@@ -568,7 +568,7 @@ Here is a high level summary from the K-FAC [paper](https://arxiv.org/pdf/1503.0
 
 ## SAC[#](#sac)
 
-\[[paper](https://arxiv.org/abs/1801.01290)|[code](https://github.com/haarnoja/sac)\]
+[[paper](https://arxiv.org/abs/1801.01290)|[code](https://github.com/haarnoja/sac)]
 
 **Soft Actor-Critic (SAC)** ([Haarnoja et al. 2018](https://arxiv.org/abs/1801.01290)) incorporates the entropy measure of the policy into the reward to encourage exploration: we expect to learn a policy that acts as randomly as possible while it is still able to succeed at the task. It is an off-policy actor-critic model following the maximum entropy reinforcement learning framework. A precedent work is [Soft Q-learning](https://arxiv.org/abs/1702.08165).
 
@@ -580,7 +580,7 @@ Three key components in SAC:
 
 The policy is trained with the objective to maximize the expected return and the entropy at the same time:
 
-$$J(\theta) = \sum_{t=1}^T \mathbb{E}_{(s_t, a_t) \sim \rho_{\pi_\theta}} \[r(s_t, a_t) + \alpha \mathcal{H}(\pi_\theta(.\vert s_t))\]$$
+$$J(\theta) = \sum_{t=1}^T \mathbb{E}_{(s_t, a_t) \sim \rho_{\pi_\theta}} [r(s_t, a_t) + \alpha \mathcal{H}(\pi_\theta(.\vert s_t))]$$
 
 where $\mathcal{H}(.)$ is the entropy measure and $\alpha$ controls how important the entropy term is, known as _temperature_ parameter. The entropy maximization leads to policies that can (1) explore more and (2) capture multiple modes of near-optimal strategies (i.e., if there exist multiple options that seem to be equally good, the policy should assign each with an equal probability to be chosen).
 
@@ -592,29 +592,29 @@ Precisely, SAC aims to learn three functions:
 
 Soft Q-value and soft state value are defined as:
 
-$$\begin{aligned} Q(s_t, a_t) &= r(s_t, a_t) + \gamma \mathbb{E}_{s_{t+1} \sim \rho_{\pi}(s)} \[V(s_{t+1})\] & \text{; according to Bellman equation.}\\ \text{where }V(s_t) &= \mathbb{E}_{a_t \sim \pi} \[Q(s_t, a_t) - \alpha \log \pi(a_t \vert s_t)\] & \text{; soft state value function.} \end{aligned}$$
+$$\begin{aligned} Q(s_t, a_t) &= r(s_t, a_t) + \gamma \mathbb{E}_{s_{t+1} \sim \rho_{\pi}(s)} [V(s_{t+1})] & \text{; according to Bellman equation.}\\ \text{where }V(s_t) &= \mathbb{E}_{a_t \sim \pi} [Q(s_t, a_t) - \alpha \log \pi(a_t \vert s_t)] & \text{; soft state value function.} \end{aligned}$$
 
-$$\text{Thus, } Q(s_t, a_t) = r(s_t, a_t) + \gamma \mathbb{E}_{(s_{t+1}, a_{t+1}) \sim \rho_{\pi}} \[Q(s_{t+1}, a_{t+1}) - \alpha \log \pi(a_{t+1} \vert s_{t+1})\]$$
+$$\text{Thus, } Q(s_t, a_t) = r(s_t, a_t) + \gamma \mathbb{E}_{(s_{t+1}, a_{t+1}) \sim \rho_{\pi}} [Q(s_{t+1}, a_{t+1}) - \alpha \log \pi(a_{t+1} \vert s_{t+1})]$$
 
 $\rho_\pi(s)$ and $\rho_\pi(s, a)$ denote the state and the state-action marginals of the state distribution induced by the policy $\pi(a \vert s)$; see the similar definitions in [DPG](#dpg) section.
 
 The soft state value function is trained to minimize the mean squared error:
 
-$$\begin{aligned} J_V(\\psi) &= \mathbb{E}_{s_t \sim \mathcal{D}} \[\frac{1}{2} \big(V_\\psi(s_t) - \mathbb{E}\[Q_w(s_t, a_t) - \log \pi_\theta(a_t \vert s_t)\] \big)^2\] \\ \text{with gradient: }\nabla_\\psi J_V(\\psi) &= \nabla_\\psi V_\\psi(s_t)\big( V_\\psi(s_t) - Q_w(s_t, a_t) + \log \pi_\theta (a_t \vert s_t) \big) \end{aligned}$$
+$$\begin{aligned} J_V(\\psi) &= \mathbb{E}_{s_t \sim \mathcal{D}} [\frac{1}{2} \big(V_\\psi(s_t) - \mathbb{E}[Q_w(s_t, a_t) - \log \pi_\theta(a_t \vert s_t)] \big)^2] \\ \text{with gradient: }\nabla_\\psi J_V(\\psi) &= \nabla_\\psi V_\\psi(s_t)\big( V_\\psi(s_t) - Q_w(s_t, a_t) + \log \pi_\theta (a_t \vert s_t) \big) \end{aligned}$$
 
 where $\mathcal{D}$ is the replay buffer.
 
 The soft Q function is trained to minimize the soft Bellman residual:
 
-$$\begin{aligned} J_Q(w) &= \mathbb{E}_{(s_t, a_t) \sim \mathcal{D}} \[\frac{1}{2}\big( Q_w(s_t, a_t) - (r(s_t, a_t) + \gamma \mathbb{E}_{s_{t+1} \sim \rho_\pi(s)}\[V_{\bar{\\psi}}(s_{t+1})\]) \big)^2\] \\ \text{with gradient: } \nabla_w J_Q(w) &= \nabla_w Q_w(s_t, a_t) \big( Q_w(s_t, a_t) - r(s_t, a_t) - \gamma V_{\bar{\\psi}}(s_{t+1})\big) \end{aligned}$$
+$$\begin{aligned} J_Q(w) &= \mathbb{E}_{(s_t, a_t) \sim \mathcal{D}} [\frac{1}{2}\big( Q_w(s_t, a_t) - (r(s_t, a_t) + \gamma \mathbb{E}_{s_{t+1} \sim \rho_\pi(s)}[V_{\bar{\\psi}}(s_{t+1})]) \big)^2] \\ \text{with gradient: } \nabla_w J_Q(w) &= \nabla_w Q_w(s_t, a_t) \big( Q_w(s_t, a_t) - r(s_t, a_t) - \gamma V_{\bar{\\psi}}(s_{t+1})\big) \end{aligned}$$
 
 where $\bar{\\psi}$ is the target value function which is the exponential moving average (or only gets updated periodically in a "hard" way), just like how the parameter of the target Q network is treated in [DQN](https://lilianweng.github.io/posts/2018-02-19-rl-overview/#deep-q-network) to stabilize the training.
 
 SAC updates the policy to minimize the [KL-divergence](https://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence):
 
-$$\begin{aligned} \pi_\text{new} &= \arg\min_{\pi' \in \\Pi} D_\text{KL} \Big( \pi'(.\vert s_t) \| \frac{\exp(Q^{\pi_\text{old}}(s_t, .))}{Z^{\pi_\text{old}}(s_t)} \Big) \\\[6pt\] &= \arg\min_{\pi' \in \\Pi} D_\text{KL} \big( \pi'(.\vert s_t) \| \exp(Q^{\pi_\text{old}}(s_t, .) - \log Z^{\pi_\text{old}}(s_t)) \big) \\\[6pt\] \text{objective for update: } J_\pi(\theta) &= \nabla_\theta D_\text{KL} \big( \pi_\theta(. \vert s_t) \| \exp(Q_w(s_t, .) - \log Z_w(s_t)) \big) \\\[6pt\] &= \mathbb{E}_{a_t\sim\pi} \Big\[ - \log \big( \frac{\exp(Q_w(s_t, a_t) - \log Z_w(s_t))}{\pi_\theta(a_t \vert s_t)} \big) \Big\] \\\[6pt\] &= \mathbb{E}_{a_t\sim\pi} \[ \log \pi_\theta(a_t \vert s_t) - Q_w(s_t, a_t) + \log Z_w(s_t) \] \end{aligned}$$
+$$\begin{aligned} \pi_\text{new} &= \arg\min_{\pi' \in \Pi} D_\text{KL} \Big( \pi'(.\vert s_t) \| \frac{\exp(Q^{\pi_\text{old}}(s_t, .))}{Z^{\pi_\text{old}}(s_t)} \Big) \\[6pt] &= \arg\min_{\pi' \in \Pi} D_\text{KL} \big( \pi'(.\vert s_t) \| \exp(Q^{\pi_\text{old}}(s_t, .) - \log Z^{\pi_\text{old}}(s_t)) \big) \\[6pt] \text{objective for update: } J_\pi(\theta) &= \nabla_\theta D_\text{KL} \big( \pi_\theta(. \vert s_t) \| \exp(Q_w(s_t, .) - \log Z_w(s_t)) \big) \\[6pt] &= \mathbb{E}_{a_t\sim\pi} \Big[ - \log \big( \frac{\exp(Q_w(s_t, a_t) - \log Z_w(s_t))}{\pi_\theta(a_t \vert s_t)} \big) \Big] \\[6pt] &= \mathbb{E}_{a_t\sim\pi} [ \log \pi_\theta(a_t \vert s_t) - Q_w(s_t, a_t) + \log Z_w(s_t) ] \end{aligned}$$
 
-where $\\Pi$ is the set of potential policies that we can model our policy as to keep them tractable; for example, $\\Pi$ can be the family of Gaussian mixture distributions, expensive to model but highly expressive and still tractable. $Z^{\pi_\text{old}}(s_t)$ is the partition function to normalize the distribution. It is usually intractable but does not contribute to the gradient. How to minimize $J_\pi(\theta)$ depends our choice of $\\Pi$.
+where $\Pi$ is the set of potential policies that we can model our policy as to keep them tractable; for example, $\Pi$ can be the family of Gaussian mixture distributions, expensive to model but highly expressive and still tractable. $Z^{\pi_\text{old}}(s_t)$ is the partition function to normalize the distribution. It is usually intractable but does not contribute to the gradient. How to minimize $J_\pi(\theta)$ depends our choice of $\Pi$.
 
 This update guarantees that $Q^{\pi_\text{new}}(s_t, a_t) \\geq Q^{\pi_\text{old}}(s_t, a_t)$, please check the proof on this lemma in the Appendix B.2 in the original [paper](https://arxiv.org/abs/1801.01290).
 
@@ -626,27 +626,27 @@ Fig. 8. The soft actor-critic algorithm. (Image source: [original paper](https:/
 
 ## SAC with Automatically Adjusted Temperature[#](#sac-with-automatically-adjusted-temperature)
 
-\[[paper](https://arxiv.org/abs/1812.05905)|[code](https://github.com/rail-berkeley/softlearning)\]
+[[paper](https://arxiv.org/abs/1812.05905)|[code](https://github.com/rail-berkeley/softlearning)]
 
 SAC is brittle with respect to the temperature parameter. Unfortunately it is difficult to adjust temperature, because the entropy can vary unpredictably both across tasks and during training as the policy becomes better. An improvement on SAC formulates a constrained optimization problem: while maximizing the expected return, the policy should satisfy a minimum entropy constraint:
 
-$$\max_{\pi_0, \dots, \pi_T} \mathbb{E} \Big\[ \sum_{t=0}^T r(s_t, a_t)\Big\] \text{s.t. } \forall t\text{, } \mathcal{H}(\pi_t) \\geq \mathcal{H}_0$$
+$$\max_{\pi_0, \dots, \pi_T} \mathbb{E} \Big[ \sum_{t=0}^T r(s_t, a_t)\Big] \text{s.t. } \forall t\text{, } \mathcal{H}(\pi_t) \\geq \mathcal{H}_0$$
 
 where $\mathcal{H}_0$ is a predefined minimum policy entropy threshold.
 
-The expected return $\mathbb{E} \Big\[ \sum_{t=0}^T r(s_t, a_t)\Big\]$ can be decomposed into a sum of rewards at all the time steps. Because the policy $\pi_t$ at time t has no effect on the policy at the earlier time step, $\pi_{t-1}$, we can maximize the return at different steps backward in time — this is essentially **DP**.
+The expected return $\mathbb{E} \Big[ \sum_{t=0}^T r(s_t, a_t)\Big]$ can be decomposed into a sum of rewards at all the time steps. Because the policy $\pi_t$ at time t has no effect on the policy at the earlier time step, $\pi_{t-1}$, we can maximize the return at different steps backward in time — this is essentially **DP**.
 
-$$\underbrace{\max_{\pi_0} \Big( \mathbb{E}\[r(s_0, a_0)\]+ \underbrace{\max_{\pi_1} \Big(\mathbb{E}\[...\] + \underbrace{\max_{\pi_T} \mathbb{E}\[r(s_T, a_T)\]}_\text{1st maximization} \Big)}_\text{second but last maximization} \Big)}_\text{last maximization}$$
+$$\underbrace{\max_{\pi_0} \Big( \mathbb{E}[r(s_0, a_0)]+ \underbrace{\max_{\pi_1} \Big(\mathbb{E}[...] + \underbrace{\max_{\pi_T} \mathbb{E}[r(s_T, a_T)]}_\text{1st maximization} \Big)}_\text{second but last maximization} \Big)}_\text{last maximization}$$
 
 where we consider $\gamma=1$.
 
 So we start the optimization from the last timestep $T$:
 
-$$\text{maximize } \mathbb{E}_{(s_T, a_T) \sim \rho_{\pi}} \[ r(s_T, a_T) \] \text{ s.t. } \mathcal{H}(\pi_T) - \mathcal{H}_0 \\geq 0$$
+$$\text{maximize } \mathbb{E}_{(s_T, a_T) \sim \rho_{\pi}} [ r(s_T, a_T) ] \text{ s.t. } \mathcal{H}(\pi_T) - \mathcal{H}_0 \\geq 0$$
 
 First, let us define the following functions:
 
-$$\begin{aligned} h(\pi_T) &= \mathcal{H}(\pi_T) - \mathcal{H}_0 = \mathbb{E}_{(s_T, a_T) \sim \rho_{\pi}} \[-\log \pi_T(a_T\vert s_T)\] - \mathcal{H}_0\\ f(\pi_T) &= \begin{cases} \mathbb{E}_{(s_T, a_T) \sim \rho_{\pi}} \[ r(s_T, a_T) \], & \text{if }h(\pi_T) \\geq 0 \\ -\infty, & \text{otherwise} \end{cases} \end{aligned}$$
+$$\begin{aligned} h(\pi_T) &= \mathcal{H}(\pi_T) - \mathcal{H}_0 = \mathbb{E}_{(s_T, a_T) \sim \rho_{\pi}} [-\log \pi_T(a_T\vert s_T)] - \mathcal{H}_0\\ f(\pi_T) &= \begin{cases} \mathbb{E}_{(s_T, a_T) \sim \rho_{\pi}} [ r(s_T, a_T) ], & \text{if }h(\pi_T) \\geq 0 \\ -\infty, & \text{otherwise} \end{cases} \end{aligned}$$
 
 And the optimization becomes:
 
@@ -671,29 +671,29 @@ $$\max_{\pi_T} f(\pi_T) = \min_{\alpha_T \\geq 0} \max_{\pi_T} L(\pi_T, \alpha_T
 
 Therefore, to maximize $f(\pi_T)$, the dual problem is listed as below. Note that to make sure $\max_{\pi_T} f(\pi_T)$ is properly maximized and would not become $-\infty$, the constraint has to be satisfied.
 
-$$\begin{aligned} \max_{\pi_T} \mathbb{E}\[ r(s_T, a_T) \] &= \max_{\pi_T} f(\pi_T) \\ &= \min_{\alpha_T \\geq 0} \max_{\pi_T} L(\pi_T, \alpha_T) \\ &= \min_{\alpha_T \\geq 0} \max_{\pi_T} f(\pi_T) + \alpha_T h(\pi_T) \\ &= \min_{\alpha_T \\geq 0} \max_{\pi_T} \mathbb{E}_{(s_T, a_T) \sim \rho_{\pi}} \[ r(s_T, a_T) \] + \alpha_T ( \mathbb{E}_{(s_T, a_T) \sim \rho_{\pi}} \[-\log \pi_T(a_T\vert s_T)\] - \mathcal{H}_0) \\ &= \min_{\alpha_T \\geq 0} \max_{\pi_T} \mathbb{E}_{(s_T, a_T) \sim \rho_{\pi}} \[ r(s_T, a_T) - \alpha_T \log \pi_T(a_T\vert s_T)\] - \alpha_T \mathcal{H}_0 \\ &= \min_{\alpha_T \\geq 0} \max_{\pi_T} \mathbb{E}_{(s_T, a_T) \sim \rho_{\pi}} \[ r(s_T, a_T) + \alpha_T \mathcal{H}(\pi_T) - \alpha_T \mathcal{H}_0 \] \end{aligned}$$
+$$\begin{aligned} \max_{\pi_T} \mathbb{E}[ r(s_T, a_T) ] &= \max_{\pi_T} f(\pi_T) \\ &= \min_{\alpha_T \\geq 0} \max_{\pi_T} L(\pi_T, \alpha_T) \\ &= \min_{\alpha_T \\geq 0} \max_{\pi_T} f(\pi_T) + \alpha_T h(\pi_T) \\ &= \min_{\alpha_T \\geq 0} \max_{\pi_T} \mathbb{E}_{(s_T, a_T) \sim \rho_{\pi}} [ r(s_T, a_T) ] + \alpha_T ( \mathbb{E}_{(s_T, a_T) \sim \rho_{\pi}} [-\log \pi_T(a_T\vert s_T)] - \mathcal{H}_0) \\ &= \min_{\alpha_T \\geq 0} \max_{\pi_T} \mathbb{E}_{(s_T, a_T) \sim \rho_{\pi}} [ r(s_T, a_T) - \alpha_T \log \pi_T(a_T\vert s_T)] - \alpha_T \mathcal{H}_0 \\ &= \min_{\alpha_T \\geq 0} \max_{\pi_T} \mathbb{E}_{(s_T, a_T) \sim \rho_{\pi}} [ r(s_T, a_T) + \alpha_T \mathcal{H}(\pi_T) - \alpha_T \mathcal{H}_0 ] \end{aligned}$$
 
 We could compute the optimal $\pi_T$ and $\alpha_T$ iteratively. First given the current $\alpha_T$, get the best policy $\pi_T^{\*}$ that maximizes $L(\pi_T^{\*}, \alpha_T)$. Then plug in $\pi_T^{\*}$ and compute $\alpha_T^{\*}$ that minimizes $L(\pi_T^{\*}, \alpha_T)$. Assuming we have one neural network for policy and one network for temperature parameter, the iterative update process is more aligned with how we update network parameters during training.
 
-$$\begin{aligned} \pi^{\*}_T &= \arg\max_{\pi_T} \mathbb{E}_{(s_T, a_T) \sim \rho_{\pi}} \[ r(s_T, a_T) + \alpha_T \mathcal{H}(\pi_T) - \alpha_T \mathcal{H}_0 \] \\ \color{blue}{\alpha^{\*}_T} &\color{blue}{=} \color{blue}{\arg\min_{\alpha_T \\geq 0} \mathbb{E}_{(s_T, a_T) \sim \rho_{\pi^{\*}}} \[\alpha_T \mathcal{H}(\pi^{\*}_T) - \alpha_T \mathcal{H}_0 \]} \end{aligned}$$
+$$\begin{aligned} \pi^{\*}_T &= \arg\max_{\pi_T} \mathbb{E}_{(s_T, a_T) \sim \rho_{\pi}} [ r(s_T, a_T) + \alpha_T \mathcal{H}(\pi_T) - \alpha_T \mathcal{H}_0 ] \\ \color{blue}{\alpha^{\*}_T} &\color{blue}{=} \color{blue}{\arg\min_{\alpha_T \\geq 0} \mathbb{E}_{(s_T, a_T) \sim \rho_{\pi^{\*}}} [\alpha_T \mathcal{H}(\pi^{\*}_T) - \alpha_T \mathcal{H}_0 ]} \end{aligned}$$
 
-$$\text{Thus, }\max_{\pi_T} \mathbb{E} \[ r(s_T, a_T) \] = \mathbb{E}_{(s_T, a_T) \sim \rho_{\pi^{\*}}} \[ r(s_T, a_T) + \alpha^{\*}_T \mathcal{H}(\pi^{\*}_T) - \alpha^{\*}_T \mathcal{H}_0 \]$$
+$$\text{Thus, }\max_{\pi_T} \mathbb{E} [ r(s_T, a_T) ] = \mathbb{E}_{(s_T, a_T) \sim \rho_{\pi^{\*}}} [ r(s_T, a_T) + \alpha^{\*}_T \mathcal{H}(\pi^{\*}_T) - \alpha^{\*}_T \mathcal{H}_0 ]$$
 
 Now let's go back to the soft Q value function:
 
-$$\begin{aligned} Q_{T-1}(s_{T-1}, a_{T-1}) &= r(s_{T-1}, a_{T-1}) + \mathbb{E} \[Q(s_T, a_T) - \alpha_T \log \pi(a_T \vert s_T)\] \\ &= r(s_{T-1}, a_{T-1}) + \mathbb{E} \[r(s_T, a_T)\] + \alpha_T \mathcal{H}(\pi_T) \\ Q_{T-1}^{\*}(s_{T-1}, a_{T-1}) &= r(s_{T-1}, a_{T-1}) + \max_{\pi_T} \mathbb{E} \[r(s_T, a_T)\] + \alpha_T \mathcal{H}(\pi^{\*}_T) & \text{; plug in the optimal }\pi_T^{\*} \end{aligned}$$
+$$\begin{aligned} Q_{T-1}(s_{T-1}, a_{T-1}) &= r(s_{T-1}, a_{T-1}) + \mathbb{E} [Q(s_T, a_T) - \alpha_T \log \pi(a_T \vert s_T)] \\ &= r(s_{T-1}, a_{T-1}) + \mathbb{E} [r(s_T, a_T)] + \alpha_T \mathcal{H}(\pi_T) \\ Q_{T-1}^{\*}(s_{T-1}, a_{T-1}) &= r(s_{T-1}, a_{T-1}) + \max_{\pi_T} \mathbb{E} [r(s_T, a_T)] + \alpha_T \mathcal{H}(\pi^{\*}_T) & \text{; plug in the optimal }\pi_T^{\*} \end{aligned}$$
 
 Therefore the expected return is as follows, when we take one step further back to the time step $T-1$:
 
-$$\begin{aligned} &\max_{\pi_{T-1}}\Big(\mathbb{E}\[r(s_{T-1}, a_{T-1})\] + \max_{\pi_T} \mathbb{E}\[r(s_T, a_T\] \Big) \\ &= \max_{\pi_{T-1}} \Big( Q^{\*}_{T-1}(s_{T-1}, a_{T-1}) - \alpha^{\*}_T \mathcal{H}(\pi^{\*}_T) \Big) & \text{; should s.t. } \mathcal{H}(\pi_{T-1}) - \mathcal{H}_0 \\geq 0 \\ &= \min_{\alpha_{T-1} \\geq 0} \max_{\pi_{T-1}} \Big( Q^{\*}_{T-1}(s_{T-1}, a_{T-1}) - \alpha^{\*}_T \mathcal{H}(\pi^{\*}_T) + \alpha_{T-1} \big( \mathcal{H}(\pi_{T-1}) - \mathcal{H}_0 \big) \Big) & \text{; dual problem w/ Lagrangian.} \\ &= \min_{\alpha_{T-1} \\geq 0} \max_{\pi_{T-1}} \Big( Q^{\*}_{T-1}(s_{T-1}, a_{T-1}) + \alpha_{T-1} \mathcal{H}(\pi_{T-1}) - \alpha_{T-1}\mathcal{H}_0 \Big) - \alpha^{\*}_T \mathcal{H}(\pi^{\*}_T) \end{aligned}$$
+$$\begin{aligned} &\max_{\pi_{T-1}}\Big(\mathbb{E}[r(s_{T-1}, a_{T-1})] + \max_{\pi_T} \mathbb{E}[r(s_T, a_T] \Big) \\ &= \max_{\pi_{T-1}} \Big( Q^{\*}_{T-1}(s_{T-1}, a_{T-1}) - \alpha^{\*}_T \mathcal{H}(\pi^{\*}_T) \Big) & \text{; should s.t. } \mathcal{H}(\pi_{T-1}) - \mathcal{H}_0 \\geq 0 \\ &= \min_{\alpha_{T-1} \\geq 0} \max_{\pi_{T-1}} \Big( Q^{\*}_{T-1}(s_{T-1}, a_{T-1}) - \alpha^{\*}_T \mathcal{H}(\pi^{\*}_T) + \alpha_{T-1} \big( \mathcal{H}(\pi_{T-1}) - \mathcal{H}_0 \big) \Big) & \text{; dual problem w/ Lagrangian.} \\ &= \min_{\alpha_{T-1} \\geq 0} \max_{\pi_{T-1}} \Big( Q^{\*}_{T-1}(s_{T-1}, a_{T-1}) + \alpha_{T-1} \mathcal{H}(\pi_{T-1}) - \alpha_{T-1}\mathcal{H}_0 \Big) - \alpha^{\*}_T \mathcal{H}(\pi^{\*}_T) \end{aligned}$$
 
 Similar to the previous step,
 
-$$\begin{aligned} \pi^{\*}_{T-1} &= \arg\max_{\pi_{T-1}} \mathbb{E}_{(s_{T-1}, a_{T-1}) \sim \rho_\pi} \[Q^{\*}_{T-1}(s_{T-1}, a_{T-1}) + \alpha_{T-1} \mathcal{H}(\pi_{T-1}) - \alpha_{T-1} \mathcal{H}_0 \] \\ \color{green}{\alpha^{\*}_{T-1}} &\color{green}{=} \color{green}{\arg\min_{\alpha_{T-1} \\geq 0} \mathbb{E}_{(s_{T-1}, a_{T-1}) \sim \rho_{\pi^{\*}}} \[ \alpha_{T-1} \mathcal{H}(\pi^{\*}_{T-1}) - \alpha_{T-1}\mathcal{H}_0 \]} \end{aligned}$$
+$$\begin{aligned} \pi^{\*}_{T-1} &= \arg\max_{\pi_{T-1}} \mathbb{E}_{(s_{T-1}, a_{T-1}) \sim \rho_\pi} [Q^{\*}_{T-1}(s_{T-1}, a_{T-1}) + \alpha_{T-1} \mathcal{H}(\pi_{T-1}) - \alpha_{T-1} \mathcal{H}_0 ] \\ \color{green}{\alpha^{\*}_{T-1}} &\color{green}{=} \color{green}{\arg\min_{\alpha_{T-1} \\geq 0} \mathbb{E}_{(s_{T-1}, a_{T-1}) \sim \rho_{\pi^{\*}}} [ \alpha_{T-1} \mathcal{H}(\pi^{\*}_{T-1}) - \alpha_{T-1}\mathcal{H}_0 ]} \end{aligned}$$
 
 The equation for updating $\alpha_{T-1}$ in green has the same format as the equation for updating $\alpha_{T-1}$ in blue above. By repeating this process, we can learn the optimal temperature parameter in every step by minimizing the same objective function:
 
-$$J(\alpha) = \mathbb{E}_{a_t \sim \pi_t} \[-\alpha \log \pi_t(a_t \mid s_t) - \alpha \mathcal{H}_0\]$$
+$$J(\alpha) = \mathbb{E}_{a_t \sim \pi_t} [-\alpha \log \pi_t(a_t \mid s_t) - \alpha \mathcal{H}_0]$$
 
 The final algorithm is same as SAC except for learning $\alpha$ explicitly with respect to the objective $J(\alpha)$ (see Fig. 7):
 
@@ -703,7 +703,7 @@ Fig. 9. The soft actor-critic algorithm with automatically adjusted temperature.
 
 ## TD3[#](#td3)
 
-\[[paper](https://arxiv.org/abs/1802.09477)|[code](https://github.com/sfujim/TD3)\]
+[[paper](https://arxiv.org/abs/1802.09477)|[code](https://github.com/sfujim/TD3)]
 
 The Q-learning algorithm is commonly known to suffer from the overestimation of the value function. This overestimation can propagate through the training iterations and negatively affect the policy. This property directly motivated [Double Q-learning](https://papers.nips.cc/paper/3964-double-q-learning) and [Double DQN](https://arxiv.org/abs/1509.06461): the action selection and Q-value update are decoupled by using two value networks.
 
@@ -735,23 +735,23 @@ Fig. 10. TD3 Algorithm. (Image source: [Fujimoto et al., 2018](https://arxiv.org
 
 ## SVPG[#](#svpg)
 
-\[[paper](https://arxiv.org/abs/1704.02399)|[code](https://github.com/dilinwang820/Stein-Variational-Gradient-Descent) for SVPG\]
+[[paper](https://arxiv.org/abs/1704.02399)|[code](https://github.com/dilinwang820/Stein-Variational-Gradient-Descent) for SVPG]
 
 Stein Variational Policy Gradient (**SVPG**; [Liu et al, 2017](https://arxiv.org/abs/1704.02399)) applies the [Stein](https://www.cs.dartmouth.edu/~qliu/stein.html) variational gradient descent (**SVGD**; [Liu and Wang, 2016](https://arxiv.org/abs/1608.04471)) algorithm to update the policy parameter $\theta$.
 
 In the setup of maximum entropy policy optimization, $\theta$ is considered as a random variable $\theta \sim q(\theta)$ and the model is expected to learn this distribution $q(\theta)$. Assuming we know a prior on how $q$ might look like, $q_0$, and we would like to guide the learning process to not make $\theta$ too far away from $q_0$ by optimizing the following objective function:
 
-$$\hat{J}(\theta) = \mathbb{E}_{\theta \sim q} \[J(\theta)\] - \alpha D_\text{KL}(q\|q_0)$$
+$$\hat{J}(\theta) = \mathbb{E}_{\theta \sim q} [J(\theta)] - \alpha D_\text{KL}(q\|q_0)$$
 
-where $\mathbb{E}_{\theta \sim q} \[R(\theta)\]$ is the expected reward when $\theta \sim q(\theta)$ and $D_\text{KL}$ is the KL divergence.
+where $\mathbb{E}_{\theta \sim q} [R(\theta)]$ is the expected reward when $\theta \sim q(\theta)$ and $D_\text{KL}$ is the KL divergence.
 
 If we don't have any prior information, we might set $q_0$ as a uniform distribution and set $q_0(\theta)$ to a constant. Then the above objective function becomes [SAC](#SAC), where the entropy term encourages exploration:
 
-$$\begin{aligned} \hat{J}(\theta) &= \mathbb{E}_{\theta \sim q} \[J(\theta)\] - \alpha D_\text{KL}(q\|q_0) \\ &= \mathbb{E}_{\theta \sim q} \[J(\theta)\] - \alpha \mathbb{E}_{\theta \sim q} \[\log q(\theta) - \log q_0(\theta)\] \\ &= \mathbb{E}_{\theta \sim q} \[J(\theta)\] + \alpha H(q(\theta)) \end{aligned}$$
+$$\begin{aligned} \hat{J}(\theta) &= \mathbb{E}_{\theta \sim q} [J(\theta)] - \alpha D_\text{KL}(q\|q_0) \\ &= \mathbb{E}_{\theta \sim q} [J(\theta)] - \alpha \mathbb{E}_{\theta \sim q} [\log q(\theta) - \log q_0(\theta)] \\ &= \mathbb{E}_{\theta \sim q} [J(\theta)] + \alpha H(q(\theta)) \end{aligned}$$
 
-Let's take the derivative of $\hat{J}(\theta) = \mathbb{E}_{\theta \sim q} \[J(\theta)\] - \alpha D_\text{KL}(q|q_0)$ w.r.t. $q$:
+Let's take the derivative of $\hat{J}(\theta) = \mathbb{E}_{\theta \sim q} [J(\theta)] - \alpha D_\text{KL}(q|q_0)$ w.r.t. $q$:
 
-$$\begin{aligned} \nabla_q \hat{J}(\theta) &= \nabla_q \big( \mathbb{E}_{\theta \sim q} \[J(\theta)\] - \alpha D_\text{KL}(q\|q_0) \big) \\ &= \nabla_q \int_\theta \big( q(\theta) J(\theta) - \alpha q(\theta)\log q(\theta) + \alpha q(\theta) \log q_0(\theta) \big) \\ &= \int_\theta \big( J(\theta) - \alpha \log q(\theta) -\alpha + \alpha \log q_0(\theta) \big) \\ &= 0 \end{aligned}$$
+$$\begin{aligned} \nabla_q \hat{J}(\theta) &= \nabla_q \big( \mathbb{E}_{\theta \sim q} [J(\theta)] - \alpha D_\text{KL}(q\|q_0) \big) \\ &= \nabla_q \int_\theta \big( q(\theta) J(\theta) - \alpha q(\theta)\log q(\theta) + \alpha q(\theta) \log q_0(\theta) \big) \\ &= \int_\theta \big( J(\theta) - \alpha \log q(\theta) -\alpha + \alpha \log q_0(\theta) \big) \\ &= 0 \end{aligned}$$
 
 The optimal distribution is:
 
@@ -761,7 +761,7 @@ The temperature $\alpha$ decides a tradeoff between exploitation and exploration
 
 When using the SVGD method to estimate the target posterior distribution $q(\theta)$, it relies on a set of particle $\{\theta_i\}_{i=1}^n$ (independently trained policy agents) and each is updated:
 
-$$\theta_i \gets \theta_i + \epsilon \phi^{\*}(\theta_i) \text{ where } \phi^{\*} = \max_{\phi \in \mathcal{H}} \{ - \nabla_\epsilon D_\text{KL} (q'_{\[\theta + \epsilon \phi(\theta)\]} \| q) \text{ s.t. } \|\phi\|_{\mathcal{H}} \leq 1\}$$
+$$\theta_i \gets \theta_i + \epsilon \phi^{\*}(\theta_i) \text{ where } \phi^{\*} = \max_{\phi \in \mathcal{H}} \{ - \nabla_\epsilon D_\text{KL} (q'_{[\theta + \epsilon \phi(\theta)]} \| q) \text{ s.t. } \|\phi\|_{\mathcal{H}} \leq 1\}$$
 
 where $\epsilon$ is a learning rate and $\phi^{\*}$ is the unit ball of a [RKHS](http://mlss.tuebingen.mpg.de/2015/slides/gretton/part_1.pdf) (reproducing kernel Hilbert space) $\mathcal{H}$ of $\theta$-shaped value vectors that maximally decreases the KL divergence between the particles and the target distribution. $q'(.)$ is the distribution of $\theta + \epsilon \phi(\theta)$.
 
@@ -785,7 +785,7 @@ $\Delta \theta$ on the kernel function space (edited)
 
 One [estimation](https://arxiv.org/abs/1608.04471) of $\phi^{\*}$ has the following form. A positive definite kernel $k(\\vartheta, \theta)$, i.e. a Gaussian [radial basis function](https://en.wikipedia.org/wiki/Radial_basis_function), measures the similarity between particles.
 
-$$\begin{aligned} \phi^{\*}(\theta_i) &= \mathbb{E}_{\\vartheta \sim q'} \[\nabla_\\vartheta \log q(\\vartheta) k(\\vartheta, \theta_i) + \nabla_\\vartheta k(\\vartheta, \theta_i)\]\\ &= \frac{1}{n} \sum_{j=1}^n \[\color{red}{\nabla_{\theta_j} \log q(\theta_j) k(\theta_j, \theta_i)} + \color{green}{\nabla_{\theta_j} k(\theta_j, \theta_i)}\] & \\scriptstyle{\text{;approximate }q'\text{ with current particle values}} \end{aligned}$$
+$$\begin{aligned} \phi^{\*}(\theta_i) &= \mathbb{E}_{\\vartheta \sim q'} [\nabla_\\vartheta \log q(\\vartheta) k(\\vartheta, \theta_i) + \nabla_\\vartheta k(\\vartheta, \theta_i)]\\ &= \frac{1}{n} \sum_{j=1}^n [\color{red}{\nabla_{\theta_j} \log q(\theta_j) k(\theta_j, \theta_i)} + \color{green}{\nabla_{\theta_j} k(\theta_j, \theta_i)}] & \\scriptstyle{\text{;approximate }q'\text{ with current particle values}} \end{aligned}$$
 
 - The first term in red encourages $\theta_i$ learning towards the high probability regions of $q$ that is shared across similar particles. => to be similar to other particles
 - The second term in green pushes particles away from each other and therefore diversifies the policy. => to be dissimilar to other particles
@@ -796,7 +796,7 @@ Usually the temperature $\alpha$ follows an annealing scheme so that the trainin
 
 ## IMPALA[#](#impala)
 
-\[[paper](https://arxiv.org/abs/1802.01561)|[code](https://github.com/deepmind/scalable_agent)\]
+[[paper](https://arxiv.org/abs/1802.01561)|[code](https://github.com/deepmind/scalable_agent)]
 
 In order to scale up RL training to achieve a very high throughput, **IMPALA** ("Importance Weighted Actor-Learner Architecture") framework decouples acting from learning on top of basic actor-critic setup and learns from all experience trajectories with **V-trace** off-policy correction.
 
@@ -863,56 +863,56 @@ Cited as:
 
 # References[#](#references)
 
-\[1\] jeremykun.com [Markov Chain Monte Carlo Without all the Bullshit](https://jeremykun.com/2015/04/06/markov-chain-monte-carlo-without-all-the-bullshit/)
+[1] jeremykun.com [Markov Chain Monte Carlo Without all the Bullshit](https://jeremykun.com/2015/04/06/markov-chain-monte-carlo-without-all-the-bullshit/)
 
-\[2\] Richard S. Sutton and Andrew G. Barto. [Reinforcement Learning: An Introduction; 2nd Edition](http://incompleteideas.net/book/bookdraft2017nov5.pdf). 2017.
+[2] Richard S. Sutton and Andrew G. Barto. [Reinforcement Learning: An Introduction; 2nd Edition](http://incompleteideas.net/book/bookdraft2017nov5.pdf). 2017.
 
-\[3\] John Schulman, et al. ["High-dimensional continuous control using generalized advantage estimation."](https://arxiv.org/pdf/1506.02438.pdf) ICLR 2016.
+[3] John Schulman, et al. ["High-dimensional continuous control using generalized advantage estimation."](https://arxiv.org/pdf/1506.02438.pdf) ICLR 2016.
 
-\[4\] Thomas Degris, Martha White, and Richard S. Sutton. ["Off-policy actor-critic."](https://arxiv.org/pdf/1205.4839.pdf) ICML 2012.
+[4] Thomas Degris, Martha White, and Richard S. Sutton. ["Off-policy actor-critic."](https://arxiv.org/pdf/1205.4839.pdf) ICML 2012.
 
-\[5\] timvieira.github.io [Importance sampling](http://timvieira.github.io/blog/post/2014/12/21/importance-sampling/)
+[5] timvieira.github.io [Importance sampling](http://timvieira.github.io/blog/post/2014/12/21/importance-sampling/)
 
-\[6\] Mnih, Volodymyr, et al. ["Asynchronous methods for deep reinforcement learning."](https://arxiv.org/abs/1602.01783) ICML. 2016.
+[6] Mnih, Volodymyr, et al. ["Asynchronous methods for deep reinforcement learning."](https://arxiv.org/abs/1602.01783) ICML. 2016.
 
-\[7\] David Silver, et al. ["Deterministic policy gradient algorithms."](https://hal.inria.fr/file/index/docid/938992/filename/dpg-icml2014.pdf) ICML. 2014.
+[7] David Silver, et al. ["Deterministic policy gradient algorithms."](https://hal.inria.fr/file/index/docid/938992/filename/dpg-icml2014.pdf) ICML. 2014.
 
-\[8\] Timothy P. Lillicrap, et al. ["Continuous control with deep reinforcement learning."](https://arxiv.org/pdf/1509.02971.pdf) arXiv preprint arXiv:1509.02971 (2015).
+[8] Timothy P. Lillicrap, et al. ["Continuous control with deep reinforcement learning."](https://arxiv.org/pdf/1509.02971.pdf) arXiv preprint arXiv:1509.02971 (2015).
 
-\[9\] Ryan Lowe, et al. ["Multi-agent actor-critic for mixed cooperative-competitive environments."](https://arxiv.org/pdf/1706.02275.pdf) NIPS. 2017.
+[9] Ryan Lowe, et al. ["Multi-agent actor-critic for mixed cooperative-competitive environments."](https://arxiv.org/pdf/1706.02275.pdf) NIPS. 2017.
 
-\[10\] John Schulman, et al. ["Trust region policy optimization."](https://arxiv.org/pdf/1502.05477.pdf) ICML. 2015.
+[10] John Schulman, et al. ["Trust region policy optimization."](https://arxiv.org/pdf/1502.05477.pdf) ICML. 2015.
 
-\[11\] Ziyu Wang, et al. ["Sample efficient actor-critic with experience replay."](https://arxiv.org/pdf/1611.01224.pdf) ICLR 2017.
+[11] Ziyu Wang, et al. ["Sample efficient actor-critic with experience replay."](https://arxiv.org/pdf/1611.01224.pdf) ICLR 2017.
 
-\[12\] Rémi Munos, Tom Stepleton, Anna Harutyunyan, and Marc Bellemare. ["Safe and efficient off-policy reinforcement learning"](http://papers.nips.cc/paper/6538-safe-and-efficient-off-policy-reinforcement-learning.pdf) NIPS. 2016.
+[12] Rémi Munos, Tom Stepleton, Anna Harutyunyan, and Marc Bellemare. ["Safe and efficient off-policy reinforcement learning"](http://papers.nips.cc/paper/6538-safe-and-efficient-off-policy-reinforcement-learning.pdf) NIPS. 2016.
 
-\[13\] Yuhuai Wu, et al. ["Scalable trust-region method for deep reinforcement learning using Kronecker-factored approximation."](https://arxiv.org/pdf/1708.05144.pdf) NIPS. 2017.
+[13] Yuhuai Wu, et al. ["Scalable trust-region method for deep reinforcement learning using Kronecker-factored approximation."](https://arxiv.org/pdf/1708.05144.pdf) NIPS. 2017.
 
-\[14\] kvfrans.com [A intuitive explanation of natural gradient descent](http://kvfrans.com/a-intuitive-explanation-of-natural-gradient-descent/)
+[14] kvfrans.com [A intuitive explanation of natural gradient descent](http://kvfrans.com/a-intuitive-explanation-of-natural-gradient-descent/)
 
-\[15\] Sham Kakade. ["A Natural Policy Gradient."](https://papers.nips.cc/paper/2073-a-natural-policy-gradient.pdf). NIPS. 2002.
+[15] Sham Kakade. ["A Natural Policy Gradient."](https://papers.nips.cc/paper/2073-a-natural-policy-gradient.pdf). NIPS. 2002.
 
-\[16\] ["Going Deeper Into Reinforcement Learning: Fundamentals of Policy Gradients."](https://danieltakeshi.github.io/2017/03/28/going-deeper-into-reinforcement-learning-fundamentals-of-policy-gradients/) - Seita's Place, Mar 2017.
+[16] ["Going Deeper Into Reinforcement Learning: Fundamentals of Policy Gradients."](https://danieltakeshi.github.io/2017/03/28/going-deeper-into-reinforcement-learning-fundamentals-of-policy-gradients/) - Seita's Place, Mar 2017.
 
-\[17\] ["Notes on the Generalized Advantage Estimation Paper."](https://danieltakeshi.github.io/2017/04/02/notes-on-the-generalized-advantage-estimation-paper/) - Seita's Place, Apr, 2017.
+[17] ["Notes on the Generalized Advantage Estimation Paper."](https://danieltakeshi.github.io/2017/04/02/notes-on-the-generalized-advantage-estimation-paper/) - Seita's Place, Apr, 2017.
 
-\[18\] Gabriel Barth-Maron, et al. ["Distributed Distributional Deterministic Policy Gradients."](https://arxiv.org/pdf/1804.08617.pdf) ICLR 2018 poster.
+[18] Gabriel Barth-Maron, et al. ["Distributed Distributional Deterministic Policy Gradients."](https://arxiv.org/pdf/1804.08617.pdf) ICLR 2018 poster.
 
-\[19\] Tuomas Haarnoja, Aurick Zhou, Pieter Abbeel, and Sergey Levine. ["Soft Actor-Critic: Off-Policy Maximum Entropy Deep Reinforcement Learning with a Stochastic Actor."](https://arxiv.org/pdf/1801.01290.pdf) arXiv preprint arXiv:1801.01290 (2018).
+[19] Tuomas Haarnoja, Aurick Zhou, Pieter Abbeel, and Sergey Levine. ["Soft Actor-Critic: Off-Policy Maximum Entropy Deep Reinforcement Learning with a Stochastic Actor."](https://arxiv.org/pdf/1801.01290.pdf) arXiv preprint arXiv:1801.01290 (2018).
 
-\[20\] Scott Fujimoto, Herke van Hoof, and Dave Meger. ["Addressing Function Approximation Error in Actor-Critic Methods."](https://arxiv.org/abs/1802.09477) arXiv preprint arXiv:1802.09477 (2018).
+[20] Scott Fujimoto, Herke van Hoof, and Dave Meger. ["Addressing Function Approximation Error in Actor-Critic Methods."](https://arxiv.org/abs/1802.09477) arXiv preprint arXiv:1802.09477 (2018).
 
-\[21\] Tuomas Haarnoja, et al. ["Soft Actor-Critic Algorithms and Applications."](https://arxiv.org/abs/1812.05905) arXiv preprint arXiv:1812.05905 (2018).
+[21] Tuomas Haarnoja, et al. ["Soft Actor-Critic Algorithms and Applications."](https://arxiv.org/abs/1812.05905) arXiv preprint arXiv:1812.05905 (2018).
 
-\[22\] David Knowles. ["Lagrangian Duality for Dummies"](https://cs.stanford.edu/people/davidknowles/lagrangian_duality.pdf) Nov 13, 2010.
+[22] David Knowles. ["Lagrangian Duality for Dummies"](https://cs.stanford.edu/people/davidknowles/lagrangian_duality.pdf) Nov 13, 2010.
 
-\[23\] Yang Liu, et al. ["Stein variational policy gradient."](https://arxiv.org/abs/1704.02399) arXiv preprint arXiv:1704.02399 (2017).
+[23] Yang Liu, et al. ["Stein variational policy gradient."](https://arxiv.org/abs/1704.02399) arXiv preprint arXiv:1704.02399 (2017).
 
-\[24\] Qiang Liu and Dilin Wang. ["Stein variational gradient descent: A general purpose bayesian inference algorithm."](https://papers.nips.cc/paper/6338-stein-variational-gradient-descent-a-general-purpose-bayesian-inference-algorithm.pdf) NIPS. 2016.
+[24] Qiang Liu and Dilin Wang. ["Stein variational gradient descent: A general purpose bayesian inference algorithm."](https://papers.nips.cc/paper/6338-stein-variational-gradient-descent-a-general-purpose-bayesian-inference-algorithm.pdf) NIPS. 2016.
 
-\[25\] Lasse Espeholt, et al. ["IMPALA: Scalable Distributed Deep-RL with Importance Weighted Actor-Learner Architectures"](https://arxiv.org/abs/1802.01561) arXiv preprint 1802.01561 (2018).
+[25] Lasse Espeholt, et al. ["IMPALA: Scalable Distributed Deep-RL with Importance Weighted Actor-Learner Architectures"](https://arxiv.org/abs/1802.01561) arXiv preprint 1802.01561 (2018).
 
-\[26\] Karl Cobbe, et al. ["Phasic Policy Gradient."](https://arxiv.org/abs/2009.04416) arXiv preprint arXiv:2009.04416 (2020).
+[26] Karl Cobbe, et al. ["Phasic Policy Gradient."](https://arxiv.org/abs/2009.04416) arXiv preprint arXiv:2009.04416 (2020).
 
-\[27\] Chloe Ching-Yun Hsu, et al. ["Revisiting Design Choices in Proximal Policy Optimization."](https://arxiv.org/abs/2009.10897) arXiv preprint arXiv:2009.10897 (2020).
+[27] Chloe Ching-Yun Hsu, et al. ["Revisiting Design Choices in Proximal Policy Optimization."](https://arxiv.org/abs/2009.10897) arXiv preprint arXiv:2009.10897 (2020).

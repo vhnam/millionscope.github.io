@@ -184,7 +184,7 @@ Fig. 10. Illustration of VisualGPT architecture. (Image source: [Chen et al. 202
 
 Let $I$ be the output of a visual encoder and $H$ be the hidden state of the LM decoder. VisualGPT introduced a self-resurrecting activation unit (SRAU) to control the tradeoff between a mixture of pre-trained linguistic information $H$ and visual component, $\text{EncDecAttn}(H, I)$ via two complementary gates $B^\text{vis}$ and $B^\text{lan}$:
 
-$$\begin{aligned} & B^\text{vis} \otimes \text{EncDecAttn}(H, I) + B^\text{lan} \otimes H \\ \text{where } & B^\text{vis}\[i,j\] = \sigma(H\[i,j\]) \mathbb{1}\[\sigma(H\[i,j\]) > \tau\] \\ & B^\text{lan}\[i,j\] = (1 - \sigma(H\[i,j\])) \mathbb{1}\[1 - \sigma(H\[i,j\]) > \tau\] \\ \end{aligned}$$where $\otimes$ is element-wise multiplication and $\[i,j\]$ denotes one element in the matrix. $\tau$ is a predefined threshold hyperparameter.
+$$\begin{aligned} & B^\text{vis} \otimes \text{EncDecAttn}(H, I) + B^\text{lan} \otimes H \\ \text{where } & B^\text{vis}[i,j] = \sigma(H[i,j]) \mathbb{1}[\sigma(H[i,j]) > \tau] \\ & B^\text{lan}[i,j] = (1 - \sigma(H[i,j])) \mathbb{1}[1 - \sigma(H[i,j]) > \tau] \\ \end{aligned}$$where $\otimes$ is element-wise multiplication and $[i,j]$ denotes one element in the matrix. $\tau$ is a predefined threshold hyperparameter.
 
 ![](assets/images/2022-06-09-vlm/VisualGPT-results.png)
 
@@ -246,9 +246,9 @@ Data processing of the Internet dataset includes:
 
 - The input Web page text is processed by inserting `<image>` tags at the location of visual inputs, as well as special tokens, `<BOS>` (beginning of sentence) and `<EOC>` (end of chunks; always at the end of the document, before any image tag).
 - From each document, they sample a random subsequence of $L = 256$ tokens and take up to $N = 5$ images included in the sampled sequence (using only the first $N$ within that sampled subsequence if there are more, or padding to $N$ if fewer)
-- A function $$\phi \: \[ 1,L \] \to \[ 0,N \]$$ is computed to track the text and image interleaving order, which assigns to each text position the index of the last image/video appearing before this position; 0 if no preceding visual data.
+- A function $$\phi \: [ 1,L ] \to [ 0,N ]$$ is computed to track the text and image interleaving order, which assigns to each text position the index of the last image/video appearing before this position; 0 if no preceding visual data.
 
-{/* $$\phi : \[ 1,L \] \to \[ 0,N \] $$ */}
+{/* $$\phi : [ 1,L ] \to [ 0,N ] $$ */}
 
 Since Flamingo is trained on a mixture of three different datasets, it optimizes for a weighted sum of dataset-specific NLL losses. Tuning the dataset weights is very important for the final performance. In practice, instead of round-robin between datasets, they actually sample one batch from each dataset and apply a weighted sum of these gradients in each update. Gradient accumulation across different heterogeneous datasets can be viewed as a mean to stabilize training, as it reduces the gradient variance between each update.
 
@@ -303,7 +303,7 @@ Finally it is possible to solve vision language tasks by stitching pretrained la
 
 The next token $x_t$ at a time step $t$ is selected according to the following equation. Model confidence and degeneration penalty ([Su et al. 2022](https://arxiv.org/abs/2202.06417)) are added to avoid corrupted generation from LM.
 
-$$\begin{aligned} & x_t = \arg\max_{v \in \mathcal{V}^{(k)}} \big\{ (1-\alpha) \underbrace{p(v \vert \boldsymbol{x}_{<t})}_\text{model confidence} - \alpha \underbrace{\max_{1 \leq j \leq t-1} { \text{cosine}(h_v, h_{x_j})}}_\text{degeneration penalty} + \beta \underbrace{f_\text{magic}(v \vert \mathcal{I}, \boldsymbol{x}_{<t}, \mathcal{V}^{(k)})}_\text{magic score} \big\} \\ \text{where } & f_\text{magic} ( v \vert \mathcal{I}, \mathbf{x}_{<t}, \mathcal{V}^{(k)} ) = \frac{ \exp(\text{CLIP}(\mathcal{I}, \[\boldsymbol{x}_{<t}:v\])) }{ \sum_{z \in \mathcal{V}^{(k)}} \exp(\text{CLIP}(\mathcal{I}, \[\boldsymbol{x}_{<t}:z\])) } = \frac{ \exp\big({h^\text{image}(\mathcal{I})}^\top h^\text{text}(\[\boldsymbol{x}_{<t}:v\])\big) }{ \sum_{z \in \mathcal{V}^{(k)}} \exp\big({h^\text{image}(\mathcal{I})}^\top h^\text{text}(\[\boldsymbol{x}_{<t}:z\])\big) } \end{aligned}$$
+$$\begin{aligned} & x_t = \arg\max_{v \in \mathcal{V}^{(k)}} \big\{ (1-\alpha) \underbrace{p(v \vert \boldsymbol{x}_{<t})}_\text{model confidence} - \alpha \underbrace{\max_{1 \leq j \leq t-1} { \text{cosine}(h_v, h_{x_j})}}_\text{degeneration penalty} + \beta \underbrace{f_\text{magic}(v \vert \mathcal{I}, \boldsymbol{x}_{<t}, \mathcal{V}^{(k)})}_\text{magic score} \big\} \\ \text{where } & f_\text{magic} ( v \vert \mathcal{I}, \mathbf{x}_{<t}, \mathcal{V}^{(k)} ) = \frac{ \exp(\text{CLIP}(\mathcal{I}, [\boldsymbol{x}_{<t}:v])) }{ \sum_{z \in \mathcal{V}^{(k)}} \exp(\text{CLIP}(\mathcal{I}, [\boldsymbol{x}_{<t}:z])) } = \frac{ \exp\big({h^\text{image}(\mathcal{I})}^\top h^\text{text}([\boldsymbol{x}_{<t}:v])\big) }{ \sum_{z \in \mathcal{V}^{(k)}} \exp\big({h^\text{image}(\mathcal{I})}^\top h^\text{text}([\boldsymbol{x}_{<t}:z])\big) } \end{aligned}$$
 
 where $\mathcal{I}$ is the input image; $\mathcal{V}^{(k)}$ contains top-$k$ possible tokens predicted by the language model $p$; $\boldsymbol{x}_{<t}$ refers to the past generated tokens before time step $t$; $h_v$ is the representation of the token $v$ computed by LM conditioned on the concatenation of $\boldsymbol{x}_{<t}$ and $v$; $h^\text{image}(.)$ and $h^\text{text}(.)$ are embeddings generated by CLIP image and text encoders, respectively.
 
@@ -433,28 +433,28 @@ Or
 
 # References[#](#references)
 
-\[1\] Li et al. ["VisualBERT: A Simple and Performant Baseline for Vision and Language."](https://arxiv.org/abs/1908.03557) arXiv preprint:1908.03557 (2019).
+[1] Li et al. ["VisualBERT: A Simple and Performant Baseline for Vision and Language."](https://arxiv.org/abs/1908.03557) arXiv preprint:1908.03557 (2019).
 
-\[2\] Wang et al. ["SimVLM: Simple Visual Language Model Pretraining with Weak Supervision."](https://arxiv.org/abs/2108.10904) ICLR 2022.
+[2] Wang et al. ["SimVLM: Simple Visual Language Model Pretraining with Weak Supervision."](https://arxiv.org/abs/2108.10904) ICLR 2022.
 
-\[3\] Aghajanyan, et al. ["CM3: A Causal Masked Multimodal Model of the Internet."](https://arxiv.org/abs/2201.07520) arXiv preprint arXiv: 2201.07520 (2022).
+[3] Aghajanyan, et al. ["CM3: A Causal Masked Multimodal Model of the Internet."](https://arxiv.org/abs/2201.07520) arXiv preprint arXiv: 2201.07520 (2022).
 
-\[4\] Tsimpoukelli et al. ["Multimodal Few-Shot Learning with Frozen Language Models."](https://arxiv.org/abs/2106.13884) NeuriPS 2021.
+[4] Tsimpoukelli et al. ["Multimodal Few-Shot Learning with Frozen Language Models."](https://arxiv.org/abs/2106.13884) NeuriPS 2021.
 
-\[5\] Mokady, Hertz & Hertz. ["ClipCap: CLIP Prefix for Image Captioning."](https://arxiv.org/abs/2111.09734) 2021.
+[5] Mokady, Hertz & Hertz. ["ClipCap: CLIP Prefix for Image Captioning."](https://arxiv.org/abs/2111.09734) 2021.
 
-\[6\] Chen et al. ["VisualGPT: Data-efficient Adaptation of Pretrained Language Models for Image Captioning."](https://arxiv.org/abs/2102.10407) arXiv preprint arXiv:2111.09734 (2021).
+[6] Chen et al. ["VisualGPT: Data-efficient Adaptation of Pretrained Language Models for Image Captioning."](https://arxiv.org/abs/2102.10407) arXiv preprint arXiv:2111.09734 (2021).
 
-\[7\] Luo et al. ["A Frustratingly Simple Approach for End-to-End Image Captioning."](https://arxiv.org/abs/2201.12723) arXiv preprint arXiv:2201.12723 (2022).
+[7] Luo et al. ["A Frustratingly Simple Approach for End-to-End Image Captioning."](https://arxiv.org/abs/2201.12723) arXiv preprint arXiv:2201.12723 (2022).
 
-\[8\] Zellers et al. ["MERLOT: Multimodal neural script knowledge models."](https://arxiv.org/abs/2106.02636) NeuriPS 2021.
+[8] Zellers et al. ["MERLOT: Multimodal neural script knowledge models."](https://arxiv.org/abs/2106.02636) NeuriPS 2021.
 
-\[9\] Alayrac et al. ["Flamingo: a Visual Language Model for Few-Shot Learning."](https://arxiv.org/abs/2204.14198) arXiv preprint arXiv:2204.14198 (2022).
+[9] Alayrac et al. ["Flamingo: a Visual Language Model for Few-Shot Learning."](https://arxiv.org/abs/2204.14198) arXiv preprint arXiv:2204.14198 (2022).
 
-\[10\] Yu & Wang et al. ["CoCa: Contrastive Captioners are Image-Text Foundation Models."](https://arxiv.org/abs/2205.01917) arXiv preprint arXiv:2205.01917 (2022).
+[10] Yu & Wang et al. ["CoCa: Contrastive Captioners are Image-Text Foundation Models."](https://arxiv.org/abs/2205.01917) arXiv preprint arXiv:2205.01917 (2022).
 
-\[11\] Yang et al. ["An Empirical Study of GPT-3 for Few-Shot Knowledge-Based VQA."](https://arxiv.org/abs/2109.05014) arXiv preprint arXiv:2109.05014 (2021).
+[11] Yang et al. ["An Empirical Study of GPT-3 for Few-Shot Knowledge-Based VQA."](https://arxiv.org/abs/2109.05014) arXiv preprint arXiv:2109.05014 (2021).
 
-\[12\] Su et al. ["Language models can see: Plugging visual controls in text generation."](https://arxiv.org/abs/2205.02655) arXiv preprint arXiv:2205.02655 (2022).
+[12] Su et al. ["Language models can see: Plugging visual controls in text generation."](https://arxiv.org/abs/2205.02655) arXiv preprint arXiv:2205.02655 (2022).
 
-\[13\] Zeng et al. ["Socratic Models: Composing Zero-Shot Multimodal Reasoning with Language."](https://arxiv.org/abs/2204.00598) arXiv preprint arXiv:2204.00598 (2022).
+[13] Zeng et al. ["Socratic Models: Composing Zero-Shot Multimodal Reasoning with Language."](https://arxiv.org/abs/2204.00598) arXiv preprint arXiv:2204.00598 (2022).

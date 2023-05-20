@@ -134,12 +134,12 @@ DenSPI introduces a _query-agnostic_ indexable representation of document phrase
 
 Given a question $x$ and a fixed set of (Wikipedia) documents, $z_1, \dots, z_K$ and each document $z_k$ contains $N_k$ words, $z_k = \langle z_k^{(1)}, \dots, z_k^{(N_k)}\rangle$. An ODQA model is a scoring function $F$ for each candidate phrase span $z_k^{(i:j)}, 1 \leq i \leq j \leq N_k$, such that the truth answer is the phrase with maximum score: $y = {\arg\max}_{k,i,j} F(x, z_k^{(i:j)})$.
 
-The phrase representation $z_k^{(i:j)}$ combines both dense and sparse vectors, $z_k^{(i:j)} = \[d_k^{(i:j)}, s_k^{(i:j)}\] \in \mathbb{R}^{d^d + d^s}$ (note that $d^d \ll d^s$):
+The phrase representation $z_k^{(i:j)}$ combines both dense and sparse vectors, $z_k^{(i:j)} = [d_k^{(i:j)}, s_k^{(i:j)}] \in \mathbb{R}^{d^d + d^s}$ (note that $d^d \ll d^s$):
 
 - The dense vector $d_k^{(i:j)}$ is effective for encoding local _syntactic_ and _semantic_ cues, as what can be learned by a pretrained language model.
 - The sparse vector $s_k^{(i:j)}$ is superior at encoding precise _lexical_ information. The sparse vector is term-frequency-based encoding. DenSPI uses 2-gram term-frequency same as DrQA, resulting a highly sparse representation ($d^s \approx 16$M)
 
-The dense vector $d^{(i:j)}$ is further decomposed into three parts, $d^{(i:j)} = \[a_i, b_j, c_{ij}\] \in \mathbb{R}^{2d^b + 1}$ where $2d^b + 1 = d^d$. All three components are learned based on different columns of the fine-tuned BERT representations.
+The dense vector $d^{(i:j)}$ is further decomposed into three parts, $d^{(i:j)} = [a_i, b_j, c_{ij}] \in \mathbb{R}^{2d^b + 1}$ where $2d^b + 1 = d^d$. All three components are learned based on different columns of the fine-tuned BERT representations.
 
 - A vector $a_i$ encodes the _start_ position for the $i$-th word of the document;
 - A vector $b_j$ encodes the _end_ position for the $j$-th word of the document;
@@ -151,7 +151,7 @@ For all possible $(i,j,k)$ tuples where $j-i < J$, the text span embeddings are 
 
 Fig. 4. An illustration of Dense-Sparse Phrase Index (DenSPI) architecture. (Image source: [Seo et al., 2019](https://arxiv.org/abs/1906.05807))
 
-At the inference time, the question is mapped into the same vector space $x=\[d', s'\] \in \mathbb{R}^{d^d + d^s}$, where the dense vector $d'$ is extracted from the BERT embedding of the special `[CLS]` symbol. The same BERT model is shared for encoding both questions and phrases. The final answer is predicted by $k^\*, i^\*, j^\* = \arg\max x^\top z_k^{(i:j)}$.
+At the inference time, the question is mapped into the same vector space $x=[d', s'] \in \mathbb{R}^{d^d + d^s}$, where the dense vector $d'$ is extracted from the BERT embedding of the special `[CLS]` symbol. The same BERT model is shared for encoding both questions and phrases. The final answer is predicted by $k^\*, i^\*, j^\* = \arg\max x^\top z_k^{(i:j)}$.
 
 ## Reader Model[#](#reader-model)
 
@@ -190,9 +190,9 @@ where $\mathbf{W}_s$ and $\mathbf{W}_e$ are learned parameters.
 
 Following the success of [BERT](https://lilianweng.github.io/posts/2019-01-31-lm/#bert) ([Devlin et al., 2018](https://arxiv.org/abs/1810.04805)), many QA models develop the machine comprehension component based on BERT. Let's define the BERT model as a function that can take one or multiple strings (concatenated by `[SEP]`) as input and outputs a set of BERT encoding vectors for the special `[CLS]` token and every input token:
 
-$$\text{BERT}(s_1, s_2, \dots) = \[\mathbf{h}^\texttt{\[CLS\]}, \mathbf{h}^{(1)}, \mathbf{h}^{(2)}, \dots\]$$
+$$\text{BERT}(s_1, s_2, \dots) = [\mathbf{h}^\texttt{[CLS]}, \mathbf{h}^{(1)}, \mathbf{h}^{(2)}, \dots]$$
 
-where $\mathbf{h}^\texttt{\[CLS\]}$ is the embedding vector for the special `[CLS]` token and $\mathbf{h}^{(i)}$ is the embedding vector for the $i$-th token.
+where $\mathbf{h}^\texttt{[CLS]}$ is the embedding vector for the special `[CLS]` token and $\mathbf{h}^{(i)}$ is the embedding vector for the $i$-th token.
 
 To use BERT for reading comprehension, it learns two additional weights, $\mathbf{W}_s$ and $\mathbf{W}_e$, and $\text{softmax}(\mathbf{h}^{(i)}\mathbf{W}_s)$ and $\text{softmax}(\mathbf{h}^{(i)}\mathbf{W}_e)$ define two probability distributions of start and end position of the predicted span per token.
 
@@ -232,7 +232,7 @@ Fig. 6. The overview of R^3 (reinforced ranker-reader) architecture. Both compon
 
 The retriever runs a max-pooling operation per passage and then aggregates to output a probability of each passage entailing the answer.
 
-$$\begin{aligned} \mathbf{u}_i &= \text{max-pooling}(\mathbf{H}^\text{rank}_i) \in \mathbb{R}^l \\ \mathbf{C} &= \text{tanh}(\mathbf{W}^c\[\mathbf{u}_1;\dots;\mathbf{u}_N\] + \mathbf{b}^c \otimes \mathbf{e}_N) \in \mathbb{R}^{l \times n} \\ \gamma &= \text{softmax}(\mathbf{w}^c \mathbf{C}) \in \mathbb{R}^n \end{aligned}$$
+$$\begin{aligned} \mathbf{u}_i &= \text{max-pooling}(\mathbf{H}^\text{rank}_i) \in \mathbb{R}^l \\ \mathbf{C} &= \text{tanh}(\mathbf{W}^c[\mathbf{u}_1;\dots;\mathbf{u}_N] + \mathbf{b}^c \otimes \mathbf{e}_N) \in \mathbb{R}^{l \times n} \\ \gamma &= \text{softmax}(\mathbf{w}^c \mathbf{C}) \in \mathbb{R}^n \end{aligned}$$
 
 Finally, the retriever is viewed as a _policy_ to output action to sample a passage according to predicted $\gamma$,
 
@@ -240,13 +240,13 @@ $$\pi(z \vert x; \theta^\gamma) = \gamma_z$$
 
 The reader predicts the start position $\beta^s$ and the end position $\beta^e$ of the answer span. Two positions are computed in the same way, with independent parameters to learn. There are $V$ words in all the passages involved.
 
-$$\begin{aligned} \mathbf{H}^\text{read} &= \[\mathbf{H}^\text{read}_\tau; \mathbf{H}^\text{read}_{\text{neg}_1}; \dots; \mathbf{H}^\text{read}_{\text{neg}_n}\] \\ \mathbf{F}^s &= \text{tanh}(\mathbf{W}^s \mathbf{H}^\text{read} + \mathbf{b}^s \otimes \mathbf{e}_V) \quad \beta^s = \text{softmax}(\mathbf{w}^s \mathbf{F}^s) \in \mathbb{R}^V \\ \mathbf{F}^e &= \text{tanh}(\mathbf{W}^e \mathbf{H}^\text{read} + \mathbf{b}^e \otimes \mathbf{e}_V) \quad \beta^e = \text{softmax}(\mathbf{w}^e \mathbf{F}^e) \in \mathbb{R}^V \\ L(y \vert z, x) &= -\log(\beta^s_{y_z^s})-\log(\beta^e_{y_z^e}) \end{aligned}$$
+$$\begin{aligned} \mathbf{H}^\text{read} &= [\mathbf{H}^\text{read}_\tau; \mathbf{H}^\text{read}_{\text{neg}_1}; \dots; \mathbf{H}^\text{read}_{\text{neg}_n}] \\ \mathbf{F}^s &= \text{tanh}(\mathbf{W}^s \mathbf{H}^\text{read} + \mathbf{b}^s \otimes \mathbf{e}_V) \quad \beta^s = \text{softmax}(\mathbf{w}^s \mathbf{F}^s) \in \mathbb{R}^V \\ \mathbf{F}^e &= \text{tanh}(\mathbf{W}^e \mathbf{H}^\text{read} + \mathbf{b}^e \otimes \mathbf{e}_V) \quad \beta^e = \text{softmax}(\mathbf{w}^e \mathbf{F}^e) \in \mathbb{R}^V \\ L(y \vert z, x) &= -\log(\beta^s_{y_z^s})-\log(\beta^e_{y_z^e}) \end{aligned}$$
 
 where $y$ is the ground-truth answer and the passage $z$ is sampled by the retriever. $\beta^s_{y_z^s}$ and $\beta^s_{y_z^e}$ represent the probabilities of the start and end positions of $y$ in passage $z$.
 
 The training objective for the end-to-end R^3 QA system is to minimize the negative log-likelihood of obtaining the correct answer $y$ given a question $x$,
 
-$$\begin{aligned} \mathcal{J}(\theta) &= -\mathbb{E}_{z\sim\pi(.\vert x)} \[L(y \vert z, x)\] \\ \nabla \mathcal{J}(\theta) &= - \nabla_\theta \sum_z \pi(z \vert x) L(y \vert z, x) \\ &= - \sum_z \big( L(y \vert z, x) \nabla_\theta\pi(z \vert x) + \pi(z \vert x) \nabla_\theta L(y \vert z, x) \big) \\ &= - \mathbb{E}_{z\sim\pi(.\vert x)} \big( \color{red}{L(y \vert z, x)\nabla_\theta\log\pi(z \vert x)} + \nabla_\theta L(y \vert z, x) \big) \\ &\approx - \mathbb{E}_{z\sim\pi(.\vert x)} \big( \underbrace{\color{red}{R(y \vert z, x)\nabla_\theta\log\pi(z \vert x)}}_\text{REINFORCE} + \nabla_\theta L(y \vert z, x) \big) \end{aligned}$$
+$$\begin{aligned} \mathcal{J}(\theta) &= -\mathbb{E}_{z\sim\pi(.\vert x)} [L(y \vert z, x)] \\ \nabla \mathcal{J}(\theta) &= - \nabla_\theta \sum_z \pi(z \vert x) L(y \vert z, x) \\ &= - \sum_z \big( L(y \vert z, x) \nabla_\theta\pi(z \vert x) + \pi(z \vert x) \nabla_\theta L(y \vert z, x) \big) \\ &= - \mathbb{E}_{z\sim\pi(.\vert x)} \big( \color{red}{L(y \vert z, x)\nabla_\theta\log\pi(z \vert x)} + \nabla_\theta L(y \vert z, x) \big) \\ &\approx - \mathbb{E}_{z\sim\pi(.\vert x)} \big( \underbrace{\color{red}{R(y \vert z, x)\nabla_\theta\log\pi(z \vert x)}}_\text{REINFORCE} + \nabla_\theta L(y \vert z, x) \big) \end{aligned}$$
 
 Essentially in training, given a passage $z$ sampled by the retriever, the reader is trained by gradient descent while the retriever is trained by [REINFORCE](https://lilianweng.github.io/posts/2018-04-08-policy-gradient/#reinforce) using $L(y \vert z, x)$ as the reward function. However, $L(y \vert z, x)$ is not bounded and may introduce a lot of variance. The paper replaces the reward with a customized scoring function by comparing the ground truth $y$ and the answer extracted by the reader $\hat{y}$:
 
@@ -264,7 +264,7 @@ Fig. 8. An illustration of the retriever component in ORQA. (Image source: replo
 
 All the evidence blocks are ranked by a retrieval score, defined as the inner product of BERT embedding vectors of the `[CLS]` token of the question $x$ and the evidence block $z$. Note that the encoders for questions and context are independent.
 
-$$\begin{aligned} h_x &= \mathbf{W}_x \text{BERT}_x(x)^{\\mathtt{\[CLS\]}} \\ h_z &= \mathbf{W}_z \text{BERT}_z(z)^{\\mathtt{\[CLS\]}} \\ S_\text{retr}(z, x) &= h_x^\top h_z \end{aligned}$$
+$$\begin{aligned} h_x &= \mathbf{W}_x \text{BERT}_x(x)^{\\mathtt{[CLS]}} \\ h_z &= \mathbf{W}_z \text{BERT}_z(z)^{\\mathtt{[CLS]}} \\ S_\text{retr}(z, x) &= h_x^\top h_z \end{aligned}$$
 
 The retriever module is pretrained with _Inverse Cloze Task (ICT)_, which is to predict the context given a sentence, opposite to the standard [Cloze Task](https://en.wikipedia.org/wiki/Cloze_test). The ICT objective is to maximize the retrieval score of the correct context $z$ given a random sentence $x$:
 
@@ -284,7 +284,7 @@ $$\mathcal{L}(x, y) = \mathcal{L}_\text{early}(x, y) + \mathcal{L}_\text{full}(x
 
 (1) Find all correct text spans within top $k$ evidence blocks and optimize for the marginal likelihood of a text span $s$ that matches the true answer $y$:
 
-$$\begin{aligned} h_s &= \text{BERT}_R(x, y)^{(\text{START}(s))} \\ h_e &= \text{BERT}_R(x, y)^{(\text{END}(s))} \\ S_\text{read}(z, s, x) &= \text{MLP}(\[h_s; h_e\]) \\ p(z, s \vert x) &= \frac{\exp(S_\text{read}(z, s, x))}{\sum_{z'\in\text{TOP}(k)} \sum_{s'\in z'} \exp(S_\text{read}(z', s', x))} \\ L_\text{full}(x, y) &= - \log \sum_{\\substack{z \in \text{TOP}(k)\\ s \in z}} \sum_{y=\text{TEXT}(s)} p(z, s \vert x) \end{aligned}$$
+$$\begin{aligned} h_s &= \text{BERT}_R(x, y)^{(\text{START}(s))} \\ h_e &= \text{BERT}_R(x, y)^{(\text{END}(s))} \\ S_\text{read}(z, s, x) &= \text{MLP}([h_s; h_e]) \\ p(z, s \vert x) &= \frac{\exp(S_\text{read}(z, s, x))}{\sum_{z'\in\text{TOP}(k)} \sum_{s'\in z'} \exp(S_\text{read}(z', s', x))} \\ L_\text{full}(x, y) &= - \log \sum_{\\substack{z \in \text{TOP}(k)\\ s \in z}} \sum_{y=\text{TEXT}(s)} p(z, s \vert x) \end{aligned}$$
 
 where $y=\text{TEXT}(s)$ indicates whether the answer $y$ matches the text span $s$. $\text{TOP}(k)$ is the top $k$ retrieved blocks according to $S_\text{retr}(z, x)$. The paper sets $k=5$.
 
@@ -633,44 +633,44 @@ Or
 
 # References[#](#references)
 
-\[1\] Danqi Chen & Scott Yih. ["ACL2020 Tutorial: Open-Domain Question Answering"](https://github.com/danqi/acl2020-openqa-tutorial) July 2020.
+[1] Danqi Chen & Scott Yih. ["ACL2020 Tutorial: Open-Domain Question Answering"](https://github.com/danqi/acl2020-openqa-tutorial) July 2020.
 
-\[2\] Danqi Chen, et al. ["Reading Wikipedia to Answer Open-Domain Questions"](https://arxiv.org/abs/1704.00051) ACL 2017. | [code](https://github.com/facebookresearch/DrQA)
+[2] Danqi Chen, et al. ["Reading Wikipedia to Answer Open-Domain Questions"](https://arxiv.org/abs/1704.00051) ACL 2017. | [code](https://github.com/facebookresearch/DrQA)
 
-\[3\] Shuohang Wang, et al. ["R^3: Reinforced Ranker-Reader for Open-Domain Question Answering"](https://arxiv.org/abs/1709.00023) AAAI 2018.
+[3] Shuohang Wang, et al. ["R^3: Reinforced Ranker-Reader for Open-Domain Question Answering"](https://arxiv.org/abs/1709.00023) AAAI 2018.
 
-\[4\] Jimmy Lin. ["The neural hype and comparisons against weak baselines."](https://sigir.org/wp-content/uploads/2019/01/p040.pdf) ACM SIGIR Forum. Vol. 52. No. 2. 2019.
+[4] Jimmy Lin. ["The neural hype and comparisons against weak baselines."](https://sigir.org/wp-content/uploads/2019/01/p040.pdf) ACM SIGIR Forum. Vol. 52. No. 2. 2019.
 
-\[5\] Wei Yang, et al. ["End-to-End Open-Domain Question Answering with BERTserini"](https://arxiv.org/abs/1902.01718) NAACL 2019.
+[5] Wei Yang, et al. ["End-to-End Open-Domain Question Answering with BERTserini"](https://arxiv.org/abs/1902.01718) NAACL 2019.
 
-\[6\] Christopher Clark & Matt Gardner. ["Simple and Effective Multi-Paragraph Reading Comprehension."](https://arxiv.org/abs/1710.10723) arXiv:1710.10723 (2017).
+[6] Christopher Clark & Matt Gardner. ["Simple and Effective Multi-Paragraph Reading Comprehension."](https://arxiv.org/abs/1710.10723) arXiv:1710.10723 (2017).
 
-\[7\] Rodrigo Nogueira & Kyunghyun Cho. ["Passage Re-ranking with BERT."](https://arxiv.org/abs/1901.04085) arXiv preprint arXiv:1901.04085 (2019). | [code](https://github.com/nyu-dl/dl4marco-bert)
+[7] Rodrigo Nogueira & Kyunghyun Cho. ["Passage Re-ranking with BERT."](https://arxiv.org/abs/1901.04085) arXiv preprint arXiv:1901.04085 (2019). | [code](https://github.com/nyu-dl/dl4marco-bert)
 
-\[8\] Zhiguo Wang, et al. ["Multi-passage BERT: A globally normalized BERT model for open-domain question answering."](https://arxiv.org/abs/1908.08167) EMNLP 2019.
+[8] Zhiguo Wang, et al. ["Multi-passage BERT: A globally normalized BERT model for open-domain question answering."](https://arxiv.org/abs/1908.08167) EMNLP 2019.
 
-\[9\] Minjoon Seo et al. ["Real-time open-domain question answering with dense-sparse phrase index."](https://arxiv.org/abs/1906.05807) ACL 2019.
+[9] Minjoon Seo et al. ["Real-time open-domain question answering with dense-sparse phrase index."](https://arxiv.org/abs/1906.05807) ACL 2019.
 
-\[10\] Kenton Lee, et al. ["Latent Retrieval for Weakly Supervised Open Domain Question Answering"](https://arxiv.org/abs/1906.00300) ACL 2019.
+[10] Kenton Lee, et al. ["Latent Retrieval for Weakly Supervised Open Domain Question Answering"](https://arxiv.org/abs/1906.00300) ACL 2019.
 
-\[11\] Kelvin Guu, et al. ["REALM: Retrieval-Augmented Language Model Pre-Training"](https://arxiv.org/abs/2002.08909) arXiv:2002.08909 (2020).
+[11] Kelvin Guu, et al. ["REALM: Retrieval-Augmented Language Model Pre-Training"](https://arxiv.org/abs/2002.08909) arXiv:2002.08909 (2020).
 
-\[12\] Vladimir Karpukhin et al. ["Dense passage retrieval for open-domain question answering."](https://arxiv.org/abs/2004.04906). EMNLP 2020. | [code](https://github.com/facebookresearch/DPR)
+[12] Vladimir Karpukhin et al. ["Dense passage retrieval for open-domain question answering."](https://arxiv.org/abs/2004.04906). EMNLP 2020. | [code](https://github.com/facebookresearch/DPR)
 
-\[13\] Patrick Lewis et al. ["Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks"](https://arxiv.org/abs/2005.11401) arXiv:2005.11401 (2020).
+[13] Patrick Lewis et al. ["Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks"](https://arxiv.org/abs/2005.11401) arXiv:2005.11401 (2020).
 
-\[14\] Adam Roberts, et al. ["How Much Knowledge Can You Pack Into the Parameters of a Language Model?"](https://arxiv.org/abs/2002.08910) EMNLP 2020.
+[14] Adam Roberts, et al. ["How Much Knowledge Can You Pack Into the Parameters of a Language Model?"](https://arxiv.org/abs/2002.08910) EMNLP 2020.
 
-\[15\] Tom Brown, et al. ["Language models are few-shot learners."](https://arxiv.org/abs/2005.14165) arXiv:2005.14165 (2020).
+[15] Tom Brown, et al. ["Language models are few-shot learners."](https://arxiv.org/abs/2005.14165) arXiv:2005.14165 (2020).
 
-\[16\] Fabio Petroni, et al. ["How Context Affects Language Models' Factual Predictions"](https://arxiv.org/abs/2005.04611) AKBC 2020.
+[16] Fabio Petroni, et al. ["How Context Affects Language Models' Factual Predictions"](https://arxiv.org/abs/2005.04611) AKBC 2020.
 
-\[17\] Gautier Izacard & Edouard Grave. ["Leveraging passage retrieval with generative models for open domain question answering."](https://arxiv.org/abs/2007.01282) arXiv:2007.01282 (2020).
+[17] Gautier Izacard & Edouard Grave. ["Leveraging passage retrieval with generative models for open domain question answering."](https://arxiv.org/abs/2007.01282) arXiv:2007.01282 (2020).
 
-\[18\] ["Dive into deep learning: Beam search"](https://d2l.ai/chapter_recurrent-modern/beam-search.html)
+[18] ["Dive into deep learning: Beam search"](https://d2l.ai/chapter_recurrent-modern/beam-search.html)
 
-\[19\] Patrick Lewis, et al. ["Question and Answer Test-Train Overlap in Open-Domain Question Answering Datasets"](https://arxiv.org/abs/2008.02637) arXiv:2008.02637 (2020). | [data](https://github.com/facebookresearch/QA-Overlap)
+[19] Patrick Lewis, et al. ["Question and Answer Test-Train Overlap in Open-Domain Question Answering Datasets"](https://arxiv.org/abs/2008.02637) arXiv:2008.02637 (2020). | [data](https://github.com/facebookresearch/QA-Overlap)
 
-\[20\] Hervé Jegou, et al. ["Faiss: A library for efficient similarity search"](https://engineering.fb.com/2017/03/29/data-infrastructure/faiss-a-library-for-efficient-similarity-search/) Mar 2017.
+[20] Hervé Jegou, et al. ["Faiss: A library for efficient similarity search"](https://engineering.fb.com/2017/03/29/data-infrastructure/faiss-a-library-for-efficient-similarity-search/) Mar 2017.
 
-\[21\] Vidhisha Balachandran, et al. ["Simple and Efficient ways to Improve REALM."](https://arxiv.org/abs/2104.08710) arXiv:2104.08710 (2021).
+[21] Vidhisha Balachandran, et al. ["Simple and Efficient ways to Improve REALM."](https://arxiv.org/abs/2104.08710) arXiv:2104.08710 (2021).

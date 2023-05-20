@@ -87,13 +87,13 @@ Fig. 4. The encoder-decoder model with additive attention mechanism in [Bahdanau
 
 Now let's define the attention mechanism introduced in NMT in a scientific way. Say, we have a source sequence $\mathbf{x}$ of length $n$ and try to output a target sequence $\mathbf{y}$ of length $m$:
 
-$$\begin{aligned} \mathbf{x} &= \[x_1, x_2, \dots, x_n\] \\ \mathbf{y} &= \[y_1, y_2, \dots, y_m\] \end{aligned}$$
+$$\begin{aligned} \mathbf{x} &= [x_1, x_2, \dots, x_n] \\ \mathbf{y} &= [y_1, y_2, \dots, y_m] \end{aligned}$$
 
 (Variables in bold indicate that they are vectors; same for everything else in this post.)
 
 The encoder is a [bidirectional RNN](https://www.coursera.org/lecture/nlp-sequence-models/bidirectional-rnn-fyXnn) (or other recurrent network setting of your choice) with a forward hidden state $\\overrightarrow{\boldsymbol{h}}_i$ and a backward one $\\overleftarrow{\boldsymbol{h}}_i$. A simple concatenation of two represents the encoder state. The motivation is to include both the preceding and following words in the annotation of one word.
 
-$$\boldsymbol{h}_i = \[\\overrightarrow{\boldsymbol{h}}_i^\top; \\overleftarrow{\boldsymbol{h}}_i^\top\]^\top, i=1,\dots,n$$
+$$\boldsymbol{h}_i = [\\overrightarrow{\boldsymbol{h}}_i^\top; \\overleftarrow{\boldsymbol{h}}_i^\top]^\top, i=1,\dots,n$$
 
 The decoder network has hidden state $\boldsymbol{s}_t=f(\boldsymbol{s}_{t-1}, y_{t-1}, \mathbf{c}_t)$ for the output word at position t, $t=1,\dots,m$, where the context vector $\mathbf{c}_t$ is a sum of hidden states of the input sequence, weighted by alignment scores:
 
@@ -101,7 +101,7 @@ $$\begin{aligned} \mathbf{c}_t &= \sum_{i=1}^n \alpha_{t,i} \boldsymbol{h}_i & \
 
 The alignment model assigns a score $\alpha_{t,i}$ to the pair of input at position i and output at position t, $(y_t, x_i)$, based on how well they match. The set of $\{\alpha_{t, i}\}$ are weights defining how much of each source hidden state should be considered for each output. In Bahdanau's paper, the alignment score $\alpha$ is parametrized by a **feed-forward network** with a single hidden layer and this network is jointly trained with other parts of the model. The score function is therefore in the following form, given that tanh is used as the non-linear activation function:
 
-$$\text{score}(\boldsymbol{s}_t, \boldsymbol{h}_i) = \mathbf{v}_a^\top \tanh(\mathbf{W}_a\[\boldsymbol{s}_t; \boldsymbol{h}_i\])$$
+$$\text{score}(\boldsymbol{s}_t, \boldsymbol{h}_i) = \mathbf{v}_a^\top \tanh(\mathbf{W}_a[\boldsymbol{s}_t; \boldsymbol{h}_i])$$
 
 where both $\mathbf{v}_a$ and $\mathbf{W}_a$ are weight matrices to be learned in the alignment model.
 
@@ -129,13 +129,13 @@ Citation
 
 Content-base attention
 
-$\text{score}(\boldsymbol{s}_t, \boldsymbol{h}_i) = \text{cosine}\[\boldsymbol{s}_t, \boldsymbol{h}_i\]$
+$\text{score}(\boldsymbol{s}_t, \boldsymbol{h}_i) = \text{cosine}[\boldsymbol{s}_t, \boldsymbol{h}_i]$
 
 [Graves2014](https://arxiv.org/abs/1410.5401)
 
 Additive(\*)
 
-$\text{score}(\boldsymbol{s}_t, \boldsymbol{h}_i) = \mathbf{v}_a^\top \tanh(\mathbf{W}_a\[\boldsymbol{s}_{t-1}; \boldsymbol{h}_i\])$
+$\text{score}(\boldsymbol{s}_t, \boldsymbol{h}_i) = \mathbf{v}_a^\top \tanh(\mathbf{W}_a[\boldsymbol{s}_{t-1}; \boldsymbol{h}_i])$
 
 [Bahdanau2015](https://arxiv.org/pdf/1409.0473.pdf)
 
@@ -260,7 +260,7 @@ where $w_t(i)$ is the $i$-th element in $\mathbf{w}_t$ and $\mathbf{M}_t(i)$ is 
 
 When writing into the memory at time t, as inspired by the input and forget gates in LSTM, a write head first wipes off some old content according to an erase vector $\mathbf{e}_t$ and then adds new information by an add vector $\mathbf{a}_t$.
 
-$$\begin{aligned} \tilde{\mathbf{M}}_t(i) &= \mathbf{M}_{t-1}(i) \[\mathbf{1} - w_t(i)\mathbf{e}_t\] &\\scriptstyle{\text{; erase}}\\ \mathbf{M}_t(i) &= \tilde{\mathbf{M}}_t(i) + w_t(i) \mathbf{a}_t &\\scriptstyle{\text{; add}} \end{aligned}$$
+$$\begin{aligned} \tilde{\mathbf{M}}_t(i) &= \mathbf{M}_{t-1}(i) [\mathbf{1} - w_t(i)\mathbf{e}_t] &\\scriptstyle{\text{; erase}}\\ \mathbf{M}_t(i) &= \tilde{\mathbf{M}}_t(i) + w_t(i) \mathbf{a}_t &\\scriptstyle{\text{; add}} \end{aligned}$$
 
 ## Attention Mechanisms[#](#attention-mechanisms)
 
@@ -270,7 +270,7 @@ In Neural Turing Machine, how to generate the attention distribution $\mathbf{w}
 
 The content-addressing creates attention vectors based on the similarity between the key vector $\mathbf{k}_t$ extracted by the controller from the input and memory rows. The content-based attention scores are computed as cosine similarity and then normalized by softmax. In addition, NTM adds a strength multiplier $\beta_t$ to amplify or attenuate the focus of the distribution.
 
-$$w_t^c(i) = \text{softmax}(\beta_t \cdot \text{cosine}\[\mathbf{k}_t, \mathbf{M}_t(i)\]) = \frac{\exp(\beta_t \frac{\mathbf{k}_t \cdot \mathbf{M}_t(i)}{\|\mathbf{k}_t\| \cdot \|\mathbf{M}_t(i)\|})}{\sum_{j=1}^N \exp(\beta_t \frac{\mathbf{k}_t \cdot \mathbf{M}_t(j)}{\|\mathbf{k}_t\| \cdot \|\mathbf{M}_t(j)\|})}$$
+$$w_t^c(i) = \text{softmax}(\beta_t \cdot \text{cosine}[\mathbf{k}_t, \mathbf{M}_t(i)]) = \frac{\exp(\beta_t \frac{\mathbf{k}_t \cdot \mathbf{M}_t(i)}{\|\mathbf{k}_t\| \cdot \|\mathbf{M}_t(i)\|})}{\sum_{j=1}^N \exp(\beta_t \frac{\mathbf{k}_t \cdot \mathbf{M}_t(j)}{\|\mathbf{k}_t\| \cdot \|\mathbf{M}_t(j)\|})}$$
 
 **Interpolation**
 
@@ -306,7 +306,7 @@ Fig. 13. The architecture of a Pointer Network model. (Image source: [Vinyals, e
 
 The Ptr-Net outputs a sequence of integer indices, $\boldsymbol{c} = (c_1, \dots, c_m)$ given a sequence of input vectors $\boldsymbol{x} = (x_1, \dots, x_n)$ and $1 \leq c_i \leq n$. The model still embraces an encoder-decoder framework. The encoder and decoder hidden states are denoted as $(\boldsymbol{h}_1, \dots, \boldsymbol{h}_n)$ and $(\boldsymbol{s}_1, \dots, \boldsymbol{s}_m)$, respectively. Note that $\mathbf{s}_i$ is the output gate after cell activation in the decoder. The Ptr-Net applies additive attention between states and then normalizes it by softmax to model the output conditional probability:
 
-$$\begin{aligned} y_i &= p(c_i \vert c_1, \dots, c_{i-1}, \boldsymbol{x}) \\ &= \text{softmax}(\text{score}(\boldsymbol{s}_t; \boldsymbol{h}_i)) = \text{softmax}(\mathbf{v}_a^\top \tanh(\mathbf{W}_a\[\boldsymbol{s}_t; \boldsymbol{h}_i\])) \end{aligned}$$
+$$\begin{aligned} y_i &= p(c_i \vert c_1, \dots, c_{i-1}, \boldsymbol{x}) \\ &= \text{softmax}(\text{score}(\boldsymbol{s}_t; \boldsymbol{h}_i)) = \text{softmax}(\mathbf{v}_a^\top \tanh(\mathbf{W}_a[\boldsymbol{s}_t; \boldsymbol{h}_i])) \end{aligned}$$
 
 The attention mechanism is simplified, as Ptr-Net does not blend the encoder states into the output with attention weights. In this way, the output only responds to the positions but not the input content.
 
@@ -332,7 +332,7 @@ Fig. 14. Multi-head scaled dot-product attention mechanism. (Image source: Fig 2
 
 Rather than only computing the attention once, the multi-head mechanism runs through the scaled dot-product attention multiple times in parallel. The independent attention outputs are simply concatenated and linearly transformed into the expected dimensions. I assume the motivation is because ensembling always helps? ;) According to the paper, _"multi-head attention allows the model to jointly attend to information from different representation **subspaces** at different positions. With a single attention head, averaging inhibits this."_
 
-$$\begin{aligned} \text{MultiHead}(\mathbf{Q}, \mathbf{K}, \mathbf{V}) &= \[\text{head}_1; \dots; \text{head}_h\]\mathbf{W}^O \\ \text{where head}_i &= \text{Attention}(\mathbf{Q}\mathbf{W}^Q_i, \mathbf{K}\mathbf{W}^K_i, \mathbf{V}\mathbf{W}^V_i) \end{aligned}$$
+$$\begin{aligned} \text{MultiHead}(\mathbf{Q}, \mathbf{K}, \mathbf{V}) &= [\text{head}_1; \dots; \text{head}_h]\mathbf{W}^O \\ \text{where head}_i &= \text{Attention}(\mathbf{Q}\mathbf{W}^Q_i, \mathbf{K}\mathbf{W}^K_i, \mathbf{V}\mathbf{W}^V_i) \end{aligned}$$
 
 where $\mathbf{W}^Q_i$, $\mathbf{W}^K_i$, $\mathbf{W}^V_i$, and $\mathbf{W}^O$ are parameter matrices to be learned.
 
@@ -439,32 +439,32 @@ Cited as:
 ```
 # References[#](#references)
 
-\[1\] ["Attention and Memory in Deep Learning and NLP."](http://www.wildml.com/2016/01/attention-and-memory-in-deep-learning-and-nlp/) - Jan 3, 2016 by Denny Britz
+[1] ["Attention and Memory in Deep Learning and NLP."](http://www.wildml.com/2016/01/attention-and-memory-in-deep-learning-and-nlp/) - Jan 3, 2016 by Denny Britz
 
-\[2\] ["Neural Machine Translation (seq2seq) Tutorial"](https://github.com/tensorflow/nmt)
+[2] ["Neural Machine Translation (seq2seq) Tutorial"](https://github.com/tensorflow/nmt)
 
-\[3\] Dzmitry Bahdanau, Kyunghyun Cho, and Yoshua Bengio. ["Neural machine translation by jointly learning to align and translate."](https://arxiv.org/pdf/1409.0473.pdf) ICLR 2015.
+[3] Dzmitry Bahdanau, Kyunghyun Cho, and Yoshua Bengio. ["Neural machine translation by jointly learning to align and translate."](https://arxiv.org/pdf/1409.0473.pdf) ICLR 2015.
 
-\[4\] Kelvin Xu, Jimmy Ba, Ryan Kiros, Kyunghyun Cho, Aaron Courville, Ruslan Salakhudinov, Rich Zemel, and Yoshua Bengio. ["Show, attend and tell: Neural image caption generation with visual attention."](http://proceedings.mlr.press/v37/xuc15.pdf) ICML, 2015.
+[4] Kelvin Xu, Jimmy Ba, Ryan Kiros, Kyunghyun Cho, Aaron Courville, Ruslan Salakhudinov, Rich Zemel, and Yoshua Bengio. ["Show, attend and tell: Neural image caption generation with visual attention."](http://proceedings.mlr.press/v37/xuc15.pdf) ICML, 2015.
 
-\[5\] Ilya Sutskever, Oriol Vinyals, and Quoc V. Le. ["Sequence to sequence learning with neural networks."](https://papers.nips.cc/paper/5346-sequence-to-sequence-learning-with-neural-networks.pdf) NIPS 2014.
+[5] Ilya Sutskever, Oriol Vinyals, and Quoc V. Le. ["Sequence to sequence learning with neural networks."](https://papers.nips.cc/paper/5346-sequence-to-sequence-learning-with-neural-networks.pdf) NIPS 2014.
 
-\[6\] Thang Luong, Hieu Pham, Christopher D. Manning. ["Effective Approaches to Attention-based Neural Machine Translation."](https://arxiv.org/pdf/1508.04025.pdf) EMNLP 2015.
+[6] Thang Luong, Hieu Pham, Christopher D. Manning. ["Effective Approaches to Attention-based Neural Machine Translation."](https://arxiv.org/pdf/1508.04025.pdf) EMNLP 2015.
 
-\[7\] Denny Britz, Anna Goldie, Thang Luong, and Quoc Le. ["Massive exploration of neural machine translation architectures."](https://arxiv.org/abs/1703.03906) ACL 2017.
+[7] Denny Britz, Anna Goldie, Thang Luong, and Quoc Le. ["Massive exploration of neural machine translation architectures."](https://arxiv.org/abs/1703.03906) ACL 2017.
 
-\[8\] Ashish Vaswani, et al. ["Attention is all you need."](http://papers.nips.cc/paper/7181-attention-is-all-you-need.pdf) NIPS 2017.
+[8] Ashish Vaswani, et al. ["Attention is all you need."](http://papers.nips.cc/paper/7181-attention-is-all-you-need.pdf) NIPS 2017.
 
-\[9\] Jianpeng Cheng, Li Dong, and Mirella Lapata. ["Long short-term memory-networks for machine reading."](https://arxiv.org/pdf/1601.06733.pdf) EMNLP 2016.
+[9] Jianpeng Cheng, Li Dong, and Mirella Lapata. ["Long short-term memory-networks for machine reading."](https://arxiv.org/pdf/1601.06733.pdf) EMNLP 2016.
 
-\[10\] Xiaolong Wang, et al. ["Non-local Neural Networks."](https://arxiv.org/pdf/1711.07971.pdf) CVPR 2018
+[10] Xiaolong Wang, et al. ["Non-local Neural Networks."](https://arxiv.org/pdf/1711.07971.pdf) CVPR 2018
 
-\[11\] Han Zhang, Ian Goodfellow, Dimitris Metaxas, and Augustus Odena. ["Self-Attention Generative Adversarial Networks."](https://arxiv.org/pdf/1805.08318.pdf) arXiv preprint arXiv:1805.08318 (2018).
+[11] Han Zhang, Ian Goodfellow, Dimitris Metaxas, and Augustus Odena. ["Self-Attention Generative Adversarial Networks."](https://arxiv.org/pdf/1805.08318.pdf) arXiv preprint arXiv:1805.08318 (2018).
 
-\[12\] Nikhil Mishra, Mostafa Rohaninejad, Xi Chen, and Pieter Abbeel. ["A simple neural attentive meta-learner."](https://arxiv.org/abs/1707.03141) ICLR 2018.
+[12] Nikhil Mishra, Mostafa Rohaninejad, Xi Chen, and Pieter Abbeel. ["A simple neural attentive meta-learner."](https://arxiv.org/abs/1707.03141) ICLR 2018.
 
-\[13\] ["WaveNet: A Generative Model for Raw Audio"](https://deepmind.com/blog/wavenet-generative-model-raw-audio/) - Sep 8, 2016 by DeepMind.
+[13] ["WaveNet: A Generative Model for Raw Audio"](https://deepmind.com/blog/wavenet-generative-model-raw-audio/) - Sep 8, 2016 by DeepMind.
 
-\[14\] Oriol Vinyals, Meire Fortunato, and Navdeep Jaitly. ["Pointer networks."](https://arxiv.org/abs/1506.03134) NIPS 2015.
+[14] Oriol Vinyals, Meire Fortunato, and Navdeep Jaitly. ["Pointer networks."](https://arxiv.org/abs/1506.03134) NIPS 2015.
 
-\[15\] Alex Graves, Greg Wayne, and Ivo Danihelka. ["Neural turing machines."](https://arxiv.org/abs/1410.5401) arXiv preprint arXiv:1410.5401 (2014).
+[15] Alex Graves, Greg Wayne, and Ivo Danihelka. ["Neural turing machines."](https://arxiv.org/abs/1410.5401) arXiv preprint arXiv:1410.5401 (2014).

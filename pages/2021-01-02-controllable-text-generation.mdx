@@ -140,9 +140,9 @@ Given a trained language model, [Gu et al (2017)](https://arxiv.org/abs/1702.024
 
 Let $p$ be the real data distribution and $p_\theta$ be a learned generative model. A classical approach for evaluating the expectation of a given function $f$ under $p$ using samples from $p_\theta$ is to use importance sampling.
 
-$$\mathbb{E}_{\mathbf{x}\sim p} \[f(\mathbf{x})\] = \mathbb{E}_{\mathbf{x}\sim p_\theta} \Big\[\frac{p(\mathbf{x})}{p_\theta(\mathbf{x})} f(\mathbf{x})\Big\] \approx \frac{1}{N} \sum_{i=1}^N w(\mathbf{x}_i)f(\mathbf{x}_i)$$
+$$\mathbb{E}_{\mathbf{x}\sim p} [f(\mathbf{x})] = \mathbb{E}_{\mathbf{x}\sim p_\theta} \Big[\frac{p(\mathbf{x})}{p_\theta(\mathbf{x})} f(\mathbf{x})\Big] \approx \frac{1}{N} \sum_{i=1}^N w(\mathbf{x}_i)f(\mathbf{x}_i)$$
 
-However, $p(\mathbf{x})$ can only be estimated via finite datasets. Let $c_\phi: \mathcal{X} \to \[0,1\]$ be a probabilistic binary classifier for predicting whether a sample $\mathbf{x}$ is from the true data distribution ($y=1$). The joint distribution over $\mathcal{X}\times\mathcal{Y}$ is denoted as $q(\mathbf{x}, y)$.
+However, $p(\mathbf{x})$ can only be estimated via finite datasets. Let $c_\phi: \mathcal{X} \to [0,1]$ be a probabilistic binary classifier for predicting whether a sample $\mathbf{x}$ is from the true data distribution ($y=1$). The joint distribution over $\mathcal{X}\times\mathcal{Y}$ is denoted as $q(\mathbf{x}, y)$.
 
 $$q(\mathbf{x}\vert y) = \begin{cases} p_\theta(\mathbf{x}) & \text{ if }y=0\text{; predicted to be generated data} \\ p(\mathbf{x}) & \text{ otherwise; from the true data distribution} \end{cases}$$
 
@@ -192,11 +192,11 @@ Fig. 6. The overview of AutoPrompt. The trigger tokens are retrieved to optimize
 
 The universal trigger tokens are identified using a gradient-guided search strategy same as in [Wallace et al., 2019](https://arxiv.org/abs/1908.07125). The _universal_ setting means that the trigger tokens $x_\text{trig}$ can optimize for the target output $\tilde{y}$ for all inputs from a dataset:
 
-$$x_\text{trig} = \arg\min_{x'_\text{trig}} \mathbb{E}_{x\sim\mathcal{X}} \[\mathcal{L}(\tilde{y}, f(x'_\text{trig}; x))\]$$
+$$x_\text{trig} = \arg\min_{x'_\text{trig}} \mathbb{E}_{x\sim\mathcal{X}} [\mathcal{L}(\tilde{y}, f(x'_\text{trig}; x))]$$
 
 The search operates in the embedding space. The embedding of every trigger token $e_{\text{trig}_i}$ is first initialized to some default value and then gets updated to minimize the first-order Taylor expansion of the task-specific loss around the current token embedding:
 
-$$e^{(t+1)}_\text{trig} = \arg\min_{e\in\mathcal{V}} \[e - e^{(t)}_{\text{trig}_i}\]^\top \nabla_{e^{(t)}_{\text{trig}_i}} \mathcal{L}$$
+$$e^{(t+1)}_\text{trig} = \arg\min_{e\in\mathcal{V}} [e - e^{(t)}_{\text{trig}_i}]^\top \nabla_{e^{(t)}_{\text{trig}_i}} \mathcal{L}$$
 
 where $\mathcal{V}$ refers to the embedding matrix of all the tokens. $\nabla_{e^{(t)}_{\text{trig}_i}} \mathcal{L}$ is the average gradient of the task loss over a batch at iteration $t$. We can brute-force the optimal $e$ by a $\vert \mathcal{V} \vert d$-dimensional dot product, which is cheap and can be computed in parallel.
 
@@ -210,9 +210,9 @@ The above token replacement method can be augmented with beam search. When looki
 
 Fig. 8. Example prompts discovered by AutoPrompt for different tasks. (Image source: [Shin et al., 2020](https://arxiv.org/abs/2010.15980))
 
-Smart prompt design essentially produces efficient context that can lead to desired completion. Motivated by this observation, [Li & Liang (2021)](https://arxiv.org/abs/2101.00190) proposed **Prefix-Tuning** which assigns a small number of trainable parameters at the beginning of an input sequence (named "prefix") to steer a LM, $\[\text{PREFIX}; x; y\]$. Let $\mathcal{P}_\text{idx}$ be a set of prefix indices and $\text{dim}(h_i)$ be the embedding size. The prefix parameters $P_\theta$ has the dimension $\vert\mathcal{P}\_\text{idx}\vert \times \text{dim}(h_i) $ and the hidden state takes the form:
+Smart prompt design essentially produces efficient context that can lead to desired completion. Motivated by this observation, [Li & Liang (2021)](https://arxiv.org/abs/2101.00190) proposed **Prefix-Tuning** which assigns a small number of trainable parameters at the beginning of an input sequence (named "prefix") to steer a LM, $[\text{PREFIX}; x; y]$. Let $\mathcal{P}_\text{idx}$ be a set of prefix indices and $\text{dim}(h_i)$ be the embedding size. The prefix parameters $P_\theta$ has the dimension $\vert\mathcal{P}\_\text{idx}\vert \times \text{dim}(h_i) $ and the hidden state takes the form:
 
-$$h_i = \begin{cases} P_\theta\[i,:\], & \text{if }i \in \mathcal{P}_\text{idx}\\ \text{LM}_\phi(z_i, h_{<{i}}), & \text{otherwise} \end{cases}$$
+$$h_i = \begin{cases} P_\theta[i,:], & \text{if }i \in \mathcal{P}_\text{idx}\\ \text{LM}_\phi(z_i, h_{<{i}}), & \text{otherwise} \end{cases}$$
 
 Note that only $P_\theta$ is trainable and the LM parameters $\phi$ is frozen during training.
 
@@ -231,14 +231,14 @@ Fig. 10. Task performance, summarization (left) and table-to-text (right), as a 
 A few other interesting learnings from their ablation studies include:
 
 - Tuning only the embedding layer (without prefix) is not sufficiently expressive.
-- Placing the trainable parameter between $x$ and $y$, $\[x; \text{INFIX}; y\]$, slightly underperforms prefix-tuning, likely because it only affects the context for $y$ while prefix affects both.
+- Placing the trainable parameter between $x$ and $y$, $[x; \text{INFIX}; y]$, slightly underperforms prefix-tuning, likely because it only affects the context for $y$ while prefix affects both.
 - Random initialization of $P_\theta$ leads to low performance with high variance. In contrast, initializing $P_\theta$ with activations of real words improves generation, even the words are irrelevant to the task.
 
 Fine-tuned models achieve better task performance but they can fail in the low data regime. Both AutoPrompt and Prefix-Tuning were found to outperform fine-tuning in the regime where the training dataset is small (i.e. $10^2-10^3$ samples). As an alternative to fine-tuning, prompt design or learning the context embedding is much cheaper. AutoPrompt improves the accuracy for sentiment classification a lot more than manual prompts and achieves similar performance as linear probing. For the NLI task, AutoPrompt obtains higher accuracy than linear probing. It is able to retrieve facts more accurately than manual prompts too. In low data regime, Prefix-Tuning achieves performance comparable with fine-tuning on table-to-text generation and summarization.
 
 Two successive works, **P-tuning** ([Liu et al. 2021](https://arxiv.org/abs/2103.10385); [code](https://github.com/THUDM/P-tuning)) and **Prompt Tuning** ([Lester et al. 2021](https://arxiv.org/abs/2104.08691)), follow the similar idea of explicit training continuous prompt embeddings but with a few different choices over the trainable parameters and architecture. Different from Prefix-Tuning which concatenates continuous prompt tokens in every hidden state layer of the transformer, both P-tuning and Prompt Tuning non-invasively add continuous prompts _only in the input_ to work well.
 
-Let $\[P_i\]$ be the $i$-th token in the prompt template of **P-tuning** ([Liu et al. 2021](https://arxiv.org/abs/2103.10385)), we can denote a prompt as a sequence $T=\{\[P_{0:i}\], \mathbf{x}, \[P_{i+1:m}\], \mathbf{y}\}$. Each token $\[P_i\]$ does not have to be a real token in the model vocabulary ("pseudo-token"), and thus the encoded template $T^e$ looks like the following and the pseudo-token hidden state can be optimized with gradient descent.
+Let $[P_i]$ be the $i$-th token in the prompt template of **P-tuning** ([Liu et al. 2021](https://arxiv.org/abs/2103.10385)), we can denote a prompt as a sequence $T=\{[P_{0:i}], \mathbf{x}, [P_{i+1:m}], \mathbf{y}\}$. Each token $[P_i]$ does not have to be a real token in the model vocabulary ("pseudo-token"), and thus the encoded template $T^e$ looks like the following and the pseudo-token hidden state can be optimized with gradient descent.
 
 $$T^e = \{ h_0, \dots, h_i, \text{embed}(\mathbf{x}), h_{i+1}, \dots, h_m, \text{embed}(\mathbf{y})\}$$
 
@@ -251,11 +251,11 @@ There are two major optimization challenges in P-tuning:
 1.  Discreteness: The word embedding of a pretrained language model are highly discrete. It is hard to optimize $h_i$ if they are intialized at random.
 2.  Association: $h_i$ should be dependent on each other. Thus they develop a mechanism to model this dependency by training a light-weighted LSTM-based prompt encoder:
 
-$$h_i = \text{MLP}(\[\text{LSTM}(h_{0:i}): \text{LSTM}(h_{i:m})\])$$
+$$h_i = \text{MLP}([\text{LSTM}(h_{0:i}): \text{LSTM}(h_{i:m})])$$
 
 P-tuning is more flexible than prefix-tuning, as it inserts trainable tokens in the middle of a prompt not just at the beginning. The usage of task-specific anchor tokens is like combining manual prompt engineering with trainable prompts.
 
-**Prompt Tuning** ([Lester et al. 2021](https://arxiv.org/abs/2104.08691)) largely simplifies the idea of prefix tuning by only allowing an additional $k$ tunable tokens per downstream task to be prepended to the input text. The conditional generation is $p_{\theta, \theta_P}(Y \vert \[P; X\])$, where $P$ is the "pseudo prompt" with parameters $\theta_P$ trainable via back-propagation. Both $X$ and $P$ are embedding vectors and we have $X \in \mathbb{R}^{n \times d^e}, P \in \mathbb{R}^{k \times d^e}$ and $\[P;X\] \in \mathbb{R}^{(n+k) \times d^e}$, where $d^e$ is the embedding space dimensionality.
+**Prompt Tuning** ([Lester et al. 2021](https://arxiv.org/abs/2104.08691)) largely simplifies the idea of prefix tuning by only allowing an additional $k$ tunable tokens per downstream task to be prepended to the input text. The conditional generation is $p_{\theta, \theta_P}(Y \vert [P; X])$, where $P$ is the "pseudo prompt" with parameters $\theta_P$ trainable via back-propagation. Both $X$ and $P$ are embedding vectors and we have $X \in \mathbb{R}^{n \times d^e}, P \in \mathbb{R}^{k \times d^e}$ and $[P;X] \in \mathbb{R}^{(n+k) \times d^e}$, where $d^e$ is the embedding space dimensionality.
 
 - Prompt tuning produces competitive results as model fine-tuning when the model gets _large_ (billions of parameters and up). This result is especially interesting given that large models are expensive to fine-tune and execute at inference time.
 - With learned task-specific parameters, prompt tuning achieves better transfer learning when adapting to new domains. It outperforms fine-tuning on domain shift problems.
@@ -267,7 +267,7 @@ Fig. 12. The illustration of how Prompt Tuning works. (Image source: [Lester et 
 
 The experiments investigated several prompt initialization schemes:
 
-1.  Random initialization by uniformly sampling from \[-0.5, 0.5\];
+1.  Random initialization by uniformly sampling from [-0.5, 0.5];
 2.  Sample embeddings of top 5000 common tokens;
 3.  Use the embedding values of the class label strings. If we don't have enough class labels to initialize the soft-prompt, we fall back to scheme 2. Random initialization performs noticeably worse than the other two options.
 
@@ -289,7 +289,7 @@ Paraphrasing is a quick way to explore more prompts similar to the known version
 
 [Ribeiro et al (2018)](https://www.aclweb.org/anthology/P18-1079/) identified _semantically equivalent adversaries (SEA)_ by generating a variety of paraphrases $\{x'\}$ of input $x$ until it triggers a different prediction of target function $f$:
 
-$$\begin{aligned} SEA(x, x') &= \mathbb{1}\[\text{SemEq}(x, x') \\land f(x) \\neq f(x')\] \\ \text{where SemEq}(x, x') &= \mathbb{1}\[\min\Big(1, \frac{p(x'\vert x)}{p(x\vert x)} \Big) \\geq \tau\] \end{aligned}$$
+$$\begin{aligned} SEA(x, x') &= \mathbb{1}[\text{SemEq}(x, x') \\land f(x) \\neq f(x')] \\ \text{where SemEq}(x, x') &= \mathbb{1}[\min\Big(1, \frac{p(x'\vert x)}{p(x\vert x)} \Big) \\geq \tau] \end{aligned}$$
 
 The rules extracted from SEA are considered as "bugs" in the model. Applying those rules as data augmentation in model training helps robustify the model and fix bugs.
 
@@ -335,7 +335,7 @@ Google implemented the similar approach in their neural machine translation syst
 
 The RL loss of Google NMT is to maximize the expected BLEU score:
 
-$$\mathcal{L}_\text{RL} = - \sum_{(x, y^\*)\sim\mathcal{D}} \mathbb{E}_{y\sim p_\theta(.\vert x)} \[R(y, y^\*)\]$$
+$$\mathcal{L}_\text{RL} = - \sum_{(x, y^\*)\sim\mathcal{D}} \mathbb{E}_{y\sim p_\theta(.\vert x)} [R(y, y^\*)]$$
 
 where $y$ is the predicted sequence and $y^\*$ is the ground truth.
 
@@ -355,11 +355,11 @@ To learn the ground truth reward $R^\*$ defined by human judgements, [Böhm et a
 
 (1) Regression loss: simply minimizing the mean squared error.
 
-$$\mathcal{L}^\text{MSE}_\text{rm} = \[R^\*(x, y) - R_\\psi(x, y)\]^2$$
+$$\mathcal{L}^\text{MSE}_\text{rm} = [R^\*(x, y) - R_\\psi(x, y)]^2$$
 
 (2) Preference loss: learning to agree with the ground truth reward,
 
-$$\begin{aligned} \mathcal{L}^\text{pref}_\text{rm} =& - \sum_{i,j} \big(\mathbb{1}\[R^\*(x, y_i) > R^\*(x, y_j)\] \log P(y_i \\succ y_j) + \\ &\mathbb{1}\[R^\*(x, y_j) > R^\*(x, y_i)\] \log P(y_j \\succ y_i) \big)\\ \text{where }P(y_i \\succ y_j) =& \frac{\exp(R_\\psi(x, y_i))}{\exp(R_\\psi(x, y_i)) + \exp(R_\\psi(x, y_j))} \end{aligned}$$
+$$\begin{aligned} \mathcal{L}^\text{pref}_\text{rm} =& - \sum_{i,j} \big(\mathbb{1}[R^\*(x, y_i) > R^\*(x, y_j)] \log P(y_i \\succ y_j) + \\ &\mathbb{1}[R^\*(x, y_j) > R^\*(x, y_i)] \log P(y_j \\succ y_i) \big)\\ \text{where }P(y_i \\succ y_j) =& \frac{\exp(R_\\psi(x, y_i))}{\exp(R_\\psi(x, y_i)) + \exp(R_\\psi(x, y_j))} \end{aligned}$$
 
 Their experiments showed that the _preference loss_ achieves the best performance, where the reward model is a thin MLP layer on top of BERT sentence embedding.
 
@@ -371,7 +371,7 @@ Fig. 18. The overview of the training framework for fine-tuning a language model
 
 The reward model is implemented by a pretrained language model with an extra random linear layer of the final embedding output. It it trained to minimize the loss:
 
-$$\mathcal{L}_\text{rm} = -\mathbb{E}_{(x, \{y_i\}, b) \sim \mathcal{D}} \Big\[ \log \frac{\exp(R_\\psi(x, y_b))}{\sum_i \exp(R_\\psi(x, y_i))} \Big\]$$
+$$\mathcal{L}_\text{rm} = -\mathbb{E}_{(x, \{y_i\}, b) \sim \mathcal{D}} \Big[ \log \frac{\exp(R_\\psi(x, y_b))}{\sum_i \exp(R_\\psi(x, y_i))} \Big]$$
 
 To keep the scale consistent during training, the reward model is normalized to have mean 0 and variance 1.
 
@@ -383,7 +383,7 @@ If running online data collection, human label collection process is continued d
 
 In the following work ([Stiennon et al., 2020](https://arxiv.org/abs/2009.01325)), the human label collection was further simplified to select the best option between a pair of summaries, $y_b \in\{y_0, y_1\}$ The reward model loss was updated to optimize the log odds of the selected summary:
 
-$$\mathcal{L}_\text{rm} = \mathbb{E}_{(x, y_0, y_1, b)\sim\mathcal{D}} \[\log(\sigma(r_\theta(x, y_b) − r_\theta(x, y_{1−b})))\]$$
+$$\mathcal{L}_\text{rm} = \mathbb{E}_{(x, y_0, y_1, b)\sim\mathcal{D}} [\log(\sigma(r_\theta(x, y_b) − r_\theta(x, y_{1−b})))]$$
 
 ![](assets/images/2021-01-02-controllable-text-generation/summarize-human-feedback.png)
 
@@ -407,7 +407,7 @@ To shift the output, at decoding time, PPLM runs one forward → one backward �
 
 $$\Delta H_t \\leftarrow \Delta H_t + \alpha \frac{\nabla_{\Delta H_t} \log p(a|H_t + \Delta H_t)}{\| \nabla_{\Delta H_t} \log p(a|H_t + \Delta H_t) \|^\gamma}$$
 
-where $\gamma$ is a normalization scaling coefficient, set per layer. $\alpha$ is step size. This update can be repeated $m \in \[3, 10\]$ times 3. The final forward pass recomputes a new distribution over the vocabulary, generated from the updated latents $\tilde{H}_t = H_t + \Delta H_t$. The next token is sampled from the updated distribution.
+where $\gamma$ is a normalization scaling coefficient, set per layer. $\alpha$ is step size. This update can be repeated $m \in [3, 10]$ times 3. The final forward pass recomputes a new distribution over the vocabulary, generated from the updated latents $\tilde{H}_t = H_t + \Delta H_t$. The next token is sampled from the updated distribution.
 
 ![](assets/images/2021-01-02-controllable-text-generation/PPLM.png)
 
@@ -417,7 +417,7 @@ Multiple attribute models can be mix-and-matched during generation with customiz
 
 1.  The simplest attribution model is based on a predefined _bag of words_ (BoW), $\{w_1, \dots, w_k\}$, that specifies a topic of interest.
 
-$$\log p(a \vert x) = \log\big( \sum_{i=1}^k p_{t+1} \[w_i\] \big)$$
+$$\log p(a \vert x) = \log\big( \sum_{i=1}^k p_{t+1} [w_i] \big)$$
 
 To encourage the model to output the desired words at least once but not at every step, they normalize the gradient by the maximum gradient norm.  
 Interestingly, they found that increasing the probability of generating words in the bag also increases the probability of generating _related_ but not identical words about the same topic. 2. The discriminator attribute models are based on learned classifiers which define preferences by a distribution instead of hard samples.
@@ -425,7 +425,7 @@ Interestingly, they found that increasing the probability of generating words in
 To ensure the fluency in language, PPLM applied two additional designs:
 
 1.  Minimizing the KL diverge between modified and unmodified LM, commonly seen in other RL fine-tuning approaches (see [above](#kl-penalty)).
-2.  It performs [post-norm fusion](https://arxiv.org/abs/1809.00125) to constantly tie the generated text to the unconditional LM $p(x)$, $x_{t+1} \sim \frac{1}{\beta}(\tilde{p}_{t+1}^{\gamma_\text{gm}} p_{t+1}^{1-\gamma_\text{gm}})$, where $p_{t+1}$ and $\tilde{p}_{t+1}$ are the unmodified and modified output distributions, respectively. $\beta$ is a normalizing factor. $\gamma_\text{gm} \in \[0.8, 0.95\]$ balances between prediction from before and after models.
+2.  It performs [post-norm fusion](https://arxiv.org/abs/1809.00125) to constantly tie the generated text to the unconditional LM $p(x)$, $x_{t+1} \sim \frac{1}{\beta}(\tilde{p}_{t+1}^{\gamma_\text{gm}} p_{t+1}^{1-\gamma_\text{gm}})$, where $p_{t+1}$ and $\tilde{p}_{t+1}$ are the unmodified and modified output distributions, respectively. $\beta$ is a normalizing factor. $\gamma_\text{gm} \in [0.8, 0.95]$ balances between prediction from before and after models.
 
 ![](assets/images/2021-01-02-controllable-text-generation/PPLM-examples.png)
 
@@ -435,7 +435,7 @@ Interestingly, they found a large variance in the extent of controllability acro
 
 One obvious drawback of PPLM is that due to multiple passes at every decoding step, the test time computation becomes much more expensive.
 
-Similar to PPLM, **DELOREAN** (DEcoding for nonmonotonic LOgical REAsoNing; [Qin et al., 2020](https://arxiv.org/abs/2010.05906)) incorporates the future context by back-propagation. Given input text $\mathbf{x}$, DELOREAN aims to generate continuation completion $\mathbf{y} = \[y_1, \dots, y_N\]$ such that $y$ satisfies certain constraints defined by a context $z$. To keep the generation differentiable, a soft representation of $y$ is tracked, $\tilde{\mathbf{y}}=(\tilde{y}_1, \dots, \tilde{y}_N)$ where $\tilde{y}_i \in \mathbb{R}^V$ are logits over the vocabulary. $\tilde{\mathbf{y}}^{(t)}$ is the soft representation at iteration $t$.
+Similar to PPLM, **DELOREAN** (DEcoding for nonmonotonic LOgical REAsoNing; [Qin et al., 2020](https://arxiv.org/abs/2010.05906)) incorporates the future context by back-propagation. Given input text $\mathbf{x}$, DELOREAN aims to generate continuation completion $\mathbf{y} = [y_1, \dots, y_N]$ such that $y$ satisfies certain constraints defined by a context $z$. To keep the generation differentiable, a soft representation of $y$ is tracked, $\tilde{\mathbf{y}}=(\tilde{y}_1, \dots, \tilde{y}_N)$ where $\tilde{y}_i \in \mathbb{R}^V$ are logits over the vocabulary. $\tilde{\mathbf{y}}^{(t)}$ is the soft representation at iteration $t$.
 
 Given the representation $\tilde{y}^{(t-1)}$ at iteration $t$, it runs the following procedures:
 
@@ -551,7 +551,7 @@ Fig. 27. Compare pointwise constrained GDC with several baselines. Low Self-BLEU
 
 The standard way of maximizing the log-likelihood loss in language model training leads to [incorrect token distribution](#beam-search-surprise), which cannot be fixed with only smart decoding methods. Such models tend to output high-frequency words too often and low-frequency words too rarely, especially when using deterministic decoding (e.g. greedy, beam search). In other words, they are overconfident in their predictions.
 
-Unlikelihood training ([Welleck & Kulikov et al. 2019](https://arxiv.org/abs/1908.04319)\] tries to combat this and incorporates preference to _unwanted_ content into the training objective directly. It combines two updates:
+Unlikelihood training ([Welleck & Kulikov et al. 2019](https://arxiv.org/abs/1908.04319)] tries to combat this and incorporates preference to _unwanted_ content into the training objective directly. It combines two updates:
 
 - A routine maximized likelihood update to assign true tokens with high probability;
 - A new type of unlikelihood update to avoid unwanted tokens with high probability.
@@ -587,74 +587,74 @@ Or
 ```
 # References[#](#references)
 
-\[1\] Patrick von Platen. ["How to generate text: using different decoding methods for language generation with Transformers"](https://huggingface.co/blog/how-to-generate) Hugging face blog, March 18, 2020.
+[1] Patrick von Platen. ["How to generate text: using different decoding methods for language generation with Transformers"](https://huggingface.co/blog/how-to-generate) Hugging face blog, March 18, 2020.
 
-\[2\] Angela Fan, et al. ["Hierarchical Neural Story Generation/"](https://arxiv.org/abs/1805.04833) arXiv preprint arXiv:1805.04833 (2018).
+[2] Angela Fan, et al. ["Hierarchical Neural Story Generation/"](https://arxiv.org/abs/1805.04833) arXiv preprint arXiv:1805.04833 (2018).
 
-\[3\] Ari Holtzman et al. ["The Curious Case of Neural Text Degeneration."](https://arxiv.org/abs/1904.09751) ICLR 2020.
+[3] Ari Holtzman et al. ["The Curious Case of Neural Text Degeneration."](https://arxiv.org/abs/1904.09751) ICLR 2020.
 
-\[4\] Marjan Ghazvininejad et al. ["Hafez: an interactive poetry generation system."](https://www.aclweb.org/anthology/P17-4008) ACL 2017.
+[4] Marjan Ghazvininejad et al. ["Hafez: an interactive poetry generation system."](https://www.aclweb.org/anthology/P17-4008) ACL 2017.
 
-\[5\] Ari Holtzman et al. ["Learning to write with cooperative discriminators."](https://arxiv.org/abs/1805.06087) ACL 2018.
+[5] Ari Holtzman et al. ["Learning to write with cooperative discriminators."](https://arxiv.org/abs/1805.06087) ACL 2018.
 
-\[6\] Ashutosh Baheti et al. ["Generating More Interesting Responses in Neural Conversation Models with Distributional Constraints."](https://arxiv.org/abs/1809.01215) EMNLP 2018.
+[6] Ashutosh Baheti et al. ["Generating More Interesting Responses in Neural Conversation Models with Distributional Constraints."](https://arxiv.org/abs/1809.01215) EMNLP 2018.
 
-\[7\] Jiatao Gu et al. ["Trainable greedy decoding for neural machine translation."](https://arxiv.org/abs/1702.02429) EMNLP 2017.
+[7] Jiatao Gu et al. ["Trainable greedy decoding for neural machine translation."](https://arxiv.org/abs/1702.02429) EMNLP 2017.
 
-\[8\] Kyunghyun Cho. ["Noisy Parallel Approximate Decoding for Conditional Recurrent Language Model."](https://arxiv.org/abs/1605.03835) arXiv preprint arXiv:1605.03835. (2016).
+[8] Kyunghyun Cho. ["Noisy Parallel Approximate Decoding for Conditional Recurrent Language Model."](https://arxiv.org/abs/1605.03835) arXiv preprint arXiv:1605.03835. (2016).
 
-\[9\] Marco Tulio Ribeiro et al. ["Semantically equivalent adversarial rules for debugging NLP models."](https://www.aclweb.org/anthology/P18-1079/) ACL 2018.
+[9] Marco Tulio Ribeiro et al. ["Semantically equivalent adversarial rules for debugging NLP models."](https://www.aclweb.org/anthology/P18-1079/) ACL 2018.
 
-\[10\] Eric Wallace et al. ["Universal Adversarial Triggers for Attacking and Analyzing NLP."](https://arxiv.org/abs/1908.07125) EMNLP 2019. \[[code](https://github.com/Eric-Wallace/universal-triggers)\]
+[10] Eric Wallace et al. ["Universal Adversarial Triggers for Attacking and Analyzing NLP."](https://arxiv.org/abs/1908.07125) EMNLP 2019. [[code](https://github.com/Eric-Wallace/universal-triggers)]
 
-\[11\] Taylor Shin et al. ["AutoPrompt: Eliciting Knowledge from Language Models with Automatically Generated Prompts."](https://arxiv.org/abs/2010.15980) EMNLP 2020. \[[code](http://ucinlp.github.io/autoprompt)\]
+[11] Taylor Shin et al. ["AutoPrompt: Eliciting Knowledge from Language Models with Automatically Generated Prompts."](https://arxiv.org/abs/2010.15980) EMNLP 2020. [[code](http://ucinlp.github.io/autoprompt)]
 
-\[12\] Zhengbao Jiang et al. ["How Can We Know What Language Models Know?"](https://arxiv.org/abs/1911.12543) TACL 2020.
+[12] Zhengbao Jiang et al. ["How Can We Know What Language Models Know?"](https://arxiv.org/abs/1911.12543) TACL 2020.
 
-\[13\] Nanyun Peng et al. ["Towards Controllable Story Generation."](https://www.aclweb.org/anthology/W18-1505/) NAACL 2018.
+[13] Nanyun Peng et al. ["Towards Controllable Story Generation."](https://www.aclweb.org/anthology/W18-1505/) NAACL 2018.
 
-\[14\] Nitish Shirish Keskar, et al. ["CTRL: A Conditional Transformer Language Model for Controllable Generation"](https://arxiv.org/abs/1909.05858) arXiv preprint arXiv:1909.05858 (2019).\[[code](https://github.com/salesforce/ctrl)\]
+[14] Nitish Shirish Keskar, et al. ["CTRL: A Conditional Transformer Language Model for Controllable Generation"](https://arxiv.org/abs/1909.05858) arXiv preprint arXiv:1909.05858 (2019).[[code](https://github.com/salesforce/ctrl)]
 
-\[15\] Marc'Aurelio Ranzato et al. ["Sequence Level Training with Recurrent Neural Networks."](https://arxiv.org/abs/1511.06732) ICLR 2016.
+[15] Marc'Aurelio Ranzato et al. ["Sequence Level Training with Recurrent Neural Networks."](https://arxiv.org/abs/1511.06732) ICLR 2016.
 
-\[16\] Yonghui Wu et al. ["Google's Neural Machine Translation System: Bridging the Gap between Human and Machine Translation."](https://arxiv.org/abs/1609.08144) CoRR 2016.
+[16] Yonghui Wu et al. ["Google's Neural Machine Translation System: Bridging the Gap between Human and Machine Translation."](https://arxiv.org/abs/1609.08144) CoRR 2016.
 
-\[17\] Romain Paulus et al. ["A Deep Reinforced Model for Abstractive Summarization."](https://arxiv.org/abs/1705.04304) ICLR 2018.
+[17] Romain Paulus et al. ["A Deep Reinforced Model for Abstractive Summarization."](https://arxiv.org/abs/1705.04304) ICLR 2018.
 
-\[18\] Paul Christiano et al. ["Deep Reinforcement Learning from Human Preferences."](https://arxiv.org/abs/1706.03741) NIPS 2017.
+[18] Paul Christiano et al. ["Deep Reinforcement Learning from Human Preferences."](https://arxiv.org/abs/1706.03741) NIPS 2017.
 
-\[19\] Sanghyun Yi et al. ["Towards coherent and engaging spoken dialog response generation using automatic conversation evaluators."](https://arxiv.org/abs/1904.13015) INLG 2019.
+[19] Sanghyun Yi et al. ["Towards coherent and engaging spoken dialog response generation using automatic conversation evaluators."](https://arxiv.org/abs/1904.13015) INLG 2019.
 
-\[20\] Florian Böhm et al. ["Better rewards yield better summaries: Learning to summarise without references."](https://arxiv.org/abs/1909.01214) EMNLP 2019. \[[code](https://github.com/yg211/summary-reward-no-reference)\]
+[20] Florian Böhm et al. ["Better rewards yield better summaries: Learning to summarise without references."](https://arxiv.org/abs/1909.01214) EMNLP 2019. [[code](https://github.com/yg211/summary-reward-no-reference)]
 
-\[21\] Daniel M Ziegler et al. ["Fine-tuning language models from human preferences."](https://arxiv.org/abs/1909.08593) arXiv preprint arXiv:1909.08593 (2019). \[[code](https://github.com/openai/lm-human-preferences)\]
+[21] Daniel M Ziegler et al. ["Fine-tuning language models from human preferences."](https://arxiv.org/abs/1909.08593) arXiv preprint arXiv:1909.08593 (2019). [[code](https://github.com/openai/lm-human-preferences)]
 
-\[22\] Nisan Stiennon, et al. ["Learning to summarize from human feedback."](https://arxiv.org/abs/2009.01325) arXiv preprint arXiv:2009.01325 (2020).
+[22] Nisan Stiennon, et al. ["Learning to summarize from human feedback."](https://arxiv.org/abs/2009.01325) arXiv preprint arXiv:2009.01325 (2020).
 
-\[23\] Sumanth Dathathri et al. ["Plug and play language models: a simple approach to controlled text generation."](https://arxiv.org/abs/1912.02164) ICLR 2020. \[[code](https://github.com/uber-research/PPLM)\]
+[23] Sumanth Dathathri et al. ["Plug and play language models: a simple approach to controlled text generation."](https://arxiv.org/abs/1912.02164) ICLR 2020. [[code](https://github.com/uber-research/PPLM)]
 
-\[24\] Jeffrey O Zhang et al. ["Side-tuning: Network adaptation via additive side networks"](https://arxiv.org/abs/1912.13503) ECCV 2020.
+[24] Jeffrey O Zhang et al. ["Side-tuning: Network adaptation via additive side networks"](https://arxiv.org/abs/1912.13503) ECCV 2020.
 
-\[25\] Ben Kruse et al. ["GeDi: Generative Discriminator Guided Sequence Generation."](https://arxiv.org/abs/2009.06367) arXiv preprint arXiv:2009.06367.
+[25] Ben Kruse et al. ["GeDi: Generative Discriminator Guided Sequence Generation."](https://arxiv.org/abs/2009.06367) arXiv preprint arXiv:2009.06367.
 
-\[26\] Yoel Zeldes et al. ["Technical Report: Auxiliary Tuning and its Application to Conditional Text Generatio."](https://arxiv.org/abs/2006.16823) arXiv preprint arXiv:2006.16823.
+[26] Yoel Zeldes et al. ["Technical Report: Auxiliary Tuning and its Application to Conditional Text Generatio."](https://arxiv.org/abs/2006.16823) arXiv preprint arXiv:2006.16823.
 
-\[27\] Thomas Scialom, et al. ["Discriminative Adversarial Search for Abstractive Summarization"](https://arxiv.org/abs/2002.10375) ICML 2020.
+[27] Thomas Scialom, et al. ["Discriminative Adversarial Search for Abstractive Summarization"](https://arxiv.org/abs/2002.10375) ICML 2020.
 
-\[28\] Clara Meister, et al. ["If beam search is the answer, what was the question?"](https://arxiv.org/abs/2010.02650) EMNLP 2020.
+[28] Clara Meister, et al. ["If beam search is the answer, what was the question?"](https://arxiv.org/abs/2010.02650) EMNLP 2020.
 
-\[29\] Xiang Lisa Li and Percy Liang. ["Prefix-Tuning: Optimizing Continuous Prompts for Generation."](https://arxiv.org/abs/2101.00190) arXiv preprint arXiv:2101.00190 (2021).
+[29] Xiang Lisa Li and Percy Liang. ["Prefix-Tuning: Optimizing Continuous Prompts for Generation."](https://arxiv.org/abs/2101.00190) arXiv preprint arXiv:2101.00190 (2021).
 
-\[30\] Lianhui Qin, et al. ["Back to the Future: Unsupervised Backprop-based Decoding for Counterfactual and Abductive Commonsense Reasoning."](https://arxiv.org/abs/2010.05906) arXiv preprint arXiv:2010.05906 (2020).
+[30] Lianhui Qin, et al. ["Back to the Future: Unsupervised Backprop-based Decoding for Counterfactual and Abductive Commonsense Reasoning."](https://arxiv.org/abs/2010.05906) arXiv preprint arXiv:2010.05906 (2020).
 
-\[31\] Muhammad Khalifa, et al. ["A Distributional Approach to Controlled Text Generation"](https://arxiv.org/abs/2012.11635) Accepted by ICLR 2021.
+[31] Muhammad Khalifa, et al. ["A Distributional Approach to Controlled Text Generation"](https://arxiv.org/abs/2012.11635) Accepted by ICLR 2021.
 
-\[32\] Aditya Grover, et al. ["Bias correction of learned generative models using likelihood-free importance weighting."](https://arxiv.org/abs/1906.09531) NeuriPS 2019.
+[32] Aditya Grover, et al. ["Bias correction of learned generative models using likelihood-free importance weighting."](https://arxiv.org/abs/1906.09531) NeuriPS 2019.
 
-\[33\] Yuntian Deng et al. ["Residual Energy-Based Models for Text Generation."](https://arxiv.org/abs/2004.11714) ICLR 2020.
+[33] Yuntian Deng et al. ["Residual Energy-Based Models for Text Generation."](https://arxiv.org/abs/2004.11714) ICLR 2020.
 
-\[34\] Brian Lester et al. ["The Power of Scale for Parameter-Efficient Prompt Tuning."](https://arxiv.org/abs/2104.08691) arXiv preprint arXiv:2104.08691 (2021).
+[34] Brian Lester et al. ["The Power of Scale for Parameter-Efficient Prompt Tuning."](https://arxiv.org/abs/2104.08691) arXiv preprint arXiv:2104.08691 (2021).
 
-\[35\] Xiao Liu et al. ["GPT Understands, Too."](https://arxiv.org/abs/2103.10385) arXiv preprint arXiv:2103.10385 (2021).
+[35] Xiao Liu et al. ["GPT Understands, Too."](https://arxiv.org/abs/2103.10385) arXiv preprint arXiv:2103.10385 (2021).
 
-\[36\] Welleck & Kulikov et al. ["Neural Text Generation with Unlikelihood Training"](https://arxiv.org/abs/1908.04319) arXiv:1908.04319 (2019).
+[36] Welleck & Kulikov et al. ["Neural Text Generation with Unlikelihood Training"](https://arxiv.org/abs/1908.04319) arXiv:1908.04319 (2019).

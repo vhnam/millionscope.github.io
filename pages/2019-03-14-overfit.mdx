@@ -68,7 +68,7 @@ Meanwhile, MDL considers the model description as part of the compression delive
 
 A _two-part version_ of MDL principle states that: Let $\mathcal{H}^{(1)}, \mathcal{H}^{(2)}, \dots$ be a list of models that can explain the dataset $\mathcal{D}$. The best hypothesis among them should be the one that minimizes the sum:
 
-$$\mathcal{H}^\text{best} = \arg\min_\mathcal{H} \[L(\mathcal{H}) + L(\mathcal{D}\vert\mathcal{H})\]$$
+$$\mathcal{H}^\text{best} = \arg\min_\mathcal{H} [L(\mathcal{H}) + L(\mathcal{D}\vert\mathcal{H})]$$
 
 - $L(\mathcal{H})$ is the length of the description of model $\mathcal{H}$ in bits.
 - $L(\mathcal{D}\vert\mathcal{H})$ is the length of the description of the data $\mathcal{D}$ in bits when encoded with $\mathcal{H}$.
@@ -129,7 +129,7 @@ Given a sample set $S = \{\boldsymbol{x}_1, \dots, \boldsymbol{x}_n\}$ and targe
 
 Let's combine all sample points into one batch as one input matrix $\mathbf{X} \in \mathbb{R}^{n \times d}$. If set $h=n$, $\mathbf{X}\mathbf{W} - \boldsymbol{b}$ would be a square matrix of size $n \times n$.
 
-$$\mathbf{M}_\text{ReLU} = \max\{\mathbf{X}\mathbf{W} - \boldsymbol{b}, 0 \} = \begin{bmatrix} \boldsymbol{x}_1\mathbf{W} - \boldsymbol{b} \\ \dots \\ \boldsymbol{x}_n\mathbf{W} - \boldsymbol{b} \\ \end{bmatrix} = \[\boldsymbol{x}_i\boldsymbol{W}_{(:,j)} - b_j\]_{i \times j}$$
+$$\mathbf{M}_\text{ReLU} = \max\{\mathbf{X}\mathbf{W} - \boldsymbol{b}, 0 \} = \begin{bmatrix} \boldsymbol{x}_1\mathbf{W} - \boldsymbol{b} \\ \dots \\ \boldsymbol{x}_n\mathbf{W} - \boldsymbol{b} \\ \end{bmatrix} = [\boldsymbol{x}_i\boldsymbol{W}_{(:,j)} - b_j]_{i \times j}$$
 
 We can simplify $\mathbf{W}$ to have the same column vectors across all the columns:
 
@@ -139,7 +139,7 @@ $$\mathbf{W}_{(:,j)} = \boldsymbol{w} \in \mathbb{R}^{d}, \forall j = 1, \dots, 
 
 Let $a_i = \boldsymbol{x}_i \boldsymbol{w}$, we would like to find a suitable $\boldsymbol{w}$ and $\boldsymbol{b}$ such that $b_1 < a_1 < b_2 < a_2 < \dots < b_n < a_n$. This is always achievable because we try to solve $n+d$ unknown variables with $n$ constraints and $\boldsymbol{x}_i$ are independent (i.e. pick a random $\boldsymbol{w}$, sort $\boldsymbol{x}_i \boldsymbol{w}$ and then set $b_j$'s as values in between). Then $\mathbf{M}_\text{ReLU}$ becomes a lower triangular matrix:
 
-$$\mathbf{M}_\text{ReLU} = \[a_i - b_j\]_{i \times j} = \begin{bmatrix} a_1 - b_1 & 0 & 0 & \dots & 0 \\ \vdots & \ddots & & & \vdots \\ a_i - b_1 & \dots & a_i - b_i & \dots & 0\\ \vdots & & & \ddots & \vdots \\ a_n - b_1 & a_n - b_2 & \dots & \dots & a_n - b_n \\ \end{bmatrix}$$
+$$\mathbf{M}_\text{ReLU} = [a_i - b_j]_{i \times j} = \begin{bmatrix} a_1 - b_1 & 0 & 0 & \dots & 0 \\ \vdots & \ddots & & & \vdots \\ a_i - b_1 & \dots & a_i - b_i & \dots & 0\\ \vdots & & & \ddots & \vdots \\ a_n - b_1 & a_n - b_2 & \dots & \dots & a_n - b_n \\ \end{bmatrix}$$
 
 It is a nonsingular square matrix as $\\det(\mathbf{M}_\text{ReLU}) \\neq 0$, so we can always find suitable $\boldsymbol{v}$ to solve $\boldsymbol{v}\mathbf{M}_\text{ReLU}=\boldsymbol{y}$ (In other words, the column space of $\mathbf{M}_\text{ReLU}$ is all of $\mathbb{R}^n$ and we can find a linear combination of column vectors to obtain any $\boldsymbol{y}$).
 
@@ -336,22 +336,22 @@ Cited as:
 
 # References[#](#references)
 
-\[1\] Wikipedia page on [Occam's Razor](https://en.wikipedia.org/wiki/Occam%27s_razor).
+[1] Wikipedia page on [Occam's Razor](https://en.wikipedia.org/wiki/Occam%27s_razor).
 
-\[2\] [Occam's Razor](http://pespmc1.vub.ac.be/OCCAMRAZ.html) on Principia Cybernetica Web.
+[2] [Occam's Razor](http://pespmc1.vub.ac.be/OCCAMRAZ.html) on Principia Cybernetica Web.
 
-\[3\] Peter Grunwald. ["A Tutorial Introduction to the Minimum Description Length Principle"](https://arxiv.org/abs/math/0406077). 2004.
+[3] Peter Grunwald. ["A Tutorial Introduction to the Minimum Description Length Principle"](https://arxiv.org/abs/math/0406077). 2004.
 
-\[4\] Ian Goodfellow, et al. [Deep Learning](https://www.deeplearningbook.org/). 2016. [Sec 6.4.1](https://www.deeplearningbook.org/contents/mlp.html).
+[4] Ian Goodfellow, et al. [Deep Learning](https://www.deeplearningbook.org/). 2016. [Sec 6.4.1](https://www.deeplearningbook.org/contents/mlp.html).
 
-\[5\] Zhang, Chiyuan, et al. ["Understanding deep learning requires rethinking generalization."](https://arxiv.org/abs/1611.03530) ICLR 2017.
+[5] Zhang, Chiyuan, et al. ["Understanding deep learning requires rethinking generalization."](https://arxiv.org/abs/1611.03530) ICLR 2017.
 
-\[6\] Shibani Santurkar, et al. ["How does batch normalization help optimization?."](https://arxiv.org/abs/1805.11604) NIPS 2018.
+[6] Shibani Santurkar, et al. ["How does batch normalization help optimization?."](https://arxiv.org/abs/1805.11604) NIPS 2018.
 
-\[7\] Mikhail Belkin, et al. ["Reconciling modern machine learning and the bias-variance trade-off."](https://arxiv.org/abs/1812.11118) arXiv:1812.11118, 2018.
+[7] Mikhail Belkin, et al. ["Reconciling modern machine learning and the bias-variance trade-off."](https://arxiv.org/abs/1812.11118) arXiv:1812.11118, 2018.
 
-\[8\] Chiyuan Zhang, et al. ["Are All Layers Created Equal?"](https://arxiv.org/abs/1902.01996) arXiv:1902.01996, 2019.
+[8] Chiyuan Zhang, et al. ["Are All Layers Created Equal?"](https://arxiv.org/abs/1902.01996) arXiv:1902.01996, 2019.
 
-\[9\] Chunyuan Li, et al. ["Measuring the intrinsic dimension of objective landscapes."](https://arxiv.org/abs/1804.08838) ICLR 2018.
+[9] Chunyuan Li, et al. ["Measuring the intrinsic dimension of objective landscapes."](https://arxiv.org/abs/1804.08838) ICLR 2018.
 
-\[10\] Jonathan Frankle and Michael Carbin. ["The lottery ticket hypothesis: Finding sparse, trainable neural networks."](https://arxiv.org/abs/1803.03635) ICLR 2019.
+[10] Jonathan Frankle and Michael Carbin. ["The lottery ticket hypothesis: Finding sparse, trainable neural networks."](https://arxiv.org/abs/1803.03635) ICLR 2019.

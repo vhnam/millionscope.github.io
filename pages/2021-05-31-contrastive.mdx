@@ -73,7 +73,7 @@ In early versions of loss functions for contrastive learning, only one positive 
 
 Given a list of input samples $\{ \mathbf{x}_i \}$, each has a corresponding label $y_i \in \{1, \dots, L\}$ among $L$ classes. We would like to learn a function $f_\theta(.): \mathcal{X}\to\mathbb{R}^d$ that encodes $x_i$ into an embedding vector such that examples from the same class have similar embeddings and samples from different classes have very different ones. Thus, contrastive loss takes a pair of inputs $(x_i, x_j)$ and minimizes the embedding distance when they are from the same class but maximizes the distance otherwise.
 
-$$\mathcal{L}_\text{cont}(\mathbf{x}_i, \mathbf{x}_j, \theta) = \mathbb{1}\[y_i=y_j\] \| f_\theta(\mathbf{x}_i) - f_\theta(\mathbf{x}_j) \|^2_2 + \mathbb{1}\[y_i\\neq y_j\]\max(0, \epsilon - \|f_\theta(\mathbf{x}_i) - f_\theta(\mathbf{x}_j)\|_2)^2$$
+$$\mathcal{L}_\text{cont}(\mathbf{x}_i, \mathbf{x}_j, \theta) = \mathbb{1}[y_i=y_j] \| f_\theta(\mathbf{x}_i) - f_\theta(\mathbf{x}_j) \|^2_2 + \mathbb{1}[y_i\\neq y_j]\max(0, \epsilon - \|f_\theta(\mathbf{x}_i) - f_\theta(\mathbf{x}_j)\|_2)^2$$
 
 where $\epsilon$ is a hyperparameter, defining the lower bound distance between samples of different classes.
 
@@ -133,7 +133,7 @@ $$\ell_\theta(\mathbf{u}) = \log \frac{p_\theta(\mathbf{u})}{q(\mathbf{u})} = \l
 
 After converting logits into probabilities with sigmoid $\sigma(.)$, we can apply cross entropy loss:
 
-$$\begin{aligned} \mathcal{L}_\text{NCE} &= - \frac{1}{N} \sum_{i=1}^N \big\[ \log \sigma (\ell_\theta(\mathbf{x}_i)) + \log (1 - \sigma (\ell_\theta(\tilde{\mathbf{x}}_i))) \big\] \\ \text{ where }\sigma(\ell) &= \frac{1}{1 + \exp(-\ell)} = \frac{p_\theta}{p_\theta + q} \end{aligned}$$
+$$\begin{aligned} \mathcal{L}_\text{NCE} &= - \frac{1}{N} \sum_{i=1}^N \big[ \log \sigma (\ell_\theta(\mathbf{x}_i)) + \log (1 - \sigma (\ell_\theta(\tilde{\mathbf{x}}_i))) \big] \\ \text{ where }\sigma(\ell) &= \frac{1}{1 + \exp(-\ell)} = \frac{p_\theta}{p_\theta + q} \end{aligned}$$
 
 Here I listed the original form of NCE loss which works with only one positive and one noise sample. In many follow-up works, contrastive loss incorporating multiple negative samples is also broadly referred to as NCE.
 
@@ -143,13 +143,13 @@ The **InfoNCE loss** in CPC ([Contrastive Predictive Coding](https://lilianweng.
 
 Given a context vector $\mathbf{c}$, the positive sample should be drawn from the conditional distribution $p(\mathbf{x} \vert \mathbf{c})$, while $N-1$ negative samples are drawn from the proposal distribution $p(\mathbf{x})$, independent from the context $\mathbf{c}$. For brevity, let us label all the samples as $X=\{ \mathbf{x}_i \}^N_{i=1}$ among which only one of them $\mathbf{x}_\texttt{pos}$ is a positive sample. The probability of we detecting the positive sample correctly is:
 
-$$p(C=\texttt{pos} \vert X, \mathbf{c}) = \frac{p(x_\texttt{pos} \vert \mathbf{c}) \prod_{i=1,\dots,N; i \\neq \texttt{pos}} p(\mathbf{x}_i)}{\sum_{j=1}^N \big\[ p(\mathbf{x}_j \vert \mathbf{c}) \prod_{i=1,\dots,N; i \\neq j} p(\mathbf{x}_i) \big\]} = \frac{ \frac{p(\mathbf{x}_\texttt{pos}\vert c)}{p(\mathbf{x}_\texttt{pos})} }{ \sum_{j=1}^N \frac{p(\mathbf{x}_j\vert \mathbf{c})}{p(\mathbf{x}_j)} } = \frac{f(\mathbf{x}_\texttt{pos}, \mathbf{c})}{ \sum_{j=1}^N f(\mathbf{x}_j, \mathbf{c}) }$$
+$$p(C=\texttt{pos} \vert X, \mathbf{c}) = \frac{p(x_\texttt{pos} \vert \mathbf{c}) \prod_{i=1,\dots,N; i \\neq \texttt{pos}} p(\mathbf{x}_i)}{\sum_{j=1}^N \big[ p(\mathbf{x}_j \vert \mathbf{c}) \prod_{i=1,\dots,N; i \\neq j} p(\mathbf{x}_i) \big]} = \frac{ \frac{p(\mathbf{x}_\texttt{pos}\vert c)}{p(\mathbf{x}_\texttt{pos})} }{ \sum_{j=1}^N \frac{p(\mathbf{x}_j\vert \mathbf{c})}{p(\mathbf{x}_j)} } = \frac{f(\mathbf{x}_\texttt{pos}, \mathbf{c})}{ \sum_{j=1}^N f(\mathbf{x}_j, \mathbf{c}) }$$
 
 where the scoring function is $f(\mathbf{x}, \mathbf{c}) \\propto \frac{p(\mathbf{x}\vert\mathbf{c})}{p(\mathbf{x})}$.
 
 The InfoNCE loss optimizes the negative log probability of classifying the positive sample correctly:
 
-$$\mathcal{L}_\text{InfoNCE} = - \mathbb{E} \Big\[\log \frac{f(\mathbf{x}, \mathbf{c})}{\sum_{\mathbf{x}' \in X} f(\mathbf{x}', \mathbf{c})} \Big\]$$
+$$\mathcal{L}_\text{InfoNCE} = - \mathbb{E} \Big[\log \frac{f(\mathbf{x}, \mathbf{c})}{\sum_{\mathbf{x}' \in X} f(\mathbf{x}', \mathbf{c})} \Big]$$
 
 The fact that $f(x, c)$ estimates the density ratio $\frac{p(x\vert c)}{p(x)}$ has a connection with mutual information optimization. To maximize the the mutual information between input $x$ and context vector $c$, we have:
 
@@ -184,7 +184,7 @@ Most recent studies follow the following definition of contrastive learning obje
 
 To learn an encoder $f(\mathbf{x})$ to learn a _L2-normalized feature vector_, the contrastive learning objective is:
 
-$$\begin{aligned} \mathcal{L}_\text{contrastive} &= \mathbb{E}_{(\mathbf{x},\mathbf{x}^+)\sim p_\texttt{pos}, \{\mathbf{x}^-_i\}^M_{i=1} \\overset{\text{i.i.d}}{\sim} p_\texttt{data} } \Big\[ -\log\frac{\exp(f(\mathbf{x})^\top f(\mathbf{x}^+) / \tau)}{ \exp(f(\mathbf{x})^\top f(\mathbf{x}^+) / \tau) + \sum_{i=1}^M \exp(f(\mathbf{x})^\top f(\mathbf{x}_i^-) / \tau)} \Big\] & \\ &\approx \mathbb{E}_{(\mathbf{x},\mathbf{x}^+)\sim p_\texttt{pos}, \{\mathbf{x}^-_i\}^M_{i=1} \\overset{\text{i.i.d}}{\sim} p_\texttt{data} }\Big\[ - f(\mathbf{x})^\top f(\mathbf{x}^+) / \tau + \log\big(\sum_{i=1}^M \exp(f(\mathbf{x})^\top f(\mathbf{x}_i^-) / \tau)\big) \Big\] & \\scriptstyle{\text{; Assuming infinite negatives}} \\ &= -\frac{1}{\tau}\mathbb{E}_{(\mathbf{x},\mathbf{x}^+)\sim p_\texttt{pos}}f(\mathbf{x})^\top f(\mathbf{x}^+) + \mathbb{E}_{ \mathbf{x} \sim p_\texttt{data}} \Big\[ \log \mathbb{E}_{\mathbf{x}^- \sim p_\texttt{data}} \big\[ \sum_{i=1}^M \exp(f(\mathbf{x})^\top f(\mathbf{x}_i^-) / \tau)\big\] \Big\] & \end{aligned}$$
+$$\begin{aligned} \mathcal{L}_\text{contrastive} &= \mathbb{E}_{(\mathbf{x},\mathbf{x}^+)\sim p_\texttt{pos}, \{\mathbf{x}^-_i\}^M_{i=1} \\overset{\text{i.i.d}}{\sim} p_\texttt{data} } \Big[ -\log\frac{\exp(f(\mathbf{x})^\top f(\mathbf{x}^+) / \tau)}{ \exp(f(\mathbf{x})^\top f(\mathbf{x}^+) / \tau) + \sum_{i=1}^M \exp(f(\mathbf{x})^\top f(\mathbf{x}_i^-) / \tau)} \Big] & \\ &\approx \mathbb{E}_{(\mathbf{x},\mathbf{x}^+)\sim p_\texttt{pos}, \{\mathbf{x}^-_i\}^M_{i=1} \\overset{\text{i.i.d}}{\sim} p_\texttt{data} }\Big[ - f(\mathbf{x})^\top f(\mathbf{x}^+) / \tau + \log\big(\sum_{i=1}^M \exp(f(\mathbf{x})^\top f(\mathbf{x}_i^-) / \tau)\big) \Big] & \\scriptstyle{\text{; Assuming infinite negatives}} \\ &= -\frac{1}{\tau}\mathbb{E}_{(\mathbf{x},\mathbf{x}^+)\sim p_\texttt{pos}}f(\mathbf{x})^\top f(\mathbf{x}^+) + \mathbb{E}_{ \mathbf{x} \sim p_\texttt{data}} \Big[ \log \mathbb{E}_{\mathbf{x}^- \sim p_\texttt{data}} \big[ \sum_{i=1}^M \exp(f(\mathbf{x})^\top f(\mathbf{x}_i^-) / \tau)\big] \Big] & \end{aligned}$$
 
 # Key Ingredients[#](#key-ingredients)
 
@@ -217,15 +217,15 @@ When we are sampling $\mathbf{x}^-$ , we cannot access the true $p^-_x(\mathbf{x
 
 $$p(\mathbf{x}') = \eta^+ p^+_x(\mathbf{x}') + \eta^- p_x^-(\mathbf{x}')$$
 
-Thus we can use $p^-_x(\mathbf{x}') = (p(\mathbf{x}') - \eta^+ p^+_x(\mathbf{x}'))/\eta^-$ for sampling $\mathbf{x}^-$ to debias the loss. With $N$ samples $\{\mathbf{u}_i\}^N_{i=1}$ from $p$ and $M$ samples $\{ \mathbf{v}_i \}_{i=1}^M$ from $p^+_x$ , we can estimate the expectation of the second term $\mathbb{E}_{\mathbf{x}^-\sim p^-_x}\[\exp(f(\mathbf{x})^\top f(\mathbf{x}^-))\]$ in the denominator of contrastive learning loss:
+Thus we can use $p^-_x(\mathbf{x}') = (p(\mathbf{x}') - \eta^+ p^+_x(\mathbf{x}'))/\eta^-$ for sampling $\mathbf{x}^-$ to debias the loss. With $N$ samples $\{\mathbf{u}_i\}^N_{i=1}$ from $p$ and $M$ samples $\{ \mathbf{v}_i \}_{i=1}^M$ from $p^+_x$ , we can estimate the expectation of the second term $\mathbb{E}_{\mathbf{x}^-\sim p^-_x}[\exp(f(\mathbf{x})^\top f(\mathbf{x}^-))]$ in the denominator of contrastive learning loss:
 
 $$g(\mathbf{x}, \{\mathbf{u}_i\}^N_{i=1}, \{\mathbf{v}_i\}_{i=1}^M) = \max\Big\{ \frac{1}{\eta^-}\Big( \frac{1}{N}\sum_{i=1}^N \exp(f(\mathbf{x})^\top f(\mathbf{u}_i)) - \frac{\eta^+}{M}\sum_{i=1}^M \exp(f(\mathbf{x})^\top f(\mathbf{v}_i)) \Big), \exp(-1/\tau) \Big\}$$
 
-where $\tau$ is the temperature and $\exp(-1/\tau)$ is the theoretical lower bound of $\mathbb{E}_{\mathbf{x}^-\sim p^-_x}\[\exp(f(\mathbf{x})^\top f(\mathbf{x}^-))\]$.
+where $\tau$ is the temperature and $\exp(-1/\tau)$ is the theoretical lower bound of $\mathbb{E}_{\mathbf{x}^-\sim p^-_x}[\exp(f(\mathbf{x})^\top f(\mathbf{x}^-))]$.
 
 The final debiased contrastive loss looks like:
 
-$$\mathcal{L}^{N,M}_\text{debias}(f) = \mathbb{E}_{\mathbf{x},\{\mathbf{u}_i\}^N_{i=1}\sim p;\\;\mathbf{x}^+, \{\mathbf{v}_i\}_{i=1}^M\sim p^+} \Big\[ -\log\frac{\exp(f(\mathbf{x})^\top f(\mathbf{x}^+)}{\exp(f(\mathbf{x})^\top f(\mathbf{x}^+) + N g(x,\{\mathbf{u}_i\}^N_{i=1}, \{\mathbf{v}_i\}_{i=1}^M)} \Big\]$$
+$$\mathcal{L}^{N,M}_\text{debias}(f) = \mathbb{E}_{\mathbf{x},\{\mathbf{u}_i\}^N_{i=1}\sim p;\\;\mathbf{x}^+, \{\mathbf{v}_i\}_{i=1}^M\sim p^+} \Big[ -\log\frac{\exp(f(\mathbf{x})^\top f(\mathbf{x}^+)}{\exp(f(\mathbf{x})^\top f(\mathbf{x}^+) + N g(x,\{\mathbf{u}_i\}^N_{i=1}, \{\mathbf{v}_i\}_{i=1}^M)} \Big]$$
 
 ![](assets/images/2021-05-31-contrastive/contrastive-debias-t-SNE.png)
 
@@ -237,9 +237,9 @@ $$q_\beta(\mathbf{x}^-) \\propto \exp(\beta f(\mathbf{x})^\top f(\mathbf{x}^-)) 
 
 where $\beta$ is a hyperparameter to tune.
 
-We can estimate the second term in the denominator $\mathbb{E}_{\mathbf{x}^- \sim q_\beta} \[\exp(f(\mathbf{x})^\top f(\mathbf{x}^-))\]$ using importance sampling where both the partition functions $Z_\beta, Z^+_\beta$ can be estimated empirically.
+We can estimate the second term in the denominator $\mathbb{E}_{\mathbf{x}^- \sim q_\beta} [\exp(f(\mathbf{x})^\top f(\mathbf{x}^-))]$ using importance sampling where both the partition functions $Z_\beta, Z^+_\beta$ can be estimated empirically.
 
-$$\begin{aligned} \mathbb{E}_{\mathbf{u} \sim q_\beta} \[\exp(f(\mathbf{x})^\top f(\mathbf{u}))\] &= \mathbb{E}_{\mathbf{u} \sim p} \[\frac{q_\beta}{p}\exp(f(\mathbf{x})^\top f(\mathbf{u}))\] = \mathbb{E}_{\mathbf{u} \sim p} \[\frac{1}{Z_\beta}\exp((\beta + 1)f(\mathbf{x})^\top f(\mathbf{u}))\] \\ \mathbb{E}_{\mathbf{v} \sim q^+_\beta} \[\exp(f(\mathbf{x})^\top f(\mathbf{v}))\] &= \mathbb{E}_{\mathbf{v} \sim p^+} \[\frac{q^+_\beta}{p}\exp(f(\mathbf{x})^\top f(\mathbf{v}))\] = \mathbb{E}_{\mathbf{v} \sim p} \[\frac{1}{Z^+_\beta}\exp((\beta + 1)f(\mathbf{x})^\top f(\mathbf{v}))\] \end{aligned}$$
+$$\begin{aligned} \mathbb{E}_{\mathbf{u} \sim q_\beta} [\exp(f(\mathbf{x})^\top f(\mathbf{u}))] &= \mathbb{E}_{\mathbf{u} \sim p} [\frac{q_\beta}{p}\exp(f(\mathbf{x})^\top f(\mathbf{u}))] = \mathbb{E}_{\mathbf{u} \sim p} [\frac{1}{Z_\beta}\exp((\beta + 1)f(\mathbf{x})^\top f(\mathbf{u}))] \\ \mathbb{E}_{\mathbf{v} \sim q^+_\beta} [\exp(f(\mathbf{x})^\top f(\mathbf{v}))] &= \mathbb{E}_{\mathbf{v} \sim p^+} [\frac{q^+_\beta}{p}\exp(f(\mathbf{x})^\top f(\mathbf{v}))] = \mathbb{E}_{\mathbf{v} \sim p} [\frac{1}{Z^+_\beta}\exp((\beta + 1)f(\mathbf{x})^\top f(\mathbf{v}))] \end{aligned}$$
 
 ![](assets/images/2021-05-31-contrastive/contrastive-hard-negatives-code.png)
 
@@ -277,7 +277,7 @@ Many frameworks are designed for learning good data augmentation strategies (i.e
 
 Image mixture methods can construct new training examples from existing data points.
 
-- Mixup ([Zhang et al., 2018](https://arxiv.org/abs/1710.09412)): It runs global-level mixture by creating a weighted pixel-wise combination of two existing images $I_1$ and $I_2$: $I_\text{mixup} \gets \alpha I_1 + (1-\alpha) I_2$ and $\alpha \in \[0, 1\]$.
+- Mixup ([Zhang et al., 2018](https://arxiv.org/abs/1710.09412)): It runs global-level mixture by creating a weighted pixel-wise combination of two existing images $I_1$ and $I_2$: $I_\text{mixup} \gets \alpha I_1 + (1-\alpha) I_2$ and $\alpha \in [0, 1]$.
 - Cutmix ([Yun et al., 2019](https://arxiv.org/abs/1905.04899)): Cutmix does region-level mixture by generating a new example by combining a local region of one image with the rest of the other image. $I_\text{cutmix} \gets \mathbf{M}_b \odot I_1 + (1-\mathbf{M}_b) \odot I_2$, where $\mathbf{M}_b \in \{0, 1\}^I$ is a binary mask and $\odot$ is element-wise multiplication. It is equivalent to filling the cutout ([DeVries & Taylor 2017](https://arxiv.org/abs/1708.04552)) region with the same region from another image.
 - MoCHi ("Mixing of Contrastive Hard Negatives"; [Kalantidis et al. 2020](https://arxiv.org/abs/2010.01028)): Given a query $\mathbf{q}$, MoCHi maintains a queue of $K$ negative features $Q=\{\mathbf{n}_1, \dots, \mathbf{n}_K \}$ and sorts these negative features by similarity to the query, $\mathbf{q}^\top \mathbf{n}$, in descending order. The first $N$ items in the queue are considered as the hardest negatives, $Q^N$. Then synthetic hard examples can be generated by $\mathbf{h} = \tilde{\mathbf{h}} / |\tilde{\mathbf{h}}|$ where $\tilde{\mathbf{h}} = \alpha\mathbf{n}_i + (1-\alpha) \mathbf{n}_j$ and $\alpha \in (0, 1)$. Even harder examples can be created by mixing with the query feature, $\mathbf{h}' = \tilde{\mathbf{h}'} / |\tilde{\mathbf{h}'}|_2$ where $\tilde{\mathbf{h}'} = \beta\mathbf{q} + (1-\beta) \mathbf{n}_j$ and $\beta \in (0, 0.5)$.
 
@@ -305,9 +305,9 @@ $$\mathbf{h}_i = f(\tilde{\mathbf{x}}_i),\quad \mathbf{h}_j = f(\tilde{\mathbf{x
 
 3.  The contrastive learning loss is defined using cosine similarity $\text{sim}(.,.)$. Note that the loss operates on an extra projection layer of the representation $g(.)$ rather than on the representation space directly. But only the representation $\mathbf{h}$ is used for downstream tasks.
 
-$$\begin{aligned} \mathbf{z}_i &= g(\mathbf{h}_i),\quad \mathbf{z}_j = g(\mathbf{h}_j) \\ \mathcal{L}_\text{SimCLR}^{(i,j)} &= - \log\frac{\exp(\text{sim}(\mathbf{z}_i, \mathbf{z}_j) / \tau)}{\sum_{k=1}^{2N} \mathbb{1}_{\[k \\neq i\]} \exp(\text{sim}(\mathbf{z}_i, \mathbf{z}_k) / \tau)} \end{aligned}$$
+$$\begin{aligned} \mathbf{z}_i &= g(\mathbf{h}_i),\quad \mathbf{z}_j = g(\mathbf{h}_j) \\ \mathcal{L}_\text{SimCLR}^{(i,j)} &= - \log\frac{\exp(\text{sim}(\mathbf{z}_i, \mathbf{z}_j) / \tau)}{\sum_{k=1}^{2N} \mathbb{1}_{[k \\neq i]} \exp(\text{sim}(\mathbf{z}_i, \mathbf{z}_k) / \tau)} \end{aligned}$$
 
-where $\mathbb{1}_{\[k \\neq i\]}$ is an indicator function: 1 if $k\\neq i$ 0 otherwise.
+where $\mathbb{1}_{[k \\neq i]}$ is an indicator function: 1 if $k\\neq i$ 0 otherwise.
 
 SimCLR needs a large batch size to incorporate enough negative samples to achieve good performance.
 
@@ -391,7 +391,7 @@ $$P(i\vert \mathbf{v}) = \frac{\exp(\mathbf{v}^\top \mathbf{f}_i / \tau)}{\sum_{
 
 Because there is only one instance per class, the training is unstable and fluctuates a lot. To improve the training smoothness, they introduced an extra term for positive samples in the loss function based on the [proximal optimization method](https://web.stanford.edu/~boyd/papers/prox_algs.html). The final NCE loss objective looks like:
 
-$$\begin{aligned} \mathcal{L}_\text{instance} &= - \mathbb{E}_{P_d}\big\[\log h(i, \mathbf{v}^{(t-1)}_i) - \lambda \|\mathbf{v}^{(t)}_i - \mathbf{v}^{(t-1)}_i\|^2_2\big\] - M\mathbb{E}_{P_n}\big\[\log(1 - h(i, \mathbf{v}'^{(t-1)})\big\] \\ h(i, \mathbf{v}) &= \frac{P(i\vert\mathbf{v})}{P(i\vert\mathbf{v}) + MP_n(i)} \text{ where the noise distribution is uniform }P_n = 1/N \end{aligned}$$
+$$\begin{aligned} \mathcal{L}_\text{instance} &= - \mathbb{E}_{P_d}\big[\log h(i, \mathbf{v}^{(t-1)}_i) - \lambda \|\mathbf{v}^{(t)}_i - \mathbf{v}^{(t-1)}_i\|^2_2\big] - M\mathbb{E}_{P_n}\big[\log(1 - h(i, \mathbf{v}'^{(t-1)})\big] \\ h(i, \mathbf{v}) &= \frac{P(i\vert\mathbf{v})}{P(i\vert\mathbf{v}) + MP_n(i)} \text{ where the noise distribution is uniform }P_n = 1/N \end{aligned}$$
 
 where $\{ \mathbf{v}^{(t-1)} \}$ are embeddings stored in the memory bank from the previous iteration. The difference between iterations $|\mathbf{v}^{(t)}_i - \mathbf{v}^{(t-1)}_i|^2_2$ will gradually vanish as the learned embedding converges.
 
@@ -405,7 +405,7 @@ $$\mathcal{L}_\text{MoCo} = - \log \frac{\exp(\mathbf{q} \cdot \mathbf{k}^+ / \t
 
 Compared to the [memory bank](#instance-discrimination-with-memoy-bank), a queue-based dictionary in MoCo enables us to reuse representations of immediately preceding mini-batches of data.
 
-The MoCo dictionary is not differentiable as a queue, so we cannot rely on back-propagation to update the key encoder $f_k$. One naive way might be to use the same encoder for both $f_q$ and $f_k$. Differently, MoCo proposed to use a momentum-based update with a momentum coefficient $m \in \[0, 1)$. Say, the parameters of $f_q$ and $f_k$ are labeled as $\theta_q$ and $\theta_k$, respectively.
+The MoCo dictionary is not differentiable as a queue, so we cannot rely on back-propagation to update the key encoder $f_k$. One naive way might be to use the same encoder for both $f_q$ and $f_k$. Differently, MoCo proposed to use a momentum-based update with a momentum coefficient $m \in [0, 1)$. Say, the parameters of $f_q$ and $f_k$ are labeled as $\theta_q$ and $\theta_k$, respectively.
 
 $$\theta_k \\leftarrow m \theta_k + (1-m) \theta_q$$
 
@@ -445,7 +445,7 @@ In each iteration, DeepCluster clusters data points using the prior representati
 
 ![](assets/images/2021-05-31-contrastive/SwAV.png)
 
-Fig. 15. Comparison of SwAV and \[contrastive instance learning\](#instance-discrimination-with-memoy-bank). (Image source: [Caron et al. 2020](https://arxiv.org/abs/2006.09882))
+Fig. 15. Comparison of SwAV and [contrastive instance learning](#instance-discrimination-with-memoy-bank). (Image source: [Caron et al. 2020](https://arxiv.org/abs/2006.09882))
 
 Given features of images with two different augmentations, $\mathbf{z}_t$ and $\mathbf{z}_s$, SwAV computes corresponding codes $\mathbf{q}_t$ and $\mathbf{q}_s$ and the loss quantifies the fit by swapping two codes using $\ell(.)$ to measure the fit between a feature and a code.
 
@@ -455,7 +455,7 @@ The swapped fit prediction depends on the cross entropy between the predicted co
 
 $$\ell(\mathbf{z}_t, \mathbf{q}_s) = - \sum_k \mathbf{q}^{(k)}_s\log\mathbf{p}^{(k)}_t \text{ where } \mathbf{p}^{(k)}_t = \frac{\exp(\mathbf{z}_t^\top\mathbf{c}_k / \tau)}{\sum_{k'}\exp(\mathbf{z}_t^\top \mathbf{c}_{k'} / \tau)}$$
 
-In a mini-batch containing $B$ feature vectors $\mathbf{Z} = \[\mathbf{z}_1, \dots, \mathbf{z}_B\]$, the mapping matrix between features and prototype vectors is defined as $\mathbf{Q} = \[\mathbf{q}_1, \dots, \mathbf{q}_B\] \in \mathbb{R}_+^{K\times B}$. We would like to maximize the similarity between the features and the prototypes:
+In a mini-batch containing $B$ feature vectors $\mathbf{Z} = [\mathbf{z}_1, \dots, \mathbf{z}_B]$, the mapping matrix between features and prototype vectors is defined as $\mathbf{Q} = [\mathbf{q}_1, \dots, \mathbf{q}_B] \in \mathbb{R}_+^{K\times B}$. We would like to maximize the similarity between the features and the prototypes:
 
 $$\begin{aligned} \max_{\mathbf{Q}\in\mathcal{Q}} &\text{Tr}(\mathbf{Q}^\top \mathbf{C}^\top \mathbf{Z}) + \varepsilon \mathcal{H}(\mathbf{Q}) \\ \text{where }\mathcal{Q} &= \big\{ \mathbf{Q} \in \mathbb{R}_{+}^{K \times B} \mid \mathbf{Q}\mathbf{1}_B = \frac{1}{K}\mathbf{1}_K, \mathbf{Q}^\top\mathbf{1}_K = \frac{1}{B}\mathbf{1}_B \big\} \end{aligned}$$
 
@@ -580,7 +580,7 @@ The pre-trained BERT sentence embedding without any fine-tuning has been found t
 
 They experimented with a few different prediction heads on top of BERT model:
 
-- Softmax classification objective: The classification head of the siamese network is built on the concatenation of two embeddings $f(\mathbf{x}), f(\mathbf{x}')$ and $\vert f(\mathbf{x}) - f(\mathbf{x}') \vert$. The predicted output is $\hat{y}=\text{softmax}(\mathbf{W}_t \[f(\mathbf{x}); f(\mathbf{x}'); \vert f(\mathbf{x}) - f(\mathbf{x}') \vert\])$. They showed that the most important component is the element-wise difference $\vert f(\mathbf{x}) - f(\mathbf{x}') \vert$.
+- Softmax classification objective: The classification head of the siamese network is built on the concatenation of two embeddings $f(\mathbf{x}), f(\mathbf{x}')$ and $\vert f(\mathbf{x}) - f(\mathbf{x}') \vert$. The predicted output is $\hat{y}=\text{softmax}(\mathbf{W}_t [f(\mathbf{x}); f(\mathbf{x}'); \vert f(\mathbf{x}) - f(\mathbf{x}') \vert])$. They showed that the most important component is the element-wise difference $\vert f(\mathbf{x}) - f(\mathbf{x}') \vert$.
 - Regression objective: This is the regression loss on $\cos(f(\mathbf{x}), f(\mathbf{x}'))$, in which the pooling strategy has a big impact. In the experiments, they observed that `max` performs much worse than `mean` and `CLS`\-token.
 - Triplet objective: $\max(0, |f(\mathbf{x}) - f(\mathbf{x}^+)|- |f(\mathbf{x}) - f(\mathbf{x}^-)| + \epsilon)$, where $\mathbf{x}, \mathbf{x}^+, \mathbf{x}^-$ are embeddings of the anchor, positive and negative sentences.
 
@@ -612,7 +612,7 @@ $$\mathbf{z}\sim p_\mathcal{Z}(\mathbf{z}) \quad \mathbf{u}=f_\phi(\mathbf{z}) \
 
 A flow-based generative model learns the invertible mapping function by maximizing the likelihood of $\mathcal{U}$'s marginal:
 
-$$\max_\phi\mathbb{E}_{\mathbf{u}=\text{BERT}(s), s\sim\mathcal{D}} \Big\[ \log p_\mathcal{Z}(f^{-1}_\phi(\mathbf{u})) + \log\big\vert\\det\frac{\partial f^{-1}_\phi(\mathbf{u})}{\partial\mathbf{u}}\big\vert \Big\]$$
+$$\max_\phi\mathbb{E}_{\mathbf{u}=\text{BERT}(s), s\sim\mathcal{D}} \Big[ \log p_\mathcal{Z}(f^{-1}_\phi(\mathbf{u})) + \log\big\vert\\det\frac{\partial f^{-1}_\phi(\mathbf{u})}{\partial\mathbf{u}}\big\vert \Big]$$
 
 where $s$ is a sentence sampled from the text corpus $\mathcal{D}$. Only the flow parameters $\phi$ are optimized while parameters in the pretrained BERT stay unchanged.
 
@@ -667,7 +667,7 @@ IS-BERT works as follows:
 
 Since the mutual information estimation is generally intractable for continuous and high-dimensional random variables, IS-BERT relies on the Jensen-Shannon estimator ([Nowozin et al., 2016](https://arxiv.org/abs/1606.00709), [Hjelm et al., 2019](https://arxiv.org/abs/1808.06670)) to maximize the mutual information between $\mathcal{E}_\theta(\mathbf{x})$ and $\mathcal{F}_\theta^{(i)} (\mathbf{x})$.
 
-$$I^\text{JSD}_\\omega(\mathcal{F}_\theta^{(i)} (\mathbf{x}); \mathcal{E}_\theta(\mathbf{x})) = \mathbb{E}_{\mathbf{x}\sim P} \[-\text{sp}(-T_\\omega(\mathcal{F}_\theta^{(i)} (\mathbf{x}); \mathcal{E}_\theta(\mathbf{x})))\] \\ - \mathbb{E}_{\mathbf{x}\sim P, \mathbf{x}' \sim\tilde{P}} \[\text{sp}(T_\\omega(\mathcal{F}_\theta^{(i)} (\mathbf{x}'); \mathcal{E}_\theta(\mathbf{x})))\]$$
+$$I^\text{JSD}_\\omega(\mathcal{F}_\theta^{(i)} (\mathbf{x}); \mathcal{E}_\theta(\mathbf{x})) = \mathbb{E}_{\mathbf{x}\sim P} [-\text{sp}(-T_\\omega(\mathcal{F}_\theta^{(i)} (\mathbf{x}); \mathcal{E}_\theta(\mathbf{x})))] \\ - \mathbb{E}_{\mathbf{x}\sim P, \mathbf{x}' \sim\tilde{P}} [\text{sp}(T_\\omega(\mathcal{F}_\theta^{(i)} (\mathbf{x}'); \mathcal{E}_\theta(\mathbf{x})))]$$
 
 where $T_\\omega: \mathcal{F}\times\mathcal{E} \to \mathbb{R}$ is a learnable network with parameters $\\omega$, generating discriminator scores. The negative sample $\mathbf{x}'$ is sampled from the distribution $\tilde{P}=P$. And $\text{sp}(x)=\log(1+e^x)$ is the softplus activation function.
 
@@ -698,70 +698,70 @@ Or
 
 # References[#](#references)
 
-\[1\] Sumit Chopra, Raia Hadsell and Yann LeCun. ["Learning a similarity metric discriminatively, with application to face verification."](http://yann.lecun.com/exdb/publis/pdf/chopra-05.pdf) CVPR 2005.
+[1] Sumit Chopra, Raia Hadsell and Yann LeCun. ["Learning a similarity metric discriminatively, with application to face verification."](http://yann.lecun.com/exdb/publis/pdf/chopra-05.pdf) CVPR 2005.
 
-\[2\] Florian Schroff, Dmitry Kalenichenko and James Philbin. ["FaceNet: A Unified Embedding for Face Recognition and Clustering."](https://arxiv.org/abs/1503.03832) CVPR 2015.
+[2] Florian Schroff, Dmitry Kalenichenko and James Philbin. ["FaceNet: A Unified Embedding for Face Recognition and Clustering."](https://arxiv.org/abs/1503.03832) CVPR 2015.
 
-\[3\] Hyun Oh Song et al. ["Deep Metric Learning via Lifted Structured Feature Embedding."](https://arxiv.org/abs/1511.06452) CVPR 2016. \[[code](https://github.com/rksltnl/Deep-Metric-Learning-CVPR16)\]
+[3] Hyun Oh Song et al. ["Deep Metric Learning via Lifted Structured Feature Embedding."](https://arxiv.org/abs/1511.06452) CVPR 2016. [[code](https://github.com/rksltnl/Deep-Metric-Learning-CVPR16)]
 
-\[4\] Ruslan Salakhutdinov and Geoff Hinton. ["Learning a Nonlinear Embedding by Preserving Class Neighbourhood Structure"](http://proceedings.mlr.press/v2/salakhutdinov07a.html) AISTATS 2007.
+[4] Ruslan Salakhutdinov and Geoff Hinton. ["Learning a Nonlinear Embedding by Preserving Class Neighbourhood Structure"](http://proceedings.mlr.press/v2/salakhutdinov07a.html) AISTATS 2007.
 
-\[5\] Michael Gutmann and Aapo Hyvärinen. ["Noise-contrastive estimation: A new estimation principle for unnormalized statistical models."](http://proceedings.mlr.press/v9/gutmann10a.html) AISTATS 2010.
+[5] Michael Gutmann and Aapo Hyvärinen. ["Noise-contrastive estimation: A new estimation principle for unnormalized statistical models."](http://proceedings.mlr.press/v9/gutmann10a.html) AISTATS 2010.
 
-\[6\] Kihyuk Sohn et al. ["Improved Deep Metric Learning with Multi-class N-pair Loss Objective"](https://papers.nips.cc/paper/2016/hash/6b180037abbebea991d8b1232f8a8ca9-Abstract.html) NIPS 2016.
+[6] Kihyuk Sohn et al. ["Improved Deep Metric Learning with Multi-class N-pair Loss Objective"](https://papers.nips.cc/paper/2016/hash/6b180037abbebea991d8b1232f8a8ca9-Abstract.html) NIPS 2016.
 
-\[7\] Nicholas Frosst, Nicolas Papernot and Geoffrey Hinton. ["Analyzing and Improving Representations with the Soft Nearest Neighbor Loss."](http://proceedings.mlr.press/v97/frosst19a.html) ICML 2019
+[7] Nicholas Frosst, Nicolas Papernot and Geoffrey Hinton. ["Analyzing and Improving Representations with the Soft Nearest Neighbor Loss."](http://proceedings.mlr.press/v97/frosst19a.html) ICML 2019
 
-\[8\] Tongzhou Wang and Phillip Isola. ["Understanding Contrastive Representation Learning through Alignment and Uniformity on the Hypersphere."](https://arxiv.org/abs/2005.10242) ICML 2020. \[[code](https://ssnl.github.io/hypersphere/)\]
+[8] Tongzhou Wang and Phillip Isola. ["Understanding Contrastive Representation Learning through Alignment and Uniformity on the Hypersphere."](https://arxiv.org/abs/2005.10242) ICML 2020. [[code](https://ssnl.github.io/hypersphere/)]
 
-\[9\] Zhirong Wu et al. ["Unsupervised feature learning via non-parametric instance-level discrimination."](https://arxiv.org/abs/1805.01978) CVPR 2018.
+[9] Zhirong Wu et al. ["Unsupervised feature learning via non-parametric instance-level discrimination."](https://arxiv.org/abs/1805.01978) CVPR 2018.
 
-\[10\] Ekin D. Cubuk et al. ["AutoAugment: Learning augmentation policies from data."](https://arxiv.org/abs/1805.09501) arXiv preprint arXiv:1805.09501 (2018).
+[10] Ekin D. Cubuk et al. ["AutoAugment: Learning augmentation policies from data."](https://arxiv.org/abs/1805.09501) arXiv preprint arXiv:1805.09501 (2018).
 
-\[11\] Daniel Ho et al. ["Population Based Augmentation: Efficient Learning of Augmentation Policy Schedules."](https://arxiv.org/abs/1905.05393) ICML 2019.
+[11] Daniel Ho et al. ["Population Based Augmentation: Efficient Learning of Augmentation Policy Schedules."](https://arxiv.org/abs/1905.05393) ICML 2019.
 
-\[12\] Ekin D. Cubuk & Barret Zoph et al. ["RandAugment: Practical automated data augmentation with a reduced search space."](https://arxiv.org/abs/1909.13719) arXiv preprint arXiv:1909.13719 (2019).
+[12] Ekin D. Cubuk & Barret Zoph et al. ["RandAugment: Practical automated data augmentation with a reduced search space."](https://arxiv.org/abs/1909.13719) arXiv preprint arXiv:1909.13719 (2019).
 
-\[13\] Hongyi Zhang et al. ["mixup: Beyond Empirical Risk Minimization."](https://arxiv.org/abs/1710.09412) ICLR 2017.
+[13] Hongyi Zhang et al. ["mixup: Beyond Empirical Risk Minimization."](https://arxiv.org/abs/1710.09412) ICLR 2017.
 
-\[14\] Sangdoo Yun et al. ["CutMix: Regularization Strategy to Train Strong Classifiers with Localizable Features."](https://arxiv.org/abs/1905.04899) ICCV 2019.
+[14] Sangdoo Yun et al. ["CutMix: Regularization Strategy to Train Strong Classifiers with Localizable Features."](https://arxiv.org/abs/1905.04899) ICCV 2019.
 
-\[15\] Yannis Kalantidis et al. ["Mixing of Contrastive Hard Negatives"](https://arxiv.org/abs/2010.01028) NeuriPS 2020.
+[15] Yannis Kalantidis et al. ["Mixing of Contrastive Hard Negatives"](https://arxiv.org/abs/2010.01028) NeuriPS 2020.
 
-\[16\] Ashish Jaiswal et al. ["A Survey on Contrastive Self-Supervised Learning."](https://arxiv.org/abs/2011.00362) arXiv preprint arXiv:2011.00362 (2021)
+[16] Ashish Jaiswal et al. ["A Survey on Contrastive Self-Supervised Learning."](https://arxiv.org/abs/2011.00362) arXiv preprint arXiv:2011.00362 (2021)
 
-\[17\] Jure Zbontar et al. ["Barlow Twins: Self-Supervised Learning via Redundancy Reduction."](https://arxiv.org/abs/2103.03230) arXiv preprint arXiv:2103.03230 (2021) \[[code](https://github.com/facebookresearch/barlowtwins)\]
+[17] Jure Zbontar et al. ["Barlow Twins: Self-Supervised Learning via Redundancy Reduction."](https://arxiv.org/abs/2103.03230) arXiv preprint arXiv:2103.03230 (2021) [[code](https://github.com/facebookresearch/barlowtwins)]
 
-\[18\] Alec Radford, et al. ["Learning Transferable Visual Models From Natural Language Supervision"](https://arxiv.org/abs/2103.00020) arXiv preprint arXiv:2103.00020 (2021)
+[18] Alec Radford, et al. ["Learning Transferable Visual Models From Natural Language Supervision"](https://arxiv.org/abs/2103.00020) arXiv preprint arXiv:2103.00020 (2021)
 
-\[19\] Mathilde Caron et al. ["Unsupervised Learning of Visual Features by Contrasting Cluster Assignments (SwAV)."](https://arxiv.org/abs/2006.09882) NeuriPS 2020.
+[19] Mathilde Caron et al. ["Unsupervised Learning of Visual Features by Contrasting Cluster Assignments (SwAV)."](https://arxiv.org/abs/2006.09882) NeuriPS 2020.
 
-\[20\] Mathilde Caron et al. ["Deep Clustering for Unsupervised Learning of Visual Features."](https://arxiv.org/abs/1807.05520) ECCV 2018.
+[20] Mathilde Caron et al. ["Deep Clustering for Unsupervised Learning of Visual Features."](https://arxiv.org/abs/1807.05520) ECCV 2018.
 
-\[21\] Prannay Khosla et al. ["Supervised Contrastive Learning."](https://arxiv.org/abs/2004.11362) NeurIPS 2020.
+[21] Prannay Khosla et al. ["Supervised Contrastive Learning."](https://arxiv.org/abs/2004.11362) NeurIPS 2020.
 
-\[22\] Aaron van den Oord, Yazhe Li & Oriol Vinyals. ["Representation Learning with Contrastive Predictive Coding"](https://arxiv.org/abs/1807.03748) arXiv preprint arXiv:1807.03748 (2018).
+[22] Aaron van den Oord, Yazhe Li & Oriol Vinyals. ["Representation Learning with Contrastive Predictive Coding"](https://arxiv.org/abs/1807.03748) arXiv preprint arXiv:1807.03748 (2018).
 
-\[23\] Jason Wei and Kai Zou. ["EDA: Easy data augmentation techniques for boosting performance on text classification tasks."](https://arxiv.org/abs/1901.11196) EMNLP-IJCNLP 2019.
+[23] Jason Wei and Kai Zou. ["EDA: Easy data augmentation techniques for boosting performance on text classification tasks."](https://arxiv.org/abs/1901.11196) EMNLP-IJCNLP 2019.
 
-\[24\] Sosuke Kobayashi. ["Contextual Augmentation: Data Augmentation by Words with Paradigmatic Relations."](https://arxiv.org/abs/1805.06201) NAACL 2018
+[24] Sosuke Kobayashi. ["Contextual Augmentation: Data Augmentation by Words with Paradigmatic Relations."](https://arxiv.org/abs/1805.06201) NAACL 2018
 
-\[25\] Hongchao Fang et al. ["CERT: Contrastive self-supervised learning for language understanding."](https://arxiv.org/abs/2005.12766) arXiv preprint arXiv:2005.12766 (2020).
+[25] Hongchao Fang et al. ["CERT: Contrastive self-supervised learning for language understanding."](https://arxiv.org/abs/2005.12766) arXiv preprint arXiv:2005.12766 (2020).
 
-\[26\] Dinghan Shen et al. ["A Simple but Tough-to-Beat Data Augmentation Approach for Natural Language Understanding and Generation."](https://arxiv.org/abs/2009.13818) arXiv preprint arXiv:2009.13818 (2020) \[[code](https://github.com/dinghanshen/cutoff)\]
+[26] Dinghan Shen et al. ["A Simple but Tough-to-Beat Data Augmentation Approach for Natural Language Understanding and Generation."](https://arxiv.org/abs/2009.13818) arXiv preprint arXiv:2009.13818 (2020) [[code](https://github.com/dinghanshen/cutoff)]
 
-\[27\] Tianyu Gao et al. ["SimCSE: Simple Contrastive Learning of Sentence Embeddings."](https://arxiv.org/abs/2104.08821) arXiv preprint arXiv:2104.08821 (2020). \[[code](https://github.com/princeton-nlp/SimCSE)\]
+[27] Tianyu Gao et al. ["SimCSE: Simple Contrastive Learning of Sentence Embeddings."](https://arxiv.org/abs/2104.08821) arXiv preprint arXiv:2104.08821 (2020). [[code](https://github.com/princeton-nlp/SimCSE)]
 
-\[28\] Nils Reimers and Iryna Gurevych. ["Sentence-BERT: Sentence embeddings using Siamese BERT-networks."](https://arxiv.org/abs/1908.10084) EMNLP 2019.
+[28] Nils Reimers and Iryna Gurevych. ["Sentence-BERT: Sentence embeddings using Siamese BERT-networks."](https://arxiv.org/abs/1908.10084) EMNLP 2019.
 
-\[29\] Jianlin Su et al. ["Whitening sentence representations for better semantics and faster retrieval."](https://arxiv.org/abs/2103.15316) arXiv preprint arXiv:2103.15316 (2021). \[[code](https://github.com/bojone/BERT-whitening)\]
+[29] Jianlin Su et al. ["Whitening sentence representations for better semantics and faster retrieval."](https://arxiv.org/abs/2103.15316) arXiv preprint arXiv:2103.15316 (2021). [[code](https://github.com/bojone/BERT-whitening)]
 
-\[30\] Yan Zhang et al. ["An unsupervised sentence embedding method by mutual information maximization."](https://arxiv.org/abs/2009.12061) EMNLP 2020. \[[code](https://github.com/yanzhangnlp/IS-BERT)\]
+[30] Yan Zhang et al. ["An unsupervised sentence embedding method by mutual information maximization."](https://arxiv.org/abs/2009.12061) EMNLP 2020. [[code](https://github.com/yanzhangnlp/IS-BERT)]
 
-\[31\] Bohan Li et al. ["On the sentence embeddings from pre-trained language models."](https://arxiv.org/abs/2011.05864) EMNLP 2020.
+[31] Bohan Li et al. ["On the sentence embeddings from pre-trained language models."](https://arxiv.org/abs/2011.05864) EMNLP 2020.
 
-\[32\] Lajanugen Logeswaran and Honglak Lee. ["An efficient framework for learning sentence representations."](https://arxiv.org/abs/1803.02893) ICLR 2018.
+[32] Lajanugen Logeswaran and Honglak Lee. ["An efficient framework for learning sentence representations."](https://arxiv.org/abs/1803.02893) ICLR 2018.
 
-\[33\] Joshua Robinson, et al. ["Contrastive Learning with Hard Negative Samples."](https://arxiv.org/abs/2010.04592) ICLR 2021.
+[33] Joshua Robinson, et al. ["Contrastive Learning with Hard Negative Samples."](https://arxiv.org/abs/2010.04592) ICLR 2021.
 
-\[34\] Ching-Yao Chuang et al. ["Debiased Contrastive Learning."](https://arxiv.org/abs/2007.00224) NeuriPS 2020.
+[34] Ching-Yao Chuang et al. ["Debiased Contrastive Learning."](https://arxiv.org/abs/2007.00224) NeuriPS 2020.

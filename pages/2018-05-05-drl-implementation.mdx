@@ -26,7 +26,7 @@ Table of Contents
 
 The full implementation is available in [lilianweng/deep-reinforcement-learning-gym](https://github.com/lilianweng/deep-reinforcement-learning-gym)
 
-In the previous two posts, I have introduced the algorithms of many deep reinforcement learning models. Now it is the time to get our hands dirty and practice how to implement the models in the wild. The implementation is gonna be built in Tensorflow and OpenAI [gym](https://github.com/openai/gym) environment. The full version of the code in this tutorial is available in [\[lilian/deep-reinforcement-learning-gym\]](https://github.com/lilianweng/deep-reinforcement-learning-gym).
+In the previous two posts, I have introduced the algorithms of many deep reinforcement learning models. Now it is the time to get our hands dirty and practice how to implement the models in the wild. The implementation is gonna be built in Tensorflow and OpenAI [gym](https://github.com/openai/gym) environment. The full version of the code in this tutorial is available in [[lilian/deep-reinforcement-learning-gym]](https://github.com/lilianweng/deep-reinforcement-learning-gym).
 
 # Environment Setup[#](#environment-setup)
 
@@ -52,7 +52,7 @@ In the previous two posts, I have introduced the algorithms of many deep reinfor
     pyenv activate workspace
 ```
 
-_\[\*\] For every new installation below, please make sure you are in the virtualenv._
+_[\*] For every new installation below, please make sure you are in the virtualenv._
 
 2.  Install OpenAI gym according to the [instruction](https://github.com/openai/gym#installation). For a minimal installation, run:
 
@@ -219,7 +219,7 @@ Often we start with a high `epsilon` and gradually decrease it during the traini
 
 The main loss function looks like the following,
 
-$$\begin{aligned} & Y(s, a, r, s') = r + \gamma \max_{a'} Q_{\theta^{-}}(s', a') \\ & \mathcal{L}(\theta) = \mathbb{E}_{(s, a, r, s') \sim U(D)} \Big\[ \big( Y(s, a, r, s') - Q_\theta(s, a) \big)^2 \Big\] \end{aligned}$$
+$$\begin{aligned} & Y(s, a, r, s') = r + \gamma \max_{a'} Q_{\theta^{-}}(s', a') \\ & \mathcal{L}(\theta) = \mathbb{E}_{(s, a, r, s') \sim U(D)} \Big[ \big( Y(s, a, r, s') - Q_\theta(s, a) \big)^2 \Big] \end{aligned}$$
 
 The Q network can be a multi-layer dense neural network, a convolutional network, or a recurrent network, depending on the problem. In the [full implementation](https://github.com/lilianweng/deep-reinforcement-learning-gym/blob/master/playground/policies/dqn.py) of the DQN policy, it is determined by the `model_type` parameter, one of ("dense", "conv", "lstm").
 
@@ -497,12 +497,12 @@ The tensorboard graph is always helpful: ![](assets/images/2018-05-05-drl-implem
 
 # References[#](#references)
 
-\[1\] [Tensorflow API Docs](https://www.tensorflow.org/api_docs/)
+[1] [Tensorflow API Docs](https://www.tensorflow.org/api_docs/)
 
-\[2\] Christopher JCH Watkins, and Peter Dayan. ["Q-learning."](https://link.springer.com/content/pdf/10.1007/BF00992698.pdf) Machine learning 8.3-4 (1992): 279-292.
+[2] Christopher JCH Watkins, and Peter Dayan. ["Q-learning."](https://link.springer.com/content/pdf/10.1007/BF00992698.pdf) Machine learning 8.3-4 (1992): 279-292.
 
-\[3\] Hado Van Hasselt, Arthur Guez, and David Silver. ["Deep Reinforcement Learning with Double Q-Learning."](https://arxiv.org/pdf/1509.06461.pdf) AAAI. Vol. 16. 2016.
+[3] Hado Van Hasselt, Arthur Guez, and David Silver. ["Deep Reinforcement Learning with Double Q-Learning."](https://arxiv.org/pdf/1509.06461.pdf) AAAI. Vol. 16. 2016.
 
-\[4\] Hado van Hasselt. ["Double Q-learning."](http://papers.nips.cc/paper/3964-double-q-learning.pdf) NIPS, 23:2613-2621, 2010.
+[4] Hado van Hasselt. ["Double Q-learning."](http://papers.nips.cc/paper/3964-double-q-learning.pdf) NIPS, 23:2613-2621, 2010.
 
-\[5\] Ziyu Wang, et al. [Dueling network architectures for deep reinforcement learning.](https://arxiv.org/pdf/1511.06581.pdf) ICML. 2016.
+[5] Ziyu Wang, et al. [Dueling network architectures for deep reinforcement learning.](https://arxiv.org/pdf/1511.06581.pdf) ICML. 2016.

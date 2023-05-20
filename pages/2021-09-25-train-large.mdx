@@ -121,7 +121,7 @@ Let's take the transformer as an example given its popularity. The transformer m
 
 A MLP layer in a transformer contains a GEMM (General matrix multiply) followed by an non-linear GeLU transfer. Let's split weight matrix $A$ by column:
 
-$$\begin{aligned} \text{Split }A &= \[A_1, A_2\] \\ Y &=\text{GeLU}(XA) \\ \[Y_1, Y_2\] &= \[\text{GeLU}(XA_1), \text{GeLU}(XA_2)\] \end{aligned}$$
+$$\begin{aligned} \text{Split }A &= [A_1, A_2] \\ Y &=\text{GeLU}(XA) \\ [Y_1, Y_2] &= [\text{GeLU}(XA_1), \text{GeLU}(XA_2)] \end{aligned}$$
 
 The attention block runs GEMM with query ($Q$), key ($K$), and value weights ($V$) according to the above partitioning in parallel and then combines them with another GEMM to produce the attention head results.
 
@@ -209,13 +209,13 @@ Both GShard top-2 and Switch Transformer top-1 depend on _token choice_, where e
 
 Given $e$ experts and an input matrix $X \in \mathbb{R}^{n \times d}$, the token-to-expert affinity scores are computed by:$$S = \text{softmax}(X \cdot W_g), \text{where } W_g \in \mathbb{R}^{d \times e}, S \in \mathbb{R}^{n \times e}$$
 
-A token-to-expert assignment is represented by three matrices, $I, G \in \mathbb{R}^{e\times k}$ and $P \in \mathbb{R}^{e \times k \times n}$. $I\[i,j\]$ annotates which token is the $j$-th selection by the $i$-th expert. The gating matrix $G$ stores the routing weights of selected tokens. $P$ is the one-hot version of $I$, used to produce the input matrix ($P \cdot X \in \mathbb{R}^{e \times k \times d}$) for the gated FFN layer.$$G, I = \text{top-k}(S^\top, k)\quad P = \text{one-hot}(I)$$
+A token-to-expert assignment is represented by three matrices, $I, G \in \mathbb{R}^{e\times k}$ and $P \in \mathbb{R}^{e \times k \times n}$. $I[i,j]$ annotates which token is the $j$-th selection by the $i$-th expert. The gating matrix $G$ stores the routing weights of selected tokens. $P$ is the one-hot version of $I$, used to produce the input matrix ($P \cdot X \in \mathbb{R}^{e \times k \times d}$) for the gated FFN layer.$$G, I = \text{top-k}(S^\top, k)\quad P = \text{one-hot}(I)$$
 
 One regularization that export choice routing explored is to limit the maximum number of experts per token.
 
-$$\begin{aligned} & \max_A \langle S^\top, A\rangle + \lambda H(A) \\ \text{s.t.} & \forall i: \sum_{j'} A\[i, j'\] = k,\quad \forall j: \sum_{i'} A\[i', j\] \leq b,\quad \forall i,j: 0 \leq A\[i,j\] \leq 1 \end{aligned}$$
+$$\begin{aligned} & \max_A \langle S^\top, A\rangle + \lambda H(A) \\ \text{s.t.} & \forall i: \sum_{j'} A[i, j'] = k,\quad \forall j: \sum_{i'} A[i', j] \leq b,\quad \forall i,j: 0 \leq A[i,j] \leq 1 \end{aligned}$$
 
-where each entry $A\[i,j\]$ in $A \in \mathbb{R}^{e \times n}$ marks whether the $i$-the expert selects the $j$-th token. Solving this is non-trivial. The paper used [Dykstra's algorithm](https://projecteuclid.org/journals/annals-of-probability/volume-13/issue-3/An-Iterative-Procedure-for-Obtaining-I-Projections-onto-the-Intersection/10.1214/aop/1176992918.full) that runs a sequence of multiple iterative computation steps. Capped expert choice results in a slight decrease in the fine-tuning performance in the experiments.
+where each entry $A[i,j]$ in $A \in \mathbb{R}^{e \times n}$ marks whether the $i$-the expert selects the $j$-th token. Solving this is non-trivial. The paper used [Dykstra's algorithm](https://projecteuclid.org/journals/annals-of-probability/volume-13/issue-3/An-Iterative-Procedure-for-Obtaining-I-Projections-onto-the-Intersection/10.1214/aop/1176992918.full) that runs a sequence of multiple iterative computation steps. Capped expert choice results in a slight decrease in the fine-tuning performance in the experiments.
 
 The parameter $k$ is determined by $k=nc/e$, where $n$ is the total number of tokens in one batch and $c$ is a capacity factor indicating the average number of experts used by one token. The paper used $c=2$ in most experiments, but EC with $c=1$ still outperforms the top-1 token choice gating. Interestingly, $c=0.5$ only marginally hurts the training performance.
 
@@ -303,36 +303,36 @@ Or
 ```
 # References[#](#references)
 
-\[1\] Li et al. ["PyTorch Distributed: Experiences on Accelerating Data Parallel Training"](https://arxiv.org/abs/2006.15704) VLDB 2020.
+[1] Li et al. ["PyTorch Distributed: Experiences on Accelerating Data Parallel Training"](https://arxiv.org/abs/2006.15704) VLDB 2020.
 
-\[2\] Cui et al. ["GeePS: Scalable deep learning on distributed GPUs with a GPU-specialized parameter server"](https://www.pdl.cmu.edu/PDL-FTP/CloudComputing/GeePS-cui-eurosys16.pdf) EuroSys 2016
+[2] Cui et al. ["GeePS: Scalable deep learning on distributed GPUs with a GPU-specialized parameter server"](https://www.pdl.cmu.edu/PDL-FTP/CloudComputing/GeePS-cui-eurosys16.pdf) EuroSys 2016
 
-\[3\] Shoeybi et al. ["Megatron-LM: Training Multi-Billion Parameter Language Models Using Model Parallelism."](https://arxiv.org/abs/1909.08053) arXiv preprint arXiv:1909.08053 (2019).
+[3] Shoeybi et al. ["Megatron-LM: Training Multi-Billion Parameter Language Models Using Model Parallelism."](https://arxiv.org/abs/1909.08053) arXiv preprint arXiv:1909.08053 (2019).
 
-\[4\] Narayanan et al. ["Efficient Large-Scale Language Model Training on GPU Clusters Using Megatron-LM."](https://arxiv.org/abs/2104.04473) arXiv preprint arXiv:2104.04473 (2021).
+[4] Narayanan et al. ["Efficient Large-Scale Language Model Training on GPU Clusters Using Megatron-LM."](https://arxiv.org/abs/2104.04473) arXiv preprint arXiv:2104.04473 (2021).
 
-\[5\] Huang et al. ["GPipe: Efficient Training of Giant Neural Networks using Pipeline Parallelism."](https://arxiv.org/abs/1811.06965) arXiv preprint arXiv:1811.06965 (2018).
+[5] Huang et al. ["GPipe: Efficient Training of Giant Neural Networks using Pipeline Parallelism."](https://arxiv.org/abs/1811.06965) arXiv preprint arXiv:1811.06965 (2018).
 
-\[6\] Narayanan et al. ["PipeDream: Generalized Pipeline Parallelism for DNN Training."](https://cs.stanford.edu/~matei/papers/2019/sosp_pipedream.pdf) SOSP 2019.
+[6] Narayanan et al. ["PipeDream: Generalized Pipeline Parallelism for DNN Training."](https://cs.stanford.edu/~matei/papers/2019/sosp_pipedream.pdf) SOSP 2019.
 
-\[7\] Narayanan et al. ["Memory-Efficient Pipeline-Parallel DNN Training."](https://arxiv.org/abs/2006.09503) ICML 2021.
+[7] Narayanan et al. ["Memory-Efficient Pipeline-Parallel DNN Training."](https://arxiv.org/abs/2006.09503) ICML 2021.
 
-\[8\] Shazeer et al. ["The Sparsely-Gated Mixture-of-Experts Layer Noam."](https://arxiv.org/abs/1701.06538) arXiv preprint arXiv:1701.06538 (2017).
+[8] Shazeer et al. ["The Sparsely-Gated Mixture-of-Experts Layer Noam."](https://arxiv.org/abs/1701.06538) arXiv preprint arXiv:1701.06538 (2017).
 
-\[9\] Lepikhin et al. ["GShard: Scaling Giant Models with Conditional Computation and Automatic Sharding."](https://arxiv.org/abs/2006.16668) arXiv preprint arXiv:2006.16668 (2020).
+[9] Lepikhin et al. ["GShard: Scaling Giant Models with Conditional Computation and Automatic Sharding."](https://arxiv.org/abs/2006.16668) arXiv preprint arXiv:2006.16668 (2020).
 
-\[10\] Fedus et al. ["Switch Transformers: Scaling to Trillion Parameter Models with Simple and Efficient Sparsity."](https://arxiv.org/abs/2101.03961) arXiv preprint arXiv:2101.03961 (2021).
+[10] Fedus et al. ["Switch Transformers: Scaling to Trillion Parameter Models with Simple and Efficient Sparsity."](https://arxiv.org/abs/2101.03961) arXiv preprint arXiv:2101.03961 (2021).
 
-\[11\] Narang & Micikevicius, et al. ["Mixed precision training."](https://arxiv.org/abs/1710.03740) ICLR 2018.
+[11] Narang & Micikevicius, et al. ["Mixed precision training."](https://arxiv.org/abs/1710.03740) ICLR 2018.
 
-\[12\] Chen et al. 2016 ["Training Deep Nets with Sublinear Memory Cost."](https://arxiv.org/abs/1604.06174) arXiv preprint arXiv:1604.06174 (2016).
+[12] Chen et al. 2016 ["Training Deep Nets with Sublinear Memory Cost."](https://arxiv.org/abs/1604.06174) arXiv preprint arXiv:1604.06174 (2016).
 
-\[13\] Jain et al. ["Gist: Efficient data encoding for deep neural network training."](https://www.microsoft.com/en-us/research/uploads/prod/2018/04/fiddle-gist-isca18.pdf) ISCA 2018.
+[13] Jain et al. ["Gist: Efficient data encoding for deep neural network training."](https://www.microsoft.com/en-us/research/uploads/prod/2018/04/fiddle-gist-isca18.pdf) ISCA 2018.
 
-\[14\] Shazeer & Stern. ["Adafactor: Adaptive learning rates with sublinear memory cost."](https://arxiv.org/abs/1804.04235) arXiv preprint arXiv:1804.04235 (2018).
+[14] Shazeer & Stern. ["Adafactor: Adaptive learning rates with sublinear memory cost."](https://arxiv.org/abs/1804.04235) arXiv preprint arXiv:1804.04235 (2018).
 
-\[15\] Anil et al. ["Memory-Efficient Adaptive Optimization."](https://arxiv.org/abs/1901.11150) arXiv preprint arXiv:1901.11150 (2019).
+[15] Anil et al. ["Memory-Efficient Adaptive Optimization."](https://arxiv.org/abs/1901.11150) arXiv preprint arXiv:1901.11150 (2019).
 
-\[16\] Rajbhandari et al. ["ZeRO: Memory Optimization Towards Training A Trillion Parameter Models Samyam."](https://arxiv.org/abs/1910.02054) arXiv preprint arXiv:1910.02054 (2019).
+[16] Rajbhandari et al. ["ZeRO: Memory Optimization Towards Training A Trillion Parameter Models Samyam."](https://arxiv.org/abs/1910.02054) arXiv preprint arXiv:1910.02054 (2019).
 
-\[17\] Zhou et al. ["Mixture-of-Experts with Expert Choice Routing"](https://arxiv.org/abs/2202.09368) arXiv preprint arXiv:2202.09368 (2022).
+[17] Zhou et al. ["Mixture-of-Experts with Expert Choice Routing"](https://arxiv.org/abs/2202.09368) arXiv preprint arXiv:2202.09368 (2022).

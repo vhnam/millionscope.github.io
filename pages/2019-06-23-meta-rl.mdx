@@ -55,7 +55,7 @@ $$\{\text{input: }(\mathbf{x}^k_i, \mathbf{y}^k_{i-1}) \to \text{label: }\mathbf
 
 Noted that _the last label_ $\mathbf{y}^k_{i-1}$ is also provided as an auxiliary input so that the function can learn the presented mapping.
 
-In the experiment of decoding two-dimensional quadratic functions, $a x_1^2 + b x_2^2 + c x_1 x_2 + d x_1 + e x_2 + f$, with coefficients $a$-$f$ are randomly sampled from \[-1, 1\], this meta-learning system was able to approximate the function after seeing only ~35 examples.
+In the experiment of decoding two-dimensional quadratic functions, $a x_1^2 + b x_2^2 + c x_1 x_2 + d x_1 + e x_2 + f$, with coefficients $a$-$f$ are randomly sampled from [-1, 1], this meta-learning system was able to approximate the function after seeing only ~35 examples.
 
 ## Proposal in 2016[#](#proposal-in-2016)
 
@@ -182,11 +182,11 @@ $$\begin{aligned} J(\tau, \theta, \eta) &= (G^\lambda_\eta(\tau) - v_\theta(s))^
 
 In policy gradient algorithms, the expected total reward is maximized by updating the policy parameters $\theta$ in the direction of estimated gradient ([Schulman et al., 2016](https://arxiv.org/abs/1506.02438)),
 
-$$g = \mathbb{E}\[\sum_{t=0}^\infty \\Psi_t \nabla_\theta \log \pi_\theta (a_t \mid s_t)\]$$
+$$g = \mathbb{E}[\sum_{t=0}^\infty \\Psi_t \nabla_\theta \log \pi_\theta (a_t \mid s_t)]$$
 
 where the candidates for $\\Psi_t$ include the trajectory return $G_t$, the Q value $Q(s_t, a_t)$, or the advantage value $A(s_t, a_t)$. The corresponding surrogate loss function for the policy gradient can be reverse-engineered:
 
-$$L_\text{pg} = \mathbb{E}\[\sum_{t=0}^\infty \\Psi_t \log \pi_\theta (a_t \mid s_t)\]$$
+$$L_\text{pg} = \mathbb{E}[\sum_{t=0}^\infty \\Psi_t \log \pi_\theta (a_t \mid s_t)]$$
 
 This loss function is a measure over a history of trajectories, $(s_0, a_0, r_0, \dots, s_t, a_t, r_t, \dots)$. **Evolved Policy Gradient** (**EPG**; [Houthooft, et al, 2018](https://papers.nips.cc/paper/7785-evolved-policy-gradients.pdf)) takes a step further by defining the policy gradient loss function as a temporal convolution (1-D convolution) over the agent's past experience, $L_\phi$. The parameters $\phi$ of the loss function network are evolved in a way that an agent can achieve higher returns.
 
@@ -249,7 +249,7 @@ Further, **Episodic LSTM** ([Ritter et al., 2018](https://arxiv.org/abs/1805.096
 
 Fig. 7. Illustration of the episodic LSTM architecture. The additional structure of episodic memory is in bold. (Image source: [Ritter et al., 2018](https://arxiv.org/abs/1805.09692))
 
-$$\begin{aligned} \mathbf{c}_t &= \mathbf{i}_t \circ \mathbf{c}_\text{in} + \mathbf{f}_t \circ \mathbf{c}_{t-1} + \color{green}{\mathbf{r}_t \circ \mathbf{c}_\text{ep}} &\\ \mathbf{i}_t &= \sigma(\mathbf{W}_{i} \cdot \[\mathbf{h}_{t-1}, \mathbf{x}_t\] + \mathbf{b}_i) & \\scriptstyle{\text{; input gate}} \\ \mathbf{f}_t &= \sigma(\mathbf{W}_{f} \cdot \[\mathbf{h}_{t-1}, \mathbf{x}_t\] + \mathbf{b}_f) & \\scriptstyle{\text{; forget gate}} \\ \color{green}{\mathbf{r}_t} & \color{green}{=} \color{green}{\sigma(\mathbf{W}_{r} \cdot \[\mathbf{h}_{t-1}, \mathbf{x}_t\] + \mathbf{b}_r)} & \\scriptstyle{\text{; reinstatement gate}} \end{aligned}$$
+$$\begin{aligned} \mathbf{c}_t &= \mathbf{i}_t \circ \mathbf{c}_\text{in} + \mathbf{f}_t \circ \mathbf{c}_{t-1} + \color{green}{\mathbf{r}_t \circ \mathbf{c}_\text{ep}} &\\ \mathbf{i}_t &= \sigma(\mathbf{W}_{i} \cdot [\mathbf{h}_{t-1}, \mathbf{x}_t] + \mathbf{b}_i) & \\scriptstyle{\text{; input gate}} \\ \mathbf{f}_t &= \sigma(\mathbf{W}_{f} \cdot [\mathbf{h}_{t-1}, \mathbf{x}_t] + \mathbf{b}_f) & \\scriptstyle{\text{; forget gate}} \\ \color{green}{\mathbf{r}_t} & \color{green}{=} \color{green}{\sigma(\mathbf{W}_{r} \cdot [\mathbf{h}_{t-1}, \mathbf{x}_t] + \mathbf{b}_r)} & \\scriptstyle{\text{; reinstatement gate}} \end{aligned}$$
 
 where $\mathbf{c}_t$ and $\mathbf{h}_t$ are hidden and cell state at time $t$; $\mathbf{i}_t$, $\mathbf{f}_t$ and $\mathbf{r}_t$ are input, forget and reinstatement gates, respectively; $\mathbf{c}_\text{ep}$ is the retrieved cell state from episodic memory. The newly added episodic memory components are marked in green.
 
@@ -302,9 +302,9 @@ DIAYN, short for "Diversity is all you need", is a framework to encourage a poli
 
 The objective function to maximize is as follows, where the policy entropy is also added to encourage diversity:
 
-$$\begin{aligned} \mathcal{F}(\theta) &= I(S; Z) + H\[A \mid S\] - I(A; Z \mid S) & \\ &= (H(Z) - H(Z \mid S)) + H\[A \mid S\] - (H\[A\mid S\] - H\[A\mid S, Z\]) & \\ &= H\[A\mid S, Z\] \color{green}{- H(Z \mid S) + H(Z)} & \\ &= H\[A\mid S, Z\] + \mathbb{E}_{z\sim p(z), s\sim\rho(s)}\[\log p(z \mid s)\] - \mathbb{E}_{z\sim p(z)}\[\log p(z)\] & \\scriptstyle{\text{; can infer skills from states & p(z) is diverse.}} \\ &\\ge H\[A\mid S, Z\] + \mathbb{E}_{z\sim p(z), s\sim\rho(s)}\[\color{red}{\log D_\phi(z \mid s) - \log p(z)}\] & \\scriptstyle{\text{; according to Jensen's inequality; "pseudo-reward" in red.}} \end{aligned}$$
+$$\begin{aligned} \mathcal{F}(\theta) &= I(S; Z) + H[A \mid S] - I(A; Z \mid S) & \\ &= (H(Z) - H(Z \mid S)) + H[A \mid S] - (H[A\mid S] - H[A\mid S, Z]) & \\ &= H[A\mid S, Z] \color{green}{- H(Z \mid S) + H(Z)} & \\ &= H[A\mid S, Z] + \mathbb{E}_{z\sim p(z), s\sim\rho(s)}[\log p(z \mid s)] - \mathbb{E}_{z\sim p(z)}[\log p(z)] & \\scriptstyle{\text{; can infer skills from states & p(z) is diverse.}} \\ &\\ge H[A\mid S, Z] + \mathbb{E}_{z\sim p(z), s\sim\rho(s)}[\color{red}{\log D_\phi(z \mid s) - \log p(z)}] & \\scriptstyle{\text{; according to Jensen's inequality; "pseudo-reward" in red.}} \end{aligned}$$
 
-where $I(.)$ is mutual information and $H\[.\]$ is entropy measure. We cannot integrate all states to compute $p(z \mid s)$, so approximate it with $D_\phi(z \mid s)$ — that is the diversity-driven discriminator function.
+where $I(.)$ is mutual information and $H[.]$ is entropy measure. We cannot integrate all states to compute $p(z \mid s)$, so approximate it with $D_\phi(z \mid s)$ — that is the diversity-driven discriminator function.
 
 ![](assets/images/2019-06-23-meta-rl/DIAYN.png)
 
@@ -326,38 +326,38 @@ Cited as:
 ```
 # References[#](#references)
 
-\[1\] Richard S. Sutton. ["The Bitter Lesson."](http://incompleteideas.net/IncIdeas/BitterLesson.html) March 13, 2019.
+[1] Richard S. Sutton. ["The Bitter Lesson."](http://incompleteideas.net/IncIdeas/BitterLesson.html) March 13, 2019.
 
-\[2\] Sepp Hochreiter, A. Steven Younger, and Peter R. Conwell. ["Learning to learn using gradient descent."](http://snowedin.net/tmp/Hochreiter2001.pdf) Intl. Conf. on Artificial Neural Networks. 2001.
+[2] Sepp Hochreiter, A. Steven Younger, and Peter R. Conwell. ["Learning to learn using gradient descent."](http://snowedin.net/tmp/Hochreiter2001.pdf) Intl. Conf. on Artificial Neural Networks. 2001.
 
-\[3\] Jane X Wang, et al. ["Learning to reinforcement learn."](https://arxiv.org/abs/1611.05763) arXiv preprint arXiv:1611.05763 (2016).
+[3] Jane X Wang, et al. ["Learning to reinforcement learn."](https://arxiv.org/abs/1611.05763) arXiv preprint arXiv:1611.05763 (2016).
 
-\[4\] Yan Duan, et al. ["RL $^ 2$: Fast Reinforcement Learning via Slow Reinforcement Learning."](https://arxiv.org/abs/1611.02779) ICLR 2017.
+[4] Yan Duan, et al. ["RL $^ 2$: Fast Reinforcement Learning via Slow Reinforcement Learning."](https://arxiv.org/abs/1611.02779) ICLR 2017.
 
-\[5\] Matthew Botvinick, et al. ["Reinforcement Learning, Fast and Slow"](<https://www.cell.com/trends/cognitive-sciences/fulltext/S1364-6613(19)30061-0>) Cell Review, Volume 23, Issue 5, P408-422, May 01, 2019.
+[5] Matthew Botvinick, et al. ["Reinforcement Learning, Fast and Slow"](<https://www.cell.com/trends/cognitive-sciences/fulltext/S1364-6613(19)30061-0>) Cell Review, Volume 23, Issue 5, P408-422, May 01, 2019.
 
-\[6\] Jeff Clune. ["AI-GAs: AI-generating algorithms, an alternate paradigm for producing general artificial intelligence"](https://arxiv.org/abs/1905.10985) arXiv preprint arXiv:1905.10985 (2019).
+[6] Jeff Clune. ["AI-GAs: AI-generating algorithms, an alternate paradigm for producing general artificial intelligence"](https://arxiv.org/abs/1905.10985) arXiv preprint arXiv:1905.10985 (2019).
 
-\[7\] Zhongwen Xu, et al. ["Meta-Gradient Reinforcement Learning"](http://papers.nips.cc/paper/7507-meta-gradient-reinforcement-learning.pdf) NIPS 2018.
+[7] Zhongwen Xu, et al. ["Meta-Gradient Reinforcement Learning"](http://papers.nips.cc/paper/7507-meta-gradient-reinforcement-learning.pdf) NIPS 2018.
 
-\[8\] Rein Houthooft, et al. ["Evolved Policy Gradients."](https://papers.nips.cc/paper/7785-evolved-policy-gradients.pdf) NIPS 2018.
+[8] Rein Houthooft, et al. ["Evolved Policy Gradients."](https://papers.nips.cc/paper/7785-evolved-policy-gradients.pdf) NIPS 2018.
 
-\[9\] Tim Salimans, et al. ["Evolution strategies as a scalable alternative to reinforcement learning."](https://arxiv.org/abs/1703.03864) arXiv preprint arXiv:1703.03864 (2017).
+[9] Tim Salimans, et al. ["Evolution strategies as a scalable alternative to reinforcement learning."](https://arxiv.org/abs/1703.03864) arXiv preprint arXiv:1703.03864 (2017).
 
-\[10\] Abhishek Gupta, et al. ["Meta-Reinforcement Learning of Structured Exploration Strategies."](http://papers.nips.cc/paper/7776-meta-reinforcement-learning-of-structured-exploration-strategies.pdf) NIPS 2018.
+[10] Abhishek Gupta, et al. ["Meta-Reinforcement Learning of Structured Exploration Strategies."](http://papers.nips.cc/paper/7776-meta-reinforcement-learning-of-structured-exploration-strategies.pdf) NIPS 2018.
 
-\[11\] Alexander Pritzel, et al. ["Neural episodic control."](https://arxiv.org/abs/1703.01988) Proc. Intl. Conf. on Machine Learning, Volume 70, 2017.
+[11] Alexander Pritzel, et al. ["Neural episodic control."](https://arxiv.org/abs/1703.01988) Proc. Intl. Conf. on Machine Learning, Volume 70, 2017.
 
-\[12\] Charles Blundell, et al. ["Model-free episodic control."](https://arxiv.org/abs/1606.04460) arXiv preprint arXiv:1606.04460 (2016).
+[12] Charles Blundell, et al. ["Model-free episodic control."](https://arxiv.org/abs/1606.04460) arXiv preprint arXiv:1606.04460 (2016).
 
-\[13\] Samuel Ritter, et al. ["Been there, done that: Meta-learning with episodic recall."](https://arxiv.org/abs/1805.09692) ICML, 2018.
+[13] Samuel Ritter, et al. ["Been there, done that: Meta-learning with episodic recall."](https://arxiv.org/abs/1805.09692) ICML, 2018.
 
-\[14\] Rui Wang et al. ["Paired Open-Ended Trailblazer (POET): Endlessly Generating Increasingly Complex and Diverse Learning Environments and Their Solutions"](https://arxiv.org/abs/1901.01753) arXiv preprint arXiv:1901.01753 (2019).
+[14] Rui Wang et al. ["Paired Open-Ended Trailblazer (POET): Endlessly Generating Increasingly Complex and Diverse Learning Environments and Their Solutions"](https://arxiv.org/abs/1901.01753) arXiv preprint arXiv:1901.01753 (2019).
 
-\[15\] Uber Engineering Blog: ["POET: Endlessly Generating Increasingly Complex and Diverse Learning Environments and their Solutions through the Paired Open-Ended Trailblazer."](https://eng.uber.com/poet-open-ended-deep-learning/) Jan 8, 2019.
+[15] Uber Engineering Blog: ["POET: Endlessly Generating Increasingly Complex and Diverse Learning Environments and their Solutions through the Paired Open-Ended Trailblazer."](https://eng.uber.com/poet-open-ended-deep-learning/) Jan 8, 2019.
 
-\[16\] Abhishek Gupta, et al.["Unsupervised meta-learning for Reinforcement Learning"](https://arxiv.org/abs/1806.04640) arXiv preprint arXiv:1806.04640 (2018).
+[16] Abhishek Gupta, et al.["Unsupervised meta-learning for Reinforcement Learning"](https://arxiv.org/abs/1806.04640) arXiv preprint arXiv:1806.04640 (2018).
 
-\[17\] Eysenbach, Benjamin, et al. ["Diversity is all you need: Learning skills without a reward function."](https://arxiv.org/abs/1802.06070) ICLR 2019.
+[17] Eysenbach, Benjamin, et al. ["Diversity is all you need: Learning skills without a reward function."](https://arxiv.org/abs/1802.06070) ICLR 2019.
 
-\[18\] Max Jaderberg, et al. ["Population Based Training of Neural Networks."](https://arxiv.org/abs/1711.09846) arXiv preprint arXiv:1711.09846 (2017).
+[18] Max Jaderberg, et al. ["Population Based Training of Neural Networks."](https://arxiv.org/abs/1711.09846) arXiv preprint arXiv:1711.09846 (2017).

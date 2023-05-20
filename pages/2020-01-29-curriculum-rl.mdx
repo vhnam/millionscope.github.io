@@ -56,10 +56,10 @@ If our naive curriculum is to train the model on samples with a gradually increa
 
 Fig. 2. Image classification accuracy on test image set (5 member classes of "small mammals" in CIFAR100). There are 4 experimental groups, (a) \`curriculum\`: sort the labels by the confidence of another trained classifier (e.g. the margin of an SVM); (b) \`control-curriculum\`: sort the labels randomly; (c) \`anti-curriculum\`: sort the labels reversely; (d) \`None\`: no curriculum. (Image source: [Weinshall, et al. 2018](https://arxiv.org/abs/1802.03796))
 
-[Zaremba & Sutskever (2014)](https://arxiv.org/abs/1410.4615) did an interesting experiment on training LSTM to predict the output of a short Python program for mathematical ops without actually executing the code. They found curriculum is necessary for learning. The program's complexity is controlled by two parameters, `length` ∈ \[1, a\] and `nesting`∈ \[1, b\]. Three strategies are considered:
+[Zaremba & Sutskever (2014)](https://arxiv.org/abs/1410.4615) did an interesting experiment on training LSTM to predict the output of a short Python program for mathematical ops without actually executing the code. They found curriculum is necessary for learning. The program's complexity is controlled by two parameters, `length` ∈ [1, a] and `nesting`∈ [1, b]. Three strategies are considered:
 
 1.  Naive curriculum: increase `length` first until reaching `a`; then increase `nesting` and reset `length` to 1; repeat this process until both reach maximum.
-2.  Mix curriculum: sample `length` ~ \[1, a\] and `nesting` ~ \[1, b\]
+2.  Mix curriculum: sample `length` ~ [1, a] and `nesting` ~ [1, b]
 3.  Combined: naive + mix.
 
 They noticed that combined strategy always outperformed the naive curriculum and would generally (but not always) outperform the mix strategy — indicating that it is quite important to mix in easy tasks during training to _avoid forgetting_.
@@ -147,7 +147,7 @@ Often RL policy needs to be able to perform over a set of tasks. The goal should
 
 The approach of Generative Goal Learning ([Florensa, et al. 2018](https://arxiv.org/abs/1705.06366)) relies on a **Goal GAN** to generate desired goals automatically. In their experiment, the reward is very sparse, just a binary flag for whether a goal is achieved or not and the policy is conditioned on goal,
 
-$$\begin{aligned} \pi^{\*}(a_t\vert s_t, g) &= \arg\max_\pi \mathbb{E}_{g\sim p_g(.)} R^g(\pi) \\ \text{where }R^g(\pi) &= \mathbb{E}_\pi(.\mid s_t, g) \mathbf{1}\[\\exists t \in \[1,\dots, T\]: s_t \in S^g\] \end{aligned}$$
+$$\begin{aligned} \pi^{\*}(a_t\vert s_t, g) &= \arg\max_\pi \mathbb{E}_{g\sim p_g(.)} R^g(\pi) \\ \text{where }R^g(\pi) &= \mathbb{E}_\pi(.\mid s_t, g) \mathbf{1}[\\exists t \in [1,\dots, T]: s_t \in S^g] \end{aligned}$$
 
 Here $R^g(\pi)$ is the expected return, also equivalent to the success probability. Given sampled trajectories from the current policy, as long as any state belongs to the goal set, the return will be positive.
 
@@ -169,13 +169,13 @@ The Goal GAN generates a curriculum automatically:
 
 The Goal GAN is constructed similar to LSGAN (Least-Squared GAN; [Mao et al., (2017)](https://arxiv.org/abs/1611.04076)), which has better stability of learning compared to vanilla GAN. According to LSGAN, we should minimize the following losses for $D$ and $G$ respectively:
 
-$$\begin{aligned} \mathcal{L}_\text{LSGAN}(D) &= \frac{1}{2} \mathbb{E}_{g \sim p_\text{data}(g)} \[ (D(g) - b)^2\] + \frac{1}{2} \mathbb{E}_{z \sim p_z(z)} \[ (D(G(z)) - a)^2\] \\ \mathcal{L}_\text{LSGAN}(G) &= \frac{1}{2} \mathbb{E}_{z \sim p_z(z)} \[ (D(G(z)) - c)^2\] \end{aligned}$$
+$$\begin{aligned} \mathcal{L}_\text{LSGAN}(D) &= \frac{1}{2} \mathbb{E}_{g \sim p_\text{data}(g)} [ (D(g) - b)^2] + \frac{1}{2} \mathbb{E}_{z \sim p_z(z)} [ (D(G(z)) - a)^2] \\ \mathcal{L}_\text{LSGAN}(G) &= \frac{1}{2} \mathbb{E}_{z \sim p_z(z)} [ (D(G(z)) - c)^2] \end{aligned}$$
 
 where $a$ is the label for fake data, $b$ for real data, and $c$ is the value that $G$ wants $D$ to believe for fake data. In LSGAN paper's experiments, they used $a=-1, b=1, c=0$.
 
 The Goal GAN introduces an extra binary flag $y_b$ indicating whether a goal $g$ is real ($y_g = 1$) or fake ($y_g = 0$) so that the model can use negative samples for training:
 
-$$\begin{aligned} \mathcal{L}_\text{GoalGAN}(D) &= \frac{1}{2} \mathbb{E}_{g \sim p_\text{data}(g)} \[ (D(g) - b)^2 + (1-y_g) (D(g) - a)^2\] + \frac{1}{2} \mathbb{E}_{z \sim p_z(z)} \[ (D(G(z)) - a)^2\] \\ \mathcal{L}_\text{GoalGAN}(G) &= \frac{1}{2} \mathbb{E}_{z \sim p_z(z)} \[ (D(G(z)) - c)^2\] \end{aligned}$$
+$$\begin{aligned} \mathcal{L}_\text{GoalGAN}(D) &= \frac{1}{2} \mathbb{E}_{g \sim p_\text{data}(g)} [ (D(g) - b)^2 + (1-y_g) (D(g) - a)^2] + \frac{1}{2} \mathbb{E}_{z \sim p_z(z)} [ (D(G(z)) - a)^2] \\ \mathcal{L}_\text{GoalGAN}(G) &= \frac{1}{2} \mathbb{E}_{z \sim p_z(z)} [ (D(G(z)) - c)^2] \end{aligned}$$
 
 ![](assets/images/2020-01-29-curriculum-rl/generative-goal-learning-algorithm.png)
 
@@ -192,16 +192,16 @@ The generator is optimized with three objectives:
 1.  Goal **validity**: The proposed goal should be achievable by an expert policy. The corresponding generative loss is designed to increase the likelihood of generating goals that the solver policy has achieved before (like in [HER](https://arxiv.org/abs/1707.01495)).
     - $\mathcal{L}_\text{val}$ is the negative log-likelihood of generated goals that have been solved by the solver in the past.
 
-$$\begin{align\*} \mathcal{L}_\text{val} = \mathbb{E}_{\\substack{ g \sim \text{ achieved by solver}, \\ \\xi \in \text{Uniform}(0, \delta), \\ f \in \text{Uniform}(0, 1) }} \big\[ -\log p(G^{-1}(g + \\xi, f)) \big\] \end{align\*}$$
+$$\begin{align\*} \mathcal{L}_\text{val} = \mathbb{E}_{\\substack{ g \sim \text{ achieved by solver}, \\ \\xi \in \text{Uniform}(0, \delta), \\ f \in \text{Uniform}(0, 1) }} \big[ -\log p(G^{-1}(g + \\xi, f)) \big] \end{align\*}$$
 
 2.  Goal **feasibility**: The proposed goal should be achievable by the current policy; that is, the level of difficulty should be appropriate.
     - $\mathcal{L}_\text{feas}$ is the output probability by the judge model $D$ on the generated goal $G(z, f)$ should match the desired $f$.
 
-$$\begin{align\*} \mathcal{L}_\text{feas} = \mathbb{E}_{\\substack{ z \in \mathcal{N}(0, 1), \\ f \in \text{Uniform}(0, 1) }} \big\[ D(G(z, f)) - \sigma^{-1}(f)^2 \big\] \end{align\*}$$
+$$\begin{align\*} \mathcal{L}_\text{feas} = \mathbb{E}_{\\substack{ z \in \mathcal{N}(0, 1), \\ f \in \text{Uniform}(0, 1) }} \big[ D(G(z, f)) - \sigma^{-1}(f)^2 \big] \end{align\*}$$
 
 3.  Goal **coverage**: We should maximize the entropy of generated goals to encourage diverse goal and to improve the coverage over the goal space.
 
-$$\begin{align\*} \mathcal{L}_\text{cov} = \mathbb{E}_{\\substack{ z \in \mathcal{N}(0, 1), \\ f \in \text{Uniform}(0, 1) }} \big\[ \log p(G(z, f)) \big\] \end{align\*}$$
+$$\begin{align\*} \mathcal{L}_\text{cov} = \mathbb{E}_{\\substack{ z \in \mathcal{N}(0, 1), \\ f \in \text{Uniform}(0, 1) }} \big[ \log p(G(z, f)) \big] \end{align\*}$$
 
 Their experiments showed complex environments require all three losses above. When the environment is changing between episodes, both the goal generator and the discriminator need to be conditioned on environmental observation to produce better results. If there is a desired goal distribution, an additional loss can be added to match a desired goal distribution using Wasserstein distance. Using this loss, the generator can push the solver toward mastering the desired tasks more efficiently.
 
@@ -227,7 +227,7 @@ Let $z$ be a latent task variable and $q_\phi$ be a variational distribution of 
 
 Precisely, given a trajectory $\tau = (s_1,\dots,s_T)$, we would like to find $\phi$ such that
 
-$$\max_\phi \mathbb{E}_{z\sim q_\phi(z)} \big\[ \log q_\phi(\tau \vert z) \big\] = \max_\phi \mathbb{E}_{z\sim q_\phi(z)} \big\[ \sum_{s_i \in \tau} \log q_\phi(s_i \vert z) \big\]$$
+$$\max_\phi \mathbb{E}_{z\sim q_\phi(z)} \big[ \log q_\phi(\tau \vert z) \big] = \max_\phi \mathbb{E}_{z\sim q_\phi(z)} \big[ \sum_{s_i \in \tau} \log q_\phi(s_i \vert z) \big]$$
 
 A simplifying assumption is made here to ignore the order of states in one trajectory.
 
@@ -240,9 +240,9 @@ Given a trajectory $\tau$, it makes sense for the policy to maximize the mutual 
 
 Then we have,
 
-$$\begin{aligned} I(\tau; z) &= \mathcal{H}(z) - \mathcal{H}(z \vert s_1,\dots, s_T) \\ &\\geq \mathbb{E}_{s \in \tau} \[\mathcal{H}(z) - \mathcal{H}(z\vert s)\] & \\scriptstyle{\text{; discard the order of states.}} \\ &= \mathbb{E}_{s \in \tau} \[\mathcal{H}(s_t) - \mathcal{H}(s\vert z)\] & \\scriptstyle{\text{; by definition of MI.}} \\ &= \mathbb{E}_{z\sim q_\phi(z), s\sim \pi_\theta(s|z)} \[\log q_\phi(s|z) - \log \pi_\theta(s)\] \\ &\approx \mathbb{E}_{z\sim q_\phi(z), s\sim \pi_\theta(s|z)} \[\color{green}{\log q_\phi(s|z) - \log q_\phi(s)}\] & \\scriptstyle{\text{; assume learned marginal distr. matches policy.}} \end{aligned}$$
+$$\begin{aligned} I(\tau; z) &= \mathcal{H}(z) - \mathcal{H}(z \vert s_1,\dots, s_T) \\ &\\geq \mathbb{E}_{s \in \tau} [\mathcal{H}(z) - \mathcal{H}(z\vert s)] & \\scriptstyle{\text{; discard the order of states.}} \\ &= \mathbb{E}_{s \in \tau} [\mathcal{H}(s_t) - \mathcal{H}(s\vert z)] & \\scriptstyle{\text{; by definition of MI.}} \\ &= \mathbb{E}_{z\sim q_\phi(z), s\sim \pi_\theta(s|z)} [\log q_\phi(s|z) - \log \pi_\theta(s)] \\ &\approx \mathbb{E}_{z\sim q_\phi(z), s\sim \pi_\theta(s|z)} [\color{green}{\log q_\phi(s|z) - \log q_\phi(s)}] & \\scriptstyle{\text{; assume learned marginal distr. matches policy.}} \end{aligned}$$
 
-We can set the reward as $\log q_\phi(s \vert z) - \log q_\phi(s)$, as shown in the red part in the equation above. In order to balance between task-specific exploration (as in red below) and latent skill matching (as in blue below) , a parameter $\lambda \in \[0, 1\]$ is added. Each realization of $z \sim q_\phi(z)$ induces a reward function $r_z(s)$ (remember that reward + CMP => MDP) as follows:
+We can set the reward as $\log q_\phi(s \vert z) - \log q_\phi(s)$, as shown in the red part in the equation above. In order to balance between task-specific exploration (as in red below) and latent skill matching (as in blue below) , a parameter $\lambda \in [0, 1]$ is added. Each realization of $z \sim q_\phi(z)$ induces a reward function $r_z(s)$ (remember that reward + CMP => MDP) as follows:
 
 $$\begin{aligned} r_z(s) &= \lambda \log q_\phi(s|z) - \log q_\phi(s) \\ &= \lambda \log q_\phi(s|z) - \log \frac{q_\phi(s|z) q_\phi(z)}{q_\phi(z|s)} \\ &= \lambda \log q_\phi(s|z) - \log q_\phi(s|z) - \log q_\phi(z) + \log q_\phi(z|s) \\ &= (\lambda - 1) \log \color{red}{q_\phi(s|z)} + \color{blue}{\log q_\phi(z|s)} + C \end{aligned}$$
 
@@ -250,11 +250,11 @@ $$\begin{aligned} r_z(s) &= \lambda \log q_\phi(s|z) - \log q_\phi(s) \\ &= \lam
 
 Fig. 9. The algorithm of CARML. (Image source: [Jabri, et al 2019](https://arxiv.org/abs/1912.04226))
 
-Learning a latent skill space can be done in different ways, such as in [Hausman, et al. 2018](https://openreview.net/forum?id=rk07ZXZRb). The goal of their approach is to learn a task-conditioned policy, $\pi(a \vert s, t^{(i)})$, where $t^{(i)}$ is from a discrete list of $N$ tasks, $\mathcal{T} = \[t^{(1)}, \dots, t^{(N)}\]$. However, rather than learning $N$ separate solutions, one per task, it would be nice to learn a latent skill space so that each task could be represented in a distribution over skills and thus skills are _reused between tasks_. The policy is defined as $\pi_\theta(a \vert s,t) = \int \pi_\theta(a \vert z,s,t) p_\phi(z \vert t)\\mathrm{d}z$, where $\pi_\theta$ and $p_\phi$ are policy and embedding networks to learn, respectively. If $z$ is discrete, i.e. drawn from a set of $K$ skills, then the policy becomes a mixture of $K$ sub-policies. The policy training uses [SAC](http://127.0.0.1:4000/lil-log/2018/04/07/policy-gradient-algorithms.html#sac) and the dependency on $z$ is introduced in the entropy term.
+Learning a latent skill space can be done in different ways, such as in [Hausman, et al. 2018](https://openreview.net/forum?id=rk07ZXZRb). The goal of their approach is to learn a task-conditioned policy, $\pi(a \vert s, t^{(i)})$, where $t^{(i)}$ is from a discrete list of $N$ tasks, $\mathcal{T} = [t^{(1)}, \dots, t^{(N)}]$. However, rather than learning $N$ separate solutions, one per task, it would be nice to learn a latent skill space so that each task could be represented in a distribution over skills and thus skills are _reused between tasks_. The policy is defined as $\pi_\theta(a \vert s,t) = \int \pi_\theta(a \vert z,s,t) p_\phi(z \vert t)\\mathrm{d}z$, where $\pi_\theta$ and $p_\phi$ are policy and embedding networks to learn, respectively. If $z$ is discrete, i.e. drawn from a set of $K$ skills, then the policy becomes a mixture of $K$ sub-policies. The policy training uses [SAC](http://127.0.0.1:4000/lil-log/2018/04/07/policy-gradient-algorithms.html#sac) and the dependency on $z$ is introduced in the entropy term.
 
 # Curriculum through Distillation[#](#curriculum-through-distillation)
 
-\[I was thinking of the name of this section for a while, deciding between cloning, inheritance, and distillation. Eventually, I picked distillation because it sounds the coolest B-)\]
+[I was thinking of the name of this section for a while, deciding between cloning, inheritance, and distillation. Eventually, I picked distillation because it sounds the coolest B-)]
 
 The motivation for the **progressive neural network** ([Rusu et al. 2016](https://arxiv.org/abs/1606.04671)) architecture is to efficiently transfer learned skills between different tasks and in the meantime avoid catastrophic forgetting. The curriculum is realized through a set of progressively stacked neural network towers (or "columns", as in the paper).
 
@@ -307,40 +307,40 @@ Or
 
 # References[#](#references)
 
-\[1\] Jeffrey L. Elman. ["Learning and development in neural networks: The importance of starting small."](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.128.4487&rep=rep1&type=pdf) Cognition 48.1 (1993): 71-99.
+[1] Jeffrey L. Elman. ["Learning and development in neural networks: The importance of starting small."](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.128.4487&rep=rep1&type=pdf) Cognition 48.1 (1993): 71-99.
 
-\[2\] Yoshua Bengio, et al. ["Curriculum learning."](https://www.researchgate.net/profile/Y_Bengio/publication/221344862_Curriculum_learning/links/546cd2570cf2193b94c577ac/Curriculum-learning.pdf) ICML 2009.
+[2] Yoshua Bengio, et al. ["Curriculum learning."](https://www.researchgate.net/profile/Y_Bengio/publication/221344862_Curriculum_learning/links/546cd2570cf2193b94c577ac/Curriculum-learning.pdf) ICML 2009.
 
-\[3\] Daphna Weinshall, Gad Cohen, and Dan Amir. ["Curriculum learning by transfer learning: Theory and experiments with deep networks."](https://arxiv.org/abs/1802.03796) ICML 2018.
+[3] Daphna Weinshall, Gad Cohen, and Dan Amir. ["Curriculum learning by transfer learning: Theory and experiments with deep networks."](https://arxiv.org/abs/1802.03796) ICML 2018.
 
-\[4\] Wojciech Zaremba and Ilya Sutskever. ["Learning to execute."](https://arxiv.org/abs/1410.4615) arXiv preprint arXiv:1410.4615 (2014).
+[4] Wojciech Zaremba and Ilya Sutskever. ["Learning to execute."](https://arxiv.org/abs/1410.4615) arXiv preprint arXiv:1410.4615 (2014).
 
-\[5\] Tambet Matiisen, et al. ["Teacher-student curriculum learning."](https://arxiv.org/abs/1707.00183) IEEE Trans. on neural networks and learning systems (2017).
+[5] Tambet Matiisen, et al. ["Teacher-student curriculum learning."](https://arxiv.org/abs/1707.00183) IEEE Trans. on neural networks and learning systems (2017).
 
-\[6\] Alex Graves, et al. ["Automated curriculum learning for neural networks."](https://arxiv.org/abs/1704.03003) ICML 2017.
+[6] Alex Graves, et al. ["Automated curriculum learning for neural networks."](https://arxiv.org/abs/1704.03003) ICML 2017.
 
-\[7\] Remy Portelas, et al. [Teacher algorithms for curriculum learning of Deep RL in continuously parameterized environments](https://arxiv.org/abs/1910.07224). CoRL 2019.
+[7] Remy Portelas, et al. [Teacher algorithms for curriculum learning of Deep RL in continuously parameterized environments](https://arxiv.org/abs/1910.07224). CoRL 2019.
 
-\[8\] Sainbayar Sukhbaatar, et al. ["Intrinsic Motivation and Automatic Curricula via Asymmetric Self-Play."](https://arxiv.org/abs/1703.05407) ICLR 2018.
+[8] Sainbayar Sukhbaatar, et al. ["Intrinsic Motivation and Automatic Curricula via Asymmetric Self-Play."](https://arxiv.org/abs/1703.05407) ICLR 2018.
 
-\[9\] Carlos Florensa, et al. ["Automatic Goal Generation for Reinforcement Learning Agents"](https://arxiv.org/abs/1705.06366) ICML 2019.
+[9] Carlos Florensa, et al. ["Automatic Goal Generation for Reinforcement Learning Agents"](https://arxiv.org/abs/1705.06366) ICML 2019.
 
-\[10\] Sebastien Racaniere & Andrew K. Lampinen, et al. ["Automated Curriculum through Setter-Solver Interactions"](https://arxiv.org/abs/1909.12892) ICLR 2020.
+[10] Sebastien Racaniere & Andrew K. Lampinen, et al. ["Automated Curriculum through Setter-Solver Interactions"](https://arxiv.org/abs/1909.12892) ICLR 2020.
 
-\[11\] Allan Jabri, et al. ["Unsupervised Curricula for Visual Meta-Reinforcement Learning"](https://arxiv.org/abs/1912.04226) NeuriPS 2019.
+[11] Allan Jabri, et al. ["Unsupervised Curricula for Visual Meta-Reinforcement Learning"](https://arxiv.org/abs/1912.04226) NeuriPS 2019.
 
-\[12\] Karol Hausman, et al. ["Learning an Embedding Space for Transferable Robot Skills "](https://openreview.net/forum?id=rk07ZXZRb) ICLR 2018.
+[12] Karol Hausman, et al. ["Learning an Embedding Space for Transferable Robot Skills "](https://openreview.net/forum?id=rk07ZXZRb) ICLR 2018.
 
-\[13\] Josh Merel, et al. ["Reusable neural skill embeddings for vision-guided whole body movement and object manipulation"](https://arxiv.org/abs/1911.06636) arXiv preprint arXiv:1911.06636 (2019).
+[13] Josh Merel, et al. ["Reusable neural skill embeddings for vision-guided whole body movement and object manipulation"](https://arxiv.org/abs/1911.06636) arXiv preprint arXiv:1911.06636 (2019).
 
-\[14\] OpenAI, et al. ["Solving Rubik's Cube with a Robot Hand."](https://arxiv.org/abs/1910.07113) arXiv preprint arXiv:1910.07113 (2019).
+[14] OpenAI, et al. ["Solving Rubik's Cube with a Robot Hand."](https://arxiv.org/abs/1910.07113) arXiv preprint arXiv:1910.07113 (2019).
 
-\[15\] Niels Justesen, et al. ["Illuminating Generalization in Deep Reinforcement Learning through Procedural Level Generation"](https://arxiv.org/abs/1806.10729) NeurIPS 2018 Deep RL Workshop.
+[15] Niels Justesen, et al. ["Illuminating Generalization in Deep Reinforcement Learning through Procedural Level Generation"](https://arxiv.org/abs/1806.10729) NeurIPS 2018 Deep RL Workshop.
 
-\[16\] Karl Cobbe, et al. ["Quantifying Generalization in Reinforcement Learning"](https://arxiv.org/abs/1812.02341) arXiv preprint arXiv:1812.02341 (2018).
+[16] Karl Cobbe, et al. ["Quantifying Generalization in Reinforcement Learning"](https://arxiv.org/abs/1812.02341) arXiv preprint arXiv:1812.02341 (2018).
 
-\[17\] Andrei A. Rusu et al. ["Progressive Neural Networks"](https://arxiv.org/abs/1606.04671) arXiv preprint arXiv:1606.04671 (2016).
+[17] Andrei A. Rusu et al. ["Progressive Neural Networks"](https://arxiv.org/abs/1606.04671) arXiv preprint arXiv:1606.04671 (2016).
 
-\[18\] Andrei A. Rusu et al. ["Sim-to-Real Robot Learning from Pixels with Progressive Nets."](https://arxiv.org/abs/1610.04286) CoRL 2017.
+[18] Andrei A. Rusu et al. ["Sim-to-Real Robot Learning from Pixels with Progressive Nets."](https://arxiv.org/abs/1610.04286) CoRL 2017.
 
-\[19\] Wojciech Marian Czarnecki, et al. ["Mix & Match - Agent Curricula for Reinforcement Learning."](https://arxiv.org/abs/1806.01780) ICML 2018.
+[19] Wojciech Marian Czarnecki, et al. ["Mix & Match - Agent Curricula for Reinforcement Learning."](https://arxiv.org/abs/1806.01780) ICML 2018.

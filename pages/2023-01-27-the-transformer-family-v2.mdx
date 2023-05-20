@@ -146,9 +146,9 @@ See my old [post for other types of attention](https://lilianweng.github.io/post
 
 The **multi-head self-attention** module is a key component in Transformer. Rather than only computing the attention once, the multi-head mechanism splits the inputs into smaller chunks and then computes the scaled dot-product attention over each subspace in parallel. The independent attention outputs are simply concatenated and linearly transformed into expected dimensions.
 
-$$\begin{aligned} \text{MultiHeadAttn}(\mathbf{X}_q, \mathbf{X}_k, \mathbf{X}_v) &= \[\text{head}_1; \dots; \text{head}_h\] \mathbf{W}^o \\ \text{where head}_i &= \text{Attention}(\mathbf{X}_q\mathbf{W}^q_i, \mathbf{X}_k\mathbf{W}^k_i, \mathbf{X}_v\mathbf{W}^v_i) \end{aligned}$$
+$$\begin{aligned} \text{MultiHeadAttn}(\mathbf{X}_q, \mathbf{X}_k, \mathbf{X}_v) &= [\text{head}_1; \dots; \text{head}_h] \mathbf{W}^o \\ \text{where head}_i &= \text{Attention}(\mathbf{X}_q\mathbf{W}^q_i, \mathbf{X}_k\mathbf{W}^k_i, \mathbf{X}_v\mathbf{W}^v_i) \end{aligned}$$
 
-where $\[.;.\]$ is a concatenation operation. $\mathbf{W}^q_i, \mathbf{W}^k_i \in \mathbb{R}^{d \times d_k/h}, \mathbf{W}^v_i \in \mathbb{R}^{d \times d_v/h}$ are weight matrices to map input embeddings of size $L \times d$ into query, key and value matrices. And $\mathbf{W}^o \in \mathbb{R}^{d_v \times d}$ is the output linear transformation. All the weights should be learned during training.
+where $[.;.]$ is a concatenation operation. $\mathbf{W}^q_i, \mathbf{W}^k_i \in \mathbb{R}^{d \times d_k/h}, \mathbf{W}^v_i \in \mathbb{R}^{d \times d_v/h}$ are weight matrices to map input embeddings of size $L \times d$ into query, key and value matrices. And $\mathbf{W}^o \in \mathbb{R}^{d_v \times d}$ is the output linear transformation. All the weights should be learned during training.
 
 ![](assets/images/2023-01-27-the-transformer-family-v2/multi-head-attention.png)
 
@@ -218,7 +218,7 @@ When generalizing to higher dimensional space, RoPE divide the $d$-dimensional s
 
 $$R^d_{\Theta, i} = \begin{bmatrix} \cos i\theta_1 & -\sin i\theta_1 & 0 & 0 & \dots & 0 & 0 \\ \sin i\theta_1 & \cos i\theta_1 & 0 & 0 & \dots & 0 & 0 \\ 0 & 0 & \cos i\theta_2 & -\sin i\theta_2 & \dots & 0 & 0 \\ 0 & 0 & \sin i\theta_1 & \cos i\theta_1 & \dots & 0 & 0 \\ \vdots & \vdots & \vdots & \vdots & \ddots & \vdots & \vdots \\ 0 & 0 & 0 & 0 & \dots & \cos i\theta_{d/2} & -\sin i\theta_{d/2} \\ 0 & 0 & 0 & 0 & \dots & \sin i\theta_{d/2} & \cos i\theta_{d/2} \\ \end{bmatrix}$$
 
-where in the paper we have $\Theta = {\theta_i = 10000^{-2(i-1)/d}, i \in \[1, 2, …, d/2\]}$. Note that this is essentially equivalent to sinusoidal positional encoding but formulated as a rotation matrix.
+where in the paper we have $\Theta = {\theta_i = 10000^{-2(i-1)/d}, i \in [1, 2, …, d/2]}$. Note that this is essentially equivalent to sinusoidal positional encoding but formulated as a rotation matrix.
 
 Then both key and query matrices incorporates the positional information by multiplying with this rotation matrix:
 
@@ -250,9 +250,9 @@ Fig. 5. A comparison between the training phrase of vanilla Transformer & Transf
 
 Let's label the hidden state of the $n$-th layer for the $(\tau + 1)$-th segment in the model as $\mathbf{h}_{\tau+1}^{(n)} \in \mathbb{R}^{L \times d}$. In addition to the hidden state of the last layer for the same segment $\mathbf{h}_{\tau+1}^{(n-1)}$, it also depends on the hidden state of the same layer for the previous segment $\mathbf{h}_{\tau}^{(n)}$. By incorporating information from the previous hidden states, the model extends the attention span much longer in the past, over multiple segments.
 
-$$\begin{aligned} \color{red}{\widetilde{\mathbf{h}}_{\tau+1}^{(n-1)}} &= \[\text{stop-gradient}(\mathbf{h}_{\tau}^{(n-1)}) \circ \mathbf{h}_{\tau+1}^{(n-1)}\] \\ \mathbf{Q}_{\tau+1}^{(n)} &= \mathbf{h}_{\tau+1}^{(n-1)}\mathbf{W}^q \\ \mathbf{K}_{\tau+1}^{(n)} &= \color{red}{\widetilde{\mathbf{h}}_{\tau+1}^{(n-1)}} \mathbf{W}^k \\ \mathbf{V}_{\tau+1}^{(n)} &= \color{red}{\widetilde{\mathbf{h}}_{\tau+1}^{(n-1)}} \mathbf{W}^v \\ \mathbf{h}_{\tau+1}^{(n)} &= \text{transformer-layer}(\mathbf{Q}_{\tau+1}^{(n)}, \mathbf{K}_{\tau+1}^{(n)}, \mathbf{V}_{\tau+1}^{(n)}) \end{aligned}$$
+$$\begin{aligned} \color{red}{\widetilde{\mathbf{h}}_{\tau+1}^{(n-1)}} &= [\text{stop-gradient}(\mathbf{h}_{\tau}^{(n-1)}) \circ \mathbf{h}_{\tau+1}^{(n-1)}] \\ \mathbf{Q}_{\tau+1}^{(n)} &= \mathbf{h}_{\tau+1}^{(n-1)}\mathbf{W}^q \\ \mathbf{K}_{\tau+1}^{(n)} &= \color{red}{\widetilde{\mathbf{h}}_{\tau+1}^{(n-1)}} \mathbf{W}^k \\ \mathbf{V}_{\tau+1}^{(n)} &= \color{red}{\widetilde{\mathbf{h}}_{\tau+1}^{(n-1)}} \mathbf{W}^v \\ \mathbf{h}_{\tau+1}^{(n)} &= \text{transformer-layer}(\mathbf{Q}_{\tau+1}^{(n)}, \mathbf{K}_{\tau+1}^{(n)}, \mathbf{V}_{\tau+1}^{(n)}) \end{aligned}$$
 
-Note that both keys and values rely on extended hidden states, while queries only consume hidden states at the current step. The concatenation operation $\[. \circ .\]$ is along the sequence length dimension. And Transformer-XL needs to use [relative positional encoding](#transformer-xl-encoding) because previous and current segments would be assigned with the same encoding if we encode absolute positions, which is undesired.
+Note that both keys and values rely on extended hidden states, while queries only consume hidden states at the current step. The concatenation operation $[. \circ .]$ is along the sequence length dimension. And Transformer-XL needs to use [relative positional encoding](#transformer-xl-encoding) because previous and current segments would be assigned with the same encoding if we encode absolute positions, which is undesired.
 
 **Compressive Transformer** ([Rae et al. 2019](https://arxiv.org/abs/1911.05507)) extends Transformer-XL by compressing past memories to support longer sequences. It explicitly adds _memory_ slots of size $m_m$ per layer for storing past activations of this layer to preserve long context. When some past activations become old enough, they are compressed and saved in an additional _compressed memory_ of size $m_{cm}$ per layer.
 
@@ -260,7 +260,7 @@ Note that both keys and values rely on extended hidden states, while queries onl
 
 Fig. 6. Compressive transformer maintains two types of memory slots, memory and compressed memory, to support long context. (Image source: [Rae et al. 2019](https://arxiv.org/abs/1911.05507)).
 
-Both memory and compressed memory are FIFO queues. Given the model context length $L$, the compression function of compression rate $c$ is defined as $f_c: \mathbb{R}^{L \times d} \to \mathbb{R}^{\[\frac{L}{c}\] \times d}$, mapping $L$ oldest activations to $\[\frac{L}{c}\]$ compressed memory elements. There are several choices of compression functions:
+Both memory and compressed memory are FIFO queues. Given the model context length $L$, the compression function of compression rate $c$ is defined as $f_c: \mathbb{R}^{L \times d} \to \mathbb{R}^{[\frac{L}{c}] \times d}$, mapping $L$ oldest activations to $[\frac{L}{c}]$ compressed memory elements. There are several choices of compression functions:
 
 1.  Max/mean pooling of kernel and stride size $c$;
 2.  1D convolution with kernel and stride size $c$ (need to learn additional parameters);
@@ -273,7 +273,7 @@ Compressive transformer has two additional training losses:
 
    $$\mathcal{L}_{ac} = \| \textbf{old_mem}^{(i)} - g(\textbf{new_cm}^{(i)}) \|_2$$
 
-    where $g: \mathbb{R}^{\[\frac{L}{c}\] \times d} \to \mathbb{R}^{L \times d}$ reverses the compression function $f$.
+    where $g: \mathbb{R}^{[\frac{L}{c}] \times d} \to \mathbb{R}^{L \times d}$ reverses the compression function $f$.
 
 2.  **Attention-reconstruction loss** (lossy objective) reconstructs content-based attention over memory vs compressed memory and minimize the difference:
 
@@ -293,7 +293,7 @@ Fig. 7. Attention weights with one standard deviation as error bars versus memor
 
 At inference time, the next token probability is a weighted sum of two predictions:
 
-$$\begin{aligned} p(y \vert \mathbf{x}) &= \lambda \\; p_\text{kNN}(y \vert \mathbf{x}) + (1- \lambda) \\; p_\text{LM}(y \vert \mathbf{x}) \\ p_\text{kNN}(y \vert \mathbf{x}) &\\propto \sum_{(k_i, w_i) \in \mathcal{N}} \mathbb{1}\[y = w_i\] \exp(-d(k_i, f(\mathbf{x}))) \end{aligned}$$
+$$\begin{aligned} p(y \vert \mathbf{x}) &= \lambda \\; p_\text{kNN}(y \vert \mathbf{x}) + (1- \lambda) \\; p_\text{LM}(y \vert \mathbf{x}) \\ p_\text{kNN}(y \vert \mathbf{x}) &\\propto \sum_{(k_i, w_i) \in \mathcal{N}} \mathbb{1}[y = w_i] \exp(-d(k_i, f(\mathbf{x}))) \end{aligned}$$
 
 where $\mathcal{N}$ contains a set of nearest neighbor data points retrieved by $k$NN; $d(., .)$ is a distance function such as L2 distance.
 
@@ -340,7 +340,7 @@ $$\begin{aligned} \mathbf{R}^{(i)} &= \alpha_i \mathbf{R} \quad \text{where }R_{
 
 where $\alpha_i$ is a learnable parameters to weight relative distance differently per head where the head is indexed by superscript $^{(i)}$; $\beta_i$ is a learnable parameter to control the upper bound and ascending slope wrt the distance for the $i$-th attention head. The weighting function $f(.)$ is designed in a way that: (1) $f(0)=1$; (2) $f(\mathbf{R}^{(i)}) = 0$ when $\mathbf{R}^{(i)} \to -\infty$; (3) $f(\mathbf{R}^{(i)})$ is bounded when $\mathbf{R}^{(i)} \to +\infty$; (4) the scale is tunable; (5) and the function is monotonic. The extra time complexity brought by $f(\mathbf{R}^{(i)})$ is $\mathcal{O}(L^2)$ and it is small relative to the self attention time complexity $\mathcal{O}(L^2 d)$. The extra memory consumption is minimal, ~$\mathcal{O}(2h)$.
 
-Instead of multipliers, _ALiBi_ ([Press et al. 2022](https://arxiv.org/abs/2108.12409)) adds a constant bias term on query-key attention scores, proportional to pairwise distances. The bias introduces a strong recency preference and penalizes keys that are too far away. The penalties are increased at different rates within different heads.$$\text{softmax}(\mathbf{q}_i \mathbf{K}^\top + \alpha_i \cdot \[0, -1, -2, \dots, -(i-1)\])$$where $\alpha_i$ is a head-specific weighting scalar. Different from DA-transformer, $\alpha_i$ is not learned but fixed as a geometric sequence; for example, for 8 heads, ${\alpha_i} = {\frac{1}{2}, \frac{1}{2^2}, \dots, \frac{1}{2^8}}$. The overall idea is very much similar to what relative positional encoding aims to solve.
+Instead of multipliers, _ALiBi_ ([Press et al. 2022](https://arxiv.org/abs/2108.12409)) adds a constant bias term on query-key attention scores, proportional to pairwise distances. The bias introduces a strong recency preference and penalizes keys that are too far away. The penalties are increased at different rates within different heads.$$\text{softmax}(\mathbf{q}_i \mathbf{K}^\top + \alpha_i \cdot [0, -1, -2, \dots, -(i-1)])$$where $\alpha_i$ is a head-specific weighting scalar. Different from DA-transformer, $\alpha_i$ is not learned but fixed as a geometric sequence; for example, for 8 heads, ${\alpha_i} = {\frac{1}{2}, \frac{1}{2^2}, \dots, \frac{1}{2^8}}$. The overall idea is very much similar to what relative positional encoding aims to solve.
 
 ![](assets/images/2023-01-27-the-transformer-family-v2/ALiBi-bias.png)
 
@@ -396,7 +396,7 @@ Given the $i$-th token, we need to compute the attention weights between this to
 
 $$\begin{aligned} e_{ij} &= \mathbf{q}_i {\mathbf{k}_j}^\top \\ a_{ij} &= \text{softmax}(e_{ij}) = \frac{\exp(e_{ij})}{\sum_{r=i-s}^{i-1} \exp(e_{ir})} \\ \mathbf{y}_i &= \sum_{r=i-s}^{i-1}a_{ir}\mathbf{v}_r = \sum_{r=i-s}^{i-1}a_{ir}\mathbf{x}_r\mathbf{W}^v \end{aligned}$$
 
-A _soft mask function_ $m_z$ is added to control for an effective adjustable attention span, which maps the distance between query and key into a \[0, 1\] value. $m_z$ is parameterized by $z \in \[0, s\]$ and $z$ is to be learned:
+A _soft mask function_ $m_z$ is added to control for an effective adjustable attention span, which maps the distance between query and key into a [0, 1] value. $m_z$ is parameterized by $z \in [0, s]$ and $z$ is to be learned:
 
 $$m_z(x) = \text{clip}(\frac{1}{R}(R+z-x), 0, 1)$$
 
@@ -445,7 +445,7 @@ Fig. 16. Illustration of three types of adaptive depth classifiers.
 
 3.  _Token-specific depth classifier (geometric-like)_: A binary exit prediction distribution is made per layer per token, $\mathcal{X}^n_t$. The RBF kernel $\kappa(t, t') = \exp(\frac{\vert t - t' \vert^2}{\sigma})$ is used to smooth the predictions to incorporate the impact of current decision on future time steps.
 
-   $$\begin{aligned} \mathcal{X}^n_t &= \text{sigmoid}(\mathbf{w}_n^\top \mathbf{h}^n_t + b_n)\quad \forall n \in \[1, \dots, N-1\] \\ q_t(n \vert \mathbf{x}, \mathbf{y}_{< t}) &= \begin{cases} \mathcal{X}^n_t \prod_{n' < n} (1 - \mathcal{X}^{n'}_t) & \text{if } n < N\\ \prod_{n' < N} (1 - \mathcal{X}^{n'}_t) & \text{otherwise} \end{cases} \\ q_\text{lik}^\*(\mathbf{x}, \mathbf{y}) &= \delta(\arg\max_n \widetilde{\text{LL}}^n_t - \lambda n) \text{ where } \widetilde{\text{LL}}^n_t = \sum_{t'=1}^{\vert\mathbf{y}\vert}\kappa(t, t') LL^n_{t'} \\ \text{or }q_\text{cor}^\*(\mathbf{x}, \mathbf{y}) &= \delta(\arg\max_n \tilde{C}_t^n - \lambda n) \text{ where }C_t^n = \mathbb{1}\[y_t = \arg\max_y p(y \vert \mathbf{h}^n_{t-1})\],\\; \tilde{C}^n_t = \sum_{t'=1}^{\vert\mathbf{y}\vert}\kappa(t, t') C^n_{t'} \\ \end{aligned}$$
+   $$\begin{aligned} \mathcal{X}^n_t &= \text{sigmoid}(\mathbf{w}_n^\top \mathbf{h}^n_t + b_n)\quad \forall n \in [1, \dots, N-1] \\ q_t(n \vert \mathbf{x}, \mathbf{y}_{< t}) &= \begin{cases} \mathcal{X}^n_t \prod_{n' < n} (1 - \mathcal{X}^{n'}_t) & \text{if } n < N\\ \prod_{n' < N} (1 - \mathcal{X}^{n'}_t) & \text{otherwise} \end{cases} \\ q_\text{lik}^\*(\mathbf{x}, \mathbf{y}) &= \delta(\arg\max_n \widetilde{\text{LL}}^n_t - \lambda n) \text{ where } \widetilde{\text{LL}}^n_t = \sum_{t'=1}^{\vert\mathbf{y}\vert}\kappa(t, t') LL^n_{t'} \\ \text{or }q_\text{cor}^\*(\mathbf{x}, \mathbf{y}) &= \delta(\arg\max_n \tilde{C}_t^n - \lambda n) \text{ where }C_t^n = \mathbb{1}[y_t = \arg\max_y p(y \vert \mathbf{h}^n_{t-1})],\\; \tilde{C}^n_t = \sum_{t'=1}^{\vert\mathbf{y}\vert}\kappa(t, t') C^n_{t'} \\ \end{aligned}$$
 
 At inference time, the confidence threshold for making an exit decision needs to be calibrated. Depth-adaptive transformer finds such a threshold on a validation set via grid search. _CALM_ ([Schuster et al. 2022](https://arxiv.org/abs/2207.07061)) applied the Learn then Test (LTT) framework ([Angelopoulos et al. 2021](https://arxiv.org/abs/2110.01052)) to identify a subset of valid thresholds and chose the minimum value as the threshold for inference. Except for training per-layer exit classifier, CALM also explored other methods for adaptive depth prediction, including the softmax responses (i.e. difference between top two softmax outputs) and hidden state saturation (i.e. $\cos(\mathbf{h}^n_t, \mathbf{h}^{n+1}_t)$) as confidence scores for exit decisions. They found softmax responses result in best inference speedup.
 
@@ -578,7 +578,7 @@ Reformer proposed two main changes:
 
 In $\mathbf{Q} \mathbf{K}^\top$ part of the [attention formula](#attention-and-self-attention), we are only interested in the largest elements as only large elements contribute a lot after softmax. For each query $\mathbf{q}_i \in \mathbf{Q}$, we are looking for row vectors in $\mathbf{K}$ closest to $\mathbf{q}_i$. In order to find nearest neighbors quickly in high-dimensional space, Reformer incorporates [Locality-Sensitive Hashing (LSH)](https://en.wikipedia.org/wiki/Locality-sensitive_hashing) into its attention mechanism.
 
-A hashing scheme $x \mapsto h(x)$ is _locality-sensitive_ if it preserves the distancing information between data points, such that close vectors obtain similar hashes while distant vectors have very different ones. The Reformer adopts a hashing scheme as such, given a fixed random matrix $\mathbf{R} \in \mathbb{R}^{d \times b/2}$ (where $b$ is a hyperparam), the hash function is $h(x) = \arg\max(\[xR; -xR\])$.
+A hashing scheme $x \mapsto h(x)$ is _locality-sensitive_ if it preserves the distancing information between data points, such that close vectors obtain similar hashes while distant vectors have very different ones. The Reformer adopts a hashing scheme as such, given a fixed random matrix $\mathbf{R} \in \mathbb{R}^{d \times b/2}$ (where $b$ is a hyperparam), the hash function is $h(x) = \arg\max([xR; -xR])$.
 
 ![](assets/images/2023-01-27-the-transformer-family-v2/LSH-attention-matrix.png)
 
@@ -613,7 +613,7 @@ $$Y_1 = X_1 + \text{Attention}(X_2), \\; Y_2 = X_2 + \text{FeedForward}(Y_1)$$
 
 The memory can be further reduced by chunking the feed-forward computation:
 
-$$Y_2 = \[Y_2^{(1)}; \dots; Y_2^{(c)}\] = \[X_2^{(1)} + \text{FeedForward}(Y_1^{(1)}); \dots; X_2^{(c)} + \text{FeedForward}(Y_1^{(c)})\]$$
+$$Y_2 = [Y_2^{(1)}; \dots; Y_2^{(c)}] = [X_2^{(1)} + \text{FeedForward}(Y_1^{(1)}); \dots; X_2^{(c)} + \text{FeedForward}(Y_1^{(c)})]$$
 
 The resulting reversible Transformer does not need to store activation in every layer.
 
@@ -645,9 +645,9 @@ The main theorem behind RFA is from [Rahimi & Recht, 2007](https://people.eecs.b
 
 > Let $\phi: \mathbb{R}^d \to \mathbb{R}^{2D}$ be a nonlinear transformation:
 >
->$$\phi(\mathbf{x}) = \frac{1}{\sqrt{D}}\[\sin(\mathbf{w}_1^\top \mathbf{x}), \dots, \sin(\mathbf{w}_D^\top \mathbf{x}), \cos(\mathbf{w}_1^\top \mathbf{x}), \dots, \cos(\mathbf{w}_D^\top \mathbf{x})\]^\top$$
+>$$\phi(\mathbf{x}) = \frac{1}{\sqrt{D}}[\sin(\mathbf{w}_1^\top \mathbf{x}), \dots, \sin(\mathbf{w}_D^\top \mathbf{x}), \cos(\mathbf{w}_1^\top \mathbf{x}), \dots, \cos(\mathbf{w}_D^\top \mathbf{x})]^\top$$
 >
-> When $d$-dimensional random vectors $\mathbf{w}_i$ are i.i.d. from $\mathcal{N}(\mathbf{0}, \sigma^2\mathbf{I}_d)$,$$\mathbb{E}_{\mathbf{w}_i} \[\phi(\mathbf{x}) \cdot \phi(\mathbf{y})\] = \exp(-\frac{\| \mathbf{x} - \mathbf{y} \|^2}{2\sigma^2})$$
+> When $d$-dimensional random vectors $\mathbf{w}_i$ are i.i.d. from $\mathcal{N}(\mathbf{0}, \sigma^2\mathbf{I}_d)$,$$\mathbb{E}_{\mathbf{w}_i} [\phi(\mathbf{x}) \cdot \phi(\mathbf{y})] = \exp(-\frac{\| \mathbf{x} - \mathbf{y} \|^2}{2\sigma^2})$$
 
 An unbiased estimation of $\exp(\mathbf{x} \cdot \mathbf{y})$ is:
 
@@ -726,68 +726,68 @@ Or
 ```
 # References[#](#references)
 
-\[1\] Ashish Vaswani, et al. ["Attention is all you need."](http://papers.nips.cc/paper/7181-attention-is-all-you-need.pdf) NIPS 2017.
+[1] Ashish Vaswani, et al. ["Attention is all you need."](http://papers.nips.cc/paper/7181-attention-is-all-you-need.pdf) NIPS 2017.
 
-\[2\] Rami Al-Rfou, et al. ["Character-level language modeling with deeper self-attention."](https://arxiv.org/abs/1808.04444) AAAI 2019.
+[2] Rami Al-Rfou, et al. ["Character-level language modeling with deeper self-attention."](https://arxiv.org/abs/1808.04444) AAAI 2019.
 
-\[3\] Olah & Carter, ["Attention and Augmented Recurrent Neural Networks"](http://doi.org/10.23915/disti), Distill, 2016.
+[3] Olah & Carter, ["Attention and Augmented Recurrent Neural Networks"](http://doi.org/10.23915/disti), Distill, 2016.
 
-\[4\] Sainbayar Sukhbaatar, et al. ["Adaptive Attention Span in Transformers"](https://arxiv.org/abs/1905.07799). ACL 2019.
+[4] Sainbayar Sukhbaatar, et al. ["Adaptive Attention Span in Transformers"](https://arxiv.org/abs/1905.07799). ACL 2019.
 
-\[5\] Rewon Child, et al. ["Generating Long Sequences with Sparse Transformers"](https://arxiv.org/abs/1904.10509) arXiv:1904.10509 (2019).
+[5] Rewon Child, et al. ["Generating Long Sequences with Sparse Transformers"](https://arxiv.org/abs/1904.10509) arXiv:1904.10509 (2019).
 
-\[6\] Nikita Kitaev, et al. ["Reformer: The Efficient Transformer"](https://arxiv.org/abs/2001.04451) ICLR 2020.
+[6] Nikita Kitaev, et al. ["Reformer: The Efficient Transformer"](https://arxiv.org/abs/2001.04451) ICLR 2020.
 
-\[7\] Alex Graves. ("Adaptive Computation Time for Recurrent Neural Networks")\[https://arxiv.org/abs/1603.08983\]
+[7] Alex Graves. ("Adaptive Computation Time for Recurrent Neural Networks")[https://arxiv.org/abs/1603.08983]
 
-\[8\] Niki Parmar, et al. ["Image Transformer"](https://arxiv.org/abs/1802.05751) ICML 2018.
+[8] Niki Parmar, et al. ["Image Transformer"](https://arxiv.org/abs/1802.05751) ICML 2018.
 
-\[9\] Zihang Dai, et al. ["Transformer-XL: Attentive Language Models Beyond a Fixed-Length Context."](https://arxiv.org/abs/1901.02860) ACL 2019.
+[9] Zihang Dai, et al. ["Transformer-XL: Attentive Language Models Beyond a Fixed-Length Context."](https://arxiv.org/abs/1901.02860) ACL 2019.
 
-\[10\] Aidan N. Gomez, et al. ["The Reversible Residual Network: Backpropagation Without Storing Activations"](https://arxiv.org/abs/1707.04585) NIPS 2017.
+[10] Aidan N. Gomez, et al. ["The Reversible Residual Network: Backpropagation Without Storing Activations"](https://arxiv.org/abs/1707.04585) NIPS 2017.
 
-\[11\] Mostafa Dehghani, et al. ["Universal Transformers"](https://arxiv.org/abs/1807.03819) ICLR 2019.
+[11] Mostafa Dehghani, et al. ["Universal Transformers"](https://arxiv.org/abs/1807.03819) ICLR 2019.
 
-\[12\] Emilio Parisotto, et al. ["Stabilizing Transformers for Reinforcement Learning"](https://arxiv.org/abs/1910.06764) arXiv:1910.06764 (2019).
+[12] Emilio Parisotto, et al. ["Stabilizing Transformers for Reinforcement Learning"](https://arxiv.org/abs/1910.06764) arXiv:1910.06764 (2019).
 
-\[13\] Rae et al. ["Compressive Transformers for Long-Range Sequence Modelling."](https://arxiv.org/abs/1911.05507) 2019.
+[13] Rae et al. ["Compressive Transformers for Long-Range Sequence Modelling."](https://arxiv.org/abs/1911.05507) 2019.
 
-\[14\] Press et al. ["Train Short, Test Long: Attention With Linear Biases Enables Input Length Extrapolation."](https://arxiv.org/abs/2108.12409) ICLR 2022.
+[14] Press et al. ["Train Short, Test Long: Attention With Linear Biases Enables Input Length Extrapolation."](https://arxiv.org/abs/2108.12409) ICLR 2022.
 
-\[15\] Wu, et al. ["DA-Transformer: Distance Aware Transformer"](https://aclanthology.org/2021.naacl-main.166) 2021.
+[15] Wu, et al. ["DA-Transformer: Distance Aware Transformer"](https://aclanthology.org/2021.naacl-main.166) 2021.
 
-\[16\] Elabyad et al. ["Depth-Adaptive Transformer."](https://arxiv.org/abs/1910.10073) ICLR 2020.
+[16] Elabyad et al. ["Depth-Adaptive Transformer."](https://arxiv.org/abs/1910.10073) ICLR 2020.
 
-\[17\] Schuster et al. ["Confident Adaptive Language Modeling"](https://arxiv.org/abs/2207.07061) 2022.
+[17] Schuster et al. ["Confident Adaptive Language Modeling"](https://arxiv.org/abs/2207.07061) 2022.
 
-\[18\] Qiu et al. ["Blockwise self-attention for long document understanding"](https://arxiv.org/abs/1911.02972) 2019
+[18] Qiu et al. ["Blockwise self-attention for long document understanding"](https://arxiv.org/abs/1911.02972) 2019
 
-\[19\] Roy et al. ["Efficient Content-Based Sparse Attention with Routing Transformers."](https://arxiv.org/abs/2003.05997) 2021.
+[19] Roy et al. ["Efficient Content-Based Sparse Attention with Routing Transformers."](https://arxiv.org/abs/2003.05997) 2021.
 
-\[20\] Ainslie et al. ["ETC: Encoding Long and Structured Inputs in Transformers."](https://aclanthology.org/2020.emnlp-main.19/) EMNLP 2019.
+[20] Ainslie et al. ["ETC: Encoding Long and Structured Inputs in Transformers."](https://aclanthology.org/2020.emnlp-main.19/) EMNLP 2019.
 
-\[21\] Beltagy et al. ["Longformer: The long-document transformer."](https://arxiv.org/abs/2004/05150) 2020.
+[21] Beltagy et al. ["Longformer: The long-document transformer."](https://arxiv.org/abs/2004/05150) 2020.
 
-\[22\] Zaheer et al. ["Big Bird: Transformers for Longer Sequences."](https://arxiv.org/abs/2007.14062) 2020.
+[22] Zaheer et al. ["Big Bird: Transformers for Longer Sequences."](https://arxiv.org/abs/2007.14062) 2020.
 
-\[23\] Wang et al. ["Linformer: Self-Attention with Linear Complexity."](https://arxiv.org/abs/2006.04768) arXiv preprint arXiv:2006.04768 (2020).
+[23] Wang et al. ["Linformer: Self-Attention with Linear Complexity."](https://arxiv.org/abs/2006.04768) arXiv preprint arXiv:2006.04768 (2020).
 
-\[24\] Tay et al. 2020 ["Sparse Sinkhorn Attention."](https://arxiv.org/abs/2002.11296) ICML 2020.
+[24] Tay et al. 2020 ["Sparse Sinkhorn Attention."](https://arxiv.org/abs/2002.11296) ICML 2020.
 
-\[25\] Peng et al. ["Random Feature Attention."](https://arxiv.org/abs/2103.02143) ICLR 2021.
+[25] Peng et al. ["Random Feature Attention."](https://arxiv.org/abs/2103.02143) ICLR 2021.
 
-\[26\] Choromanski et al. ["Rethinking Attention with Performers."](https://arxiv.org/abs/2009.14794) ICLR 2021.
+[26] Choromanski et al. ["Rethinking Attention with Performers."](https://arxiv.org/abs/2009.14794) ICLR 2021.
 
-\[27\] Khandelwal et al. ["Generalization through memorization: Nearest neighbor language models."](https://arxiv.org/abs/1911.00172) ICLR 2020.
+[27] Khandelwal et al. ["Generalization through memorization: Nearest neighbor language models."](https://arxiv.org/abs/1911.00172) ICLR 2020.
 
-\[28\] Yogatama et al. ["Adaptive semiparametric language models."](https://arxiv.org/abs/2102.02557) ACL 2021.
+[28] Yogatama et al. ["Adaptive semiparametric language models."](https://arxiv.org/abs/2102.02557) ACL 2021.
 
-\[29\] Wu et al. ["Memorizing Transformers."](https://arxiv.org/abs/2203.08913) ICLR 2022.
+[29] Wu et al. ["Memorizing Transformers."](https://arxiv.org/abs/2203.08913) ICLR 2022.
 
-\[30\] Su et al. ["Roformer: Enhanced transformer with rotary position embedding."](https://arxiv.org/abs/2104.09864) arXiv preprint arXiv:2104.09864 (2021).
+[30] Su et al. ["Roformer: Enhanced transformer with rotary position embedding."](https://arxiv.org/abs/2104.09864) arXiv preprint arXiv:2104.09864 (2021).
 
-\[31\] Shaw et al. ["Self-attention with relative position representations."](https://arxiv.org/abs/1803.02155) arXiv preprint arXiv:1803.02155 (2018).
+[31] Shaw et al. ["Self-attention with relative position representations."](https://arxiv.org/abs/1803.02155) arXiv preprint arXiv:1803.02155 (2018).
 
-\[32\] Tay et al. ["Efficient Transformers: A Survey."](https://arxiv.org/abs/2009.06732) ACM Computing Surveys 55.6 (2022): 1-28.
+[32] Tay et al. ["Efficient Transformers: A Survey."](https://arxiv.org/abs/2009.06732) ACM Computing Surveys 55.6 (2022): 1-28.
 
-\[33\] Chen et al., ["Decision Transformer: Reinforcement Learning via Sequence Modeling"](https://arxiv.org/abs/2106.01345) arXiv preprint arXiv:2106.01345 (2021).
+[33] Chen et al., ["Decision Transformer: Reinforcement Learning via Sequence Modeling"](https://arxiv.org/abs/2106.01345) arXiv preprint arXiv:2106.01345 (2021).

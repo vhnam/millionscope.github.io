@@ -36,7 +36,7 @@ Table of Contents
 
 This post only focuses on prompt engineering for autoregressive language models, so nothing with Cloze tests, image generation or multimodality models. At its core, the goal of prompt engineering is about alignment and model steerability. Check my [previous post](https://lilianweng.github.io/posts/2021-01-02-controllable-text-generation/) on controllable text generation.
 
-\[My personal spicy take\] In my opinion, some prompt engineering papers are not worthy 8 pages long, since those tricks can be explained in one or a few sentences and the rest is all about benchmarking. An easy-to-use and shared benchmark infrastructure should be more beneficial to the community. Iterative prompting or external tool use would not be trivial to set up. Also non-trivial to align the whole research community to adopt it.
+[My personal spicy take] In my opinion, some prompt engineering papers are not worthy 8 pages long, since those tricks can be explained in one or a few sentences and the rest is all about benchmarking. An easy-to-use and shared benchmark infrastructure should be more beneficial to the community. Iterative prompting or external tool use would not be trivial to set up. Also non-trivial to align the whole research community to adopt it.
 
 Useful Resources
 
@@ -205,7 +205,7 @@ Prompt is a sequence of prefix tokens that increase the probability of getting d
 **APE** (Automatic Prompt Engineer; [Zhou et al. 2022](https://arxiv.org/abs/2211.01910)) is a method to search over a pool of model-generated instruction candidates and then filters the candidate set according to a chosen score function to ultimately choose the best candidate with highest score.
 
 1.  Prompt LLM to generate instruction candidates based on a small set of demonstrations in the form of input-output pairs. E.g. `{{Given desired input-output pairs}}\n\nThe instruction is`.
-2.  Given a dataset of $\mathcal{D}_\text{train} = \{(x, y)\}$, we would like to find an instruction $\rho$ such that $\rho^\* = \arg\max_\rho \mathbb{E}_{(x, y) \in \mathcal{D}_\text{train}} \[f(\rho, x, y)\]$, where $f(.)$ is a per-sample score function, such as execution accuracy $\mathbb{1}\[\text{LM}(.\vert \rho, x)=y\]$ or log probability: $p_\text{LM}(y \mid \rho, x)$.
+2.  Given a dataset of $\mathcal{D}_\text{train} = \{(x, y)\}$, we would like to find an instruction $\rho$ such that $\rho^\* = \arg\max_\rho \mathbb{E}_{(x, y) \in \mathcal{D}_\text{train}} [f(\rho, x, y)]$, where $f(.)$ is a per-sample score function, such as execution accuracy $\mathbb{1}[\text{LM}(.\vert \rho, x)=y]$ or log probability: $p_\text{LM}(y \mid \rho, x)$.
 3.  Use an iterative Monte Carlo search method to improve the best candidates by proposing semantically similar variants via prompts like `Generate a variation of the following instruction while keeping the semantic meaning.\n\nInput: ...\n\nOutput:...`
 
 To construct chain-of-thought prompts automatically, [Shum et al. (2023)](https://arxiv.org/abs/2302.12822) suggested augment-prune-select, a three-step process:
@@ -312,7 +312,7 @@ Toolformer is trained as follows:
      $$\begin{aligned} e(c) &= \langle\texttt{API}\rangle a_c(i_c) \langle\texttt{/API}\rangle \\ e(c, r) &= \langle\texttt{API}\rangle a_c(i_c) \to r \langle\texttt{/API}\rangle \end{aligned}$$
 
     - Sample API calls based on the probabilities $p_\text{LM}(\langle\texttt{API}\rangle \mid \text{prompt}(\mathbf{x}), \mathbf{x}_{1:i})$ and select top $k$ candidate positions for doing API calls at position $i$ if the probability is larger than a threshold.
-    - Then we sample potential API calls from the LM given the sequence $\[\text{prompt}(\mathbf{x}), x_1, \dots, x_{i-1}, \langle\texttt{API}\rangle\]$ as prefix and $\langle\texttt{/API}\rangle$ as suffix.
+    - Then we sample potential API calls from the LM given the sequence $[\text{prompt}(\mathbf{x}), x_1, \dots, x_{i-1}, \langle\texttt{API}\rangle]$ as prefix and $\langle\texttt{/API}\rangle$ as suffix.
 
 2.  _Filter annotations based on whether API calls help model predict future tokens._ Use a self-supervised loss to decide which API calls are actually helpful.
 
@@ -350,52 +350,52 @@ Or
 
 # References[#](#references)
 
-\[1\] Zhao et al. ["Calibrate Before Use: Improving Few-shot Performance of Language Models."](https://arxiv.org/abs/2102.09690) ICML 2021
+[1] Zhao et al. ["Calibrate Before Use: Improving Few-shot Performance of Language Models."](https://arxiv.org/abs/2102.09690) ICML 2021
 
-\[2\] Liu et al. ["What Makes Good In-Context Examples for GPT-3?"](https://arxiv.org/abs/2101.06804) arXiv preprint arXiv:2101.06804 (2021).
+[2] Liu et al. ["What Makes Good In-Context Examples for GPT-3?"](https://arxiv.org/abs/2101.06804) arXiv preprint arXiv:2101.06804 (2021).
 
-\[3\] Lu et al. ["Fantastically Ordered Prompts and Where to Find Them: Overcoming Few-Shot Prompt Order Sensitivity."](https://arxiv.org/abs/2104.08786) ACL 2022
+[3] Lu et al. ["Fantastically Ordered Prompts and Where to Find Them: Overcoming Few-Shot Prompt Order Sensitivity."](https://arxiv.org/abs/2104.08786) ACL 2022
 
-\[4\] Ye et al. ["In-Context Instruction Learning."](https://arxiv.org/abs/2302.14691) arXiv preprint arXiv:2302.14691 (2023).
+[4] Ye et al. ["In-Context Instruction Learning."](https://arxiv.org/abs/2302.14691) arXiv preprint arXiv:2302.14691 (2023).
 
-\[5\] Su et al. ["Selective annotation makes language models better few-shot learners."](https://arxiv.org/abs/2209.01975) arXiv preprint arXiv:2209.01975 (2022).
+[5] Su et al. ["Selective annotation makes language models better few-shot learners."](https://arxiv.org/abs/2209.01975) arXiv preprint arXiv:2209.01975 (2022).
 
-\[6\] Rubin et al. ["Learning to retrieve prompts for in-context learning."](https://arxiv.org/abs/2112.08633) NAACL-HLT 2022
+[6] Rubin et al. ["Learning to retrieve prompts for in-context learning."](https://arxiv.org/abs/2112.08633) NAACL-HLT 2022
 
-\[7\] Wei et al. ["Chain of thought prompting elicits reasoning in large language models."](https://arxiv.org/abs/2201.11903) NeurIPS 2022
+[7] Wei et al. ["Chain of thought prompting elicits reasoning in large language models."](https://arxiv.org/abs/2201.11903) NeurIPS 2022
 
-\[8\] Wang et al. ["Self-Consistency Improves Chain of Thought Reasoning in Language Models."](https://arxiv.org/abs/2203.11171) ICLR 2023.
+[8] Wang et al. ["Self-Consistency Improves Chain of Thought Reasoning in Language Models."](https://arxiv.org/abs/2203.11171) ICLR 2023.
 
-\[9\] Diao et al. ["Active Prompting with Chain-of-Thought for Large Language Models."](https://arxiv.org/abs/2302.12246) arXiv preprint arXiv:2302.12246 (2023).
+[9] Diao et al. ["Active Prompting with Chain-of-Thought for Large Language Models."](https://arxiv.org/abs/2302.12246) arXiv preprint arXiv:2302.12246 (2023).
 
-\[10\] Zelikman et al. ["STaR: Bootstrapping Reasoning With Reasoning."](https://arxiv.org/abs/2203.14465) arXiv preprint arXiv:2203.14465 (2022).
+[10] Zelikman et al. ["STaR: Bootstrapping Reasoning With Reasoning."](https://arxiv.org/abs/2203.14465) arXiv preprint arXiv:2203.14465 (2022).
 
-\[11\] Ye & Durrett. ["The unreliability of explanations in few-shot in-context learning."](https://arxiv.org/abs/2205.03401) arXiv preprint arXiv:2205.03401 (2022).
+[11] Ye & Durrett. ["The unreliability of explanations in few-shot in-context learning."](https://arxiv.org/abs/2205.03401) arXiv preprint arXiv:2205.03401 (2022).
 
-\[12\] Trivedi et al. ["Interleaving retrieval with chain-of-thought reasoning for knowledge-intensive multi-step questions."](https://arxiv.org/abs/2212.10509) arXiv preprint arXiv:2212.10509 (2022).
+[12] Trivedi et al. ["Interleaving retrieval with chain-of-thought reasoning for knowledge-intensive multi-step questions."](https://arxiv.org/abs/2212.10509) arXiv preprint arXiv:2212.10509 (2022).
 
-\[13\] Press et al. ["Measuring and narrowing the compositionality gap in language models."](https://arxiv.org/abs/2210.03350) arXiv preprint arXiv:2210.03350 (2022).
+[13] Press et al. ["Measuring and narrowing the compositionality gap in language models."](https://arxiv.org/abs/2210.03350) arXiv preprint arXiv:2210.03350 (2022).
 
-\[14\] Yao et al. ["ReAct: Synergizing reasoning and acting in language models."](https://arxiv.org/abs/2210.03629) ICLR 2023.
+[14] Yao et al. ["ReAct: Synergizing reasoning and acting in language models."](https://arxiv.org/abs/2210.03629) ICLR 2023.
 
-\[15\] Fu et al. ["Complexity-based prompting for multi-step reasoning."](https://arxiv.org/abs/2210.00720) arXiv preprint arXiv:2210.00720 (2022).
+[15] Fu et al. ["Complexity-based prompting for multi-step reasoning."](https://arxiv.org/abs/2210.00720) arXiv preprint arXiv:2210.00720 (2022).
 
-\[16\] Wang et al. ["Rationale-augmented ensembles in language models."](https://arxiv.org/abs/2207.00747) arXiv preprint arXiv:2207.00747 (2022).
+[16] Wang et al. ["Rationale-augmented ensembles in language models."](https://arxiv.org/abs/2207.00747) arXiv preprint arXiv:2207.00747 (2022).
 
-\[17\] Zhang et al. ["Automatic chain of thought prompting in large language models."](https://arxiv.org/abs/2210.03493) arXiv preprint arXiv:2210.03493 (2022).
+[17] Zhang et al. ["Automatic chain of thought prompting in large language models."](https://arxiv.org/abs/2210.03493) arXiv preprint arXiv:2210.03493 (2022).
 
-\[18\] Shum et al. ["Automatic Prompt Augmentation and Selection with Chain-of-Thought from Labeled Data."](https://arxiv.org/abs/2302.12822) arXiv preprint arXiv:2302.12822 (2023).
+[18] Shum et al. ["Automatic Prompt Augmentation and Selection with Chain-of-Thought from Labeled Data."](https://arxiv.org/abs/2302.12822) arXiv preprint arXiv:2302.12822 (2023).
 
-\[19\] Zhou et al. ["Large Language Models Are Human-Level Prompt Engineers."](https://arxiv.org/abs/2211.01910) ICLR 2023.
+[19] Zhou et al. ["Large Language Models Are Human-Level Prompt Engineers."](https://arxiv.org/abs/2211.01910) ICLR 2023.
 
-\[20\] Lazaridou et al. ["Internet augmented language models through few-shot prompting for open-domain question answering."](https://arxiv.org/abs/2203.05115) arXiv preprint arXiv:2203.05115 (2022).
+[20] Lazaridou et al. ["Internet augmented language models through few-shot prompting for open-domain question answering."](https://arxiv.org/abs/2203.05115) arXiv preprint arXiv:2203.05115 (2022).
 
-\[21\] Chen et al. ["Program of Thoughts Prompting: Disentangling Computation from Reasoning for Numerical Reasoning Tasks."](https://arxiv.org/abs/2211.12588) arXiv preprint arXiv:2211.12588 (2022).
+[21] Chen et al. ["Program of Thoughts Prompting: Disentangling Computation from Reasoning for Numerical Reasoning Tasks."](https://arxiv.org/abs/2211.12588) arXiv preprint arXiv:2211.12588 (2022).
 
-\[22\] Gao et al. ["PAL: Program-aided language models."](https://arxiv.org/abs/2211.10435) arXiv preprint arXiv:2211.10435 (2022).
+[22] Gao et al. ["PAL: Program-aided language models."](https://arxiv.org/abs/2211.10435) arXiv preprint arXiv:2211.10435 (2022).
 
-\[23\] Parisi et al. ["TALM: Tool Augmented Language Models"](https://arxiv.org/abs/2205.12255) arXiv preprint arXiv:2205.12255 (2022).
+[23] Parisi et al. ["TALM: Tool Augmented Language Models"](https://arxiv.org/abs/2205.12255) arXiv preprint arXiv:2205.12255 (2022).
 
-\[24\] Schick et al. ["Toolformer: Language Models Can Teach Themselves to Use Tools."](https://arxiv.org/abs/2302.04761) arXiv preprint arXiv:2302.04761 (2023).
+[24] Schick et al. ["Toolformer: Language Models Can Teach Themselves to Use Tools."](https://arxiv.org/abs/2302.04761) arXiv preprint arXiv:2302.04761 (2023).
 
-\[25\] Mialon et al. ["Augmented Language Models: a Survey"](https://arxiv.org/abs/2302.07842) arXiv preprint arXiv:2302.07842 (2023).
+[25] Mialon et al. ["Augmented Language Models: a Survey"](https://arxiv.org/abs/2302.07842) arXiv preprint arXiv:2302.07842 (2023).

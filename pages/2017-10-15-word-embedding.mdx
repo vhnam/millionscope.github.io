@@ -59,25 +59,25 @@ Target word
 
 Context
 
-\[The man who\]
+[The man who]
 
 the
 
 man, who
 
-\[The man who passes\]
+[The man who passes]
 
 man
 
 the, who, passes
 
-\[The man who passes the\]
+[The man who passes the]
 
 who
 
 the, man, passes, the
 
-\[man who passes the sentence\]
+[man who passes the sentence]
 
 passes
 
@@ -89,19 +89,19 @@ man, who, the, sentence
 
 …
 
-\[sentence should swing the sword\]
+[sentence should swing the sword]
 
 swing
 
 sentence, should, the, sword
 
-\[should swing the sword\]
+[should swing the sword]
 
 the
 
 should, swing, sword
 
-\[swing the sword\]
+[swing the sword]
 
 sword
 
@@ -201,11 +201,11 @@ The Noise Contrastive Estimation (NCE) metric intends to differentiate the targe
 
 Given an input word $w_I$, the correct output word is known as $w$. In the meantime, we sample $N$ other words from the noise sample distribution $Q$, denoted as $\tilde{w}_1, \tilde{w}_2, \dots, \tilde{w}_N \sim Q$. Let's label the decision of the binary classifier as $d$ and $d$$can only take a binary value.
 
-$$\mathcal{L}_\theta = - \[ \log p(d=1 \vert w, w_I) + \sum_{i=1, \tilde{w}_i \sim Q}^N \log p(d=0|\tilde{w}_i, w_I) \]$$
+$$\mathcal{L}_\theta = - [ \log p(d=1 \vert w, w_I) + \sum_{i=1, \tilde{w}_i \sim Q}^N \log p(d=0|\tilde{w}_i, w_I) ]$$
 
 When $N$ is big enough, according to [the Law of large numbers](https://en.wikipedia.org/wiki/Law_of_large_numbers),
 
-$$\mathcal{L}_\theta = - \[ \log p(d=1 \vert w, w_I) + N\mathbb{E}_{\tilde{w}_i \sim Q} \log p(d=0|\tilde{w}_i, w_I)\]$$
+$$\mathcal{L}_\theta = - [ \log p(d=1 \vert w, w_I) + N\mathbb{E}_{\tilde{w}_i \sim Q} \log p(d=0|\tilde{w}_i, w_I)]$$
 
 To compute the probability $p(d=1 \vert w, w_I)$, we can start with the joint probability $p(d, w \vert w_I)$. Among $w, \tilde{w}_1, \tilde{w}_2, \dots, \tilde{w}_N$, we have 1 out of (N+1) chance to pick the true word $w$, which is sampled from the conditional probability $p(w \vert w_I)$; meanwhile, we have N out of (N+1) chances to pick a noise word, each sampled from $q(\tilde{w}) \sim Q$. Thus,
 
@@ -219,18 +219,18 @@ $$\begin{align} p(d=0 \vert w, w_I) &= \frac{p(d=0, w \vert w_I)}{p(d=1, w \vert
 
 Finally the loss function of NCE's binary classifier becomes:
 
-$$\begin{align} \mathcal{L}_\theta & = - \[ \log p(d=1 \vert w, w_I) + \sum_{\\substack{i=1 \\ \tilde{w}_i \sim Q}}^N \log p(d=0|\tilde{w}_i, w_I)\] \\ & = - \[ \log \frac{p(w \vert w_I)}{p(w \vert w_I) + Nq(\tilde{w})} + \sum_{\\substack{i=1 \\ \tilde{w}_i \sim Q}}^N \log \frac{Nq(\tilde{w}_i)}{p(w \vert w_I) + Nq(\tilde{w}_i)}\] \end{align}$$
+$$\begin{align} \mathcal{L}_\theta & = - [ \log p(d=1 \vert w, w_I) + \sum_{\\substack{i=1 \\ \tilde{w}_i \sim Q}}^N \log p(d=0|\tilde{w}_i, w_I)] \\ & = - [ \log \frac{p(w \vert w_I)}{p(w \vert w_I) + Nq(\tilde{w})} + \sum_{\\substack{i=1 \\ \tilde{w}_i \sim Q}}^N \log \frac{Nq(\tilde{w}_i)}{p(w \vert w_I) + Nq(\tilde{w}_i)}] \end{align}$$
 
 However, $p(w \vert w_I)$ still involves summing up the entire vocabulary in the denominator. Let's label the denominator as a partition function of the input word, $Z(w_I)$. A common assumption is $Z(w) \approx 1$ given that we expect the softmax output layer to be normalized ([Minh and Teh, 2012](https://www.cs.toronto.edu/~amnih/papers/ncelm.pdf)). Then the loss function is simplified to:
 
-$$\mathcal{L}_\theta = - \[ \log \frac{\exp({v'_w}^{\top}{v_{w_I}})}{\exp({v'_w}^{\top}{v_{w_I}}) + Nq(\tilde{w})} + \sum_{\\substack{i=1 \\ \tilde{w}_i \sim Q}}^N \log \frac{Nq(\tilde{w}_i)}{\exp({v'_w}^{\top}{v_{w_I}}) + Nq(\tilde{w}_i)}\]$$
+$$\mathcal{L}_\theta = - [ \log \frac{\exp({v'_w}^{\top}{v_{w_I}})}{\exp({v'_w}^{\top}{v_{w_I}}) + Nq(\tilde{w})} + \sum_{\\substack{i=1 \\ \tilde{w}_i \sim Q}}^N \log \frac{Nq(\tilde{w}_i)}{\exp({v'_w}^{\top}{v_{w_I}}) + Nq(\tilde{w}_i)}]$$
 
 The noise distribution $Q$ is a tunable parameter and we would like to design it in a way so that:
 
 - intuitively it should be very similar to the real data distribution; and
 - it should be easy to sample from.
 
-For example, the sampling implementation ([log_uniform_candidate_sampler](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/python/ops/candidate_sampling_ops.py#L83)) of NCE loss in tensorflow assumes that such noise samples follow a log-uniform distribution, also known as [Zipfian's law](https://en.wikipedia.org/wiki/Zipf%27s_law). The probability of a given word in logarithm is expected to be reversely proportional to its rank, while high-frequency words are assigned with lower ranks. In this case, $q(\tilde{w}) = \frac{1}{ \log V}(\log (r_{\tilde{w}} + 1) - \log r_{\tilde{w}})$, where $r_{\tilde{w}} \in \[1, V\]$ is the rank of a word by frequency in descending order.
+For example, the sampling implementation ([log_uniform_candidate_sampler](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/python/ops/candidate_sampling_ops.py#L83)) of NCE loss in tensorflow assumes that such noise samples follow a log-uniform distribution, also known as [Zipfian's law](https://en.wikipedia.org/wiki/Zipf%27s_law). The probability of a given word in logarithm is expected to be reversely proportional to its rank, while high-frequency words are assigned with lower ranks. In this case, $q(\tilde{w}) = \frac{1}{ \log V}(\log (r_{\tilde{w}} + 1) - \log r_{\tilde{w}})$, where $r_{\tilde{w}} \in [1, V]$ is the rank of a word by frequency in descending order.
 
 ## Negative Sampling (NEG)[#](#negative-sampling-neg)
 
@@ -242,7 +242,7 @@ $$\begin{align} p(d=1 \vert w_, w_I) &= \sigma({v'_{w}}^\top v_{w_I}) \\ p(d=0 \
 
 The final NCE loss function looks like:
 
-$$\mathcal{L}_\theta = - \[ \log \sigma({v'_{w}}^\top v_{w_I}) + \sum_{\\substack{i=1 \\ \tilde{w}_i \sim Q}}^N \log \sigma(-{v'_{\tilde{w}_i}}^\top v_{w_I})\]$$
+$$\mathcal{L}_\theta = - [ \log \sigma({v'_{w}}^\top v_{w_I}) + \sum_{\\substack{i=1 \\ \tilde{w}_i \sim Q}}^N \log \sigma(-{v'_{\tilde{w}_i}}^\top v_{w_I})]$$
 
 # Other Tips for Learning Word Embedding[#](#other-tips-for-learning-word-embedding)
 
@@ -401,24 +401,24 @@ Cited as:
 
 # References[#](#references)
 
-\[1\] Tensorflow Tutorial [Vector Representations of Words](https://www.tensorflow.org/tutorials/word2vec).
+[1] Tensorflow Tutorial [Vector Representations of Words](https://www.tensorflow.org/tutorials/word2vec).
 
-\[2\] ["Word2Vec Tutorial - The Skip-Gram Model"](http://mccormickml.com/2016/04/19/word2vec-tutorial-the-skip-gram-model/) by Chris McCormick.
+[2] ["Word2Vec Tutorial - The Skip-Gram Model"](http://mccormickml.com/2016/04/19/word2vec-tutorial-the-skip-gram-model/) by Chris McCormick.
 
-\[3\] ["On word embeddings - Part 2: Approximating the Softmax"](http://ruder.io/word-embeddings-softmax/) by Sebastian Ruder.
+[3] ["On word embeddings - Part 2: Approximating the Softmax"](http://ruder.io/word-embeddings-softmax/) by Sebastian Ruder.
 
-\[4\] Xin Rong. [word2vec Parameter Learning Explained](https://arxiv.org/pdf/1411.2738.pdf)
+[4] Xin Rong. [word2vec Parameter Learning Explained](https://arxiv.org/pdf/1411.2738.pdf)
 
-\[5\] Mikolov, Tomas, Kai Chen, Greg Corrado, and Jeffrey Dean. ["Efficient estimation of word representations in vector space."](https://arxiv.org/pdf/1301.3781.pdf) arXiv preprint arXiv:1301.3781 (2013).
+[5] Mikolov, Tomas, Kai Chen, Greg Corrado, and Jeffrey Dean. ["Efficient estimation of word representations in vector space."](https://arxiv.org/pdf/1301.3781.pdf) arXiv preprint arXiv:1301.3781 (2013).
 
-\[6\] Frederic Morin and Yoshua Bengio. ["Hierarchical Probabilistic Neural Network Language Model."](https://www.iro.umontreal.ca/~lisa/pointeurs/hierarchical-nnlm-aistats05.pdf) Aistats. Vol. 5. 2005.
+[6] Frederic Morin and Yoshua Bengio. ["Hierarchical Probabilistic Neural Network Language Model."](https://www.iro.umontreal.ca/~lisa/pointeurs/hierarchical-nnlm-aistats05.pdf) Aistats. Vol. 5. 2005.
 
-\[7\] Michael Gutmann and Aapo Hyvärinen. ["Noise-contrastive estimation: A new estimation principle for unnormalized statistical models."](http://proceedings.mlr.press/v9/gutmann10a/gutmann10a.pdf) Proc. Intl. Conf. on Artificial Intelligence and Statistics. 2010.
+[7] Michael Gutmann and Aapo Hyvärinen. ["Noise-contrastive estimation: A new estimation principle for unnormalized statistical models."](http://proceedings.mlr.press/v9/gutmann10a/gutmann10a.pdf) Proc. Intl. Conf. on Artificial Intelligence and Statistics. 2010.
 
-\[8\] Tomas Mikolov, Ilya Sutskever, Kai Chen, Greg Corrado, and Jeffrey Dean. ["Distributed representations of words and phrases and their compositionality."](https://papers.nips.cc/paper/5021-distributed-representations-of-words-and-phrases-and-their-compositionality.pdf) Advances in neural information processing systems. 2013.
+[8] Tomas Mikolov, Ilya Sutskever, Kai Chen, Greg Corrado, and Jeffrey Dean. ["Distributed representations of words and phrases and their compositionality."](https://papers.nips.cc/paper/5021-distributed-representations-of-words-and-phrases-and-their-compositionality.pdf) Advances in neural information processing systems. 2013.
 
-\[9\] Tomas Mikolov, Kai Chen, Greg Corrado, and Jeffrey Dean. ["Efficient estimation of word representations in vector space."](https://arxiv.org/pdf/1301.3781.pdf) arXiv preprint arXiv:1301.3781 (2013).
+[9] Tomas Mikolov, Kai Chen, Greg Corrado, and Jeffrey Dean. ["Efficient estimation of word representations in vector space."](https://arxiv.org/pdf/1301.3781.pdf) arXiv preprint arXiv:1301.3781 (2013).
 
-\[10\] Marco Baroni, Georgiana Dinu, and Germán Kruszewski. ["Don't count, predict! A systematic comparison of context-counting vs. context-predicting semantic vectors."](http://anthology.aclweb.org/P/P14/P14-1023.pdf) ACL (1). 2014.
+[10] Marco Baroni, Georgiana Dinu, and Germán Kruszewski. ["Don't count, predict! A systematic comparison of context-counting vs. context-predicting semantic vectors."](http://anthology.aclweb.org/P/P14/P14-1023.pdf) ACL (1). 2014.
 
-\[11\] Jeffrey Pennington, Richard Socher, and Christopher Manning. ["Glove: Global vectors for word representation."](http://www.aclweb.org/anthology/D14-1162) Proc. Conf. on empirical methods in natural language processing (EMNLP). 2014.
+[11] Jeffrey Pennington, Richard Socher, and Christopher Manning. ["Glove: Global vectors for word representation."](http://www.aclweb.org/anthology/D14-1162) Proc. Conf. on empirical methods in natural language processing (EMNLP). 2014.

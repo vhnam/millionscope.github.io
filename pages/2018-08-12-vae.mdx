@@ -41,7 +41,7 @@ The dataset, $\mathcal{D} = \{ \mathbf{x}^{(1)}, \mathbf{x}^{(2)}, \dots, \mathb
 
 $\mathbf{x}^{(i)}$
 
-Each data point is a vector of $d$ dimensions, $\mathbf{x}^{(i)} = \[x^{(i)}_1, x^{(i)}_2, \dots, x^{(i)}_d\]$.
+Each data point is a vector of $d$ dimensions, $\mathbf{x}^{(i)} = [x^{(i)}_1, x^{(i)}_2, \dots, x^{(i)}_d]$.
 
 $\mathbf{x}$
 
@@ -130,7 +130,7 @@ Recall that common [activation functions](http://cs231n.github.io/neural-network
 
 Let's say there are $s_l$ neurons in the $l$-th hidden layer and the activation function for the $j$-th neuron in this layer is labelled as $a^{(l)}_j(.)$, $j=1, \dots, s_l$. The fraction of activation of this neuron $\hat{\rho}_j$ is expected to be a small number $\rho$, known as _sparsity parameter_; a common config is $\rho = 0.05$.
 
-$$\hat{\rho}_j^{(l)} = \frac{1}{n} \sum_{i=1}^n \[a_j^{(l)}(\mathbf{x}^{(i)})\] \approx \rho$$
+$$\hat{\rho}_j^{(l)} = \frac{1}{n} \sum_{i=1}^n [a_j^{(l)}(\mathbf{x}^{(i)})] \approx \rho$$
 
 This constraint is achieved by adding a penalty term into the loss function. The KL-divergence $D_\text{KL}$ measures the difference between two Bernoulli distributions, one with mean $\rho$ and the other with mean $\hat{\rho}_j^{(l)}$. The hyperparameter $\beta$ controls how strong the penalty we want to apply on the sparsity loss.
 
@@ -215,7 +215,7 @@ Fig. 7. Forward and reversed KL divergence have different demands on how to matc
 
 Let's now expand the equation:
 
-$$\begin{aligned} & D_\text{KL}( q_\phi(\mathbf{z}\vert\mathbf{x}) \| p_\theta(\mathbf{z}\vert\mathbf{x}) ) & \\ &=\int q_\phi(\mathbf{z} \vert \mathbf{x}) \log\frac{q_\phi(\mathbf{z} \vert \mathbf{x})}{p_\theta(\mathbf{z} \vert \mathbf{x})} d\mathbf{z} & \\ &=\int q_\phi(\mathbf{z} \vert \mathbf{x}) \log\frac{q_\phi(\mathbf{z} \vert \mathbf{x})p_\theta(\mathbf{x})}{p_\theta(\mathbf{z}, \mathbf{x})} d\mathbf{z} & \\scriptstyle{\text{; Because }p(z \vert x) = p(z, x) / p(x)} \\ &=\int q_\phi(\mathbf{z} \vert \mathbf{x}) \big( \log p_\theta(\mathbf{x}) + \log\frac{q_\phi(\mathbf{z} \vert \mathbf{x})}{p_\theta(\mathbf{z}, \mathbf{x})} \big) d\mathbf{z} & \\ &=\log p_\theta(\mathbf{x}) + \int q_\phi(\mathbf{z} \vert \mathbf{x})\log\frac{q_\phi(\mathbf{z} \vert \mathbf{x})}{p_\theta(\mathbf{z}, \mathbf{x})} d\mathbf{z} & \\scriptstyle{\text{; Because }\int q(z \vert x) dz = 1}\\ &=\log p_\theta(\mathbf{x}) + \int q_\phi(\mathbf{z} \vert \mathbf{x})\log\frac{q_\phi(\mathbf{z} \vert \mathbf{x})}{p_\theta(\mathbf{x}\vert\mathbf{z})p_\theta(\mathbf{z})} d\mathbf{z} & \\scriptstyle{\text{; Because }p(z, x) = p(x \vert z) p(z)} \\ &=\log p_\theta(\mathbf{x}) + \mathbb{E}_{\mathbf{z}\sim q_\phi(\mathbf{z} \vert \mathbf{x})}\[\log \frac{q_\phi(\mathbf{z} \vert \mathbf{x})}{p_\theta(\mathbf{z})} - \log p_\theta(\mathbf{x} \vert \mathbf{z})\] &\\ &=\log p_\theta(\mathbf{x}) + D_\text{KL}(q_\phi(\mathbf{z}\vert\mathbf{x}) \| p_\theta(\mathbf{z})) - \mathbb{E}_{\mathbf{z}\sim q_\phi(\mathbf{z}\vert\mathbf{x})}\log p_\theta(\mathbf{x}\vert\mathbf{z}) & \end{aligned}$$
+$$\begin{aligned} & D_\text{KL}( q_\phi(\mathbf{z}\vert\mathbf{x}) \| p_\theta(\mathbf{z}\vert\mathbf{x}) ) & \\ &=\int q_\phi(\mathbf{z} \vert \mathbf{x}) \log\frac{q_\phi(\mathbf{z} \vert \mathbf{x})}{p_\theta(\mathbf{z} \vert \mathbf{x})} d\mathbf{z} & \\ &=\int q_\phi(\mathbf{z} \vert \mathbf{x}) \log\frac{q_\phi(\mathbf{z} \vert \mathbf{x})p_\theta(\mathbf{x})}{p_\theta(\mathbf{z}, \mathbf{x})} d\mathbf{z} & \\scriptstyle{\text{; Because }p(z \vert x) = p(z, x) / p(x)} \\ &=\int q_\phi(\mathbf{z} \vert \mathbf{x}) \big( \log p_\theta(\mathbf{x}) + \log\frac{q_\phi(\mathbf{z} \vert \mathbf{x})}{p_\theta(\mathbf{z}, \mathbf{x})} \big) d\mathbf{z} & \\ &=\log p_\theta(\mathbf{x}) + \int q_\phi(\mathbf{z} \vert \mathbf{x})\log\frac{q_\phi(\mathbf{z} \vert \mathbf{x})}{p_\theta(\mathbf{z}, \mathbf{x})} d\mathbf{z} & \\scriptstyle{\text{; Because }\int q(z \vert x) dz = 1}\\ &=\log p_\theta(\mathbf{x}) + \int q_\phi(\mathbf{z} \vert \mathbf{x})\log\frac{q_\phi(\mathbf{z} \vert \mathbf{x})}{p_\theta(\mathbf{x}\vert\mathbf{z})p_\theta(\mathbf{z})} d\mathbf{z} & \\scriptstyle{\text{; Because }p(z, x) = p(x \vert z) p(z)} \\ &=\log p_\theta(\mathbf{x}) + \mathbb{E}_{\mathbf{z}\sim q_\phi(\mathbf{z} \vert \mathbf{x})}[\log \frac{q_\phi(\mathbf{z} \vert \mathbf{x})}{p_\theta(\mathbf{z})} - \log p_\theta(\mathbf{x} \vert \mathbf{z})] &\\ &=\log p_\theta(\mathbf{x}) + D_\text{KL}(q_\phi(\mathbf{z}\vert\mathbf{x}) \| p_\theta(\mathbf{z})) - \mathbb{E}_{\mathbf{z}\sim q_\phi(\mathbf{z}\vert\mathbf{x})}\log p_\theta(\mathbf{x}\vert\mathbf{z}) & \end{aligned}$$
 
 So we have:
 
@@ -265,7 +265,7 @@ For example, a model trained on photos of human faces might capture the gentle, 
 
 β-VAE ([Higgins et al., 2017](https://openreview.net/forum?id=Sy2fzU9gl)) is a modification of Variational Autoencoder with a special emphasis to discover disentangled latent factors. Following the same incentive in VAE, we want to maximize the probability of generating real data, while keeping the distance between the real and estimated posterior distributions small (say, under a small constant $\delta$):
 
-$$\begin{aligned} &\max_{\phi, \theta} \mathbb{E}_{\mathbf{x}\sim\mathcal{D}}\[\mathbb{E}_{\mathbf{z} \sim q_\phi(\mathbf{z}\vert\mathbf{x})} \log p_\theta(\mathbf{x}\vert\mathbf{z})\]\\ &\text{subject to } D_\text{KL}(q_\phi(\mathbf{z}\vert\mathbf{x})\|p_\theta(\mathbf{z})) < \delta \end{aligned}$$
+$$\begin{aligned} &\max_{\phi, \theta} \mathbb{E}_{\mathbf{x}\sim\mathcal{D}}[\mathbb{E}_{\mathbf{z} \sim q_\phi(\mathbf{z}\vert\mathbf{x})} \log p_\theta(\mathbf{x}\vert\mathbf{z})]\\ &\text{subject to } D_\text{KL}(q_\phi(\mathbf{z}\vert\mathbf{x})\|p_\theta(\mathbf{z})) < \delta \end{aligned}$$
 
 We can rewrite it as a Lagrangian with a Lagrangian multiplier $\beta$ under the [KKT condition](https://www.cs.cmu.edu/~ggordon/10725-F12/slides/16-kkt.pdf). The above optimization problem with only one inequality constraint is equivalent to maximizing the following equation $\mathcal{F}(\theta, \phi, \beta)$:
 
@@ -306,9 +306,9 @@ Because argmin() is non-differentiable on a discrete space, the gradients $\nabl
 - _VQ loss_: The L2 error between the embedding space and the encoder outputs.
 - _Commitment loss_: A measure to encourage the encoder output to stay close to the embedding space and to prevent it from fluctuating too frequently from one code vector to another.
 
-$$L = \underbrace{\|\mathbf{x} - D(\mathbf{e}_k)\|_2^2}_{\textrm{reconstruction loss}} + \underbrace{\|\text{sg}\[E(\mathbf{x})\] - \mathbf{e}_k\|_2^2}_{\textrm{VQ loss}} + \underbrace{\beta \|E(\mathbf{x}) - \text{sg}\[\mathbf{e}_k\]\|_2^2}_{\textrm{commitment loss}}$$
+$$L = \underbrace{\|\mathbf{x} - D(\mathbf{e}_k)\|_2^2}_{\textrm{reconstruction loss}} + \underbrace{\|\text{sg}[E(\mathbf{x})] - \mathbf{e}_k\|_2^2}_{\textrm{VQ loss}} + \underbrace{\beta \|E(\mathbf{x}) - \text{sg}[\mathbf{e}_k]\|_2^2}_{\textrm{commitment loss}}$$
 
-where $\text{sq}\[.\]$ is the `stop_gradient` operator.
+where $\text{sq}[.]$ is the `stop_gradient` operator.
 
 The embedding vectors in the codebook is updated through EMA (exponential moving average). Given a code vector $\mathbf{e}_i$, say we have $n_i$ encoder output vectors, $\{\mathbf{z}_{i,j}\}_{j=1}^{n_i}$, that are quantized to $\mathbf{e}_i$:
 
@@ -350,15 +350,15 @@ Further, an agent is expected to imagine distant futures based on all the inform
 
 Recall what we have learned from the variance lower bound [above](#loss-function-elbo):
 
-$$\begin{aligned} \log p(x) &\\geq \log p(x) - D_\text{KL}(q(z|x)\|p(z|x)) \\ &= \mathbb{E}_{z\sim q} \log p(x|z) - D_\text{KL}(q(z|x)\|p(z)) \\ &= \mathbb{E}_{z \sim q} \log p(x|z) - \mathbb{E}_{z \sim q} \log \frac{q(z|x)}{p(z)} \\ &= \mathbb{E}_{z \sim q}\[\log p(x|z) -\log q(z|x) + \log p(z)\] \\ &= \mathbb{E}_{z \sim q}\[\log p(x, z) -\log q(z|x)\] \\ \log p(x) &\\geq \mathbb{E}_{z \sim q}\[\log p(x, z) -\log q(z|x)\] \end{aligned}$$
+$$\begin{aligned} \log p(x) &\\geq \log p(x) - D_\text{KL}(q(z|x)\|p(z|x)) \\ &= \mathbb{E}_{z\sim q} \log p(x|z) - D_\text{KL}(q(z|x)\|p(z)) \\ &= \mathbb{E}_{z \sim q} \log p(x|z) - \mathbb{E}_{z \sim q} \log \frac{q(z|x)}{p(z)} \\ &= \mathbb{E}_{z \sim q}[\log p(x|z) -\log q(z|x) + \log p(z)] \\ &= \mathbb{E}_{z \sim q}[\log p(x, z) -\log q(z|x)] \\ \log p(x) &\\geq \mathbb{E}_{z \sim q}[\log p(x, z) -\log q(z|x)] \end{aligned}$$
 
 Now let's model the distribution of the state $x_t$ as a probability function conditioned on all the past states $x_{<t}$ and two latent variables, $z_t$ and $z_{t-1}$, at current time step and one step back:
 
-$$\log p(x_t|x_{<{t}}) \\geq \mathbb{E}_{(z_{t-1}, z_t) \sim q}\[\log p(x_t, z_{t-1}, z_{t}|x_{<{t}}) -\log q(z_{t-1}, z_t|x_{\leq t})\]$$
+$$\log p(x_t|x_{<{t}}) \\geq \mathbb{E}_{(z_{t-1}, z_t) \sim q}[\log p(x_t, z_{t-1}, z_{t}|x_{<{t}}) -\log q(z_{t-1}, z_t|x_{\leq t})]$$
 
 Continue expanding the equation:
 
-$$\begin{aligned} & \log p(x_t|x_{<{t}}) \\ &\\geq \mathbb{E}_{(z_{t-1}, z_t) \sim q}\[\log p(x_t, z_{t-1}, z_{t}|x_{<{t}}) -\log q(z_{t-1}, z_t|x_{\leq t})\] \\ &\\geq \mathbb{E}_{(z_{t-1}, z_t) \sim q}\[\log p(x_t|\color{red}{z_{t-1}}, z_{t}, \color{red}{x_{<{t}}}) + \color{blue}{\log p(z_{t-1}, z_{t}|x_{<{t}})} -\log q(z_{t-1}, z_t|x_{\leq t})\] \\ &\\geq \mathbb{E}_{(z_{t-1}, z_t) \sim q}\[\log p(x_t|z_{t}) + \color{blue}{\log p(z_{t-1}|x_{<{t}})} + \color{blue}{\log p(z_{t}|z_{t-1})} - \color{green}{\log q(z_{t-1}, z_t|x_{\leq t})}\] \\ &\\geq \mathbb{E}_{(z_{t-1}, z_t) \sim q}\[\log p(x_t|z_{t}) + \log p(z_{t-1}|x_{<{t}}) + \log p(z_{t}|z_{t-1}) - \color{green}{\log q(z_t|x_{\leq t})} - \color{green}{\log q(z_{t-1}|z_t, x_{\leq t})}\] \end{aligned}$$
+$$\begin{aligned} & \log p(x_t|x_{<{t}}) \\ &\\geq \mathbb{E}_{(z_{t-1}, z_t) \sim q}[\log p(x_t, z_{t-1}, z_{t}|x_{<{t}}) -\log q(z_{t-1}, z_t|x_{\leq t})] \\ &\\geq \mathbb{E}_{(z_{t-1}, z_t) \sim q}[\log p(x_t|\color{red}{z_{t-1}}, z_{t}, \color{red}{x_{<{t}}}) + \color{blue}{\log p(z_{t-1}, z_{t}|x_{<{t}})} -\log q(z_{t-1}, z_t|x_{\leq t})] \\ &\\geq \mathbb{E}_{(z_{t-1}, z_t) \sim q}[\log p(x_t|z_{t}) + \color{blue}{\log p(z_{t-1}|x_{<{t}})} + \color{blue}{\log p(z_{t}|z_{t-1})} - \color{green}{\log q(z_{t-1}, z_t|x_{\leq t})}] \\ &\\geq \mathbb{E}_{(z_{t-1}, z_t) \sim q}[\log p(x_t|z_{t}) + \log p(z_{t-1}|x_{<{t}}) + \log p(z_{t}|z_{t-1}) - \color{green}{\log q(z_t|x_{\leq t})} - \color{green}{\log q(z_{t-1}|z_t, x_{\leq t})}] \end{aligned}$$
 
 Notice two things:
 
@@ -391,7 +391,7 @@ Precisely, there are four types of distributions to learn:
 
 To incorporate the idea of jumpy prediction, the sequential ELBO has to not only work on $t, t+1$, but also two distant timestamp $t_1 < t_2$. Here is the final TD-VAE objective function to maximize:
 
-$$J_{t_1, t_2} = \mathbb{E}\[ \log p_D(x_{t_2}|z_{t_2}) + \log p_B(z_{t_1}|b_{t_1}) + \log p_T(z_{t_2}|z_{t_1}) - \log p_B(z_{t_2}|b_{t_2}) - \log p_S(z_{t_1}|z_{t_2}, b_{t_1}, b_{t_2})\]$$
+$$J_{t_1, t_2} = \mathbb{E}[ \log p_D(x_{t_2}|z_{t_2}) + \log p_B(z_{t_1}|b_{t_1}) + \log p_T(z_{t_2}|z_{t_1}) - \log p_B(z_{t_2}|b_{t_2}) - \log p_S(z_{t_1}|z_{t_2}, b_{t_1}, b_{t_2})]$$
 
 ![](assets/images/2018-08-12-vae/TD-VAE.png)
 
@@ -413,38 +413,38 @@ Cited as:
 
 # References[#](#references)
 
-\[1\] Geoffrey E. Hinton, and Ruslan R. Salakhutdinov. ["Reducing the dimensionality of data with neural networks."](https://pdfs.semanticscholar.org/c50d/ca78e97e335d362d6b991ae0e1448914e9a3.pdf) Science 313.5786 (2006): 504-507.
+[1] Geoffrey E. Hinton, and Ruslan R. Salakhutdinov. ["Reducing the dimensionality of data with neural networks."](https://pdfs.semanticscholar.org/c50d/ca78e97e335d362d6b991ae0e1448914e9a3.pdf) Science 313.5786 (2006): 504-507.
 
-\[2\] Pascal Vincent, et al. ["Extracting and composing robust features with denoising autoencoders."](http://www.cs.toronto.edu/~larocheh/publications/icml-2008-denoising-autoencoders.pdf) ICML, 2008.
+[2] Pascal Vincent, et al. ["Extracting and composing robust features with denoising autoencoders."](http://www.cs.toronto.edu/~larocheh/publications/icml-2008-denoising-autoencoders.pdf) ICML, 2008.
 
-\[3\] Pascal Vincent, et al. ["Stacked denoising autoencoders: Learning useful representations in a deep network with a local denoising criterion."](http://www.jmlr.org/papers/volume11/vincent10a/vincent10a.pdf). Journal of machine learning research 11.Dec (2010): 3371-3408.
+[3] Pascal Vincent, et al. ["Stacked denoising autoencoders: Learning useful representations in a deep network with a local denoising criterion."](http://www.jmlr.org/papers/volume11/vincent10a/vincent10a.pdf). Journal of machine learning research 11.Dec (2010): 3371-3408.
 
-\[4\] Geoffrey E. Hinton, Nitish Srivastava, Alex Krizhevsky, Ilya Sutskever, and Ruslan R. Salakhutdinov. "Improving neural networks by preventing co-adaptation of feature detectors." arXiv preprint arXiv:1207.0580 (2012).
+[4] Geoffrey E. Hinton, Nitish Srivastava, Alex Krizhevsky, Ilya Sutskever, and Ruslan R. Salakhutdinov. "Improving neural networks by preventing co-adaptation of feature detectors." arXiv preprint arXiv:1207.0580 (2012).
 
-\[5\] [Sparse Autoencoder](https://web.stanford.edu/class/cs294a/sparseAutoencoder.pdf) by Andrew Ng.
+[5] [Sparse Autoencoder](https://web.stanford.edu/class/cs294a/sparseAutoencoder.pdf) by Andrew Ng.
 
-\[6\] Alireza Makhzani, Brendan Frey (2013). ["k-sparse autoencoder"](https://arxiv.org/abs/1312.5663). ICLR 2014.
+[6] Alireza Makhzani, Brendan Frey (2013). ["k-sparse autoencoder"](https://arxiv.org/abs/1312.5663). ICLR 2014.
 
-\[7\] Salah Rifai, et al. ["Contractive auto-encoders: Explicit invariance during feature extraction."](http://www.icml-2011.org/papers/455_icmlpaper.pdf) ICML, 2011.
+[7] Salah Rifai, et al. ["Contractive auto-encoders: Explicit invariance during feature extraction."](http://www.icml-2011.org/papers/455_icmlpaper.pdf) ICML, 2011.
 
-\[8\] Diederik P. Kingma, and Max Welling. ["Auto-encoding variational bayes."](https://arxiv.org/abs/1312.6114) ICLR 2014.
+[8] Diederik P. Kingma, and Max Welling. ["Auto-encoding variational bayes."](https://arxiv.org/abs/1312.6114) ICLR 2014.
 
-\[9\] [Tutorial - What is a variational autoencoder?](https://jaan.io/what-is-variational-autoencoder-vae-tutorial/) on jaan.io
+[9] [Tutorial - What is a variational autoencoder?](https://jaan.io/what-is-variational-autoencoder-vae-tutorial/) on jaan.io
 
-\[10\] Youtube tutorial: [Variational Autoencoders](https://www.youtube.com/watch?v=9zKuYvjFFS8) by Arxiv Insights
+[10] Youtube tutorial: [Variational Autoencoders](https://www.youtube.com/watch?v=9zKuYvjFFS8) by Arxiv Insights
 
-\[11\] ["A Beginner's Guide to Variational Methods: Mean-Field Approximation"](https://blog.evjang.com/2016/08/variational-bayes.html) by Eric Jang.
+[11] ["A Beginner's Guide to Variational Methods: Mean-Field Approximation"](https://blog.evjang.com/2016/08/variational-bayes.html) by Eric Jang.
 
-\[12\] Carl Doersch. ["Tutorial on variational autoencoders."](https://arxiv.org/abs/1606.05908) arXiv:1606.05908, 2016.
+[12] Carl Doersch. ["Tutorial on variational autoencoders."](https://arxiv.org/abs/1606.05908) arXiv:1606.05908, 2016.
 
-\[13\] Irina Higgins, et al. ["$\beta$-VAE: Learning basic visual concepts with a constrained variational framework."](https://openreview.net/forum?id=Sy2fzU9gl) ICLR 2017.
+[13] Irina Higgins, et al. ["$\beta$-VAE: Learning basic visual concepts with a constrained variational framework."](https://openreview.net/forum?id=Sy2fzU9gl) ICLR 2017.
 
-\[14\] Christopher P. Burgess, et al. ["Understanding disentangling in beta-VAE."](https://arxiv.org/abs/1804.03599) NIPS 2017.
+[14] Christopher P. Burgess, et al. ["Understanding disentangling in beta-VAE."](https://arxiv.org/abs/1804.03599) NIPS 2017.
 
-\[15\] Aaron van den Oord, et al. ["Neural Discrete Representation Learning"](https://arxiv.org/abs/1711.00937) NIPS 2017.
+[15] Aaron van den Oord, et al. ["Neural Discrete Representation Learning"](https://arxiv.org/abs/1711.00937) NIPS 2017.
 
-\[16\] Ali Razavi, et al. ["Generating Diverse High-Fidelity Images with VQ-VAE-2"](https://arxiv.org/abs/1906.00446). arXiv preprint arXiv:1906.00446 (2019).
+[16] Ali Razavi, et al. ["Generating Diverse High-Fidelity Images with VQ-VAE-2"](https://arxiv.org/abs/1906.00446). arXiv preprint arXiv:1906.00446 (2019).
 
-\[17\] Xi Chen, et al. ["PixelSNAIL: An Improved Autoregressive Generative Model."](https://arxiv.org/abs/1712.09763) arXiv preprint arXiv:1712.09763 (2017).
+[17] Xi Chen, et al. ["PixelSNAIL: An Improved Autoregressive Generative Model."](https://arxiv.org/abs/1712.09763) arXiv preprint arXiv:1712.09763 (2017).
 
-\[18\] Karol Gregor, et al. ["Temporal Difference Variational Auto-Encoder."](https://arxiv.org/abs/1806.03107) ICLR 2019.
+[18] Karol Gregor, et al. ["Temporal Difference Variational Auto-Encoder."](https://arxiv.org/abs/1806.03107) ICLR 2019.

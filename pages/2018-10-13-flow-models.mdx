@@ -56,7 +56,7 @@ We should understand two key concepts before getting into the flow-based generat
 
 Given a function of mapping a $n$-dimensional input vector $\mathbf{x}$ to a $m$-dimensional output vector, $\mathbf{f}: \mathbb{R}^n \mapsto \mathbb{R}^m$, the matrix of all first-order partial derivatives of this function is called the **Jacobian matrix**, $\mathbf{J}$ where one entry on the i-th row and j-th column is $\mathbf{J}_{ij} = \frac{\partial f_i}{\partial x_j}$.
 
-$$\mathbf{J} = \begin{bmatrix} \frac{\partial f_1}{\partial x_1} & \dots & \frac{\partial f_1}{\partial x_n} \\\[6pt\] \vdots & \ddots & \vdots \\\[6pt\] \frac{\partial f_m}{\partial x_1} & \dots & \frac{\partial f_m}{\partial x_n} \\\[6pt\] \end{bmatrix}$$
+$$\mathbf{J} = \begin{bmatrix} \frac{\partial f_1}{\partial x_1} & \dots & \frac{\partial f_1}{\partial x_n} \\[6pt] \vdots & \ddots & \vdots \\[6pt] \frac{\partial f_m}{\partial x_1} & \dots & \frac{\partial f_m}{\partial x_n} \\[6pt] \end{bmatrix}$$
 
 The determinant is one real number computed as a function of all the elements in a squared matrix. Note that the determinant _only exists for **square** matrices_. The absolute value of the determinant can be thought of as a measure of _"how much multiplication by the matrix expands or contracts space"._
 
@@ -148,7 +148,7 @@ $$\begin{cases} \mathbf{y}_{1:d} &= \mathbf{x}_{1:d} \\ \mathbf{y}_{d+1:D} &= \m
 
 Yes. It is not hard to get the Jacobian matrix and determinant of this transformation. The Jacobian is a lower triangular matrix.
 
-$$\mathbf{J} = \begin{bmatrix} \mathbb{I}_d & \mathbf{0}_{d\times(D-d)} \\\[5pt\] \frac{\partial \mathbf{y}_{d+1:D}}{\partial \mathbf{x}_{1:d}} & \text{diag}(\exp(s(\mathbf{x}_{1:d}))) \end{bmatrix}$$
+$$\mathbf{J} = \begin{bmatrix} \mathbb{I}_d & \mathbf{0}_{d\times(D-d)} \\[5pt] \frac{\partial \mathbf{y}_{d+1:D}}{\partial \mathbf{x}_{1:d}} & \text{diag}(\exp(s(\mathbf{x}_{1:d}))) \end{bmatrix}$$
 
 Hence the determinant is simply the product of terms on the diagonal.
 
@@ -204,7 +204,7 @@ Fig. 4. Three substeps in one step of flow in Glow. (Image source: [Kingma and D
 
 # Models with Autoregressive Flows[#](#models-with-autoregressive-flows)
 
-The **autoregressive** constraint is a way to model sequential data, $\mathbf{x} = \[x_1, \dots, x_D\]$: each output only depends on the data observed in the past, but not on the future ones. In other words, the probability of observing $x_i$ is conditioned on $x_1, \dots, x_{i-1}$ and the product of these conditional probabilities gives us the probability of observing the full sequence:
+The **autoregressive** constraint is a way to model sequential data, $\mathbf{x} = [x_1, \dots, x_D]$: each output only depends on the data observed in the past, but not on the future ones. In other words, the probability of observing $x_i$ is conditioned on $x_1, \dots, x_{i-1}$ and the product of these conditional probabilities gives us the probability of observing the full sequence:
 
 $$p(\mathbf{x}) = \prod_{i=1}^{D} p(x_i\vert x_1, \dots, x_{i-1}) = \prod_{i=1}^{D} p(x_i\vert x_{1:i-1})$$
 
@@ -377,7 +377,7 @@ In [Variational Autoencoder](https://lilianweng.github.io/posts/2018-08-12-vae/#
 
 ---
 
-_If you notice mistakes and errors in this post, don't hesitate to contact me at \[lilian dot wengweng at gmail dot com\] and I would be very happy to correct them right away!_
+_If you notice mistakes and errors in this post, don't hesitate to contact me at [lilian dot wengweng at gmail dot com] and I would be very happy to correct them right away!_
 
 See you in the next post :D
 
@@ -397,28 +397,28 @@ Cited as:
 
 # Reference[#](#reference)
 
-\[1\] Danilo Jimenez Rezende, and Shakir Mohamed. ["Variational inference with normalizing flows."](https://arxiv.org/abs/1505.05770) ICML 2015.
+[1] Danilo Jimenez Rezende, and Shakir Mohamed. ["Variational inference with normalizing flows."](https://arxiv.org/abs/1505.05770) ICML 2015.
 
-\[2\] [Normalizing Flows Tutorial, Part 1: Distributions and Determinants](https://blog.evjang.com/2018/01/nf1.html) by Eric Jang.
+[2] [Normalizing Flows Tutorial, Part 1: Distributions and Determinants](https://blog.evjang.com/2018/01/nf1.html) by Eric Jang.
 
-\[3\] [Normalizing Flows Tutorial, Part 2: Modern Normalizing Flows](https://blog.evjang.com/2018/01/nf2.html) by Eric Jang.
+[3] [Normalizing Flows Tutorial, Part 2: Modern Normalizing Flows](https://blog.evjang.com/2018/01/nf2.html) by Eric Jang.
 
-\[4\] [Normalizing Flows](http://akosiorek.github.io/ml/2018/04/03/norm_flows.html) by Adam Kosiorek.
+[4] [Normalizing Flows](http://akosiorek.github.io/ml/2018/04/03/norm_flows.html) by Adam Kosiorek.
 
-\[5\] Laurent Dinh, Jascha Sohl-Dickstein, and Samy Bengio. ["Density estimation using Real NVP."](https://arxiv.org/abs/1605.08803) ICLR 2017.
+[5] Laurent Dinh, Jascha Sohl-Dickstein, and Samy Bengio. ["Density estimation using Real NVP."](https://arxiv.org/abs/1605.08803) ICLR 2017.
 
-\[6\] Laurent Dinh, David Krueger, and Yoshua Bengio. ["NICE: Non-linear independent components estimation."](https://arxiv.org/abs/1410.8516) ICLR 2015 Workshop track.
+[6] Laurent Dinh, David Krueger, and Yoshua Bengio. ["NICE: Non-linear independent components estimation."](https://arxiv.org/abs/1410.8516) ICLR 2015 Workshop track.
 
-\[7\] Diederik P. Kingma, and Prafulla Dhariwal. ["Glow: Generative flow with invertible 1x1 convolutions."](https://arxiv.org/abs/1807.03039) arXiv:1807.03039 (2018).
+[7] Diederik P. Kingma, and Prafulla Dhariwal. ["Glow: Generative flow with invertible 1x1 convolutions."](https://arxiv.org/abs/1807.03039) arXiv:1807.03039 (2018).
 
-\[8\] Germain, Mathieu, Karol Gregor, Iain Murray, and Hugo Larochelle. ["Made: Masked autoencoder for distribution estimation."](https://arxiv.org/abs/1502.03509) ICML 2015.
+[8] Germain, Mathieu, Karol Gregor, Iain Murray, and Hugo Larochelle. ["Made: Masked autoencoder for distribution estimation."](https://arxiv.org/abs/1502.03509) ICML 2015.
 
-\[9\] Aaron van den Oord, Nal Kalchbrenner, and Koray Kavukcuoglu. ["Pixel recurrent neural networks."](https://arxiv.org/abs/1601.06759) ICML 2016.
+[9] Aaron van den Oord, Nal Kalchbrenner, and Koray Kavukcuoglu. ["Pixel recurrent neural networks."](https://arxiv.org/abs/1601.06759) ICML 2016.
 
-\[10\] Diederik P. Kingma, et al. ["Improved variational inference with inverse autoregressive flow."](https://arxiv.org/abs/1606.04934) NIPS. 2016.
+[10] Diederik P. Kingma, et al. ["Improved variational inference with inverse autoregressive flow."](https://arxiv.org/abs/1606.04934) NIPS. 2016.
 
-\[11\] George Papamakarios, Iain Murray, and Theo Pavlakou. ["Masked autoregressive flow for density estimation."](https://arxiv.org/abs/1705.07057) NIPS 2017.
+[11] George Papamakarios, Iain Murray, and Theo Pavlakou. ["Masked autoregressive flow for density estimation."](https://arxiv.org/abs/1705.07057) NIPS 2017.
 
-\[12\] Jianlin Su, and Guang Wu. ["f-VAEs: Improve VAEs with Conditional Flows."](https://arxiv.org/abs/1809.05861) arXiv:1809.05861 (2018).
+[12] Jianlin Su, and Guang Wu. ["f-VAEs: Improve VAEs with Conditional Flows."](https://arxiv.org/abs/1809.05861) arXiv:1809.05861 (2018).
 
-\[13\] Van Den Oord, Aaron, et al. ["WaveNet: A generative model for raw audio."](https://arxiv.org/abs/1609.03499) SSW. 2016.
+[13] Van Den Oord, Aaron, et al. ["WaveNet: A generative model for raw audio."](https://arxiv.org/abs/1609.03499) SSW. 2016.
