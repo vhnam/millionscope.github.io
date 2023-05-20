@@ -88,11 +88,11 @@ _Easy Data Augmentation_ (EDA; [Wei & Zou 2019](https://arxiv.org/abs/1901.11196
 3.  Random swap (RS): Randomly swap two words and repeat $n$ times.
 4.  Random deletion (RD): Randomly delete each word in the sentence with probability $p$.
 
-where $p=\alpha$ and $n=\alpha \times \text{sentence_length}$, with the intuition that longer sentences can absorb more noise while maintaining the original label. The hyperparameter $\alpha$ roughly indicates the percent of words in one sentence that may be changed by one augmentation.
+where $p=\alpha$ and $n = \alpha \times \text{sentence_length}$, with the intuition that longer sentences can absorb more noise while maintaining the original label. The hyperparameter $\alpha$ roughly indicates the percent of words in one sentence that may be changed by one augmentation.
 
 EDA is shown to improve the classification accuracy on several classification benchmark datasets compared to baseline without EDA. The performance lift is more significant on a _smaller_ training set. All the four operations in EDA help improve the classification accuracy, but get to optimal at different $\alpha$'s.
 
-![](EDA-exp1.png)
+![](assets/images/2022-04-15-data-gen/EDA-exp1.png)
 
 Fig. 1. EDA leads to performance improvement on several classification benchmarks. (Image source: [Wei & Zou 2019](https://arxiv.org/abs/1901.11196))
 
@@ -132,7 +132,7 @@ Given that generating high-quality, photorealistic images is a lot more difficul
 
 [Wang et al. (2021)](https://arxiv.org/abs/2108.13487) explored ways to leverage GPT-3 as a weak annotator via few-shot prompting, achieving 10x cheaper than human labeling. The paper argues that by using data labeled by GPT-3, it essentially performs [_self-training_](https://lilianweng.github.io/posts/2021-12-05-semi-supervised/#self-training): The predictions on unlabeled samples apply entropy regularization on the model to avoid high class overlaps so as to help improve the model performance.
 
-![](GPT3-data-gen.png)
+![](assets/images/2022-04-15-data-gen/GPT3-data-gen.png)
 
 Fig. 2. Illustration of how to use GPT-3 to generate more training data with the human-in-the-loop active learning pipeline to improve the data quality. (Image source: [Wang et al. 2021](https://arxiv.org/abs/2108.13487))
 
@@ -142,7 +142,7 @@ GPT-3 labeling achieves better results in the low-cost regime, but has a gap wit
 
 > **A lot of high-quality data > A lot of noisy data > A little high quality data**.
 
-![](GPT3-data-gen-exp.png)
+![](assets/images/2022-04-15-data-gen/GPT3-data-gen-exp.png)
 
 Fig. 3. GPT-3 labeling technique improves the classification performance in the low-cost regime. (Image source: [Wang et al. 2021](https://arxiv.org/abs/2108.13487))
 
@@ -161,7 +161,7 @@ _Language-model-based data augmentation_ (**LAMBADA**; [Anaby-Tavor et al. 2019]
 
 The final classifier is trained on $\mathcal{D}_\text{syn} \cup \mathcal{D}_\text{train}$ . The process can be repeated multiple times, but it is unclear whether the benefit would quickly diminish or the repetitive process would bring in self-bias.
 
-![](LAMBADA.png)
+![](assets/images/2022-04-15-data-gen/LAMBADA.png)
 
 Fig. 4. Accuracy of LAMBADA vs. other generative approaches over all datasets and classifiers. (Image source: [Anaby-Tavor et al. 2019](https://arxiv.org/abs/1911.03118))
 
@@ -169,7 +169,7 @@ To simplify LAMBADA, we can actually remove the dependency of a fine-tuned gener
 
 [Schick & Schutze (2021)](https://arxiv.org/abs/2104.07540) proposed a similar idea but on the NLI task instead of classification, asking PLM to write sentence pairs that are similar or different while the model is prompted with task-specific instructions.
 
-![](UDG.png)
+![](assets/images/2022-04-15-data-gen/UDG.png)
 
 Fig. 5. Illustration of the unsupervised data generation (UDG) framework. (Image source: [Wang et al., 2021](https://arxiv.org/abs/2109.09193))
 
@@ -182,7 +182,7 @@ Note that the threshold $\mu_t$ is time-dependent, initialized as 0.9 and then g
 
 As shown in their experiments, the improvement of UDG over few-shot inference is quit significant, where NLA brings in some extra boost. The results are even comparable with supervised fine-tuning on several cases.
 
-![](UDG-exp.png)
+![](assets/images/2022-04-15-data-gen/UDG-exp.png)
 
 Fig. 6. Comparison of accuracy of UDG and other methods on different classification datasets. (Image source: [Wang et al., 2021](https://arxiv.org/abs/2109.09193))
 
@@ -194,13 +194,13 @@ Fig. 6. Comparison of accuracy of UDG and other methods on different classificat
 4.  _Back-translation._ Continue fine-tuning on the back-translation dataset where the order of samples is reversed, `<sampledSeq, seq>`.
 5.  Step 1-4 can be repeated.
 
-![](back-translation-data-gen.png)
+![](assets/images/2022-04-15-data-gen/back-translation-data-gen.png)
 
 Fig. 7. Algorithm of using distillation and back-translation to train a language model on translation tasks. (Image source: [Han et al. 2021](https://arxiv.org/abs/2110.05448))
 
 The success of the above method depends on a good pretrained LM to kick off the initial translation dataset. Iterative few-shot generation and distillation with back-translation is an effective way to extract and refine the translation capability out of a pretrained LM and further to distill that into a new model.
 
-![](back-translation-data-gen-exp.png)
+![](assets/images/2022-04-15-data-gen/back-translation-data-gen-exp.png)
 
 Fig. 8. Comparison of BLEU scores of the translation models of different training runs using: only distillation, back-translation, both and with more monolingual training data. (Image source: [Han et al. 2021](https://arxiv.org/abs/2110.05448))
 
@@ -219,7 +219,7 @@ Given all the generated data, either by data augmentation or data synthesis, how
 
 The final model performance is dependent on both metrics to be high enough.
 
-![](affinity-diversity.png)
+![](assets/images/2022-04-15-data-gen/affinity-diversity.png)
 
 Fig. 9. (a) Left: A scatter plot of affinity vs diversity metric, where each point represents a different augmentation method and its color indicates the final test accuracy. (b) Right: The conceptual illustration of the relationship between clean and augmented data in different regions of affinity and diversity metrics. (Image source: [Gontijo-Lopes et al. 2020](https://arxiv.org/abs/2002.08973))
 
@@ -237,7 +237,7 @@ A different approach is to enhance the network with a dedicated **noisy adaptati
 
 [Sukhbaatar et al. (2015)](https://arxiv.org/abs/1406.2080) introduced an extra linear layer $Q$ into the network architecture to adapt the predictions to match the noisy label distribution. The noise matrix $Q$ is initially _fixed_ to the identity function while only the base model parameters is updated. After some time, $Q$ starts to be updated and expected to capture the noise in the data. The noise matrix is trained with regularization to encourage it to match the noise distribution while keeping the base model prediction accurate for true labels.
 
-![](noise-adaptation-layer.png)
+![](assets/images/2022-04-15-data-gen/noise-adaptation-layer.png)
 
 Fig. 10. (a) Left: A noise matrix $Q$ is added between softmax and the final output for the loss. (b) Right: The noise matrix $Q$ is fixed at the identity function initially and only gets updated with regularization after some training. (Image source: [Sukhbaatar et al. 2015](https://arxiv.org/abs/1406.2080))
 
@@ -289,7 +289,7 @@ where $\mathcal{A}_i$ is a subset of data points from $\mathcal{D}_c$ with label
 
 Let $f(x) = \hat{p}(\tilde{y} \vert \mathbf{x}; \theta)$ and this model should be trained with $\mathcal{L}(f(\mathbf{x}), y)$ on clean data $\mathcal{D}_c$ and with $\mathcal{L}(\hat{C}^\top f(\mathbf{x}), \hat{y})$ on noisy data $\mathcal{D}_n$.
 
-![](GLC.png)
+![](assets/images/2022-04-15-data-gen/GLC.png)
 
 Fig. 11. Algorithm of gold loss correction (GLC), estimating the noise transition matrix with a trusted dataset. (Image source: [Hendrycks et al. 2018](https://arxiv.org/abs/1802.05300))
 
@@ -331,13 +331,13 @@ $$\begin{aligned} \theta^{\*}(\mathbf{w}) &= \arg\min_\theta \sum_{i=1}^n w_i f(
 
 The learning process involves two nested loops of optimization, so pretty expensive, 3x training time.
 
-![](L2R-backprop.png)
+![](assets/images/2022-04-15-data-gen/L2R-backprop.png)
 
 Fig. 12. Illustration of updates implemented by second order [automatic differentiation](https://en.wikipedia.org/wiki/Automatic_differentiation). (Image source: [Ren et al. 2018](https://arxiv.org/abs/1803.09050))
 
 They ran experiments on (1) two-class MNIST to test the robustness of L2R when the class distribution is imbalanced and (2) CIFAR-10 with noisy labels. L2R is shown to be better than other baseline methods at the time on both tasks.
 
-![](L2R-exp.png)
+![](assets/images/2022-04-15-data-gen/L2R-exp.png)
 
 Fig. 13. Left: Imbalanced classes on MNIST (class 4 and 9); Right: Effect of the number of clean samples. Task is on CIFAR-10 with 40% of data flipped to label 3. (Image source: [Ren et al. 2018](https://arxiv.org/abs/1803.09050))
 
@@ -353,7 +353,7 @@ $$\begin{aligned} \mathcal{L}(\theta, \mathbf{w}) &= \frac{1}{n}\sum_{i=1}^n \ma
 
 The mentor network $g_\\psi$ is trained with cross entropy on the input $(\phi_{f_\theta}(\mathbf{x}_i, y_i), w^{\*}_i)$ , where $v^\*_i=1$ if $y_i$ is known to be a correct label, otherwise 0. The architecture of MentorNet does not have to be very complicated. In the paper, they adopted a LSTM layer to capture the prediction variance in time.
 
-![](MentorNet.png)
+![](assets/images/2022-04-15-data-gen/MentorNet.png)
 
 Fig. 14. Model architecture of MentorNet and StudentNet which are trained simultaneously, where MentorNet predicts the sample weights for StudentNet to train on. (Image source: [Jiang et al. 2018](https://arxiv.org/abs/1712.05055))
 
@@ -365,7 +365,7 @@ Different from MentorNet where one network explicitly learns weighting scheme an
 
 According to their experiments, co-teaching performs better than [F-correction](#fcorrection) where the noise rates are high or the corruption transition matrix is not symmetric.
 
-![](co-teaching.png)
+![](assets/images/2022-04-15-data-gen/co-teaching.png)
 
 Fig. 15. Algorithm of co-teaching in which two networks are trained separately in parallel and each selects samples for the other to train on. (Image source: [Han et al. 2018](https://arxiv.org/abs/1804.06872))
 
@@ -376,6 +376,7 @@ Cited as:
 > Weng, Lilian. (Apr 2022). Learning with not enough data part 3: data generation. Lil'Log. https://lilianweng.github.io/posts/2022-04-15-data-gen/.
 
 Or
+
 ```
     @article{weng2022datagen,
       title   = "Learning with not Enough Data Part 3: Data Generation",
@@ -386,6 +387,7 @@ Or
       url     = "https://lilianweng.github.io/posts/2022-04-15-data-gen/"
     }
 ```
+
 # Reference[#](#reference)
 
 \[1\] Zhang et al. [“Adversarial AutoAgument”](https://arxiv.org/abs/1912.11188) ICLR 2020.

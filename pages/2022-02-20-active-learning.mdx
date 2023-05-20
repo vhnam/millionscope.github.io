@@ -93,7 +93,7 @@ Batch size.
 
 Given an unlabeled dataset $\mathcal{U}$ and a fixed amount of labeling cost $B$, active learning aims to select a subset of $B$ examples from $\mathcal{U}$ to be labeled such that they can result in maximized improvement in model performance. This is an effective way of learning especially when data labeling is difficult and costly, e.g. medical images. This classical [survey paper](https://burrsettles.com/pub/settles.activelearning.pdf) in 2010 lists many key concepts. While some conventional approaches may not apply to deep learning, discussion in this post mainly focuses on deep neural models and training in batch mode.
 
-![](active-learning-workflow.png)
+![](assets/images/2022-02-20-active-learning/active-learning-workflow.png)
 
 Fig. 1. Illustration of a cyclic workflow of active learning, producing better models more efficiently by smartly choosing which samples to label.
 
@@ -150,7 +150,7 @@ In active learning, a commoner approach is to use _dropout_ to “simulate” a 
 
 **DBAL** (Deep Bayesian active learning; [Gal et al. 2017](https://arxiv.org/abs/1703.02910)) approximates Bayesian neural networks with MC dropout such that it learns a distribution over model weights. In their experiment, MC dropout performed better than random baseline and mean standard deviation (Mean STD), similarly to variation ratios and entropy measurement.
 
-![](DBAL-exp.png)
+![](assets/images/2022-02-20-active-learning/DBAL-exp.png)
 
 Fig. 2. Active learning results of DBAL on MNIST. (Image source: [Gal et al. 2017](https://arxiv.org/abs/1703.02910)).
 
@@ -183,7 +183,7 @@ The process of Bayes-by-backprop can be summarized as:
 
 The loss objective guides model training. A low loss value indicates that a model can make good and accurate predictions. [Yoo & Kweon (2019)](https://arxiv.org/abs/1905.03677) designed a **loss prediction module** to predict the loss value for unlabeled inputs, as an estimation of how good a model prediction is on the given data. Data samples are selected if the loss prediction module makes uncertain predictions (high loss value) for them. The loss prediction module is a simple MLP with dropout, that takes several intermediate layer features as inputs and concatenates them after a global average pooling.
 
-![](active-learning-loss-prediction.png)
+![](assets/images/2022-02-20-active-learning/active-learning-loss-prediction.png)
 
 Fig. 3. Use the model with a loss prediction module to do active learning selection. (Image source: [Yoo & Kweon 2019](https://arxiv.org/abs/1905.03677))
 
@@ -195,7 +195,7 @@ where $\\epsilon$ is a predefined positive margin constant.
 
 In experiments on three vision tasks, active learning selection based on the loss prediction performs better than random baseline, entropy based acquisition and [core-set](#core-sets-approach).
 
-![](active-learning-loss-prediction-exp.png)
+![](assets/images/2022-02-20-active-learning/active-learning-loss-prediction-exp.png)
 
 Fig. 4. Active learning results of loss prediction module based selection, in comparison with other approaches. (Image source: [Yoo & Kweon 2019](https://arxiv.org/abs/1905.03677))
 
@@ -203,7 +203,7 @@ Fig. 4. Active learning results of loss prediction module based selection, in co
 
 [Sinha et al. (2019)](https://arxiv.org/abs/1904.00370) proposed a GAN-like setup, named **VAAL** (Variational Adversarial Active Learning), where a discriminator is trained to distinguish unlabeled data from labeled data. Interestingly, active learning acquisition criteria does not depend on the task performance in VAAL.
 
-![](VAAL.png)
+![](assets/images/2022-02-20-active-learning/VAAL.png)
 
 Fig. 5. Illustration of VAAL (Variational adversarial active learning). (Image source: [Sinha et al. 2019](https://arxiv.org/abs/1904.00370))
 
@@ -220,7 +220,7 @@ The discriminator loss is:
 
 $$\mathcal{L}_D = -\mathbb{E}\[\log D(q_\phi (\mathbf{z}^l \vert \mathbf{x}^l))\] - \mathbb{E}\[\log (1 - D(q_\phi (\mathbf{z}^u \vert \mathbf{u})))\]$$
 
-![](VAAL-exp.png)
+![](assets/images/2022-02-20-active-learning/VAAL-exp.png)
 
 Fig. 6. Experiment results of VAAL (variational adversarial active learning) on several image classification tasks. (Image source: [Sinha et al. 2019](https://arxiv.org/abs/1904.00370)
 
@@ -228,7 +228,7 @@ Ablation studies showed that jointly training VAE and discriminator is critical.
 
 **MAL** (Minimax Active Learning; [Ebrahimiet al. 2021](https://arxiv.org/abs/2012.10467)) is an extension of VAAL. The MAL framework consists of an entropy minimizing feature encoding network $F$ followed by an entropy maximizing classifier $C$. This minimax setup reduces the distribution gap between labeled and unlabeled data.
 
-![](MAL.png)
+![](assets/images/2022-02-20-active-learning/MAL.png)
 
 Fig. 7. Illustration of the MAL (minimax active learning) framework. (Image source: [Ebrahimiet al. 2021](https://arxiv.org/abs/2012.10467))
 
@@ -256,7 +256,7 @@ Sampling strategy in MAL considers both diversity and uncertainty:
 
 The experiments compared MAL to random, entropy, core-set, BALD and VAAL baselines, on image classification and segmentation tasks. The results look pretty strong.
 
-![](MAL-exp.png)
+![](assets/images/2022-02-20-active-learning/MAL-exp.png)
 
 Fig. 8. Performance of MAL on ImageNet. (Table source: [Ebrahimiet al. 2021](https://arxiv.org/abs/2012.10467))
 
@@ -288,7 +288,7 @@ $$\min_{\mathcal{S}^{(t+1)} : \vert \mathcal{S}^{(t+1)} \vert \leq b} \bigg\vert
 
 It is equivalent to [the $k$-Center problem](https://en.wikipedia.org/wiki/Metric_k-center): choose $b$ center points such that the largest distance between a data point and its nearest center is minimized. This problem is NP-hard. An approximate solution depends on the greedy algorithm.
 
-![](core-sets-exp.png)
+![](assets/images/2022-02-20-active-learning/core-sets-exp.png)
 
 Fig. 9. Active learning results of core-sets algorithm in comparison with several common baselines on CIFAR-10, CIFAR-100, SVHN. (Image source: [Sener & Savarese 2018](https://arxiv.org/abs/1708.00489))
 
@@ -303,7 +303,7 @@ Because the core-set selection is expensive, [Coleman et al. (2020)](https://arx
 - Uncertainty. Given an unlabeled sample $\mathbf{x}$, BADGE first computes the prediction $\hat{y}$ and the gradient $g_\mathbf{x}$ of the loss on $(\mathbf{x}, \hat{y})$ w.r.t. the last layer's parameters. They observed that the norm of $g_\mathbf{x}$ conservatively estimates the example's influence on the model learning and high-confidence samples tend to have gradient embeddings of small magnitude.
 - Diversity. Given many gradient embeddings of many samples, $g_\mathbf{x}$, BADGE runs [$k$-means++](https://en.wikipedia.org/wiki/K-means%2B%2B) to sample data points accordingly.
 
-![](BADGE-algo.png)
+![](assets/images/2022-02-20-active-learning/BADGE-algo.png)
 
 Fig. 10. Algorithm of BADGE (batch active learning by diverse gradient embeddings). (Image source: [Ash et al. 2020](https://arxiv.org/abs/1906.03671))
 
@@ -342,7 +342,7 @@ $$\text{Dispersion}(\mathbf{x}) = 1 - \frac{f_\mathbf{x}}{T} \text{ where } f_\m
 
 In their implementation, dispersion is computed at every epoch. Label dispersion is low if the model consistently assigns the same label to the same sample but high if the prediction changes often. Label dispersion is correlated with network uncertainty, as shown in Fig. 11.
 
-![](label-dispersion-vs-uncertainty.png)
+![](assets/images/2022-02-20-active-learning/label-dispersion-vs-uncertainty.png)
 
 Fig. 11. Label dispersion is correlated with network uncertainty. On the x-axis, data points are sorted by label dispersion scores. The y-axis is the model prediction accuracy when the model trys to infer the labels for those samples. (Image source: [Bengar et al. 2021](https://arxiv.org/abs/2107.14707))
 
@@ -373,7 +373,7 @@ Active learning can be further combined with [semi-supervised learning](https://
 1.  Select uncertain samples via active learning and get them labeled;
 2.  Select samples with the most confident prediction and assign them [pseudo labels](https://lilianweng.github.io/posts/2021-12-05-semi-supervised/#pseudo-labeling). The confidence prediction is judged by whether the prediction entropy is below a threshold $\delta$. As the model is getting better in time, the threshold $\delta$ decays in time as well.
 
-![](CEAL.png)
+![](assets/images/2022-02-20-active-learning/CEAL.png)
 
 Fig. 12. Illustration of CEAL (cost-effective active learning). (Image source: [Yang et al. 2017](https://arxiv.org/abs/1701.03551))
 
@@ -384,6 +384,7 @@ Cited as:
 > Weng, Lilian. (Feb 2022). Learning with not enough data part 2: active learning. Lil'Log. https://lilianweng.github.io/posts/2022-02-20-active-learning/.
 
 Or
+
 ```
     @article{weng2022active,
       title   = "Learning with not Enough Data Part 2: Active Learning",
@@ -394,6 +395,7 @@ Or
       url     = "https://lilianweng.github.io/posts/2022-02-20-active-learning/"
     }
 ```
+
 # References[#](#references)
 
 \[1\] Burr Settles. [Active learning literature survey.](https://burrsettles.com/pub/settles.activelearning.pdf) University of Wisconsin, Madison, 52(55-66):11, 2010.
