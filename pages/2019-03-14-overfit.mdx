@@ -70,7 +70,7 @@ Meanwhile, MDL considers the model description as part of the compression delive
 
 A _two-part version_ of MDL principle states that: Let $\mathcal{H}^{(1)}, \mathcal{H}^{(2)}, \dots$ be a list of models that can explain the dataset $\mathcal{D}$. The best hypothesis among them should be the one that minimizes the sum:
 
-$$ \mathcal{H}^\text{best} = \arg\min_\mathcal{H} \[L(\mathcal{H}) + L(\mathcal{D}\vert\mathcal{H})\] $$
+$$\mathcal{H}^\text{best} = \arg\min_\mathcal{H} \[L(\mathcal{H}) + L(\mathcal{D}\vert\mathcal{H})\]$$
 
 - $L(\mathcal{H})$ is the length of the description of model $\mathcal{H}$ in bits.
 - $L(\mathcal{D}\vert\mathcal{H})$ is the length of the description of the data $\mathcal{D}$ in bits when encoded with $\mathcal{H}$.
@@ -85,7 +85,7 @@ Kolmogorov Complexity relies on the concept of modern computers to define the al
 
 The formal definition of Kolmogorov Complexity states that: Given a universal computer $\mathcal{U}$ and a program $p$, let's denote $\mathcal{U}(p)$ as the output of the computer processing the program and $L(p)$ as the descriptive length of the program. Then Kolmogorov Complexity $K_\mathcal{U}$ of a string $s$ with respect to a universal computer $\mathcal{U}$ is:
 
-$$ K_\mathcal{U}(s) = \min_{p: \mathcal{U}(p)=s} L(p) $$
+$$K_\mathcal{U}(s) = \min_{p: \mathcal{U}(p)=s} L(p)$$
 
 Note that a universal computer is one that can mimic the actions of any other computers. All modern computers are universal as they can all be reduced to Turing machines. The definition is universal no matter which computers we are using, because another universal computer can always be programmed to clone the behavior of $\mathcal{U}$, while encoding this clone program is just a constant.
 
@@ -123,7 +123,7 @@ _Proof._ First we would like to construct a two-layer neural network $C: \mathbb
 
 The output of network $C$ for a input vector $\boldsymbol{x}$ can be represented as follows:
 
-$$ C(\boldsymbol{x}) = \boldsymbol{v} \max\{ \boldsymbol{x}\mathbf{W} - \boldsymbol{b}, 0\}^\top = \sum_{i=1}^h v_i \max\{\boldsymbol{x}\boldsymbol{W}_{(:,i)} - b_i, 0\} $$
+$$C(\boldsymbol{x}) = \boldsymbol{v} \max\{ \boldsymbol{x}\mathbf{W} - \boldsymbol{b}, 0\}^\top = \sum_{i=1}^h v_i \max\{\boldsymbol{x}\boldsymbol{W}_{(:,i)} - b_i, 0\}$$
 
 where $\boldsymbol{W}_{(:,i)}$ is the $i$-th column in the $d \times h$ matrix.
 
@@ -131,17 +131,17 @@ Given a sample set $S = \{\boldsymbol{x}_1, \dots, \boldsymbol{x}_n\}$ and targe
 
 Let's combine all sample points into one batch as one input matrix $\mathbf{X} \in \mathbb{R}^{n \times d}$. If set $h=n$, $\mathbf{X}\mathbf{W} - \boldsymbol{b}$ would be a square matrix of size $n \times n$.
 
-$$ \mathbf{M}_\text{ReLU} = \max\{\mathbf{X}\mathbf{W} - \boldsymbol{b}, 0 \} = \begin{bmatrix} \boldsymbol{x}_1\mathbf{W} - \boldsymbol{b} \\ \dots \\ \boldsymbol{x}_n\mathbf{W} - \boldsymbol{b} \\ \end{bmatrix} = \[\boldsymbol{x}_i\boldsymbol{W}_{(:,j)} - b_j\]_{i \times j} $$
+$$\mathbf{M}_\text{ReLU} = \max\{\mathbf{X}\mathbf{W} - \boldsymbol{b}, 0 \} = \begin{bmatrix} \boldsymbol{x}_1\mathbf{W} - \boldsymbol{b} \\ \dots \\ \boldsymbol{x}_n\mathbf{W} - \boldsymbol{b} \\ \end{bmatrix} = \[\boldsymbol{x}_i\boldsymbol{W}_{(:,j)} - b_j\]_{i \times j}$$
 
 We can simplify $\mathbf{W}$ to have the same column vectors across all the columns:
 
-$$ \mathbf{W}_{(:,j)} = \boldsymbol{w} \in \mathbb{R}^{d}, \forall j = 1, \dots, n $$
+$$\mathbf{W}_{(:,j)} = \boldsymbol{w} \in \mathbb{R}^{d}, \forall j = 1, \dots, n$$
 
 ![](nn-expressivity-proof.png)
 
 Let $a_i = \boldsymbol{x}_i \boldsymbol{w}$, we would like to find a suitable $\boldsymbol{w}$ and $\boldsymbol{b}$ such that $b_1 < a_1 < b_2 < a_2 < \dots < b_n < a_n$. This is always achievable because we try to solve $n+d$ unknown variables with $n$ constraints and $\boldsymbol{x}_i$ are independent (i.e. pick a random $\boldsymbol{w}$, sort $\boldsymbol{x}_i \boldsymbol{w}$ and then set $b_j$'s as values in between). Then $\mathbf{M}_\text{ReLU}$ becomes a lower triangular matrix:
 
-$$ \mathbf{M}_\text{ReLU} = \[a_i - b_j\]_{i \times j} = \begin{bmatrix} a_1 - b_1 & 0 & 0 & \dots & 0 \\ \vdots & \ddots & & & \vdots \\ a_i - b_1 & \dots & a_i - b_i & \dots & 0\\ \vdots & & & \ddots & \vdots \\ a_n - b_1 & a_n - b_2 & \dots & \dots & a_n - b_n \\ \end{bmatrix} $$
+$$\mathbf{M}_\text{ReLU} = \[a_i - b_j\]_{i \times j} = \begin{bmatrix} a_1 - b_1 & 0 & 0 & \dots & 0 \\ \vdots & \ddots & & & \vdots \\ a_i - b_1 & \dots & a_i - b_i & \dots & 0\\ \vdots & & & \ddots & \vdots \\ a_n - b_1 & a_n - b_2 & \dots & \dots & a_n - b_n \\ \end{bmatrix}$$
 
 It is a nonsingular square matrix as $\\det(\mathbf{M}_\text{ReLU}) \\neq 0$, so we can always find suitable $\boldsymbol{v}$ to solve $\boldsymbol{v}\mathbf{M}_\text{ReLU}=\boldsymbol{y}$ (In other words, the column space of $\mathbf{M}_\text{ReLU}$ is all of $\mathbb{R}^n$ and we can find a linear combination of column vectors to obtain any $\boldsymbol{y}$).
 
@@ -220,7 +220,7 @@ Fig. 7. Illustration of parameter vectors for direct optimization when $D=3$. (I
 
 The gradient update formula looks like the follows:
 
-$$ \theta^{(D)} = \theta_0^{(D)} + \mathbf{P} \theta^{(d)} $$
+$$\theta^{(D)} = \theta_0^{(D)} + \mathbf{P} \theta^{(d)}$$
 
 where $\theta_0^{(D)}$ are the initialization values and $\mathbf{P}$ is a $D \times d$ projection matrix that is randomly sampled before training. Both $\theta_0^{(D)}$ and $\mathbf{P}$ are not trainable and fixed during training. $\theta^{(d)}$ is initialized as all zeros.
 

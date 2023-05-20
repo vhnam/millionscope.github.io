@@ -53,7 +53,7 @@ Many classic models have relatively simpler formation and naturally, come with a
 
 A general form of a linear regression model is:
 
-$$ y = w_0 + w_1 x_1 + w_2 x_2 + … + w_n x_n $$
+$$y = w_0 + w_1 x_1 + w_2 x_2 + … + w_n x_n$$
 
 The coefficients describe the change of the response triggered by one unit increase of the independent variables. The coefficients are not comparable directly unless the features have been standardized (check sklearn.preprocessing.[StandardScalar](http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html#sklearn.preprocessing.StandardScaler) and [RobustScaler](http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.RobustScaler.html#sklearn.preprocessing.RobustScaler)), since one unit of different features can refer to very different things. Without standardization, the product $w_i \\dot x_i$ can be used to quantify one feature's contribution to the response.
 
@@ -63,11 +63,11 @@ Naive Bayes is named as “Naive” because it works on a very simplified assump
 
 Given a feature vector $\mathbf{x} = \[x_1, x_2, \dots, x_n\]$ and a class label $c \in \{1, 2, \dots, C\}$, the probability of this data point belonging to this class is:
 
-$$ \begin{aligned} p(c | x_1, x_2, \dots, x_n) &\\propto p(c, x_1, x_2, \dots, x_n)\\ &\\propto p(c) p(x_1 | c) p(x_2 | c) \dots p(x_n | c)\\ &\\propto p(c) \prod_{i=1}^n p(x_i | c). \end{aligned} $$
+$$\begin{aligned} p(c | x_1, x_2, \dots, x_n) &\\propto p(c, x_1, x_2, \dots, x_n)\\ &\\propto p(c) p(x_1 | c) p(x_2 | c) \dots p(x_n | c)\\ &\\propto p(c) \prod_{i=1}^n p(x_i | c). \end{aligned}$$
 
 The Naive Bayes classifier is then defined as:
 
-$$ \hat{y} = \arg\max_{c \in 1, \dots, C} p(c) \prod_{i=1}^n p(x_i | c) $$
+$$\hat{y} = \arg\max_{c \in 1, \dots, C} p(c) \prod_{i=1}^n p(x_i | c)$$
 
 Because the model has learned the prior $p(x_i \vert c)$ during the training, the contribution of an individual feature value can be easily measured by the posterior, $p(c \vert x_i) = p(c)p(x_i \vert c) / p(x_i)$.
 
@@ -110,7 +110,7 @@ The interpretation framework should balance between two goals:
 
 Let's say we need to generate an explanation for a classification model $f: \mathbf{X} \rightarrow \mathbf{Y}$. Given a data point $x \in X$ which consists of $a$ individual values of attribute $A_i$, $i = 1, \dots, a$, and is labeled with class $y \in Y$. The _prediction difference_ is quantified by computing the difference between the model predicted probabilities with or without knowing $A_i$:
 
-$$ \text{probDiff}_i (y | x) = p(y| x) - p(y | x \\backslash A_i) $$
+$$\text{probDiff}_i (y | x) = p(y| x) - p(y | x \\backslash A_i)$$
 
 (The paper also discussed on using the odds ratio or the entropy-based information metric to quantify the prediction difference.)
 
@@ -118,7 +118,7 @@ $$ \text{probDiff}_i (y | x) = p(y| x) - p(y | x \\backslash A_i) $$
 
 **Another problem**: If we generate $x \\backslash A_i$ by replacing $A_i$ with a missing value (like `None`, `NaN`, etc.), we have to rely on the model's internal mechanism for missing value imputation. A model which replaces these missing cases with the median should have output very different from a model which imputes a special placeholder. One solution as presented in the paper is to replace $A_i$ with all possible values of this feature and then sum up the prediction weighted by how likely each value shows in the data:
 
-$$ \begin{aligned} p(y \vert x \\backslash A_i) &= \sum_{s=1}^{m_i} p(A_i=a_s \vert x \\backslash A_i) p(y \vert x \\leftarrow A_i=a_s) \\ &\approx \sum_{s=1}^{m_i} p(A_i=a_s) p(y \vert x \\leftarrow A_i=a_s) \end{aligned} $$
+$$\begin{aligned} p(y \vert x \\backslash A_i) &= \sum_{s=1}^{m_i} p(A_i=a_s \vert x \\backslash A_i) p(y \vert x \\leftarrow A_i=a_s) \\ &\approx \sum_{s=1}^{m_i} p(A_i=a_s) p(y \vert x \\leftarrow A_i=a_s) \end{aligned}$$
 
 Where $p(y \vert x \\leftarrow A_i=a_s)$ is the probability of getting label $y$ if we replace the feature $A_i$ with value $a_s$ in the feature vector of $x$. There are $m_i$ unique values of $A_i$ in the training set.
 
@@ -134,7 +134,7 @@ This method ([Baehrens, et al. 2010](http://www.jmlr.org/papers/volume11/baehren
 
 Let's say, we have a [Bayes Classifier](https://en.wikipedia.org/wiki/Bayes_classifier) which is trained on the data set $X$ and outputs probabilities over the class labels $Y$, $p(Y=y \vert X=x)$. And one class label $y$ is drawn from the class label pool, $\{1, 2, \dots, C\}$. This Bayes classifier is constructed as:
 
-$$ f^{\*}(x) = \arg \min_{c \in \{1, \dots, C\}} p(Y \\neq c \vert X = x) $$
+$$f^{\*}(x) = \arg \min_{c \in \{1, \dots, C\}} p(Y \\neq c \vert X = x)$$
 
 The _local explanation vector_ is defined as the derivative of the probability prediction function at the test point $x = x_0$. A large entry in this vector highlights a feature with a big influence on the model decision; A positive sign indicates that increasing the feature would lower the probability of $x_0$ assigned to $f^{\*}(x_0)$.
 
@@ -142,17 +142,17 @@ However, this approach requires the model output to be a probability (similar to
 
 (1) Apply [Parzen window](https://en.wikipedia.org/?title=Parzen_window&redirect=no) to the training data to estimate the weighted class densities:
 
-$$ \hat{p}_{\sigma}(x, y=c) = \frac{1}{n} \sum_{i \in I_c} k_{\sigma} (x - x_i) $$
+$$\hat{p}_{\sigma}(x, y=c) = \frac{1}{n} \sum_{i \in I_c} k_{\sigma} (x - x_i)$$
 
 Where $I_c$ is the index set containing the indices of data points assigned to class $c$ by the model $f$, $I_c = \{i \vert f(x_i) = c\}$. $k_{\sigma}$ is a kernel function. Gaussian kernel is a popular one among [many candidates](<https://en.wikipedia.org/wiki/Kernel_(statistics)#Kernel_functions_in_common_use>).
 
 (2) Then, apply the Bayes' rule to approximate the probability $p(Y=c \vert X=x)$ for all classes:
 
-$$ \begin{aligned} \hat{p}_{\sigma}(y=c | x) &= \frac{\hat{p}_{\sigma}(x, y=c)}{\hat{p}_{\sigma}(x, y=c) + \hat{p}_{\sigma}(x, y \\neq c)} \\ &\approx \frac{\sum_{i \in I_c} k_{\sigma} (x - x_i)}{\sum_i k_{\sigma} (x - x_i)} \end{aligned} $$
+$$\begin{aligned} \hat{p}_{\sigma}(y=c | x) &= \frac{\hat{p}_{\sigma}(x, y=c)}{\hat{p}_{\sigma}(x, y=c) + \hat{p}_{\sigma}(x, y \\neq c)} \\ &\approx \frac{\sum_{i \in I_c} k_{\sigma} (x - x_i)}{\sum_i k_{\sigma} (x - x_i)} \end{aligned}$$
 
 (3) The final estimated Bayes classifier takes the form:
 
-$$ \hat{f}_{\sigma} = \arg\min_{c \in \{1, \dots, C\}} \hat{p}_{\sigma}(y \\neq c \vert x) $$
+$$\hat{f}_{\sigma} = \arg\min_{c \in \{1, \dots, C\}} \hat{p}_{\sigma}(y \\neq c \vert x)$$
 
 Noted that we can generate the labeled data with the original model $f$, as much as we want, not restricted by the size of the training data. The hyperparameter $\sigma$ is selected to optimize the chances of $\hat{f}_{\sigma}(x) = f(x)$ to achieve high fidelity.
 

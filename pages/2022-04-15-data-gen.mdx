@@ -251,7 +251,7 @@ For example, **MAE** (mean absolute error) is more robust to noisy labels than C
 
 To exploit the benefits of both the noise-robustness provided by MAE and the implicit weighting scheme of CCE, GCE adopts the the negative Box-Cox transformation as a loss function:
 
-$$ \mathcal{L}_q(f(\mathbf{x}_i, y_i = j)) = \frac{1 - f^{(j)}(\mathbf{x}_i)^q}{q} $$
+$$\mathcal{L}_q(f(\mathbf{x}_i, y_i = j)) = \frac{1 - f^{(j)}(\mathbf{x}_i)^q}{q}$$
 
 where $f^{(j)}$ denotes the $j$-th element of $f(.)$ and $q \in (0, 1\]$. $\mathcal{L}_q$ is equivalent to CCE when $q \to 0$ and becomes MAE when $q=1$. Empirical experiments show that there exists a threshold of $q$ with which overfitting never emerges and the noisier the data the higher such a threshold should be.
 
@@ -259,13 +259,13 @@ Given true and predicted labels, $y_i, \hat{y}_i \in \{0, 1\}$ and let $u_i=y_i 
 
 The [hinge loss](https://en.wikipedia.org/wiki/Hinge_loss), $\mathcal{L}_\text{hinge}(\mathbf{u}) = \sum_{i=1}^n \max(0, 1 - u_i)$, defines a rough upper bound of the zero-one loss. [Lyu & Tsang (2020)](https://arxiv.org/abs/1905.10045) proposed a _curriculum loss_ (**CL**), which is a tighter upper bound compared to a conventional surrogate loss like the hinge loss, $\mathcal{L}_\text{01}(\mathbf{u}) \leq \mathcal{L}_\text{CL}(\mathbf{u}) \leq \mathcal{L}_\text{hinge}(\mathbf{u})$.
 
-$$ \mathcal{L}_\text{CL}(\mathbf{u}) = \min_{\mathbf{w}\in\{0,1\}^n}\max(\sum_{i=1}^n w_i \ell(u_i), n - \sum_{i=1}^n w_i + \sum_{i=1}^n\mathbb{1}\[u_i < 0\]) $$
+$$\mathcal{L}_\text{CL}(\mathbf{u}) = \min_{\mathbf{w}\in\{0,1\}^n}\max(\sum_{i=1}^n w_i \ell(u_i), n - \sum_{i=1}^n w_i + \sum_{i=1}^n\mathbb{1}\[u_i < 0\])$$
 
 where $\ell(u_i)$ is a base surrogate loss for the zero-one loss (e.g. hinge loss) and the optimal weighting variable $\mathbf{w}$ is to be learned.
 
 Given a label corruption rate $\rho$, the _noise pruned curriculum loss_ (**NPCL**) is constructed based on the intuition that an ideal model should correctly classify $n(1-\rho)$ samples with clean labels but misclassify $n\rho$ corrupted labels. If $\rho$ is a known prior, we would know how many samples (with largest losses) to be pruned. Assuming $\ell(u_1) \leq \dots \leq \ell(u_n)$, then $u_{n(1-\rho)+1} = \dots = u_n =0$ and the following NPCL is the basic CL for only $n(1-\rho)$ samples:
 
-$$ \text{NPCL}(\mathbf{u}) = \min_{\mathbf{w}\in\{0,1\}^{n(1-\rho)}} \max(\sum_{i=1}^{n(1-\rho)} w_i \ell(u_i), n(1-\rho) - \sum_{i=1}^{n(1-\rho)} w_i) $$
+$$\text{NPCL}(\mathbf{u}) = \min_{\mathbf{w}\in\{0,1\}^{n(1-\rho)}} \max(\sum_{i=1}^{n(1-\rho)} w_i \ell(u_i), n(1-\rho) - \sum_{i=1}^{n(1-\rho)} w_i)$$
 
 When experimenting on CIFAR-10, NPCL is comparable with GCE and performs better when the noise rate increases.
 
@@ -275,15 +275,15 @@ Since it is known some labels are incorrect, noise-robust training can explicitl
 
 One approach is to rely on the estimation of a noise transition matrix and use that to correct the forward or backward loss, named **F-correction** ([Patrini et al. 2017](https://arxiv.org/abs/1609.03683)). Let's first assume that there are $k$ classes and the noise transition matrix $C \in \[0, 1\]^{k\times k}$ is observable and the label flipping probability does not depend on the sample input but only the label (i.e. known as random classification noise, RCN). Let $\tilde{y}$ denote a corrupted label. Each entry of $C$ represents the probability of one label flipping to another[1](#fn:1),
 
-$$ C_{ij} = p(\tilde{y}= j \vert y =i, \mathbf{x}) \approx p(\tilde{y}= j \vert y =i) $$
+$$C_{ij} = p(\tilde{y}= j \vert y =i, \mathbf{x}) \approx p(\tilde{y}= j \vert y =i)$$
 
 Then we can proceed a forward label correction procedure to incorporate the prior knowledge of noisy transition matrix into the prediction.
 
-$$ \begin{aligned} \mathcal{L}(\hat{p}(\tilde{y}\vert\mathbf{x}), y) &= - \log \hat{p}(\tilde{y}=i\vert\mathbf{x}) \\ &= - \log \sum_{j=1}^k p(\tilde{y}=i\vert y=j) \hat{p}(y=j\vert\mathbf{x}) \\ &= - \log \sum_{j=1}^k C_{ji} \hat{p}(y=j\vert\mathbf{x}) \end{aligned} $$
+$$\begin{aligned} \mathcal{L}(\hat{p}(\tilde{y}\vert\mathbf{x}), y) &= - \log \hat{p}(\tilde{y}=i\vert\mathbf{x}) \\ &= - \log \sum_{j=1}^k p(\tilde{y}=i\vert y=j) \hat{p}(y=j\vert\mathbf{x}) \\ &= - \log \sum_{j=1}^k C_{ji} \hat{p}(y=j\vert\mathbf{x}) \end{aligned}$$
 
 In matrix form, we have $\mathcal{L}(\hat{p}(y \vert \mathbf{x})) = - \log C^\top \hat{p}(y \vert \mathbf{x})$. However, such a noise transition matrix is usually _unknown_. If we have access to a clean dataset, the noise matrix $C$ can be estimated ([Hendrycks et al. 2018](https://arxiv.org/abs/1802.05300)) by calculating confusion matrix on the clean data. Let's denote a clean trusted dataset as $\mathcal{D}_c$ and a noisy dataset as $\mathcal{D}_n$ going forward.
 
-$$ \hat{C}_{ij} = \frac{1}{\vert \mathcal{A}_i\vert} \sum_{\mathbf{x} \in \mathcal{A}_i} \hat{p}(\tilde{y}=j \vert y=i, \mathbf{x}) \approx p(\tilde{y}=j \vert y=i) $$
+$$\hat{C}_{ij} = \frac{1}{\vert \mathcal{A}_i\vert} \sum_{\mathbf{x} \in \mathcal{A}_i} \hat{p}(\tilde{y}=j \vert y=i, \mathbf{x}) \approx p(\tilde{y}=j \vert y=i)$$
 
 where $\mathcal{A}_i$ is a subset of data points from $\mathcal{D}_c$ with label $i$.
 
@@ -301,7 +301,7 @@ The label correction distillation works as following:
 2.  Because the clean dataset is not large, $f_c$ is likely to overfit, [Li et al. (2017)](https://arxiv.org/abs/1703.02391) turn to a knowledge graph $\mathcal{G}$ that defines the relations in the label space and _propagate_ the prediction among labels accordingly. The new soft label is donated as $\hat{s}_i = \mathcal{G}(s_i)$.
 3.  The primary model $f$ is trained with predictions from $f_c$ to imitate,
 
-$$ \mathcal{L}(y_i, f(\mathbf{x}_i)) = \text{CE}(\underbrace{\lambda y_i + (1 - \lambda) \hat{s}_i}_\text{pseudo label}, f(\mathbf{x}_i)) $$
+$$\mathcal{L}(y_i, f(\mathbf{x}_i)) = \text{CE}(\underbrace{\lambda y_i + (1 - \lambda) \hat{s}_i}_\text{pseudo label}, f(\mathbf{x}_i))$$
 
 ## Sample Reweighting and Selection[#](#sample-reweighting-and-selection)
 
@@ -309,25 +309,25 @@ Some samples may be more likely to have inaccurate labels than others. Such esti
 
 Considering a binary classification task with random classification noise, $y, \hat{y} \in \{-1, +1\}$, the label flipping probabilities, $\rho_{-1}, \rho_{+1} \in \[0, 0.5)$, are defined as:
 
-$$ \rho_{-1} = P(\tilde{y} = +1 \vert y=-1)\quad\rho_{+1} = P(\tilde{y}=-1 \vert y =+1) $$
+$$\rho_{-1} = P(\tilde{y} = +1 \vert y=-1)\quad\rho_{+1} = P(\tilde{y}=-1 \vert y =+1)$$
 
 [Liu & Tao (2015)](https://arxiv.org/abs/1411.7718) applies **importance reweighting** to adjust the weighted distribution of observed $\hat{y}$ to match the distribution of unobservable $y$. Let $\mathcal{D}$ be the true data distribution and $\mathcal{D}_\rho$ be the corrupted version.
 
-$$ \begin{aligned} \mathcal{L}_{\ell,\mathcal{D}}(f) &= \mathbb{E}_{(\mathbf{x},y)\sim \mathcal{D}}\[\ell(f(\mathbf{x}), y)\] \\ &= \mathbb{E}_{(\mathbf{x},\tilde{y})\sim \mathcal{D}_\rho} \Big\[ \frac{P_\mathcal{D}(\mathbf{x}, y=\tilde{y})}{P_{\mathcal{D}_\rho}(\mathbf{x}, \tilde{y})} \ell(f(\mathbf{x}), \tilde{y}) \Big\] \\ &= \mathbb{E}_{(\mathbf{x},\tilde{y})\sim \mathcal{D}_\rho} \Big\[ \frac{P_\mathcal{D}(y=\tilde{y} \vert \mathbf{x})}{P_{\mathcal{D}_\rho}(\tilde{y} \vert \mathbf{x})} \ell(f(\mathbf{x}), \tilde{y}) \Big\] & \text{; because }P_\mathcal{D}(\mathbf{x})=P_{\mathcal{D}_\rho}(\mathbf{x}) \\ &= \mathbb{E}_{(\mathbf{x},\tilde{y})\sim \mathcal{D}_\rho} \[ w(\mathbf{x}, \hat{y})\ell(f(\mathbf{x}), \tilde{y}) \] = \mathcal{L}_{w\ell,\mathcal{D}}(f) \end{aligned} $$
+$$\begin{aligned} \mathcal{L}_{\ell,\mathcal{D}}(f) &= \mathbb{E}_{(\mathbf{x},y)\sim \mathcal{D}}\[\ell(f(\mathbf{x}), y)\] \\ &= \mathbb{E}_{(\mathbf{x},\tilde{y})\sim \mathcal{D}_\rho} \Big\[ \frac{P_\mathcal{D}(\mathbf{x}, y=\tilde{y})}{P_{\mathcal{D}_\rho}(\mathbf{x}, \tilde{y})} \ell(f(\mathbf{x}), \tilde{y}) \Big\] \\ &= \mathbb{E}_{(\mathbf{x},\tilde{y})\sim \mathcal{D}_\rho} \Big\[ \frac{P_\mathcal{D}(y=\tilde{y} \vert \mathbf{x})}{P_{\mathcal{D}_\rho}(\tilde{y} \vert \mathbf{x})} \ell(f(\mathbf{x}), \tilde{y}) \Big\] & \text{; because }P_\mathcal{D}(\mathbf{x})=P_{\mathcal{D}_\rho}(\mathbf{x}) \\ &= \mathbb{E}_{(\mathbf{x},\tilde{y})\sim \mathcal{D}_\rho} \[ w(\mathbf{x}, \hat{y})\ell(f(\mathbf{x}), \tilde{y}) \] = \mathcal{L}_{w\ell,\mathcal{D}}(f) \end{aligned}$$
 
 Because,
 
-$$ \begin{aligned} P_{\mathcal{D}_\rho}(\tilde{y} \vert \mathbf{x}) &= P_\mathcal{D}(y = \tilde{y} \vert \mathbf{x}) P_{\mathcal{D}_\rho}(\tilde{y} \vert y=\tilde{y}) + P_\mathcal{D}(y = - \tilde{y} \vert \mathbf{x}) P_{\mathcal{D}_\rho}(\tilde{y} \vert y = - \tilde{y}) \\ &= P_\mathcal{D}(y = \tilde{y} \vert \mathbf{x}) (1 - P_{\mathcal{D}_\rho}(- \tilde{y} \vert y=\tilde{y})) + (1 - P_\mathcal{D}(y = \tilde{y} \vert \mathbf{x})) P_{\mathcal{D}_\rho}(\tilde{y} \vert y = - \tilde{y}) \\ &= P_\mathcal{D}(y = \tilde{y} \vert \mathbf{x}) (1 - \rho_{\tilde{y}}) + (1 - P_\mathcal{D}(y = \tilde{y} \vert \mathbf{x})) \rho_{-\tilde{y}} \\ &= P_\mathcal{D}(y = \tilde{y} \vert \mathbf{x})(1 - \rho_{\tilde{y}} - \rho_{-\tilde{y}}) + \rho_{-\tilde{y}} \end{aligned} $$
+$$\begin{aligned} P_{\mathcal{D}_\rho}(\tilde{y} \vert \mathbf{x}) &= P_\mathcal{D}(y = \tilde{y} \vert \mathbf{x}) P_{\mathcal{D}_\rho}(\tilde{y} \vert y=\tilde{y}) + P_\mathcal{D}(y = - \tilde{y} \vert \mathbf{x}) P_{\mathcal{D}_\rho}(\tilde{y} \vert y = - \tilde{y}) \\ &= P_\mathcal{D}(y = \tilde{y} \vert \mathbf{x}) (1 - P_{\mathcal{D}_\rho}(- \tilde{y} \vert y=\tilde{y})) + (1 - P_\mathcal{D}(y = \tilde{y} \vert \mathbf{x})) P_{\mathcal{D}_\rho}(\tilde{y} \vert y = - \tilde{y}) \\ &= P_\mathcal{D}(y = \tilde{y} \vert \mathbf{x}) (1 - \rho_{\tilde{y}}) + (1 - P_\mathcal{D}(y = \tilde{y} \vert \mathbf{x})) \rho_{-\tilde{y}} \\ &= P_\mathcal{D}(y = \tilde{y} \vert \mathbf{x})(1 - \rho_{\tilde{y}} - \rho_{-\tilde{y}}) + \rho_{-\tilde{y}} \end{aligned}$$
 
 Thus the weight assigned to a noisy sample is,
 
-$$ w(x, \tilde{y}) = \frac{P_\mathcal{D}(y=\tilde{y} \vert \mathbf{x})}{P_{\mathcal{D}_\rho}(\tilde{y} \vert \mathbf{x})} = \frac{P_{\mathcal{D}_\rho}(\tilde{y} \vert \mathbf{x}) - \rho_{-\tilde{y}}}{(1-\rho_0-\rho_1) P_{\mathcal{D}_\rho}(\tilde{y} \vert \mathbf{x})} $$
+$$w(x, \tilde{y}) = \frac{P_\mathcal{D}(y=\tilde{y} \vert \mathbf{x})}{P_{\mathcal{D}_\rho}(\tilde{y} \vert \mathbf{x})} = \frac{P_{\mathcal{D}_\rho}(\tilde{y} \vert \mathbf{x}) - \rho_{-\tilde{y}}}{(1-\rho_0-\rho_1) P_{\mathcal{D}_\rho}(\tilde{y} \vert \mathbf{x})}$$
 
 where $P_{\mathcal{D}_\rho}(\tilde{y} \vert \mathbf{x})$ can be estimated using a simple logistic regression, but estimating the note rates is more challenging. Naive cross-validation can work out but is costly as the quality depends on the amount of trusted labels available. The paper approximates the upper bounds for noise rates first, $\rho_\tilde{y} \leq P_{\mathcal{D}_\rho}(- \tilde{y} \vert \mathbf{x})$ and then use a mild assumption to efficiently estimate them, $\hat{\rho}_{\tilde{y}} = \min_{\mathbf{x} \in {\mathbf{x}_1, \dots, \mathbf{x}_n}} \hat{P}_{\mathcal{D}_\rho}(- \tilde{y} \vert \mathbf{x})$. In their experiments, the advantage of importance reweighting only varies across datasets and is more beneficial when the noise rates are high in general.
 
 Sample reweighting schemes can be learned by a separate network. _Learning to reweight_ (**L2R**; [Ren et al. 2018](https://arxiv.org/abs/1803.09050)) is a meta-learning approach to directly optimize the weights in pursuit of best validation performance on a known set of clean data. Each example gets assigned with the weight based on its gradient direction. The weighted loss to minimize $\theta^\*(\mathbf{w})$ involves a set of training weights $\{w_i\}_{i=1}^n$ as unknown hyperparameters. These sample training weights $w_i$ are learned to minimize the loss on this unbiased validate set, $\mathcal{D}_c = \{x^\text{valid}_j\}_{j=1}^m$.
 
-$$ \begin{aligned} \theta^{\*}(\mathbf{w}) &= \arg\min_\theta \sum_{i=1}^n w_i f(x_i; \theta) \\ \text{where optimal }\mathbf{w}^{\*} &= \arg\min_{\mathbf{w}, \mathbf{w} \\geq \mathbf{0}} \frac{1}{m} \sum_{j=1}^m f(\mathbf{x}^\text{valid}_j; \theta^{\*}(\mathbf{w})) \end{aligned} $$
+$$\begin{aligned} \theta^{\*}(\mathbf{w}) &= \arg\min_\theta \sum_{i=1}^n w_i f(x_i; \theta) \\ \text{where optimal }\mathbf{w}^{\*} &= \arg\min_{\mathbf{w}, \mathbf{w} \\geq \mathbf{0}} \frac{1}{m} \sum_{j=1}^m f(\mathbf{x}^\text{valid}_j; \theta^{\*}(\mathbf{w})) \end{aligned}$$
 
 The learning process involves two nested loops of optimization, so pretty expensive, 3x training time.
 
@@ -345,11 +345,11 @@ Fig. 13. Left: Imbalanced classes on MNIST (class 4 and 9); Right: Effect of the
 
 Let $g_\\psi$ be the MentorNet parameterized by $\\psi$ , $f_\theta$ be the StudentNet parametrized by $\theta$ and $G$ be a predefined curriculum parameterized by $\lambda$. Given the training data $\mathcal{D} = \{(\mathbf{x}_i, y_i)\}_{i=1}^n$ for a $k$-class classification task, the MentorNet needs to predict a time-varying latent weight variable $\mathbf{w} \in \[0, 1\]^{n \times k}$ to guide the learning of StudentNet, taking an intermediate feature processed by StudentNet $f$ , $\mathbf{z}_i = \phi_{f_\theta}(\mathbf{x}_i, y_i)$:
 
-$$ g_{\\psi^{\*}}(\mathbf{z}_i) = \arg\min_{w_i \in \[0,1\]} \mathcal{L}(\theta, \mathbf{w}), \forall i \in \[1, n\] $$
+$$g_{\\psi^{\*}}(\mathbf{z}_i) = \arg\min_{w_i \in \[0,1\]} \mathcal{L}(\theta, \mathbf{w}), \forall i \in \[1, n\]$$
 
 StudentNet learns to minimize the following learning objective,
 
-$$ \begin{aligned} \mathcal{L}(\theta, \mathbf{w}) &= \frac{1}{n}\sum_{i=1}^n \mathbf{w}_i^\top \ell(y_i, f_\theta(\mathbf{x}_i)) + G_\lambda(\mathbf{w}) + \alpha |\theta|^2_2 \\ &= \frac{1}{n}\sum_{i=1}^n g_\\psi(\mathbf{z}_i)^\top \ell_i + G_\lambda(\mathbf{w}) + \alpha |\theta|^2_2 & \text{; Let }\ell_i = \ell(y_i, f_\theta(\mathbf{x}_i)) \\ \end{aligned} $$
+$$\begin{aligned} \mathcal{L}(\theta, \mathbf{w}) &= \frac{1}{n}\sum_{i=1}^n \mathbf{w}_i^\top \ell(y_i, f_\theta(\mathbf{x}_i)) + G_\lambda(\mathbf{w}) + \alpha |\theta|^2_2 \\ &= \frac{1}{n}\sum_{i=1}^n g_\\psi(\mathbf{z}_i)^\top \ell_i + G_\lambda(\mathbf{w}) + \alpha |\theta|^2_2 & \text{; Let }\ell_i = \ell(y_i, f_\theta(\mathbf{x}_i)) \\ \end{aligned}$$
 
 The mentor network $g_\\psi$ is trained with cross entropy on the input $(\phi_{f_\theta}(\mathbf{x}_i, y_i), w^{\*}_i)$ , where $v^\*_i=1$ if $y_i$ is known to be a correct label, otherwise 0. The architecture of MentorNet does not have to be very complicated. In the paper, they adopted a LSTM layer to capture the prediction variance in time.
 

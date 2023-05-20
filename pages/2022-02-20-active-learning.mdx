@@ -166,7 +166,7 @@ Unfortunately all the cheap implicit ensemble options above perform worse than n
 
 **Bayes-by-backprop** ([Blundell et al. 2015](https://arxiv.org/abs/1505.05424)) measures weight uncertainty in neural networks directly. The method maintains a probability distribution over the weights $\mathbf{w}$, which is modeled as a variational distribution $q(\mathbf{w} \vert \theta)$ since the true posterior $p(\mathbf{w} \vert \mathcal{D})$ is not tractable directly. The loss is to minimize the KL divergence between $q(\mathbf{w} \vert \theta)$ and $p(\mathbf{w} \vert \mathcal{D})$,
 
-$$ \begin{aligned} \mathcal{L}(\theta) &= \text{KL}\[q(\mathbf{w}\vert\theta) \| p(\mathbf{w} \vert \mathcal{D})\] \\ &= \int q(\mathbf{w}\vert\theta) \log \frac{q(\mathbf{w}\vert\theta)}{p(\mathbf{w}) p(\mathcal{D}\vert \mathbf{w})} d\mathbf{w} \\ &= \text{KL}\[q(\mathbf{w}\vert\theta) \| p(w)\] - \mathbb{E}_{q(\mathbf{w}\vert\theta)} \[\log p(\mathcal{D} \vert \mathbf{w})\] \\ &\approx \log q(\mathbf{w} \vert \theta) - \log p(\mathbf{w}) p(\mathcal{D}\vert \mathbf{w}) & \text{; monte carlo sampling; }q(\mathbf{w} \vert \theta)\text{ & }p(\mathbf{w})\text{ are close.} \end{aligned} $$
+$$\begin{aligned} \mathcal{L}(\theta) &= \text{KL}\[q(\mathbf{w}\vert\theta) \| p(\mathbf{w} \vert \mathcal{D})\] \\ &= \int q(\mathbf{w}\vert\theta) \log \frac{q(\mathbf{w}\vert\theta)}{p(\mathbf{w}) p(\mathcal{D}\vert \mathbf{w})} d\mathbf{w} \\ &= \text{KL}\[q(\mathbf{w}\vert\theta) \| p(w)\] - \mathbb{E}_{q(\mathbf{w}\vert\theta)} \[\log p(\mathcal{D} \vert \mathbf{w})\] \\ &\approx \log q(\mathbf{w} \vert \theta) - \log p(\mathbf{w}) p(\mathcal{D}\vert \mathbf{w}) & \text{; monte carlo sampling; }q(\mathbf{w} \vert \theta)\text{ & }p(\mathbf{w})\text{ are close.} \end{aligned}$$
 
 The variational distribution $q$ is typically a Gaussian with diagonal covariance and each weight is sampled from $\mathcal{N}(\mu_i, \sigma_i^2)$. To ensure non-negativity of $\sigma_i$, it is further parameterized via softplus, $\sigma_i = \log(1 + \exp(\rho_i))$ where the variational parameters are $\theta = \{\mu_i , \rho_i\}^d_{i=1}$.
 
@@ -189,7 +189,7 @@ Fig. 3. Use the model with a loss prediction module to do active learning select
 
 Let $\hat{l}$ be the output of the loss prediction module and $l$ be the true loss. When training the loss prediction module, a simple MSE loss $=(l - \hat{l})^2$ is not a good choice, because the loss decreases in time as the model learns to behave better. A good learning objective should be independent of the scale changes of the target loss. They instead rely on the comparison of sample pairs. Within each batch of size $b$, there are $b/2$ pairs of samples $(\mathbf{x}_i, \mathbf{x}_j)$ and the loss prediction model is expected to correctly predict which sample has a larger loss.
 
-$$ \begin{aligned} \mathcal{L}_\text{loss}(\mathbf{x}_i, \mathbf{x}_j) &= \max\big( 0, -\mathbb{1}(l(\mathbf{x}_i), l(\mathbf{x}_j)) \cdot (\hat{l}(\mathbf{x}_i) - \hat{l}(\mathbf{x}_j)) + \\epsilon \big) \\ \text{where } \mathbb{1}(l_i, l_j) &= \begin{cases} +1 & \text{if }l_i > l_j \\ -1 & \text{otherwise} \end{cases} \end{aligned} $$
+$$\begin{aligned} \mathcal{L}_\text{loss}(\mathbf{x}_i, \mathbf{x}_j) &= \max\big( 0, -\mathbb{1}(l(\mathbf{x}_i), l(\mathbf{x}_j)) \cdot (\hat{l}(\mathbf{x}_i) - \hat{l}(\mathbf{x}_j)) + \\epsilon \big) \\ \text{where } \mathbb{1}(l_i, l_j) &= \begin{cases} +1 & \text{if }l_i > l_j \\ -1 & \text{otherwise} \end{cases} \end{aligned}$$
 
 where $\\epsilon$ is a predefined positive margin constant.
 
@@ -212,13 +212,13 @@ Fig. 5. Illustration of VAAL (Variational adversarial active learning). (Image s
 
 The loss for VAE representation learning in VAAL contains both a reconstruction part (minimizing the ELBO of given samples) and an adversarial part (labeled and unlabeled data is drawn from the same probability distribution $q_\phi$):
 
-$$ \begin{aligned} \mathcal{L}_\text{VAE} &= \lambda_1 \mathcal{L}^\text{rec}_\text{VAE} + \lambda_2 \mathcal{L}^\text{adv}_\text{VAE} \\ \mathcal{L}^\text{rec}_\text{VAE} &= \mathbb{E}\[\log p_\theta(\mathbf{x}^l \vert \mathbf{z}^l)\] - \beta \text{KL}(q_\phi(\mathbf{z}^l \vert \mathbf{x}^l) \| p(\mathbf{\tilde{z}})) + \mathbb{E}\[\log p_\theta(\mathbf{u} \vert \mathbf{z}^u)\] - \beta \text{KL}(q_\phi(\mathbf{z}^u \vert \mathbf{u}) \| p(\mathbf{\tilde{z}})) \\ \mathcal{L}^\text{adv}_\text{VAE} &= - \mathbb{E}\[\log D(q_\phi (\mathbf{z}^l \vert \mathbf{x}^l))\] - \mathbb{E}\[\log D(q_\phi(\mathbf{z}^u \vert \mathbf{u}))\] \end{aligned} $$
+$$\begin{aligned} \mathcal{L}_\text{VAE} &= \lambda_1 \mathcal{L}^\text{rec}_\text{VAE} + \lambda_2 \mathcal{L}^\text{adv}_\text{VAE} \\ \mathcal{L}^\text{rec}_\text{VAE} &= \mathbb{E}\[\log p_\theta(\mathbf{x}^l \vert \mathbf{z}^l)\] - \beta \text{KL}(q_\phi(\mathbf{z}^l \vert \mathbf{x}^l) \| p(\mathbf{\tilde{z}})) + \mathbb{E}\[\log p_\theta(\mathbf{u} \vert \mathbf{z}^u)\] - \beta \text{KL}(q_\phi(\mathbf{z}^u \vert \mathbf{u}) \| p(\mathbf{\tilde{z}})) \\ \mathcal{L}^\text{adv}_\text{VAE} &= - \mathbb{E}\[\log D(q_\phi (\mathbf{z}^l \vert \mathbf{x}^l))\] - \mathbb{E}\[\log D(q_\phi(\mathbf{z}^u \vert \mathbf{u}))\] \end{aligned}$$
 
 where $p(\mathbf{\tilde{z}})$ is a unit Gaussian as a predefined prior and $\beta$ is the Lagrangian parameter.
 
 The discriminator loss is:
 
-$$ \mathcal{L}_D = -\mathbb{E}\[\log D(q_\phi (\mathbf{z}^l \vert \mathbf{x}^l))\] - \mathbb{E}\[\log (1 - D(q_\phi (\mathbf{z}^u \vert \mathbf{u})))\] $$
+$$\mathcal{L}_D = -\mathbb{E}\[\log D(q_\phi (\mathbf{z}^l \vert \mathbf{x}^l))\] - \mathbb{E}\[\log (1 - D(q_\phi (\mathbf{z}^u \vert \mathbf{u})))\]$$
 
 ![](VAAL-exp.png)
 
@@ -236,11 +236,11 @@ A feature encoder $F$ encodes a sample into a $\ell_2$-normalized $d$-dimensiona
 
 (1) First $F$ and $C$ are trained on labeled samples by a simple cross entropy loss to achieve good classification results,
 
-$$ \mathcal{L}_\text{CE} = -\mathbb{E}_{(\mathbf{x}^l, y) \sim \mathcal{X}} \sum_{k=1}^K \mathbb{1}\[k=y\] \log\Big( \sigma(\frac{1}{T} \frac{\mathbf{W}^\top F\big(\mathbf{x}^l)}{\|F(\mathbf{x}^l)\|}\big) \Big) $$
+$$\mathcal{L}_\text{CE} = -\mathbb{E}_{(\mathbf{x}^l, y) \sim \mathcal{X}} \sum_{k=1}^K \mathbb{1}\[k=y\] \log\Big( \sigma(\frac{1}{T} \frac{\mathbf{W}^\top F\big(\mathbf{x}^l)}{\|F(\mathbf{x}^l)\|}\big) \Big)$$
 
 (2) When training on the unlabeled examples, MAL relies on a _minimax_ game setup
 
-$$ \begin{aligned} \mathcal{L}_\text{Ent} &= -\sum^K_{k=1} p(y=k \vert \mathbf{u}) \log p(y=k\vert \mathbf{u}) \\ \theta^\*_F, \theta^\*_C &= \min_F\max_C \mathcal{L}_\text{Ent} \\ \theta_F &\gets \theta_F - \alpha_1 \nabla \mathcal{L}_\text{Ent} \\ \theta_C &\gets \theta_C + \alpha_2 \nabla \mathcal{L}_\text{Ent} \end{aligned} $$
+$$\begin{aligned} \mathcal{L}_\text{Ent} &= -\sum^K_{k=1} p(y=k \vert \mathbf{u}) \log p(y=k\vert \mathbf{u}) \\ \theta^\*_F, \theta^\*_C &= \min_F\max_C \mathcal{L}_\text{Ent} \\ \theta_F &\gets \theta_F - \alpha_1 \nabla \mathcal{L}_\text{Ent} \\ \theta_C &\gets \theta_C + \alpha_2 \nabla \mathcal{L}_\text{Ent} \end{aligned}$$
 
 where,
 
@@ -262,7 +262,7 @@ Fig. 8. Performance of MAL on ImageNet. (Table source: [Ebrahimiet al. 2021](htt
 
 **CAL** (Contrastive Active Learning; [Margatina et al. 2021](https://arxiv.org/abs/2109.03764)) intends to select [contrastive](https://lilianweng.github.io/posts/2021-05-31-contrastive/) examples. If two data points with different labels share similar network representations $\phi(.)$, they are considered as contrastive examples in CAL. Given a pair of contrastive examples $(\mathbf{x}_i, \mathbf{x}_j)$, they should
 
-$$ d(\phi(\mathbf{x}_i), \phi(\mathbf{x}_j)) < \\epsilon \quad\text{and}\quad \text{KL}(p(y\vert \mathbf{x}_i) \| p(y\vert \mathbf{x}_j)) \rightarrow \infty $$
+$$d(\phi(\mathbf{x}_i), \phi(\mathbf{x}_j)) < \\epsilon \quad\text{and}\quad \text{KL}(p(y\vert \mathbf{x}_i) \| p(y\vert \mathbf{x}_j)) \rightarrow \infty$$
 
 Given an unlabeled sample $\mathbf{x}$, CAL runs the following process:
 
@@ -280,11 +280,11 @@ A **core-set** is a concept in computational geometry, referring to a small set 
 
 [Sener & Savarese (2018)](https://arxiv.org/abs/1708.00489) treats active learning as a core-set selection problem. Let's say, there are $N$ samples in total accessible during training. During active learning, a small set of data points get labeled at every time step $t$, denoted as $\mathcal{S}^{(t)}$. The upper bound of the learning objective can be written as follows, where the _core-set loss_ is defined as the difference between average empirical loss over the labeled samples and the loss over the entire dataset including unlabelled ones.
 
-$$ \begin{aligned} \mathbb{E}_{(\mathbf{x}, y) \sim p} \[\mathcal{L}(\mathbf{x}, y)\] \leq& \bigg\vert \mathbb{E}_{(\mathbf{x}, y) \sim p} \[\mathcal{L}(\mathbf{x}, y)\] - \frac{1}{N} \sum_{i=1}^N \mathcal{L}(\mathbf{x}_i, y_i) \bigg\vert & \text{; Generalization error}\\ +& \frac{1}{\vert \mathcal{S}^{(t)} \vert} \sum_{j=1}^{\vert \mathcal{S}^{(t)} \vert} \mathcal{L}(\mathbf{x}^l_j, y_j) & \text{; Training error}\\ +& \bigg\vert \frac{1}{N} \sum_{i=1}^N \mathcal{L}(\mathbf{x}_i, y_i) - \frac{1}{\vert \mathcal{S}^{(t)} \vert} \sum_{j=1}^{\vert \mathcal{S}^{(t)} \vert} \mathcal{L}(\mathbf{x}^l_j, y_j) \bigg\vert & \text{; Core-set error} \end{aligned} $$
+$$\begin{aligned} \mathbb{E}_{(\mathbf{x}, y) \sim p} \[\mathcal{L}(\mathbf{x}, y)\] \leq& \bigg\vert \mathbb{E}_{(\mathbf{x}, y) \sim p} \[\mathcal{L}(\mathbf{x}, y)\] - \frac{1}{N} \sum_{i=1}^N \mathcal{L}(\mathbf{x}_i, y_i) \bigg\vert & \text{; Generalization error}\\ +& \frac{1}{\vert \mathcal{S}^{(t)} \vert} \sum_{j=1}^{\vert \mathcal{S}^{(t)} \vert} \mathcal{L}(\mathbf{x}^l_j, y_j) & \text{; Training error}\\ +& \bigg\vert \frac{1}{N} \sum_{i=1}^N \mathcal{L}(\mathbf{x}_i, y_i) - \frac{1}{\vert \mathcal{S}^{(t)} \vert} \sum_{j=1}^{\vert \mathcal{S}^{(t)} \vert} \mathcal{L}(\mathbf{x}^l_j, y_j) \bigg\vert & \text{; Core-set error} \end{aligned}$$
 
 Then the active learning problem can be redefined as:
 
-$$ \min_{\mathcal{S}^{(t+1)} : \vert \mathcal{S}^{(t+1)} \vert \leq b} \bigg\vert \frac{1}{N}\sum_{i=1}^N \mathcal{L}(\mathbf{x}_i, y_i) - \frac{1}{\vert \mathcal{S}^{(t)} \cup \mathcal{S}^{(t+1)} \vert} \sum_{j=1}^{\vert \mathcal{S}^{(t)} \cup \mathcal{S}^{(t+1)} \vert} \mathcal{L}(\mathbf{x}^l_j, y_j) \bigg\vert $$
+$$\min_{\mathcal{S}^{(t+1)} : \vert \mathcal{S}^{(t+1)} \vert \leq b} \bigg\vert \frac{1}{N}\sum_{i=1}^N \mathcal{L}(\mathbf{x}_i, y_i) - \frac{1}{\vert \mathcal{S}^{(t)} \cup \mathcal{S}^{(t+1)} \vert} \sum_{j=1}^{\vert \mathcal{S}^{(t)} \cup \mathcal{S}^{(t+1)} \vert} \mathcal{L}(\mathbf{x}^l_j, y_j) \bigg\vert$$
 
 It is equivalent to [the $k$-Center problem](https://en.wikipedia.org/wiki/Metric_k-center): choose $b$ center points such that the largest distance between a data point and its nearest center is minimized. This problem is NP-hard. An approximate solution depends on the greedy algorithm.
 
@@ -315,11 +315,11 @@ Fig. 10. Algorithm of BADGE (batch active learning by diverse gradient embedding
 
 Let $\nabla \mathcal{L}(\theta)$ be the gradient of the loss function with respect to the model parameters. Specifically, given an unlabeled sample $\mathbf{x}_i$, we need to calculate the gradient assuming the label is $y \in \mathcal{Y}$, $\nabla \mathcal{L}^{(y)}(\theta)$. Because the true label $y_i$ is unknown, EGL relies on the current model belief to compute the expected gradient change:
 
-$$ \text{EGL}(\mathbf{x}_i) = \sum_{y_i \in \mathcal{Y}} p(y=y_i \vert \mathbf{x}) \|\nabla \mathcal{L}^{(y_i)}(\theta)\| $$
+$$\text{EGL}(\mathbf{x}_i) = \sum_{y_i \in \mathcal{Y}} p(y=y_i \vert \mathbf{x}) \|\nabla \mathcal{L}^{(y_i)}(\theta)\|$$
 
 **BALD** (Bayesian Active Learning by Disagreement; [Houlsby et al. 2011](https://arxiv.org/abs/1112.5745)) aims to identify samples to maximize the information gain about the model weights, that is equivalent to maximize the decrease in expected posterior entropy.
 
-$$ \begin{aligned} I\[\boldsymbol{\theta}, y \vert x,\mathcal{D}\] &= H(\boldsymbol{\theta} \vert \mathcal{D}) - \mathbb{E}_{y \sim p(y \vert \boldsymbol{x}, \mathcal{D})} \big\[ H(\boldsymbol{\theta} \vert y, \boldsymbol{x}, \mathcal{D}) \big\] & \text{; Decrease in expected posterior entropy}\\ &= H(y \vert \boldsymbol{x}, \mathcal{D}) - \mathbb{E}_{\boldsymbol{\theta} \sim p(\boldsymbol{\theta} \vert \mathcal{D})} \big\[ H(y \vert \boldsymbol{x}, \mathcal{\theta}) \big\] \end{aligned} $$
+$$\begin{aligned} I\[\boldsymbol{\theta}, y \vert x,\mathcal{D}\] &= H(\boldsymbol{\theta} \vert \mathcal{D}) - \mathbb{E}_{y \sim p(y \vert \boldsymbol{x}, \mathcal{D})} \big\[ H(\boldsymbol{\theta} \vert y, \boldsymbol{x}, \mathcal{D}) \big\] & \text{; Decrease in expected posterior entropy}\\ &= H(y \vert \boldsymbol{x}, \mathcal{D}) - \mathbb{E}_{\boldsymbol{\theta} \sim p(\boldsymbol{\theta} \vert \mathcal{D})} \big\[ H(y \vert \boldsymbol{x}, \mathcal{\theta}) \big\] \end{aligned}$$
 
 The underlying interpretation is to “seek $\mathbf{x}$ for which the model is marginally most uncertain about $y$ (high $H(y \vert \mathbf{x}, \mathcal{D})$), but for which individual settings of the parameters are confident (low $H(y \vert \mathbf{x}, \boldsymbol{\theta})$).” In other words, each individual posterior draw is confident but a collection of draws carry diverse opinions.
 
@@ -338,7 +338,7 @@ In the implementation, the forgetting event is only counted when a sample is inc
 
 Forgetting events can be used as a signal for active learning acquisition if we hypothesize a model changing predictions during training is an indicator of model uncertainty. However, ground truth is unknown for unlabeled samples. [Bengar et al. (2021)](https://arxiv.org/abs/2107.14707) proposed a new metric called **label dispersion** for such a purpose. Let's see across the training time, $c^\*$ is the most commonly predicted label for the input $\mathbf{x}$ and the label dispersion measures the fraction of training steps when the model does not assign $c^\*\*$ to this sample:
 
-$$ \text{Dispersion}(\mathbf{x}) = 1 - \frac{f_\mathbf{x}}{T} \text{ where } f_\mathbf{x} = \sum_{t=1}^T \mathbb{1}\[\hat{y}_t = c^\*\], c^\* = \arg\max_{c=1,\dots,C}\sum_{t=1}^T \mathbb{1}\[\hat{y}_t = c\] $$
+$$\text{Dispersion}(\mathbf{x}) = 1 - \frac{f_\mathbf{x}}{T} \text{ where } f_\mathbf{x} = \sum_{t=1}^T \mathbb{1}\[\hat{y}_t = c^\*\], c^\* = \arg\max_{c=1,\dots,C}\sum_{t=1}^T \mathbb{1}\[\hat{y}_t = c\]$$
 
 In their implementation, dispersion is computed at every epoch. Label dispersion is low if the model consistently assigns the same label to the same sample but high if the prediction changes often. Label dispersion is correlated with network uncertainty, as shown in Fig. 11.
 
@@ -353,7 +353,7 @@ When running active learning in batch mode, it is important to control diversity
 1.  First, SA selects top $K$ images with high uncertainty scores to form a candidate pool $\mathcal{S}_c \subseteq \mathcal{S}_U$. The uncertainty is measured as disagreement between multiple models training with bootstrapping.
 2.  The next step is to find a subset $\mathcal{S}_a \subseteq \mathcal{S}_c$ with highest representativeness. The cosine similarity between feature vectors of two inputs approximates how similar they are. The representativeness of $\mathcal{S}_a$ for $\mathcal{S}_U$ reflects how well $\mathcal{S}_a$ can represent all the samples in $\mathcal{S}_u$, defined as:
 
-$$ F(\mathcal{S}_a, \mathcal{S}_u) = \sum_{\mathbf{x}_j \in \mathcal{S}_u} f(\mathcal{S}_a, \mathbf{x}_j) = \sum_{\mathbf{x}_j \in \mathcal{S}_u} \max_{\mathbf{x}_i \in \mathcal{S}_a} \text{sim}(\mathbf{x}_i, \mathbf{x}_j) $$
+$$F(\mathcal{S}_a, \mathcal{S}_u) = \sum_{\mathbf{x}_j \in \mathcal{S}_u} f(\mathcal{S}_a, \mathbf{x}_j) = \sum_{\mathbf{x}_j \in \mathcal{S}_u} \max_{\mathbf{x}_i \in \mathcal{S}_a} \text{sim}(\mathbf{x}_i, \mathbf{x}_j)$$
 
 Formulating $\mathcal{S}_a \subseteq \mathcal{S}_c$ with $k$ data points that maximizes $F(\mathcal{S}_a, \mathcal{S}_u)$ is a generalized version of the maximum set cover problem. It is NP-hard and its best possible polynomial time approximation algorithm is a simple greedy method.
 

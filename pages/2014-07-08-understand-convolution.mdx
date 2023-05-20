@@ -294,14 +294,14 @@ In fact, the use of highly-efficient parallel convolution implementations on GPU
 
     For example, convolution is a commutative operation. That is, $f*g=g*f$. Why?
 
-    $$
+   $$
         \sum_{a+b=c} f(a)⋅g(b)  = \sum_{b+a=c} g(b)⋅f(a)
-    $$
+   $$
 
     Convolution is also associative. That is, $(f*g)*h=f*(g*h)$. Why?
 
-    $$
+   $$
         \sum_{(a+b)+c=d} (f(a)⋅g(b))⋅h(c)  = \sum_{a+(b+c)=d} f(a)⋅(g(b)⋅h(c))
-    $$
+   $$
 
 3. There's also the bias, which is the “threshold” for whether the neuron fires, but it's much simpler and I don't want to clutter this section talking about it.

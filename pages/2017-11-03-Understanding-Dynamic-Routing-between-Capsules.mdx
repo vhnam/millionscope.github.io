@@ -63,7 +63,7 @@ MNist dataset contains 55,000 training data. i.e. 5,500 samples per digits. Howe
 
 > A capsule is a group of neurons that not only capture the likelihood but also the parameters of the specific feature.
 
-For example, the first row below indicates the probabilities of detecting the number "7" by a neuron. A 2-D capsule is formed by combining 2 neurons. This capsule outputs a 2-D vector in detecting the number "7". For the first image in the second row, it outputs a vector $$ v = (0, 0.9)$$. The magnitude of the vector $$ \| v \| = \sqrt{ 0^2 + 0.9^2 } = 0.9 $$ corresponds to the probability of detecting "7". The second image of each row looks more like a "1" than a "7". Therefore its corresponding likelihood as "7" is smaller (smaller scaler value or smaller vector's magnitude but with the same orientation) .
+For example, the first row below indicates the probabilities of detecting the number "7" by a neuron. A 2-D capsule is formed by combining 2 neurons. This capsule outputs a 2-D vector in detecting the number "7". For the first image in the second row, it outputs a vector$$v = (0, 0.9)$$. The magnitude of the vector$$\| v \| = \sqrt{ 0^2 + 0.9^2 } = 0.9$$corresponds to the probability of detecting "7". The second image of each row looks more like a "1" than a "7". Therefore its corresponding likelihood as "7" is smaller (smaller scaler value or smaller vector's magnitude but with the same orientation) .
 
 ![cap1](assets/images/capsule/cap1.jpg)
 
@@ -86,7 +86,7 @@ $$s^{(1)}=(100, 66), s^{(2)}=(200, 131) \text{ and } s^{(3)}=( 50, 33).$$
 
 ([Image modified from](http://sharenoesis.com/article/draw-face/84))
 
-Let's assume $$W_m =2, W_e=3$$, and we calculate a vote from the mouth and the eye for $$ s^{(1)}$$ as:
+Let's assume$$W_m =2, W_e=3$$, and we calculate a vote from the mouth and the eye for$$s^{(1)}$$as:
 
 $$
 \begin{split}
@@ -95,15 +95,15 @@ v^{(1)}_e & = W_e \times width_e = 3 \times 66 = 198 \\
 \end{split}
 $$
 
-We realize both $$v^{(1)}_m$$ and $$v^{(1)}_e$$ are very similar. When we repeat it with other sketches, we get the same findings. So the mouth capsule and the eye capsule can be strongly related to a parent capsule with width approximate 200 pixels. From our experience, a face is 2 times ($$W_m=2$$) the width of a mouth and 3 times the width ($$W_e=3$$) of an eye. So the parent capsule we detected is a face capsule. Of course, we can make it more accurate by adding more properties like height or color. In dynamic routing, we transform the vectors of an input capsules with a transformation matrix $$W$$ to form a vote, and group capsules with similar votes. Those votes eventually becomes the output vector of the parent capsule. So how can we know $$W$$? Just do it in the deep learning way: backpropagation with a cost function.
+We realize both$$v^{(1)}_m$$and$$v^{(1)}_e$$are very similar. When we repeat it with other sketches, we get the same findings. So the mouth capsule and the eye capsule can be strongly related to a parent capsule with width approximate 200 pixels. From our experience, a face is 2 times ($$W_m=2$$) the width of a mouth and 3 times the width ($$W_e=3$$) of an eye. So the parent capsule we detected is a face capsule. Of course, we can make it more accurate by adding more properties like height or color. In dynamic routing, we transform the vectors of an input capsules with a transformation matrix$$W$$to form a vote, and group capsules with similar votes. Those votes eventually becomes the output vector of the parent capsule. So how can we know$$W$$? Just do it in the deep learning way: backpropagation with a cost function.
 
 #### Calculating a capsule output
 
-For a capsule, the input $$u_i$$ and the output $$v_j$$ of a capsule are vectors.
+For a capsule, the input$$u_i$$and the output$$v_j$$of a capsule are vectors.
 
 ![fc2](assets/images/capsule/fc2.jpg)
 
-We apply a **transformation matrix** $$W_{ij}$$ to the capsule output $$ u*i $$ of the pervious layer. For example, with a $$p \times k $$ matrix, we transform $$u_i$$ to $$\hat{u}*{j \vert i}$$ from k-dimension to p-dimension. ($$ (p \times k) \times (k \times 1) \implies p \times 1$$) Then we compute a weighted sum $$s_j$$ with weights $$c_{ij}$$.
+We apply a **transformation matrix**$$W_{ij}$$to the capsule output$$u*i$$of the pervious layer. For example, with a$$p \times k$$matrix, we transform$$u_i$$to$$\hat{u}*{j \vert i}$$from k-dimension to p-dimension. ($$(p \times k) \times (k \times 1) \implies p \times 1$$) Then we compute a weighted sum$$s_j$$with weights$$c_{ij}$$.
 
 $$
 \begin{split}
@@ -112,9 +112,9 @@ s_j & = \sum_i c_{ij}  \hat{u}_{j|i} \\
 \end{split}
 $$
 
-$$c_{ij}$$ are **coupling coefficients** that are calculated by the iterative dynamic routing process (discussed next) and $$ \sum*{j} c*{ij}$$ are designed to sum to one. Conceptually, $$c_{ij}$$ measures how likely capsule $$i$$ may activate capsule $$j$$.
+$$c_{ij}$$are **coupling coefficients** that are calculated by the iterative dynamic routing process (discussed next) and$$\sum*{j} c*{ij}$$are designed to sum to one. Conceptually,$$c_{ij}$$measures how likely capsule$$i$$may activate capsule$$j$$.
 
-Instead of applying a ReLU function, we apply a squashing function to $$s_j$$ so the final output vector $$v_j$$ of the capsule has length between 0 and 1. This function shrinks small vectors to zero and large vectors to unit vectors.
+Instead of applying a ReLU function, we apply a squashing function to$$s_j$$so the final output vector$$v_j$$of the capsule has length between 0 and 1. This function shrinks small vectors to zero and large vectors to unit vectors.
 
 $$
 \begin{split}
@@ -131,11 +131,11 @@ $$
 
 ### Iterative dynamic Routing
 
-In capsule, we use iterative dynamic routing to compute the capsule output by calculating an intermediate value $$c_{ij}$$ (coupling coefficient).
+In capsule, we use iterative dynamic routing to compute the capsule output by calculating an intermediate value$$c_{ij}$$(coupling coefficient).
 
 ![face6](assets/images/capsule/face6.jpg)
 
-Recall that the **prediction vector** $$\hat{u}_{j \vert i}$$ is computed as:
+Recall that the **prediction vector**$$\hat{u}_{j \vert i}$$is computed as:
 
 $$
 \begin{split}
@@ -143,7 +143,7 @@ $$
 \end{split}
 $$
 
-and the **activity vector** $$v_j$$ (the capsule $$j$$ output) is:
+and the **activity vector**$$v_j$$(the capsule$$j$$output) is:
 
 $$
 \begin{split}
@@ -152,7 +152,7 @@ v_{j} & = \frac{\| s_{j} \|^2}{ 1 + \| s_{j} \|^2} \frac{s_{j}}{ \| s_{j} \|}  \
 \end{split}
 $$
 
-Intuitively, prediction vector $$\hat{u}_{j \vert i}$$ is the prediction (**vote**) from the capsule $$i$$ on the output of the capsule $$j$$ above. If the activity vector has close similarity with the prediction vector, we conclude that both capsules are highly related. Such similarity is measured using the scalar product of the prediction and the activity vector.
+Intuitively, prediction vector$$\hat{u}_{j \vert i}$$is the prediction (**vote**) from the capsule$$i$$on the output of the capsule$$j$$above. If the activity vector has close similarity with the prediction vector, we conclude that both capsules are highly related. Such similarity is measured using the scalar product of the prediction and the activity vector.
 
 $$
 \begin{split}
@@ -160,9 +160,9 @@ b_{ij} ← \hat{u}_{j \vert i} \cdot v_j \\
 \end{split}
 $$
 
-Therefore, the similarity score $$b_{ij}$$ takes into account on both likeliness and the feature properties, instead of just likeliness in neurons. Also, $$ b*{ij} $$ remains low if the activation $$u_i$$ of capsule $$i$$ is low since $$\hat{u}*{j \vert i}$$ length is proportional to $$u_i$$. i.e. $$b_{ij}$$ should remain low between the mouth capsule and the face capsule if the mouth capsule is not activated.
+Therefore, the similarity score$$b_{ij}$$takes into account on both likeliness and the feature properties, instead of just likeliness in neurons. Also,$$b*{ij}$$remains low if the activation$$u_i$$of capsule$$i$$is low since$$\hat{u}*{j \vert i}$$length is proportional to$$u_i$$. i.e.$$b_{ij}$$should remain low between the mouth capsule and the face capsule if the mouth capsule is not activated.
 
-The coupling coefficients $$ c*{ij} $$ is computed as the softmax of $$ b*{ij} $$:
+The coupling coefficients$$c*{ij}$$is computed as the softmax of$$b*{ij}$$:
 
 $$
 \begin{split}
@@ -170,7 +170,7 @@ c_{ij} & = \frac{\exp{b_{ij}}} {\sum_k \exp{b_{ik}} } \\
 \end{split}
 $$
 
-To make $$b_{ij}$$ more accurate , it is updated iteratively in multiple iterations (typically in 3 iterations).
+To make$$b_{ij}$$more accurate , it is updated iteratively in multiple iterations (typically in 3 iterations).
 
 $$
 \begin{split}
@@ -186,7 +186,7 @@ Here is the final pseudo code for the dynamic routing:
 
 > Routing a capsule to the capsule in the layer above based on relevancy is called **Routing-by-agreement**.
 
-The dynamic routing is not a complete replacement of the backpropagation. The transformation matrix $$W$$ is still trained with the backpropagation using a cost function. However, we use dynamic routing to compute the output of a capsule. We compute $$c_{ij}$$ to quantify the connection between a capsule and its parent capsules. This value is important but short lived. We re-initialize it to 0 for every datapoint before the dynamic routing calculation. To calculate a capsule output, training or testing, we always redo the dynamic routing calculation.
+The dynamic routing is not a complete replacement of the backpropagation. The transformation matrix$$W$$is still trained with the backpropagation using a cost function. However, we use dynamic routing to compute the output of a capsule. We compute$$c_{ij}$$to quantify the connection between a capsule and its parent capsules. This value is important but short lived. We re-initialize it to 0 for every datapoint before the dynamic routing calculation. To calculate a capsule output, training or testing, we always redo the dynamic routing calculation.
 
 ### Max pooling shortcoming
 
@@ -202,7 +202,7 @@ $$
 y_j =  ReLU( \sum_{i} W_{ij} x_i + b_{j} ),
 $$
 
-and $$W$$ is trained by the backpropagation with a global cost function. Iterative dynamic routing provides an alternative of calculating how a capsule is activated by using local features' properties. Theoretically, we can group capsules better and simpler to form a **parse tree** with reduced risk of adversaries.
+and$$W$$is trained by the backpropagation with a global cost function. Iterative dynamic routing provides an alternative of calculating how a capsule is activated by using local features' properties. Theoretically, we can group capsules better and simpler to form a **parse tree** with reduced risk of adversaries.
 
 ![face7](assets/images/capsule/face7.jpg)
 
@@ -226,9 +226,9 @@ Finally, we apply capsules to build the CapsNet to classify the MNist digits. Th
 
 Image is feed into the ReLU Conv1 which is a standard convolution layer. It applies 256 9x9 kernels to generate an output with 256 channels (feature maps). With stride 1 and no padding, the spatial dimension is reduced to 20x20. ( 28-9+1=20)
 
-It is then feed into PrimaryCapsules which is a modified convolution layer supporting capsules. It generates a 8-D vector instead of a scalar. PrimaryCapsules used 8x32 kernels to generate 32 8-D capsules. (i.e. 8 output neurons are grouped together to form a capsule) PrimaryCapsules uses 9x9 kernels with stride 2 and no padding to reduce the spatial dimension from 20x20 to 6x6 ( $$ \lfloor \frac{20-9}{2} \rfloor + 1 = 6 $$). In PrimaryCapsules, we have 32x6x6 capsules.
+It is then feed into PrimaryCapsules which is a modified convolution layer supporting capsules. It generates a 8-D vector instead of a scalar. PrimaryCapsules used 8x32 kernels to generate 32 8-D capsules. (i.e. 8 output neurons are grouped together to form a capsule) PrimaryCapsules uses 9x9 kernels with stride 2 and no padding to reduce the spatial dimension from 20x20 to 6x6 ($$\lfloor \frac{20-9}{2} \rfloor + 1 = 6$$). In PrimaryCapsules, we have 32x6x6 capsules.
 
-It is then feed into DigiCaps which apply a transformation matrix $$W_{ij} $$ with shape 16x8 to convert the 8-D capsule to a 16-D capsule for each class $$j$$ (from 1 to 10).
+It is then feed into DigiCaps which apply a transformation matrix$$W_{ij}$$with shape 16x8 to convert the 8-D capsule to a 16-D capsule for each class$$j$$(from 1 to 10).
 
 $$
 \begin{split}
@@ -236,7 +236,7 @@ $$
 \end{split}
 $$
 
-The final output $$v_j$$ for class $$j$$ is computed as:
+The final output$$v_j$$for class$$j$$is computed as:
 
 $$
 \begin{split}
@@ -245,7 +245,7 @@ v_{j} & = \frac{\| s_{j} \|^2}{ 1 + \| s_{j} \|^2} \frac{s_{j}}{ \| s_{j} \|}  \
 \end{split}
 $$
 
-Because there are 10 classes, the shape of DigiCaps is 10x16 (10 16-D vector.) Each vector $$v_j$$ acts as the capsule for class $$j$$. The probability of the image to be classify as $$j$$ is computed by $$\| v_j \|$$. In our example, the true label is 7 and $$v_7$$ is the latent representation of our input. With a 2 hidden fully connected layers, we can reconstruct the 28x28 image from $$v_7$$.
+Because there are 10 classes, the shape of DigiCaps is 10x16 (10 16-D vector.) Each vector$$v_j$$acts as the capsule for class$$j$$. The probability of the image to be classify as$$j$$is computed by$$\| v_j \|$$. In our example, the true label is 7 and$$v_7$$is the latent representation of our input. With a 2 hidden fully connected layers, we can reconstruct the 28x28 image from$$v_7$$.
 
 Here is the summary of each layers:
 
@@ -254,7 +254,7 @@ Here is the summary of each layers:
 | Image           | Raw image array                                                                                                                       | 28x28x1      |
 | ReLU Conv1      | Convolution layer with 9x9 kernels output 256 channels, stride 1, no padding with ReLU                                                | 20x20x256    |
 | PrimaryCapsules | Convolution capsule layer with 9x9 kernel output 32x6x6 8-D capsule, stride 2, no padding                                             | 6x6x32x8     |
-| DigiCaps        | Capsule output computed from a $$W_{ij} $$ (16x8 matrix) between $$u_i$$ and $$v_j$$ ($$i$$ from 1 to 32x6x6 and $$j$$ from 1 to 10). | 10x16        |
+| DigiCaps        | Capsule output computed from a$$W_{ij}$$(16x8 matrix) between$$u_i$$and$$v_j$$($$i$$from 1 to 32x6x6 and$$j$$from 1 to 10). | 10x16        |
 | FC1             | Fully connected with ReLU                                                                                                             | 512          |
 | FC2             | Fully connected with ReLU                                                                                                             | 1024         |
 | Output image    | Fully connected with sigmoid                                                                                                          | 784 (28x28)  |
@@ -263,13 +263,13 @@ Here is the summary of each layers:
 
 ### Loss function (Margin loss)
 
-In our example, we want to detect multiple digits in a picture. Capsules use a separate margin loss $$L_c$$ for each category $$c$$ digit present in the picture:
+In our example, we want to detect multiple digits in a picture. Capsules use a separate margin loss$$L_c$$for each category$$c$$digit present in the picture:
 
 $$
 L_c = T_c \max(0, m^+ − \|v_c\|)^2 + λ (1 − T_c) \max(0, \|v_c\| − m^−)^2
 $$
 
-which $$T_c = 1$$ if an object of class $$c$$ is present. $$m^+ = 0.9$$ and $$m^− = 0.1$$. The λ down-weighting (default 0.5) stops the initial learning from shrinking the activity
+which$$T_c = 1$$if an object of class$$c$$is present.$$m^+ = 0.9$$and$$m^− = 0.1$$. The λ down-weighting (default 0.5) stops the initial learning from shrinking the activity
 vectors of all classes. The total loss is just the sum of the losses of all classes.
 
 Computing the margin loss in Keras
@@ -333,7 +333,7 @@ def CapsNet(input_shape, n_class, num_routing):
     return models.Model([x, y], [out_caps, x_recon])
 ```
 
-The length of the capsule's output vector $$\| v_j \| $$ corresponds to the probability that it belong to the class $$j$$. For example, $$ \| v_7 \| $$ is the probability of the input image belongs to 7.
+The length of the capsule's output vector$$\| v_j \|$$corresponds to the probability that it belong to the class$$j$$. For example,$$\| v_7 \|$$is the probability of the input image belongs to 7.
 
 ```python
 class Length(layers.Layer):
@@ -386,7 +386,7 @@ def squash(vectors, axis=-1):
 
 #### DigiCaps with dynamic routing
 
-DigiCaps converts the capsules in PrimaryCapsules to 10 capsules each making a prediction for class $$j$$. The following is the code in creating 10 (n_class) 16-D (dim_vector) capsules:
+DigiCaps converts the capsules in PrimaryCapsules to 10 capsules each making a prediction for class$$j$$. The following is the code in creating 10 (n_class) 16-D (dim_vector) capsules:
 
 ```python
 # num_routing is default to 3
@@ -468,7 +468,7 @@ class DigiCap(layers.Layer):
         return K.reshape(outputs, [-1, self.num_capsule, self.dim_vector])
 ```
 
-_build_ declares the self.W parameters representing the transform matrix W and self.b representing the $$b_{ij}$$.
+_build_ declares the self.W parameters representing the transform matrix W and self.b representing the$$b_{ij}$$.
 
 ```python
     def build(self, input_shape):
@@ -500,7 +500,7 @@ $$
 \end{split}
 $$
 
-The code first expand the dimension of $$u_i$$ and then multiple it with $$w$$. Nevertheless, the simple dot product implementation of $$ W_{ij} u_i $$ (commet out below) is replaced by tf.scan for better speed performance.
+The code first expand the dimension of$$u_i$$and then multiple it with$$w$$. Nevertheless, the simple dot product implementation of$$W_{ij} u_i$$(commet out below) is replaced by tf.scan for better speed performance.
 
 ```python
 class DigiCap(layers.Layer):
@@ -560,9 +560,9 @@ class DigiCap(layers.Layer):
 
 #### Image reconstruction
 
-We use the true label to select $$ v_j $$ to reconstruct the image during training. Then we feed $$v_j$$ through 3 fully connected layers to re-generate the original image.
+We use the true label to select$$v_j$$to reconstruct the image during training. Then we feed$$v_j$$through 3 fully connected layers to re-generate the original image.
 
-Select $$v_j$$ in training with Mask
+Select$$v_j$$in training with Mask
 
 ```python
 class Mask(layers.Layer):
@@ -588,7 +588,7 @@ class Mask(layers.Layer):
 
 #### Reconstruction loss
 
-A reconstruction loss $$ \| \text{image} - \text{reconstructed image} \|$$ is added to the loss function. It trains the network to capture the critical properties into the capsule. However, the reconstruction loss is multiple by a regularization factor (0.0005) so it does not dominate over the marginal loss.
+A reconstruction loss$$\| \text{image} - \text{reconstructed image} \|$$is added to the loss function. It trains the network to capture the critical properties into the capsule. However, the reconstruction loss is multiple by a regularization factor (0.0005) so it does not dominate over the marginal loss.
 
 ### What capsule is learning?
 

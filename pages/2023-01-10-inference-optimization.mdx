@@ -80,7 +80,7 @@ Fig. 1. The generic framework of teacher-student knowledge distillation training
 
 Given a dataset, a student model is trained to mimic outputs of a teacher via distillation loss. Usually a neural network has a softmax layer; For example, a LLM outputs a probability distribution over tokens. Let's denote the logits layer right before softmax as $\mathbf{z}_t$ and $\mathbf{z}_s$ for teacher and student models, respectively. The _distillation loss_ minimizes the difference between two softmax outputs with a high temperature $T$. When ground truth labels $\mathbf{y}$ are known, we can combine it with a _supervised_ learning objective between ground truth and the student's soft logits using e.g. cross-entropy.
 
-$$ \mathcal{L}_\text{KD} = \mathcal{L}_\text{distll}(\text{softmax}(\mathbf{z}_t, T), \text{softmax}(\mathbf{z}\_s, T)) + \lambda\mathcal{L}_\text{CE}(\mathbf{y}, \mathbf{z}\_s) $$
+$$\mathcal{L}_\text{KD} = \mathcal{L}_\text{distll}(\text{softmax}(\mathbf{z}_t, T), \text{softmax}(\mathbf{z}\_s, T)) + \lambda\mathcal{L}_\text{CE}(\mathbf{y}, \mathbf{z}\_s)$$
 
 where $\lambda$ is a hyperparameter to balance between soft and hard learning objectives. A common choice for $\mathcal{L}_\text{distll}$ is KL divergence / cross entropy.
 
@@ -152,7 +152,7 @@ Q-BERT ([Shen, Dong & Ye, et al. 2020](https://arxiv.org/abs/1909.05840)) develo
 
 In another viewpoint, the problem of quantization is an optimization problem. Given a weight matrix $\mathbf{W}$ and an input matrix $\mathbf{X}$ , we want to find a quantized weight matrix $\hat{\mathbf{W}}$ to minimize the MSE:
 
-$$ \hat{\mathbf{W}}^\* = {\arg\min}\_{\hat{\mathbf{W}}} | \mathbf{W}\mathbf{X} - \hat{\mathbf{W}}\mathbf{X}| $$
+$$\hat{\mathbf{W}}^\* = {\arg\min}\_{\hat{\mathbf{W}}} | \mathbf{W}\mathbf{X} - \hat{\mathbf{W}}\mathbf{X}|$$
 
 **GPTQ** ([Frantar et al. 2022](https://arxiv.org/abs/2210.17323)) treats the weight matrix $\mathbf{W}$ as a collection of row vectors ${\mathbf{w}}$ and applies quantization to each row independently. GPTQ iteratively quantizes more weights that are selected greedily to minimize the quantization error. The update on selected weights has a closed-form formula, utilizing Hessian matrices. Read more details in the paper and the OBQ (Optimal Brain Quantization; [Frantar & Alistarh 2022](https://arxiv.org/abs/2208.11580)) method if interested. GPTQ can reduce the bitwidth of weights in OPT-175B down to 3 or 4 bits without much performance loss, but it only applies to model weights not activation.
 
@@ -166,7 +166,7 @@ Fig. 6. SmoothQuant migrates the scale variance from activations to weights offl
 
 Considering a per-channel smooth factor $\mathbf{s}$, SmoothQuant scales the weights according to:
 
-$$ \mathbf{Y} = (\mathbf{X} \text{diag}(\mathbf{s})^{-1}) \cdot (\text{diag}(\mathbf{s})\mathbf{W}) = \hat{\mathbf{X}}\hat{\mathbf{W}} $$
+$$\mathbf{Y} = (\mathbf{X} \text{diag}(\mathbf{s})^{-1}) \cdot (\text{diag}(\mathbf{s})\mathbf{W}) = \hat{\mathbf{X}}\hat{\mathbf{W}}$$
 
 The smoothing factor can be easily fused into previous layers' parameters offline. A hyperparameter $\alpha$ controls how much we migrate the quantization difficulty from activations to weights: $\mathbf{s} = \max (\vert \mathbf{X}_j \vert)^\alpha / \max( \vert \mathbf{W}_j \vert )^{1-\alpha}$. The paper found that $\alpha=0.5$ is a sweet spot for many LLMs in the experiments. For models with more significant outliers in activation, $\alpha$ can be adjusted to be larger.
 
@@ -257,11 +257,11 @@ To train a model with N:M sparsity from scratch, [Zhou & Ma, et al. (2021)](http
 
 STE computes the gradients of dense parameters wrt the pruned network $\widetilde{W}$, $\partial \mathcal{L}/\partial \widetilde{W}$, and applies that to the dense network $W$ as an approximation:
 
-$$ W\_{t+1} \gets W_t - \gamma \frac{\partial\mathcal{L}}{\partial\widetilde{W}} $$
+$$W\_{t+1} \gets W_t - \gamma \frac{\partial\mathcal{L}}{\partial\widetilde{W}}$$
 
 The extended version, **SR-STE** (Sparse-refined STE), updates the dense weights $W$ by:
 
-$$ W\_{t+1} \gets W_t - \gamma \frac{\partial\mathcal{L}}{\partial\widetilde{W}} + \lambda_W (\bar{\mathcal{E}} \odot W_t) $$ where $\bar{\mathcal{E}}$ is the mask matrix for $\widetilde{W}$ and $\odot$ is element-wise multiplication. SR-STE is proposed to prevent large change in the binary mask by (1) restricting the values of weights pruned in $\widetilde{W}_t$, and (2) promoting the non-pruned weights in $\widetilde{W}_t$.
+$$W\_{t+1} \gets W_t - \gamma \frac{\partial\mathcal{L}}{\partial\widetilde{W}} + \lambda_W (\bar{\mathcal{E}} \odot W_t)$$where $\bar{\mathcal{E}}$ is the mask matrix for $\widetilde{W}$ and $\odot$ is element-wise multiplication. SR-STE is proposed to prevent large change in the binary mask by (1) restricting the values of weights pruned in $\widetilde{W}_t$, and (2) promoting the non-pruned weights in $\widetilde{W}_t$.
 
 ![](assets/images/2023-01-10-inference-optimization/SR-STE.png)
 
@@ -273,13 +273,13 @@ At one training step $t$, Top-KAST processes as follows:
 
 1.  _Sparse forward pass_: Select a subset of parameters $A^t \subset \Theta$, containing top-$K$ parameters by magnitude by each layer, restricted to top $D$-proportion of weights. The parameterization $\alpha^t$ at time $t$ has parameters zeroed out if it is not in $A^t$ (active weights).
 
-$$ \alpha^t_i = \begin{cases} \theta^t_i & \text{ if } i \in A^t = \{i \mid \theta^t_i \in \text{TopK}(\theta^t, D) \}\\ 0 & \text{ otherwise} \end{cases} $$
+$$\alpha^t_i = \begin{cases} \theta^t_i & \text{ if } i \in A^t = \{i \mid \theta^t_i \in \text{TopK}(\theta^t, D) \}\\ 0 & \text{ otherwise} \end{cases}$$
 
 where $\text{TopK}(\theta, x)$ selected top $x$ proportion of weights from $\theta$ based on magnitude.
 
 2.  _Sparse backward pass_: Then apply gradients to a larger parameter subset $B \subset \Theta$ where $B$ contains $(D+M)$-proportion of weights and $A \subset B$. Updating a larger proportion of weights enables more effective exploration of different pruning masks, making it more likely to cause permutations in the top $D$-proportion active weights.
 
-$$ \Delta*{\theta^t_i} = \begin{cases} -\eta \nabla*{\alpha_t} \mathcal{L}(y, x, \alpha^t)\_i & \text{ if } i\in B^t = \{i \mid \theta^t_i \in \text{TopK}(\theta^t, D+M) \} \\ 0 & \text{ otherwise } \end{cases} $$
+$$\Delta*{\theta^t_i} = \begin{cases} -\eta \nabla*{\alpha_t} \mathcal{L}(y, x, \alpha^t)\_i & \text{ if } i\in B^t = \{i \mid \theta^t_i \in \text{TopK}(\theta^t, D+M) \} \\ 0 & \text{ otherwise } \end{cases}$$
 
 Training is split into two stages and the additional coordinates in the set $B \setminus A$ controls how much exploration is brought in. The amount of exploration is expected to diminish gradually through the training process and the mask eventually stabilizes.
 
@@ -289,7 +289,7 @@ Fig. 12. The pruning mask of Top-KAST stabilizes in time. (Image source: [Jayaku
 
 To prevent rich-get-richer phenomenon, Top-KAST penalizes the magnitude of active weights via a L2 regularization loss to encourage more exploration of new items. Parameters in $B \setminus A$ are penalized more than $A$ for a higher selection bar during updates to stabilize the mask.
 
-$$ L\_\text{penalty}(\alpha^t_i) = \begin{cases} \vert \theta^t_i\vert & \text{ if } i \in A^t \\ \vert \theta^t_i\vert / D & \text{ if } i \in B^t \setminus A^t \\ 0 & \text{ otherwise} \end{cases} $$
+$$L\_\text{penalty}(\alpha^t_i) = \begin{cases} \vert \theta^t_i\vert & \text{ if } i \in A^t \\ \vert \theta^t_i\vert / D & \text{ if } i \in B^t \setminus A^t \\ 0 & \text{ otherwise} \end{cases}$$
 
 ## Sparsified Transformer[#](#sparsified-transformer)
 
@@ -301,7 +301,7 @@ Fig. 13. The speed of decoding a single token (unbatched inference) by a transfo
 
 **Sparse FFN layer**: Each FFN layer contains 2 MLP and one ReLU in-between. Because ReLU will introduce a lot of zeros, they implement a fixed structure on activations to enforce only 1 non-zero value in one block of $N$ elements. The sparsity pattern is dynamic, different for each token.
 
-$$ \begin{aligned} Y*\text{sparse} &= \max(0, xW_1 + b_1) \odot \text{Controller}(x) \\ \text{SparseFFN}(x) &= Y*\text{sparse} W_2 + b_2 \\ \text{Controller}(x) &= \arg\max(\text{Reshape}(x C_1 C_2, (-1, N))) \end{aligned} $$
+$$\begin{aligned} Y*\text{sparse} &= \max(0, xW_1 + b_1) \odot \text{Controller}(x) \\ \text{SparseFFN}(x) &= Y*\text{sparse} W_2 + b_2 \\ \text{Controller}(x) &= \arg\max(\text{Reshape}(x C_1 C_2, (-1, N))) \end{aligned}$$
 
 where each activation in $Y_\text{sparse}$ corresponds to one column in $W_1$ and one row in $W_2$. The controller is implemented as a low-rank bottleneck dense layer, $C_1 \in \mathbb{R}^{d_\text{model} \times d_\text{lowrank}}, C_2 \in \mathbb{R}^{d_\text{lowrank} \times d_\text{ff}}$ and $d_\text{lowrank} = d_\text{model} / N$. It uses $\arg\max$ for inference to select which columns should be non-zero and Gumbel-softmax trick ([Jang et al. 2016](https://arxiv.org/abs/1611.01144)) during training. Because we can compute $\text{Controller}(x)$ before loading FFN weight matrices, we know which columns will be zeroed out and thus choose _not to load_ them into memory for inference speedup.
 
@@ -313,7 +313,7 @@ Fig. 14. (a) Sparse FFN layer; columns in red are not loaded in memory for faste
 
 Given an input vector $x \in \mathbb{R}^{d_\text{model}}$, the multiplicative layer outputs $y \in \mathbb{R}^{S \times M}$:
 
-$$ y*{s,m} = \sum_i x_i D*{i,s} E*{i,m} \quad\text{where }D \in \mathbb{R}^{d*\text{model} \times S}, D \in \mathbb{R}^{d\_\text{model} \times M} $$
+$$y*{s,m} = \sum_i x_i D*{i,s} E*{i,m} \quad\text{where }D \in \mathbb{R}^{d*\text{model} \times S}, D \in \mathbb{R}^{d\_\text{model} \times M}$$
 
 The output of the multiplicative layer is a tensor of size $\in \mathbb{R}^{\text{batch size}\times \text{length} \times S \times M}$. It then gets processed by a two-dimensional convolutional layer, where $\text{length}$ and $S$ are treated as the height and width of an image. Such a convolution layer further reduces the parameter count and computation time of attention layer.
 
@@ -329,7 +329,7 @@ Mixture-of-experts (MoE) models depend on a collection of “expert” networks 
 
 With MoE architecture, only partial parameters are utilized at decoding time and therefore it saves inference cost. The capacity of each expert can be adjusted with a hyperparameter, capacity factor $C$, and the expert capacity is defined as:
 
-$$ \text{Expert capacity} = \text{round}(C \cdot k \cdot \frac{\text{total # tokens in one batch}}{\text{# experts}}) $$
+$$\text{Expert capacity} = \text{round}(C \cdot k \cdot \frac{\text{total # tokens in one batch}}{\text{# experts}})$$
 
 where top-$k$ experts are selected per token. Larger $C$ leads to higher expert capacity and improved performance but more expensive computationally. When $C>1$, a slack capacity is added; otherwise, when $C<1$, the routing network needs to ignore some tokens.
 

@@ -53,7 +53,7 @@ By adopting different decoding methods, we can place restrictions or preferences
 
 Since the final layer of the model predicts logits $o$ over the vocabulary space, the next token can be sampled by applying softmax with temperature $T$. The probability of sampling the $i$-th token is
 
-$$ p_i \\propto \frac{\exp(o_i / T)}{\sum_j \exp(o_j/T)} $$
+$$p_i \\propto \frac{\exp(o_i / T)}{\sum_j \exp(o_j/T)}$$
 
 A low temperature would make the distribution sharper and a high value makes it softer.
 
@@ -75,7 +75,7 @@ Both top-k and nucleus sampling have less repetitions with a proper set of hyper
 
 **Penalized sampling** ([Keskar et al. 2019](https://arxiv.org/abs/1909.05858)): To avoid the common failure case of generating duplicate substrings, the [CTRL](https://arxiv.org/abs/1909.05858) paper proposed a new sampling method to penalize repetitions by discounting the scores of previously generated tokens. The probability distribution for the next token with repetition penalty is defined as:
 
-$$ p_i = \frac{\exp(o_i / (T \cdot \mathbb{1}(i \in g)))}{\sum_j \exp(o_j / (T \cdot \mathbb{1}(j \in g)))} \quad \mathbb{1}(c) = \theta \text{ if the condition }c\text{ is True else }1 $$
+$$p_i = \frac{\exp(o_i / (T \cdot \mathbb{1}(i \in g)))}{\sum_j \exp(o_j / (T \cdot \mathbb{1}(j \in g)))} \quad \mathbb{1}(c) = \theta \text{ if the condition }c\text{ is True else }1$$
 
 where $g$ contains a set of previously generated tokens, $\mathbb{1}(.)$ is an identity function. $\theta=1.2$ is found to yield a good balance between less repetition and truthful generation.
 
@@ -85,7 +85,7 @@ All the above standard decoding strategies sample tokens according to the predic
 
 [Ghazvininejad et al. (2017)](https://www.aclweb.org/anthology/P17-4008/) built a system called “Hafez” for generating poetry in desired style by adjusting sampling weights in beam search at decoding steps. The likelihood of sampling for the next token $x_{t+1}$ at step $t$ is augmented by a scoring function:
 
-$$ \text{score}(x_{t+1}, b_t) = \text{score}(b_t) + \log p(x_{t+1}) + \color{green}{\sum_i \alpha_i f_i(x_{t+1})} $$
+$$\text{score}(x_{t+1}, b_t) = \text{score}(b_t) + \log p(x_{t+1}) + \color{green}{\sum_i \alpha_i f_i(x_{t+1})}$$
 
 where $\log p(x_{t+1})$ is the log-likelihood predicted by LM. $\text{score}(b_t)$ is the accumulated score of the already-generated words in the current beam state $b_t$. The green part can incorporate many different features for steering the style of the output. A set of feature functions $f_i(.)$ define the preferences and the associated weights $alpha_i$ work like “control knobs” that can be easily customized at decoding time. Features can measure a variety of attributes and can be easily combined; for example,
 
@@ -100,11 +100,11 @@ Similar to Hafez, [Baheti et al. (2018)](https://arxiv.org/abs/1809.01215) manua
 
 [Meister et al. (2020)](https://arxiv.org/abs/2010.02650) studied beam search in a regularized decoding framework:
 
-$$ \mathbf{y}^\* = \arg\max_{\mathbf{y}\in\mathcal{Y}} \big( \underbrace{\log p_\theta(\mathbf{y}\vert\mathbf{x})}_\text{MAP} - \underbrace{\lambda\mathcal{R}(\mathbf{y})}_\text{regularizer} \big) $$
+$$\mathbf{y}^\* = \arg\max_{\mathbf{y}\in\mathcal{Y}} \big( \underbrace{\log p_\theta(\mathbf{y}\vert\mathbf{x})}_\text{MAP} - \underbrace{\lambda\mathcal{R}(\mathbf{y})}_\text{regularizer} \big)$$
 
 Since we expect maximum probability to have minimum surprise, the surprisal of a LM at time step $t$ can be defined as follows:
 
-$$ \begin{aligned} u_0(\texttt{BOS}) &= 0 \text{ ; BOS is a placeholder token for the beginning of a sentence.}\\ u_t(y) &= -\log P_\theta(y \vert \mathbf{x}, \mathbf{y}_{<{t}}) \text{ for }t \\geq 1 \end{aligned} $$
+$$\begin{aligned} u_0(\texttt{BOS}) &= 0 \text{ ; BOS is a placeholder token for the beginning of a sentence.}\\ u_t(y) &= -\log P_\theta(y \vert \mathbf{x}, \mathbf{y}_{<{t}}) \text{ for }t \\geq 1 \end{aligned}$$
 
 The MAP (maximum a posteriori) part demands for sequences with maximum probability given context, while the regularizer introduces other constraints. It is possible a global optimal strategy may need to have a high-surprisal step occasionally so that it can shorten the output length or produce more low-surprisal steps afterwards.
 
@@ -144,15 +144,15 @@ Given a trained language model, [Gu et al (2017)](https://arxiv.org/abs/1702.024
 
 Let $p$ be the real data distribution and $p_\theta$ be a learned generative model. A classical approach for evaluating the expectation of a given function $f$ under $p$ using samples from $p_\theta$ is to use importance sampling.
 
-$$ \mathbb{E}_{\mathbf{x}\sim p} \[f(\mathbf{x})\] = \mathbb{E}_{\mathbf{x}\sim p_\theta} \Big\[\frac{p(\mathbf{x})}{p_\theta(\mathbf{x})} f(\mathbf{x})\Big\] \approx \frac{1}{N} \sum_{i=1}^N w(\mathbf{x}_i)f(\mathbf{x}_i) $$
+$$\mathbb{E}_{\mathbf{x}\sim p} \[f(\mathbf{x})\] = \mathbb{E}_{\mathbf{x}\sim p_\theta} \Big\[\frac{p(\mathbf{x})}{p_\theta(\mathbf{x})} f(\mathbf{x})\Big\] \approx \frac{1}{N} \sum_{i=1}^N w(\mathbf{x}_i)f(\mathbf{x}_i)$$
 
 However, $p(\mathbf{x})$ can only be estimated via finite datasets. Let $c_\phi: \mathcal{X} \to \[0,1\]$ be a probabilistic binary classifier for predicting whether a sample $\mathbf{x}$ is from the true data distribution ($y=1$). The joint distribution over $\mathcal{X}\times\mathcal{Y}$ is denoted as $q(\mathbf{x}, y)$.
 
-$$ q(\mathbf{x}\vert y) = \begin{cases} p_\theta(\mathbf{x}) & \text{ if }y=0\text{; predicted to be generated data} \\ p(\mathbf{x}) & \text{ otherwise; from the true data distribution} \end{cases} $$
+$$q(\mathbf{x}\vert y) = \begin{cases} p_\theta(\mathbf{x}) & \text{ if }y=0\text{; predicted to be generated data} \\ p(\mathbf{x}) & \text{ otherwise; from the true data distribution} \end{cases}$$
 
 Then if $c_\phi$ is [Bayes optimal](https://svivek.com/teaching/lectures/slides/prob-learning/bayes-optimal-classifier.pdf), the importance weight can be estimated by:
 
-$$ w_\phi(\mathbf{x}) = \frac{p(\mathbf{x})}{p_\theta(\mathbf{x})} = \frac{q(\mathbf{x} \vert y=1)}{q(\mathbf{x} \vert y=0)} = \frac{q(y=0)}{q(y=1)} \frac{q(y=1 \vert \mathbf{x})}{q(y=0 \vert \mathbf{x})} = \gamma \frac{c_\phi(\mathbf{x})}{1 - c_\phi(\mathbf{x})} $$
+$$w_\phi(\mathbf{x}) = \frac{p(\mathbf{x})}{p_\theta(\mathbf{x})} = \frac{q(\mathbf{x} \vert y=1)}{q(\mathbf{x} \vert y=0)} = \frac{q(y=0)}{q(y=1)} \frac{q(y=1 \vert \mathbf{x})}{q(y=0 \vert \mathbf{x})} = \gamma \frac{c_\phi(\mathbf{x})}{1 - c_\phi(\mathbf{x})}$$
 
 where $\gamma = \frac{q(y=0)}{q(y=1)} > 0$ is a fixed odd ratio.
 
@@ -170,11 +170,11 @@ Fig. 4. The algorithm for sampling from a generative model according to importan
 
 [Deng et al., 2020](https://arxiv.org/abs/2004.11714) proposed to learn a EBM to steer a LM in the [residual space](https://arxiv.org/abs/1906.03351), $P_\theta(x) \\propto P_\text{LM}(x)\exp(-E_\theta(x))$, where $P_\theta$ is the joint model; $E_\theta$ is the residual energy function to be learned. If we know the partition function $Z$, we can model the generative model for generative a sequence $x_{p+1}, \dots, x_T$ as:
 
-$$ P_\theta(x_{p+1:T}\vert x_{1:p}) = \frac{P_\text{LM}(x_{p+1:T}\vert x_{1:p}) \exp(-E_\theta(x_{1:T}))}{Z_\theta(x_{1:p})} $$
+$$P_\theta(x_{p+1:T}\vert x_{1:p}) = \frac{P_\text{LM}(x_{p+1:T}\vert x_{1:p}) \exp(-E_\theta(x_{1:T}))}{Z_\theta(x_{1:p})}$$
 
 The goal is to learn the parameters of the energy function $E_\theta$ such that the joint model $P_\theta$ gets closer to the desired data distribution. The residual energy function is trained by noise contrastive estimation ([NCE](https://www.kdnuggets.com/2019/07/introduction-noise-contrastive-estimation.html)), considering $P_\theta$ as the model distribution and $P_\text{LM}$ as the noise distribution:
 
-$$ \theta = \arg\max_{\theta} \mathbb{E}_{x^+ \sim P_\text{data}} \log\frac{1}{1+\exp(E_\theta(x^+))} + \mathbb{E}_{x^- \sim P_\text{LM}} \log\frac{1}{1+\exp(-E_\theta(x^-))} $$
+$$\theta = \arg\max_{\theta} \mathbb{E}_{x^+ \sim P_\text{data}} \log\frac{1}{1+\exp(E_\theta(x^+))} + \mathbb{E}_{x^- \sim P_\text{LM}} \log\frac{1}{1+\exp(-E_\theta(x^-))}$$
 
 However, the partition function is intractable in practice. The paper proposed a simple way to first sample from the original LM and then to resample from them according to the energy function. This is unfortunately quite expensive.
 
@@ -196,11 +196,11 @@ Fig. 6. The overview of AutoPrompt. The trigger tokens are retrieved to optimize
 
 The universal trigger tokens are identified using a gradient-guided search strategy same as in [Wallace et al., 2019](https://arxiv.org/abs/1908.07125). The _universal_ setting means that the trigger tokens $x_\text{trig}$ can optimize for the target output $\tilde{y}$ for all inputs from a dataset:
 
-$$ x_\text{trig} = \arg\min_{x'_\text{trig}} \mathbb{E}_{x\sim\mathcal{X}} \[\mathcal{L}(\tilde{y}, f(x'_\text{trig}; x))\] $$
+$$x_\text{trig} = \arg\min_{x'_\text{trig}} \mathbb{E}_{x\sim\mathcal{X}} \[\mathcal{L}(\tilde{y}, f(x'_\text{trig}; x))\]$$
 
 The search operates in the embedding space. The embedding of every trigger token $e_{\text{trig}_i}$ is first initialized to some default value and then gets updated to minimize the first-order Taylor expansion of the task-specific loss around the current token embedding:
 
-$$ e^{(t+1)}_\text{trig} = \arg\min_{e\in\mathcal{V}} \[e - e^{(t)}_{\text{trig}_i}\]^\top \nabla_{e^{(t)}_{\text{trig}_i}} \mathcal{L} $$
+$$e^{(t+1)}_\text{trig} = \arg\min_{e\in\mathcal{V}} \[e - e^{(t)}_{\text{trig}_i}\]^\top \nabla_{e^{(t)}_{\text{trig}_i}} \mathcal{L}$$
 
 where $\mathcal{V}$ refers to the embedding matrix of all the tokens. $\nabla_{e^{(t)}_{\text{trig}_i}} \mathcal{L}$ is the average gradient of the task loss over a batch at iteration $t$. We can brute-force the optimal $e$ by a $\vert \mathcal{V} \vert d$-dimensional dot product, which is cheap and can be computed in parallel.
 
@@ -216,7 +216,7 @@ Fig. 8. Example prompts discovered by AutoPrompt for different tasks. (Image sou
 
 Smart prompt design essentially produces efficient context that can lead to desired completion. Motivated by this observation, [Li & Liang (2021)](https://arxiv.org/abs/2101.00190) proposed **Prefix-Tuning** which assigns a small number of trainable parameters at the beginning of an input sequence (named “prefix”) to steer a LM, $\[\text{PREFIX}; x; y\]$. Let $\mathcal{P}_\text{idx}$ be a set of prefix indices and $\text{dim}(h_i)$ be the embedding size. The prefix parameters $P_\theta$ has the dimension $\vert\mathcal{P}_\text{idx}\vert \times \text{dim}(h_i) $ and the hidden state takes the form:
 
-$$ h_i = \begin{cases} P_\theta\[i,:\], & \text{if }i \in \mathcal{P}_\text{idx}\\ \text{LM}_\phi(z_i, h_{<{i}}), & \text{otherwise} \end{cases} $$
+$$h_i = \begin{cases} P_\theta\[i,:\], & \text{if }i \in \mathcal{P}_\text{idx}\\ \text{LM}_\phi(z_i, h_{<{i}}), & \text{otherwise} \end{cases}$$
 
 Note that only $P_\theta$ is trainable and the LM parameters $\phi$ is frozen during training.
 
@@ -244,7 +244,7 @@ Two successive works, **P-tuning** ([Liu et al. 2021](https://arxiv.org/abs/2103
 
 Let $\[P_i\]$ be the $i$-th token in the prompt template of **P-tuning** ([Liu et al. 2021](https://arxiv.org/abs/2103.10385)), we can denote a prompt as a sequence $T=\{\[P_{0:i}\], \mathbf{x}, \[P_{i+1:m}\], \mathbf{y}\}$. Each token $\[P_i\]$ does not have to be a real token in the model vocabulary (“pseudo-token”), and thus the encoded template $T^e$ looks like the following and the pseudo-token hidden state can be optimized with gradient descent.
 
-$$ T^e = \{ h_0, \dots, h_i, \text{embed}(\mathbf{x}), h_{i+1}, \dots, h_m, \text{embed}(\mathbf{y})\} $$
+$$T^e = \{ h_0, \dots, h_i, \text{embed}(\mathbf{x}), h_{i+1}, \dots, h_m, \text{embed}(\mathbf{y})\}$$
 
 ![](p-tuning.png)
 
@@ -255,7 +255,7 @@ There are two major optimization challenges in P-tuning:
 1.  Discreteness: The word embedding of a pretrained language model are highly discrete. It is hard to optimize $h_i$ if they are intialized at random.
 2.  Association: $h_i$ should be dependent on each other. Thus they develop a mechanism to model this dependency by training a light-weighted LSTM-based prompt encoder:
 
-$$ h_i = \text{MLP}(\[\text{LSTM}(h_{0:i}): \text{LSTM}(h_{i:m})\]) $$
+$$h_i = \text{MLP}(\[\text{LSTM}(h_{0:i}): \text{LSTM}(h_{i:m})\])$$
 
 P-tuning is more flexible than prefix-tuning, as it inserts trainable tokens in the middle of a prompt not just at the beginning. The usage of task-specific anchor tokens is like combining manual prompt engineering with trainable prompts.
 
@@ -293,7 +293,7 @@ Paraphrasing is a quick way to explore more prompts similar to the known version
 
 [Ribeiro et al (2018)](https://www.aclweb.org/anthology/P18-1079/) identified _semantically equivalent adversaries (SEA)_ by generating a variety of paraphrases $\{x'\}$ of input $x$ until it triggers a different prediction of target function $f$:
 
-$$ \begin{aligned} SEA(x, x') &= \mathbb{1}\[\text{SemEq}(x, x') \\land f(x) \\neq f(x')\] \\ \text{where SemEq}(x, x') &= \mathbb{1}\[\min\Big(1, \frac{p(x'\vert x)}{p(x\vert x)} \Big) \\geq \tau\] \end{aligned} $$
+$$\begin{aligned} SEA(x, x') &= \mathbb{1}\[\text{SemEq}(x, x') \\land f(x) \\neq f(x')\] \\ \text{where SemEq}(x, x') &= \mathbb{1}\[\min\Big(1, \frac{p(x'\vert x)}{p(x\vert x)} \Big) \\geq \tau\] \end{aligned}$$
 
 The rules extracted from SEA are considered as “bugs” in the model. Applying those rules as data augmentation in model training helps robustify the model and fix bugs.
 
@@ -339,13 +339,13 @@ Google implemented the similar approach in their neural machine translation syst
 
 The RL loss of Google NMT is to maximize the expected BLEU score:
 
-$$ \mathcal{L}_\text{RL} = - \sum_{(x, y^\*)\sim\mathcal{D}} \mathbb{E}_{y\sim p_\theta(.\vert x)} \[R(y, y^\*)\] $$
+$$\mathcal{L}_\text{RL} = - \sum_{(x, y^\*)\sim\mathcal{D}} \mathbb{E}_{y\sim p_\theta(.\vert x)} \[R(y, y^\*)\]$$
 
 where $y$ is the predicted sequence and $y^\*$ is the ground truth.
 
 [Paulus et al (2017)](https://arxiv.org/abs/1705.04304) added an extra weighting term based on the reward difference between two output sequences, $y$ by sampling the next token according to the predicted probability and $\hat{y}$ by greedily taking the most likely token. This RL loss maximizes the conditional likelihood of the sampled sequence $y$ if it obtains a higher reward than the greedy baseline $\hat{y}$:
 
-$$ \mathcal{L}_\text{RL} = \sum_{(x, y^\*)\sim\mathcal{D}} (R(\hat{y}, y^\*) - R(y, y^\*)) \sum_{t=1}^{n'} \log p(y_t \vert y_{<{t}}, x) $$
+$$\mathcal{L}_\text{RL} = \sum_{(x, y^\*)\sim\mathcal{D}} (R(\hat{y}, y^\*) - R(y, y^\*)) \sum_{t=1}^{n'} \log p(y_t \vert y_{<{t}}, x)$$
 
 ## RL Fine-tuning with Human Preferences[#](#rl-fine-tuning-with-human-preferences)
 
@@ -359,11 +359,11 @@ To learn the ground truth reward $R^\*$ defined by human judgements, [Böhm et a
 
 (1) Regression loss: simply minimizing the mean squared error.
 
-$$ \mathcal{L}^\text{MSE}_\text{rm} = \[R^\*(x, y) - R_\\psi(x, y)\]^2 $$
+$$\mathcal{L}^\text{MSE}_\text{rm} = \[R^\*(x, y) - R_\\psi(x, y)\]^2$$
 
 (2) Preference loss: learning to agree with the ground truth reward,
 
-$$ \begin{aligned} \mathcal{L}^\text{pref}_\text{rm} =& - \sum_{i,j} \big(\mathbb{1}\[R^\*(x, y_i) > R^\*(x, y_j)\] \log P(y_i \\succ y_j) + \\ &\mathbb{1}\[R^\*(x, y_j) > R^\*(x, y_i)\] \log P(y_j \\succ y_i) \big)\\ \text{where }P(y_i \\succ y_j) =& \frac{\exp(R_\\psi(x, y_i))}{\exp(R_\\psi(x, y_i)) + \exp(R_\\psi(x, y_j))} \end{aligned} $$
+$$\begin{aligned} \mathcal{L}^\text{pref}_\text{rm} =& - \sum_{i,j} \big(\mathbb{1}\[R^\*(x, y_i) > R^\*(x, y_j)\] \log P(y_i \\succ y_j) + \\ &\mathbb{1}\[R^\*(x, y_j) > R^\*(x, y_i)\] \log P(y_j \\succ y_i) \big)\\ \text{where }P(y_i \\succ y_j) =& \frac{\exp(R_\\psi(x, y_i))}{\exp(R_\\psi(x, y_i)) + \exp(R_\\psi(x, y_j))} \end{aligned}$$
 
 Their experiments showed that the _preference loss_ achieves the best performance, where the reward model is a thin MLP layer on top of BERT sentence embedding.
 
@@ -375,19 +375,19 @@ Fig. 18. The overview of the training framework for fine-tuning a language model
 
 The reward model is implemented by a pretrained language model with an extra random linear layer of the final embedding output. It it trained to minimize the loss:
 
-$$ \mathcal{L}_\text{rm} = -\mathbb{E}_{(x, \{y_i\}, b) \sim \mathcal{D}} \Big\[ \log \frac{\exp(R_\\psi(x, y_b))}{\sum_i \exp(R_\\psi(x, y_i))} \Big\] $$
+$$\mathcal{L}_\text{rm} = -\mathbb{E}_{(x, \{y_i\}, b) \sim \mathcal{D}} \Big\[ \log \frac{\exp(R_\\psi(x, y_b))}{\sum_i \exp(R_\\psi(x, y_i))} \Big\]$$
 
 To keep the scale consistent during training, the reward model is normalized to have mean 0 and variance 1.
 
 During RL fine-tuning, the policy $\pi$, initialized by a pretrained language model $p$, is optimized via [PPO](https://lilianweng.github.io/posts/2018-04-08-policy-gradient/#ppo) with the above learned reward model. To avoid the policy's deviating from its original behavior too much, a **KL penalty** is added:
 
-$$ R(x, y) = R_\\psi(x, y) - \beta\log\frac{\pi(y \vert x)}{p(y \vert x)} $$
+$$R(x, y) = R_\\psi(x, y) - \beta\log\frac{\pi(y \vert x)}{p(y \vert x)}$$
 
 If running online data collection, human label collection process is continued during RL fine-tuning and thus the human labelers can review results generated by the latest policy. The number of human labels are evenly spread out during the training process. Meanwhile the reward model is also retrained periodically. Online data collection turns out to be important for the summarization task but not for the text continuation task. In their experiments, jointly training the reward model and the policy with shared parameters did not work well and can lead to overfitting due to the big imbalance between dataset sizes.
 
 In the following work ([Stiennon et al., 2020](https://arxiv.org/abs/2009.01325)), the human label collection was further simplified to select the best option between a pair of summaries, $y_b \in\{y_0, y_1\}$ The reward model loss was updated to optimize the log odds of the selected summary:
 
-$$ \mathcal{L}_\text{rm} = \mathbb{E}_{(x, y_0, y_1, b)\sim\mathcal{D}} \[\log(\sigma(r_\theta(x, y_b) − r_\theta(x, y_{1−b})))\] $$
+$$\mathcal{L}_\text{rm} = \mathbb{E}_{(x, y_0, y_1, b)\sim\mathcal{D}} \[\log(\sigma(r_\theta(x, y_b) − r_\theta(x, y_{1−b})))\]$$
 
 ![](summarize-human-feedback.png)
 
@@ -409,7 +409,7 @@ To shift the output, at decoding time, PPLM runs one forward → one backward �
 1.  First a forward pass is performed to compute the likelihood of attribute $a$ by $p(a\vert x)$;
 2.  Let $\Delta H_t$ be a stepwise update to the hidden state $H_t$ such that $(H_t + \Delta H_t)$ shifts the distribution of generated text closer to having the attribute $a$. $\Delta H_t$ is initialized at zero. Then a backward pass updates the LM hidden states using normalized gradients from the attribute model $\nabla_{\Delta H_t} \log p(a \vert H_t + \Delta H_t)$ as
 
-$$ \Delta H_t \\leftarrow \Delta H_t + \alpha \frac{\nabla_{\Delta H_t} \log p(a|H_t + \Delta H_t)}{\| \nabla_{\Delta H_t} \log p(a|H_t + \Delta H_t) \|^\gamma} $$
+$$\Delta H_t \\leftarrow \Delta H_t + \alpha \frac{\nabla_{\Delta H_t} \log p(a|H_t + \Delta H_t)}{\| \nabla_{\Delta H_t} \log p(a|H_t + \Delta H_t) \|^\gamma}$$
 
 where $\gamma$ is a normalization scaling coefficient, set per layer. $\alpha$ is step size. This update can be repeated $m \in \[3, 10\]$ times 3. The final forward pass recomputes a new distribution over the vocabulary, generated from the updated latents $\tilde{H}_t = H_t + \Delta H_t$. The next token is sampled from the updated distribution.
 
@@ -421,7 +421,7 @@ Multiple attribute models can be mix-and-matched during generation with customiz
 
 1.  The simplest attribution model is based on a predefined _bag of words_ (BoW), $\{w_1, \dots, w_k\}$, that specifies a topic of interest.
 
-$$ \log p(a \vert x) = \log\big( \sum_{i=1}^k p_{t+1} \[w_i\] \big) $$
+$$\log p(a \vert x) = \log\big( \sum_{i=1}^k p_{t+1} \[w_i\] \big)$$
 
 To encourage the model to output the desired words at least once but not at every step, they normalize the gradient by the maximum gradient norm.  
 Interestingly, they found that increasing the probability of generating words in the bag also increases the probability of generating _related_ but not identical words about the same topic. 2. The discriminator attribute models are based on learned classifiers which define preferences by a distribution instead of hard samples.
@@ -462,11 +462,11 @@ The conditional probability of $p(x_t\vert x_{<t}, z)$ can be decomposed into tw
 1.  $p(x_t\vert x_{<t})$ assigns high probabilities to fluent sequences of tokens;
 2.  a shift on $p(x_t\vert x_{<t})$ towards $p(x_t\vert x_{<t}, z)$.
 
-$$ p(x_t\vert x_{<{t}}, z) = \text{softmax}(\text{logits}_\text{LM}(x_t \vert x_{<{t}}) + \text{logits}_\text{aux}(x_t \vert x_{<{t}}, z)) $$
+$$p(x_t\vert x_{<{t}}, z) = \text{softmax}(\text{logits}_\text{LM}(x_t \vert x_{<{t}}) + \text{logits}_\text{aux}(x_t \vert x_{<{t}}, z))$$
 
 By Bayesian rule, we have
 
-$$ p(x_t\vert x_{<{t}}, z) = \frac{p(z \vert x_{\leq t})}{p(z)} p(x_t \vert x_{<{t}}) \\propto p(z \vert x_{\leq t}) p(x_t \vert x_{<{t}}) $$
+$$p(x_t\vert x_{<{t}}, z) = \frac{p(z \vert x_{\leq t})}{p(z)} p(x_t \vert x_{<{t}}) \\propto p(z \vert x_{\leq t}) p(x_t \vert x_{<{t}})$$
 
 And therefore the auxiliary model $\text{logits}_\text{aux}(x_t \vert x_{<t}, z))$ effectively should learn to predict $p(z \vert x_{\leq t})$. In the experiments of [Zeldes et al., 2020](https://arxiv.org/abs/2006.16823), the auxiliary model can re-use the intermediate layers of the pre-trained LM for feature extraction.
 
@@ -481,7 +481,7 @@ Fig. 23. The auxiliary model is trained by reusing features extracted from multi
 
 GeDi relies on the contract between $p_\theta(x_{1:t} \vert z)$ and $p_\theta(x_{1:t} \vert \bar{z})$ to compute the probability of the sequence belonging to the desired class. The discriminator loss is to maximize the probability of desired attribute $z$:
 
-$$ \begin{aligned} p_\theta(z \vert x_{1:t}) &= \frac{p(z) p_\theta(x_{1:\tau} \vert z)^{\alpha/\tau}}{\sum_{z' \in \{z, \bar{z}\}} p(z') p_\theta(x_{1:\tau} \vert z')^{\alpha/\tau} } \\ \mathcal{L}_\text{desc} &= -\frac{1}{N} \sum_{i=1}^N \log p_\theta(z^{(i)} \vert x^{(i)}_{1:\tau_i}) \\ &= -\frac{1}{N} \sum_{i=1}^N \log \frac{p(z) p_\theta(x^{(i)}_{1:\tau_i} \vert z^{(i)})^{\alpha/t_i}}{\sum_{z' \in \{z, \bar{z}\} } p(z')p_\theta(x^{(i)}_{1:\tau_i} \vert z')^{\alpha/\tau_i}} \end{aligned} $$
+$$\begin{aligned} p_\theta(z \vert x_{1:t}) &= \frac{p(z) p_\theta(x_{1:\tau} \vert z)^{\alpha/\tau}}{\sum_{z' \in \{z, \bar{z}\}} p(z') p_\theta(x_{1:\tau} \vert z')^{\alpha/\tau} } \\ \mathcal{L}_\text{desc} &= -\frac{1}{N} \sum_{i=1}^N \log p_\theta(z^{(i)} \vert x^{(i)}_{1:\tau_i}) \\ &= -\frac{1}{N} \sum_{i=1}^N \log \frac{p(z) p_\theta(x^{(i)}_{1:\tau_i} \vert z^{(i)})^{\alpha/t_i}}{\sum_{z' \in \{z, \bar{z}\} } p(z')p_\theta(x^{(i)}_{1:\tau_i} \vert z')^{\alpha/\tau_i}} \end{aligned}$$
 
 where $p(z) = \exp(b_z) / \sum_{z'} \exp(b_{z'})$ and $b_z$ is a learned class prior. The probabilities are normalized by the current sequence length $\tau$ to robustify generation sequences of variable lengths. $\tau_i$ is the sequence length of the $i$-th input $x^{(i)}$ in the dataset.
 
@@ -505,17 +505,17 @@ Let's label a pretrained LM as $a$ and a target LM with desired features as $p$.
 
 In summary, given a pretrained model $a$, we would like to find a target model $p$ such that:
 
-$$ \begin{aligned} \bar{\boldsymbol{\mu}} &= \mathbb{E}_{x\sim p}\boldsymbol{\phi}(x) \\ p &= \arg\min_{c \in \mathcal{C}} D_\text{KL}(c, a) \end{aligned} $$
+$$\begin{aligned} \bar{\boldsymbol{\mu}} &= \mathbb{E}_{x\sim p}\boldsymbol{\phi}(x) \\ p &= \arg\min_{c \in \mathcal{C}} D_\text{KL}(c, a) \end{aligned}$$
 
 where $\mathcal{C}$ is the set of all distributions over $X$ that satisfy the moment constraints.
 
 According to theorems in Information Geometry, $p$ can be approximated by an EBM (energy-based model; an unnormalized probability distribution) $P$ in the form of exponential function, such that $p(x) \\propto P(x)$ and $p(x)=\frac{1}{Z}P(x)$ where $Z=\sum_x P(x)$. The energy-based model can be approximated by:
 
-$$ P(x)=a(x)\exp\big(\sum_i \lambda_i \phi_i(x)\big)=a(x)\exp(\boldsymbol{\lambda}\cdot\boldsymbol{\phi}(x)) $$
+$$P(x)=a(x)\exp\big(\sum_i \lambda_i \phi_i(x)\big)=a(x)\exp(\boldsymbol{\lambda}\cdot\boldsymbol{\phi}(x))$$
 
 Let's define _importance weight_ $w(x, \boldsymbol{\lambda}) = \frac{P(x)}{a(x)} = \exp\langle\boldsymbol{\lambda}\cdot\boldsymbol{\phi}(x)\rangle$. Given a large number of sequences sampled from the pretrained model $x_1, \dots, x_N \sim a(x)$,
 
-$$ \begin{aligned} \mu(\boldsymbol{\lambda}) &= \mathbb{E}_{x\sim p}\boldsymbol{\phi}(x) = \mathbb{E}_{x\sim a} \frac{p(x)}{a(x)}\boldsymbol{\phi}(x) = \frac{1}{Z}\mathbb{E}_{x\sim a} w(x, \boldsymbol{\lambda}) \boldsymbol{\phi}(x) \\ &= \frac{\mathbb{E}_{x\sim a} w(x, \boldsymbol{\lambda}) \boldsymbol{\phi}(x)}{\sum_{x\in X} P(x)} = \frac{\mathbb{E}_{x\sim a} w(x, \boldsymbol{\lambda}) \boldsymbol{\phi}(x)}{\sum_{x\in X} w(x, \boldsymbol{\lambda})a(x)} = \frac{\mathbb{E}_{x\sim a} w(x, \boldsymbol{\lambda}) \boldsymbol{\phi}(x)}{\mathbb{E}_{x\sim a} w(x, \boldsymbol{\lambda})} \\ &\simeq \frac{\sum_{i=1}^N w(x_i,\boldsymbol{\lambda}) \boldsymbol{\phi}(x_i)}{\sum_{i=1}^N w(x_i, \boldsymbol{\lambda})} = \frac{\sum_{i=1}^N \exp\langle\boldsymbol{\lambda}\cdot\boldsymbol{\phi}(x)\rangle \boldsymbol{\phi}(x_i)}{\sum_{i=1}^N \exp\langle\boldsymbol{\lambda}\cdot\boldsymbol{\phi}(x)\rangle} \end{aligned} $$
+$$\begin{aligned} \mu(\boldsymbol{\lambda}) &= \mathbb{E}_{x\sim p}\boldsymbol{\phi}(x) = \mathbb{E}_{x\sim a} \frac{p(x)}{a(x)}\boldsymbol{\phi}(x) = \frac{1}{Z}\mathbb{E}_{x\sim a} w(x, \boldsymbol{\lambda}) \boldsymbol{\phi}(x) \\ &= \frac{\mathbb{E}_{x\sim a} w(x, \boldsymbol{\lambda}) \boldsymbol{\phi}(x)}{\sum_{x\in X} P(x)} = \frac{\mathbb{E}_{x\sim a} w(x, \boldsymbol{\lambda}) \boldsymbol{\phi}(x)}{\sum_{x\in X} w(x, \boldsymbol{\lambda})a(x)} = \frac{\mathbb{E}_{x\sim a} w(x, \boldsymbol{\lambda}) \boldsymbol{\phi}(x)}{\mathbb{E}_{x\sim a} w(x, \boldsymbol{\lambda})} \\ &\simeq \frac{\sum_{i=1}^N w(x_i,\boldsymbol{\lambda}) \boldsymbol{\phi}(x_i)}{\sum_{i=1}^N w(x_i, \boldsymbol{\lambda})} = \frac{\sum_{i=1}^N \exp\langle\boldsymbol{\lambda}\cdot\boldsymbol{\phi}(x)\rangle \boldsymbol{\phi}(x_i)}{\sum_{i=1}^N \exp\langle\boldsymbol{\lambda}\cdot\boldsymbol{\phi}(x)\rangle} \end{aligned}$$
 
 Using SGD over the objective $|\boldsymbol{\mu}(\boldsymbol{\lambda}) - \bar{\boldsymbol{\mu}}|^2_2$, we can obtain an estimated value for $\boldsymbol{\lambda}$ and a representation of $P(x)=a(x)\exp\langle\boldsymbol{\lambda}\cdot\boldsymbol{\phi}(x)\rangle$. $P(x)$ is a sequential EBM because $a$ is an autoregressive model.
 
@@ -523,7 +523,7 @@ Using SGD over the objective $|\boldsymbol{\mu}(\boldsymbol{\lambda}) - \bar{\bo
 
 The EBM $P(x)$ can compute ratios of probabilities of two sequences, but cannot sample from $p(x)$ with knowing $Z$. In order to sample from a sequential EBM, the paper proposed to use [Distributional Policy Gradient](https://arxiv.org/abs/1912.08517) (DPG; but not this [DPG](https://lilianweng.github.io/posts/2018-04-08-policy-gradient/#dpg)) with the objective to obtain an autoregressive policy $\pi_\theta$ to approximate a target distribution $p$ by minimizing the cross entropy $H(p, \pi_\theta)$. DPG runs through a sequence of iterations. Within each iteration, the proposed distribution $q$ is used for sampling and we can correct the cross entropy loss with importance weights too:
 
-$$ \begin{aligned} \nabla_\theta H(p, \pi_\theta) &= - \nabla_\theta \mathbb{E}_{x\sim p} \log \pi_\theta(x) = - \mathbb{E}_{x\sim p} \nabla_\theta \log \pi_\theta(x) \\ &= - \mathbb{E}_{x\sim q} \frac{p(x)}{q(x)} \nabla_\theta \log \pi_\theta(x) = - \frac{1}{Z}\mathbb{E}_{x\sim q} \frac{P(x)}{q(x)} \nabla_\theta \log \pi_\theta(x) \end{aligned} $$
+$$\begin{aligned} \nabla_\theta H(p, \pi_\theta) &= - \nabla_\theta \mathbb{E}_{x\sim p} \log \pi_\theta(x) = - \mathbb{E}_{x\sim p} \nabla_\theta \log \pi_\theta(x) \\ &= - \mathbb{E}_{x\sim q} \frac{p(x)}{q(x)} \nabla_\theta \log \pi_\theta(x) = - \frac{1}{Z}\mathbb{E}_{x\sim q} \frac{P(x)}{q(x)} \nabla_\theta \log \pi_\theta(x) \end{aligned}$$
 
 To learn such a $\pi_\theta$, the paper adopts a KL-adaptive version of DPG: It only updates $q$ when the estimated policy $\pi_\theta$ gets closer to $p$. This adaptive step is important for fast convergence.
 
@@ -562,13 +562,13 @@ Unlikelihood training ([Welleck & Kulikov et al. 2019](https://arxiv.org/abs/190
 
 Given a sequence of tokens $(x_1, \dots, x_T)$ and a set of negative candidate tokens $\mathcal{C}^t = \{c_1, \dots , c_m\}$ at step $t$, where each token $x_i, c_j \in \mathcal{V}$, the combined loss for step $t$ is defined as:
 
-$$ \mathcal{L}^t_\text{UL}(p_\theta (. \vert x_{<{t}}), \mathcal{C}^t) = - \alpha \cdot \underbrace{\sum_{c \in \mathcal{C}^t} \log(1 - p_\theta(c \vert x_{<{t}}))}_\text{unlikelihood} - \underbrace{\log p_\theta (x_t \vert x_{<{t}})}_\text{likelihood} $$
+$$\mathcal{L}^t_\text{UL}(p_\theta (. \vert x_{<{t}}), \mathcal{C}^t) = - \alpha \cdot \underbrace{\sum_{c \in \mathcal{C}^t} \log(1 - p_\theta(c \vert x_{<{t}}))}_\text{unlikelihood} - \underbrace{\log p_\theta (x_t \vert x_{<{t}})}_\text{likelihood}$$
 
 One approach for constructing $\mathcal{C}^t$ is to randomly select candidates from model-generated sequences.
 
 The unlikelihood training can be extended to be on the _sequence_\-level, where the negative continuation is defined by a sequence of per-step negative candidate sets. They should be designed to penalize properties that we don't like. For example, we can penalize repeating n-grams as follows:
 
-$$ \mathcal{C}^t_\text{repeat-n} = \{x_t\} \text{ if }(x_{t-i}, \dots, x_{t+j}) \in x_{<{t-i}} \text{ for any } (j-i)=n, i\leq n \leq j. $$
+$$\mathcal{C}^t_\text{repeat-n} = \{x_t\} \text{ if }(x_{t-i}, \dots, x_{t+j}) \in x_{<{t-i}} \text{ for any } (j-i)=n, i\leq n \leq j.$$
 
 Their experiments used unlikelihood training to avoid repetitions in language model outputs and indeed showed better results on less repetition and more unique tokens compared to standard MLE training.
 

@@ -69,11 +69,11 @@ The goal is to maximize the cumulative reward $\sum_{t=1}^T r_t$. If we know the
 
 The optimal reward probability $\theta^{\*}$ of the optimal action $a^{\*}$ is:
 
-$$ \theta^{\*}=Q(a^{\*})=\max_{a \in \mathcal{A}} Q(a) = \max_{1 \leq i \leq K} \theta_i $$
+$$\theta^{\*}=Q(a^{\*})=\max_{a \in \mathcal{A}} Q(a) = \max_{1 \leq i \leq K} \theta_i$$
 
 Our loss function is the total regret we might have by not selecting the optimal action up to the time step T:
 
-$$ \mathcal{L}_T = \mathbb{E} \Big\[ \sum_{t=1}^T \big( \theta^{\*} - Q(a_t) \big) \Big\] $$
+$$\mathcal{L}_T = \mathbb{E} \Big\[ \sum_{t=1}^T \big( \theta^{\*} - Q(a_t) \big) \Big\]$$
 
 ## Bandit Strategies[#](#bandit-strategies)
 
@@ -87,7 +87,7 @@ Based on how we do exploration, there several ways to solve the multi-armed band
 
 The ε-greedy algorithm takes the best action most of the time, but does random exploration occasionally. The action value is estimated according to the past experience by averaging the rewards associated with the target action a that we have observed so far (up to the current time step t):
 
-$$ \hat{Q}_t(a) = \frac{1}{N_t(a)} \sum_{\tau=1}^t r_\tau \mathbb{1}\[a_\tau = a\] $$
+$$\hat{Q}_t(a) = \frac{1}{N_t(a)} \sum_{\tau=1}^t r_\tau \mathbb{1}\[a_\tau = a\]$$
 
 where $\mathbb{1}$ is a binary indicator function and $N_t(a)$ is how many times the action a has been selected so far, $N_t(a) = \sum_{\tau=1}^t \mathbb{1}\[a_\tau = a\]$.
 
@@ -103,7 +103,7 @@ The Upper Confidence Bounds (UCB) algorithm measures this potential by an upper 
 
 In UCB algorithm, we always select the greediest action to maximize the upper confidence bound:
 
-$$ a^{UCB}_t = argmax_{a \in \mathcal{A}} \hat{Q}_t(a) + \hat{U}_t(a) $$
+$$a^{UCB}_t = argmax_{a \in \mathcal{A}} \hat{Q}_t(a) + \hat{U}_t(a)$$
 
 Now, the question is _how to estimate the upper confidence bound_.
 
@@ -113,7 +113,7 @@ If we do not want to assign any prior knowledge on how the distribution looks li
 
 Let $X_1, \dots, X_t$ be i.i.d. (independent and identically distributed) random variables and they are all bounded by the interval \[0, 1\]. The sample mean is $\overline{X}_t = \frac{1}{t}\sum_{\tau=1}^t X_\tau$. Then for u > 0, we have:
 
-$$ \mathbb{P} \[ \mathbb{E}\[X\] > \overline{X}_t + u\] \leq e^{-2tu^2} $$
+$$\mathbb{P} \[ \mathbb{E}\[X\] > \overline{X}_t + u\] \leq e^{-2tu^2}$$
 
 Given one target action a, let us consider:
 
@@ -124,17 +124,17 @@ Given one target action a, let us consider:
 
 Then we have,
 
-$$ \mathbb{P} \[ Q(a) > \hat{Q}_t(a) + U_t(a)\] \leq e^{-2t{U_t(a)}^2} $$
+$$\mathbb{P} \[ Q(a) > \hat{Q}_t(a) + U_t(a)\] \leq e^{-2t{U_t(a)}^2}$$
 
 We want to pick a bound so that with high chances the true mean is blow the sample mean + the upper confidence bound. Thus $e^{-2t U_t(a)^2}$ should be a small probability. Let's say we are ok with a tiny threshold p:
 
-$$ e^{-2t U_t(a)^2} = p \text{ Thus, } U_t(a) = \sqrt{\frac{-\log p}{2 N_t(a)}} $$
+$$e^{-2t U_t(a)^2} = p \text{ Thus, } U_t(a) = \sqrt{\frac{-\log p}{2 N_t(a)}}$$
 
 ## UCB1[#](#ucb1)
 
 One heuristic is to reduce the threshold p in time, as we want to make more confident bound estimation with more rewards observed. Set $p=t^{-4}$ we get **UCB1** algorithm:
 
-$$ U_t(a) = \sqrt{\frac{2 \log t}{N_t(a)}} \text{ and } a^{UCB1}_t = \arg\max_{a \in \mathcal{A}} Q(a) + \sqrt{\frac{2 \log t}{N_t(a)}} $$
+$$U_t(a) = \sqrt{\frac{2 \log t}{N_t(a)}} \text{ and } a^{UCB1}_t = \arg\max_{a \in \mathcal{A}} Q(a) + \sqrt{\frac{2 \log t}{N_t(a)}}$$
 
 ## Bayesian UCB[#](#bayesian-ucb)
 
@@ -158,7 +158,7 @@ Fig. 4. Oops, I guess not this Thompson? (Credit goes to [Ben Taborsky](https://
 
 At each time step, we want to select action a according to the probability that a is **optimal**:
 
-$$ \begin{aligned} \pi(a \\; \vert \\; h_t) &= \mathbb{P} \[ Q(a) > Q(a'), \forall a' \\neq a \\; \vert \\; h_t\] \\ &= \mathbb{E}_{\mathcal{R} \vert h_t} \[ \mathbb{1}(a = \arg\max_{a \in \mathcal{A}} Q(a)) \] \end{aligned} $$
+$$\begin{aligned} \pi(a \\; \vert \\; h_t) &= \mathbb{P} \[ Q(a) > Q(a'), \forall a' \\neq a \\; \vert \\; h_t\] \\ &= \mathbb{E}_{\mathcal{R} \vert h_t} \[ \mathbb{1}(a = \arg\max_{a \in \mathcal{A}} Q(a)) \] \end{aligned}$$
 
 where $\pi(a ; \vert ; h_t)$ is the probability of taking action a given the history $h_t$.
 
@@ -171,7 +171,7 @@ First, let us initialize the Beta parameters α and β based on some prior knowl
 
 At each time t, we sample an expected reward, $\tilde{Q}(a)$, from the prior distribution $\text{Beta}(\alpha_i, \beta_i)$ for every action. The best action is selected among samples: $a^{TS}_t = \arg\max_{a \in \mathcal{A}} \tilde{Q}(a)$. After the true reward is observed, we can update the Beta distribution accordingly, which is essentially doing Bayesian inference to compute the posterior with the known prior and the likelihood of getting the sampled data.
 
-$$ \begin{aligned} \alpha_i & \\leftarrow \alpha_i + r_t \mathbb{1}\[a^{TS}_t = a_i\] \\ \beta_i & \\leftarrow \beta_i + (1-r_t) \mathbb{1}\[a^{TS}_t = a_i\] \end{aligned} $$
+$$\begin{aligned} \alpha_i & \\leftarrow \alpha_i + r_t \mathbb{1}\[a^{TS}_t = a_i\] \\ \beta_i & \\leftarrow \beta_i + (1-r_t) \mathbb{1}\[a^{TS}_t = a_i\] \end{aligned}$$
 
 Thompson sampling implements the idea of [probability matching](https://en.wikipedia.org/wiki/Probability_matching). Because its reward estimations $\tilde{Q}$ are sampled from posterior distributions, each of these probabilities is equivalent to the probability that the corresponding action is optimal, conditioned on observed history.
 

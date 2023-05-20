@@ -58,7 +58,7 @@ _Fig. 4. The encoder-decoder model with additive attention mechanism in [Bahdana
 
 ### Definition
 
-Now let's define the attention mechanism introduced in NMT in a scientific way. Say, we have a source sequence $$\mathbf{x}$$ of length $$n$$ and try to output a target sequence $$\mathbf{y}$$ of length $$m$$:
+Now let's define the attention mechanism introduced in NMT in a scientific way. Say, we have a source sequence$$\mathbf{x}$$of length$$n$$and try to output a target sequence$$\mathbf{y}$$of length$$m$$:
 
 $$
 \begin{aligned}
@@ -69,13 +69,13 @@ $$
 
 (Variables in bold indicate that they are vectors; same for everything else in this post.)
 
-The encoder is a [bidirectional RNN](https://www.coursera.org/lecture/nlp-sequence-models/bidirectional-rnn-fyXnn) (or other recurrent network setting of your choice) with a forward hidden state $$\overrightarrow{\boldsymbol{h}}_i$$ and a backward one $$\overleftarrow{\boldsymbol{h}}_i$$. A simple concatenation of two represents the encoder state. The motivation is to include both the preceding and following words in the annotation of one word.
+The encoder is a [bidirectional RNN](https://www.coursera.org/lecture/nlp-sequence-models/bidirectional-rnn-fyXnn) (or other recurrent network setting of your choice) with a forward hidden state$$\overrightarrow{\boldsymbol{h}}_i$$and a backward one$$\overleftarrow{\boldsymbol{h}}_i$$. A simple concatenation of two represents the encoder state. The motivation is to include both the preceding and following words in the annotation of one word.
 
 $$
 \boldsymbol{h}_i = [\overrightarrow{\boldsymbol{h}}_i^\top; \overleftarrow{\boldsymbol{h}}_i^\top]^\top, i=1,\dots,n
 $$
 
-The decoder network has hidden state $$\boldsymbol{s}_t=f(\boldsymbol{s}_{t-1}, y_{t-1}, \mathbf{c}_t)$$ for the output word at position t, $$t=1,\dots,m$$, where the context vector $$\mathbf{c}_t$$ is a sum of hidden states of the input sequence, weighted by alignment scores:
+The decoder network has hidden state$$\boldsymbol{s}_t=f(\boldsymbol{s}_{t-1}, y_{t-1}, \mathbf{c}_t)$$for the output word at position t,$$t=1,\dots,m$$, where the context vector$$\mathbf{c}_t$$is a sum of hidden states of the input sequence, weighted by alignment scores:
 
 $$
 \begin{aligned}
@@ -85,13 +85,13 @@ $$
 \end{aligned}
 $$
 
-The alignment model assigns a score $$\alpha_{t,i}$$ to the pair of input at position i and output at position t, $$(y_t, x_i)$$, based on how well they match. The set of $$\{\alpha_{t, i}\}$$ are weights defining how much of each source hidden state should be considered for each output. In Bahdanau's paper, the alignment score $$\alpha$$ is parametrized by a **feed-forward network** with a single hidden layer and this network is jointly trained with other parts of the model. The score function is therefore in the following form, given that tanh is used as the non-linear activation function:
+The alignment model assigns a score$$\alpha_{t,i}$$to the pair of input at position i and output at position t,$$(y_t, x_i)$$, based on how well they match. The set of$$\{\alpha_{t, i}\}$$are weights defining how much of each source hidden state should be considered for each output. In Bahdanau's paper, the alignment score$$\alpha$$is parametrized by a **feed-forward network** with a single hidden layer and this network is jointly trained with other parts of the model. The score function is therefore in the following form, given that tanh is used as the non-linear activation function:
 
 $$
 \text{score}(\boldsymbol{s}_t, \boldsymbol{h}_i) = \mathbf{v}_a^\top \tanh(\mathbf{W}_a[\boldsymbol{s}_t; \boldsymbol{h}_i])
 $$
 
-where both $$\mathbf{v}_a$$ and $$\mathbf{W}_a$$ are weight matrices to be learned in the alignment model.
+where both$$\mathbf{v}_a$$and$$\mathbf{W}_a$$are weight matrices to be learned in the alignment model.
 
 The matrix of alignment scores is a nice byproduct to explicitly show the correlation between source and target words.
 
@@ -110,15 +110,15 @@ Below is a summary table of several popular attention mechanisms and correspondi
 
 | Name | Alignment score function | Citation |
 | -------------------------- | ------------- | ------------- |
-| Content-base attention | $$\text{score}(\boldsymbol{s}_t, \boldsymbol{h}_i) = \text{cosine}[\boldsymbol{s}_t, \boldsymbol{h}_i]$$ | [Graves2014](https://arxiv.org/abs/1410.5401) |
-| Additive(\*) | $$\text{score}(\boldsymbol{s}_t, \boldsymbol{h}_i) = \mathbf{v}_a^\top \tanh(\mathbf{W}_a[\boldsymbol{s}_t; \boldsymbol{h}_i])$$ | [Bahdanau2015](https://arxiv.org/pdf/1409.0473.pdf) |
-| Location-Base | $$\alpha_{t,i} = \text{softmax}(\mathbf{W}_a \boldsymbol{s}_t)$$<br/>Note: This simplifies the softmax alignment to only depend on the target position. | [Luong2015](https://arxiv.org/pdf/1508.04025.pdf) |
-| General | $$\text{score}(\boldsymbol{s}_t, \boldsymbol{h}_i) = \boldsymbol{s}_t^\top\mathbf{W}_a\boldsymbol{h}_i$$<br/>where $$\mathbf{W}_a$$ is a trainable weight matrix in the attention layer. | [Luong2015](https://arxiv.org/pdf/1508.04025.pdf) |
-| Dot-Product | $$\text{score}(\boldsymbol{s}_t, \boldsymbol{h}_i) = \boldsymbol{s}_t^\top\boldsymbol{h}_i$$ | [Luong2015](https://arxiv.org/pdf/1508.4025.pdf) |
-| Scaled Dot-Product(^) | $$\text{score}(\boldsymbol{s}_t, \boldsymbol{h}_i) = \frac{\boldsymbol{s}_t^\top\boldsymbol{h}_i}{\sqrt{n}}$$<br/>Note: very similar to the dot-product attention except for a scaling factor; where n is the dimension of the source hidden state. | [Vaswani2017](http://papers.nips.cc/paper/7181-attention-is-all-you-need.pdf) |
+| Content-base attention |$$\text{score}(\boldsymbol{s}_t, \boldsymbol{h}_i) = \text{cosine}[\boldsymbol{s}_t, \boldsymbol{h}_i]$$| [Graves2014](https://arxiv.org/abs/1410.5401) |
+| Additive(\*) |$$\text{score}(\boldsymbol{s}_t, \boldsymbol{h}_i) = \mathbf{v}_a^\top \tanh(\mathbf{W}_a[\boldsymbol{s}_t; \boldsymbol{h}_i])$$| [Bahdanau2015](https://arxiv.org/pdf/1409.0473.pdf) |
+| Location-Base |$$\alpha_{t,i} = \text{softmax}(\mathbf{W}_a \boldsymbol{s}_t)$$<br/>Note: This simplifies the softmax alignment to only depend on the target position. | [Luong2015](https://arxiv.org/pdf/1508.04025.pdf) |
+| General |$$\text{score}(\boldsymbol{s}_t, \boldsymbol{h}_i) = \boldsymbol{s}_t^\top\mathbf{W}_a\boldsymbol{h}_i$$<br/>where$$\mathbf{W}_a$$is a trainable weight matrix in the attention layer. | [Luong2015](https://arxiv.org/pdf/1508.04025.pdf) |
+| Dot-Product |$$\text{score}(\boldsymbol{s}_t, \boldsymbol{h}_i) = \boldsymbol{s}_t^\top\boldsymbol{h}_i$$| [Luong2015](https://arxiv.org/pdf/1508.4025.pdf) |
+| Scaled Dot-Product(^) |$$\text{score}(\boldsymbol{s}_t, \boldsymbol{h}_i) = \frac{\boldsymbol{s}_t^\top\boldsymbol{h}_i}{\sqrt{n}}$$<br/>Note: very similar to the dot-product attention except for a scaling factor; where n is the dimension of the source hidden state. | [Vaswani2017](http://papers.nips.cc/paper/7181-attention-is-all-you-need.pdf) |
 
 (\*) Referred to as "concat" in Luong, et al., 2015 and as "additive attention" in Vaswani, et al., 2017.
-(^) It adds a scaling factor $$1/\sqrt{n}$$, motivated by the concern when the input is large, the softmax function may have an extremely small gradient, hard for efficient learning.<br/>
+(^) It adds a scaling factor$$1/\sqrt{n}$$, motivated by the concern when the input is large, the softmax function may have an extremely small gradient, hard for efficient learning.<br/>
 
 Here are a summary of broader categories of attention mechanisms:
 
@@ -175,7 +175,7 @@ _Fig. 9. How a Turing machine looks like: a tape + a head that handles the tape.
 
 NTM contains two major components, a _controller_ neural network and a _memory_ bank.
 Controller: is in charge of executing operations on the memory. It can be any type of neural network, feed-forward or recurrent.
-Memory: stores processed information. It is a matrix of size $$N \times M$$, containing N vector rows and each has $$M$$ dimensions.
+Memory: stores processed information. It is a matrix of size$$N \times M$$, containing N vector rows and each has$$M$$dimensions.
 
 In one update iteration, the controller processes the input and interacts with the memory bank accordingly to generate output. The interaction is handled by a set of parallel _read_ and _write_ heads. Both read and write operations are "blurry" by softly attending to all the memory addresses.
 
@@ -185,15 +185,15 @@ _Fig 10. Neural Turing Machine Architecture._
 
 ### Reading and Writing
 
-When reading from the memory at time t, an attention vector of size $$N$$, $$\mathbf{w}_t$$ controls how much attention to assign to different memory locations (matrix rows). The read vector $$\mathbf{r}_t$$ is a sum weighted by attention intensity:
+When reading from the memory at time t, an attention vector of size$$N$$,$$\mathbf{w}_t$$controls how much attention to assign to different memory locations (matrix rows). The read vector$$\mathbf{r}_t$$is a sum weighted by attention intensity:
 
 $$
 \mathbf{r}_t = \sum_{i=1}^N w_t(i)\mathbf{M}_t(i)\text{, where }\sum_{i=1}^N w_t(i)=1, \forall i: 0 \leq w_t(i) \leq 1
 $$
 
-where $$w_t(i)$$ is the $$i$$-th element in $$\mathbf{w}_t$$ and $$\mathbf{M}_t(i)$$ is the $$i$$-th row vector in the memory.
+where$$w_t(i)$$is the$$i$$-th element in$$\mathbf{w}_t$$and$$\mathbf{M}_t(i)$$is the$$i$$-th row vector in the memory.
 
-When writing into the memory at time t, as inspired by the input and forget gates in LSTM, a write head first wipes off some old content according to an erase vector $$\mathbf{e}_t$$ and then adds new information by an add vector $$\mathbf{a}_t$$.
+When writing into the memory at time t, as inspired by the input and forget gates in LSTM, a write head first wipes off some old content according to an erase vector$$\mathbf{e}_t$$and then adds new information by an add vector$$\mathbf{a}_t$$.
 
 $$
 \begin{aligned}
@@ -204,11 +204,11 @@ $$
 
 ### Attention Mechanisms
 
-In Neural Turing Machine, how to generate the attention distribution $$\mathbf{w}_t$$ depends on the addressing mechanisms: NTM uses a mixture of content-based and location-based addressings.
+In Neural Turing Machine, how to generate the attention distribution$$\mathbf{w}_t$$depends on the addressing mechanisms: NTM uses a mixture of content-based and location-based addressings.
 
 **Content-based addressing**
 
-The content-addressing creates attention vectors based on the similarity between the key vector $$\mathbf{k}_t$$ extracted by the controller from the input and memory rows. The content-based attention scores are computed as cosine similarity and then normalized by softmax. In addition, NTM adds a strength multiplier $$\beta_t$$ to amplify or attenuate the focus of the distribution.
+The content-addressing creates attention vectors based on the similarity between the key vector$$\mathbf{k}_t$$extracted by the controller from the input and memory rows. The content-based attention scores are computed as cosine similarity and then normalized by softmax. In addition, NTM adds a strength multiplier$$\beta_t$$to amplify or attenuate the focus of the distribution.
 
 $$
 w_t^c(i)
@@ -218,7 +218,7 @@ $$
 
 **Interpolation**
 
-Then an interpolation gate scalar $$g_t$$ is used to blend the newly generated content-based attention vector with the attention weights in the last time step:
+Then an interpolation gate scalar$$g_t$$is used to blend the newly generated content-based attention vector with the attention weights in the last time step:
 
 $$
 \mathbf{w}_t^g = g_t \mathbf{w}_t^c + (1 - g_t) \mathbf{w}_{t-1}
@@ -226,12 +226,12 @@ $$
 
 **Location-based addressing**
 
-The location-based addressing sums up the values at different positions in the attention vector, weighted by a weighting distribution over allowable integer shifts. It is equivalent to a 1-d convolution with a kernel $$\mathbf{s}_t(.)$$, a function of the position offset. There are multiple ways to define this distribution. See Fig. 11. for inspiration.
+The location-based addressing sums up the values at different positions in the attention vector, weighted by a weighting distribution over allowable integer shifts. It is equivalent to a 1-d convolution with a kernel$$\mathbf{s}_t(.)$$, a function of the position offset. There are multiple ways to define this distribution. See Fig. 11. for inspiration.
 
 ![shift-weighting](assets/images/transformer/shift-weighting.png)
-_Fig. 11. Two ways to represent the shift weighting distribution $$\mathbf{s}_t$$._
+_Fig. 11. Two ways to represent the shift weighting distribution$$\mathbf{s}_t$$._
 
-Finally the attention distribution is enhanced by a sharpening scalar $$\gamma_t \geq 1$$.
+Finally the attention distribution is enhanced by a sharpening scalar$$\gamma_t \geq 1$$.
 
 $$
 \begin{aligned}
@@ -240,7 +240,7 @@ w_t(i) &= \frac{\tilde{w}_t(i)^{\gamma_t}}{\sum_{j=1}^N \tilde{w}_t(j)^{\gamma_t
 \end{aligned}
 $$
 
-The complete process of generating the attention vector $$\mathbf{w}_t$$ at time step t is illustrated in Fig. 12. All the parameters produced by the controller are unique for each head. If there are multiple read and write heads in parallel, the controller would output multiple sets.
+The complete process of generating the attention vector$$\mathbf{w}_t$$at time step t is illustrated in Fig. 12. All the parameters produced by the controller are unique for each head. If there are multiple read and write heads in parallel, the controller would output multiple sets.
 
 ![NTM-flow-addressing](assets/images/transformer/NTM-flow-addressing.png)
 _Fig. 12. Flow diagram of the addressing mechanisms in Neural Turing Machine. (Image source: [Graves, Wayne & Danihelka, 2014](https://arxiv.org/abs/1410.5401))_
@@ -252,7 +252,7 @@ In problems like sorting or travelling salesman, both input and output are seque
 ![pointer network](assets/images/transformer/ptr-net.png)
 _Fig. 13. The architecture of a Pointer Network model. (Image source: [Vinyals, et al. 2015](https://arxiv.org/abs/1506.03134))_
 
-The Ptr-Net outputs a sequence of integer indices, $$\boldsymbol{c} = (c_1, \dots, c_m)$$ given a sequence of input vectors $$\boldsymbol{x} = (x_1, \dots, x_n)$$ and $$1 \leq c_i \leq n$$. The model still embraces an encoder-decoder framework. The encoder and decoder hidden states are denoted as $$(\boldsymbol{h}_1, \dots, \boldsymbol{h}_n)$$ and $$(\boldsymbol{s}_1, \dots, \boldsymbol{s}_m)$$, respectively. Note that $$\mathbf{s}_i$$ is the output gate after cell activation in the decoder. The Ptr-Net applies additive attention between states and then normalizes it by softmax to model the output conditional probability:
+The Ptr-Net outputs a sequence of integer indices,$$\boldsymbol{c} = (c_1, \dots, c_m)$$given a sequence of input vectors$$\boldsymbol{x} = (x_1, \dots, x_n)$$and$$1 \leq c_i \leq n$$. The model still embraces an encoder-decoder framework. The encoder and decoder hidden states are denoted as$$(\boldsymbol{h}_1, \dots, \boldsymbol{h}_n)$$and$$(\boldsymbol{s}_1, \dots, \boldsymbol{s}_m)$$, respectively. Note that$$\mathbf{s}_i$$is the output gate after cell activation in the decoder. The Ptr-Net applies additive attention between states and then normalizes it by softmax to model the output conditional probability:
 
 $$
 \begin{aligned}
@@ -272,7 +272,7 @@ The secret recipe is carried in its model architecture.
 
 ### Key, Value and Query
 
-The major component in the transformer is the unit of _multi-head self-attention mechanism_. The transformer views the encoded representation of the input as a set of **key**-**value** pairs, $$(\mathbf{K}, \mathbf{V})$$, both of dimension $$n$$ (input sequence length); in the context of NMT, both the keys and values are the encoder hidden states. In the decoder, the previous output is compressed into a **query** ($$\mathbf{Q}$$ of dimension $$m$$) and the next output is produced by mapping this query and the set of keys and values.
+The major component in the transformer is the unit of _multi-head self-attention mechanism_. The transformer views the encoded representation of the input as a set of **key**-**value** pairs,$$(\mathbf{K}, \mathbf{V})$$, both of dimension$$n$$(input sequence length); in the context of NMT, both the keys and values are the encoder hidden states. In the decoder, the previous output is compressed into a **query** ($$\mathbf{Q}$$of dimension$$m$$) and the next output is produced by mapping this query and the set of keys and values.
 
 The transformer adopts the [scaled dot-product attention](#summary): the output is a weighted sum of the values, where the weight assigned to each value is determined by the dot-product of the query with all the keys:
 
@@ -292,7 +292,7 @@ $$
 \end{aligned}
 $$
 
-where $$\mathbf{W}^Q_i$$, $$\mathbf{W}^K_i$$, $$\mathbf{W}^V_i$$, and $$\mathbf{W}^O$$ are parameter matrices to be learned.
+where$$\mathbf{W}^Q_i$$,$$\mathbf{W}^K_i$$,$$\mathbf{W}^V_i$$, and$$\mathbf{W}^O$$are parameter matrices to be learned.
 
 ### Encoder
 
@@ -305,7 +305,7 @@ The encoder generates an attention-based representation with capability to locat
 - A stack of N=6 identical layers.
 - Each layer has a **multi-head self-attention layer** and a simple position-wise **fully connected feed-forward network**.
 - Each sub-layer adopts a [**residual**](https://arxiv.org/pdf/1512.03385.pdf) connection and a layer **normalization**.
-  All the sub-layers output data of the same dimension $$d_\text{model} = 512$$.
+  All the sub-layers output data of the same dimension$$d_\text{model} = 512$$.
 
 ### Decoder
 
@@ -323,7 +323,7 @@ The decoder is able to retrieval from the encoded representation.
 
 Finally here is the complete view of the transformer's architecture:
 
-- Both the source and target sequences first go through embedding layers to produce data of the same dimension $$d_\text{model} =512$$.
+- Both the source and target sequences first go through embedding layers to produce data of the same dimension$$d_\text{model} =512$$.
 - To preserve the position information, a sinusoid-wave-based positional encoding is applied and summed with the embedding output.
 - A softmax and linear layer are added to the final decoder output.
 
@@ -353,11 +353,11 @@ As the (soft) self-attention in the vision context is designed to explicitly lea
 ![Conv vs self-attention on images](assets/images/transformer/conv-vs-self-attention.png)
 _Fig. 19. Convolution operation and self-attention have access to regions of very different sizes._
 
-The SAGAN adopts the [non-local neural network](https://arxiv.org/pdf/1711.07971.pdf) to apply the attention computation. The convolutional image feature maps $$\mathbf{x}$$ is branched out into three copies, corresponding to the concepts of [key, value, and query](#key-value-and-query) in the transformer:
+The SAGAN adopts the [non-local neural network](https://arxiv.org/pdf/1711.07971.pdf) to apply the attention computation. The convolutional image feature maps$$\mathbf{x}$$is branched out into three copies, corresponding to the concepts of [key, value, and query](#key-value-and-query) in the transformer:
 
-- Key: $$f(\mathbf{x}) = \mathbf{W}_f \mathbf{x}$$
-- Query: $$g(\mathbf{x}) = \mathbf{W}_g \mathbf{x}$$
-- Value: $$h(\mathbf{x}) = \mathbf{W}_h \mathbf{x}$$
+- Key:$$f(\mathbf{x}) = \mathbf{W}_f \mathbf{x}$$
+- Query:$$g(\mathbf{x}) = \mathbf{W}_g \mathbf{x}$$
+- Value:$$h(\mathbf{x}) = \mathbf{W}_h \mathbf{x}$$
 
 Then we apply the dot-product attention to output the self-attention feature maps:
 
@@ -371,7 +371,7 @@ $$
 ![SAGAN](assets/images/transformer/SAGAN.png)
 _Fig. 20. The self-attention mechanism in SAGAN. (Image source: Fig. 2 in [Zhang et al., 2018](https://arxiv.org/abs/1805.08318))_
 
-Note that $$\alpha_{i,j}$$ is one entry in the attention map, indicating how much attention the model should pay to the $$i$$-th position when synthesizing the $$j$$-th location. $$\mathbf{W}_f$$, $$\mathbf{W}_g$$, and $$\mathbf{W}_h$$ are all 1x1 convolution filters. If you feel that 1x1 conv sounds like a weird concept (i.e., isn't it just to multiply the whole feature map with one number?), watch this short [tutorial](https://www.coursera.org/lecture/convolutional-neural-networks/networks-in-networks-and-1x1-convolutions-ZTb8x) by Andrew Ng. The output $$\mathbf{o}_j$$ is a column vector of the final output $$\mathbf{o}= (\mathbf{o}_1, \mathbf{o}_2, \dots, \mathbf{o}_j, \dots, \mathbf{o}_N)$$.
+Note that$$\alpha_{i,j}$$is one entry in the attention map, indicating how much attention the model should pay to the$$i$$-th position when synthesizing the$$j$$-th location.$$\mathbf{W}_f$$,$$\mathbf{W}_g$$, and$$\mathbf{W}_h$$are all 1x1 convolution filters. If you feel that 1x1 conv sounds like a weird concept (i.e., isn't it just to multiply the whole feature map with one number?), watch this short [tutorial](https://www.coursera.org/lecture/convolutional-neural-networks/networks-in-networks-and-1x1-convolutions-ZTb8x) by Andrew Ng. The output$$\mathbf{o}_j$$is a column vector of the final output$$\mathbf{o}= (\mathbf{o}_1, \mathbf{o}_2, \dots, \mathbf{o}_j, \dots, \mathbf{o}_N)$$.
 
 Furthermore, the output of the attention layer is multiplied by a scale parameter and added back to the original input feature map:
 
@@ -379,7 +379,7 @@ $$
 \mathbf{y} = \mathbf{x}_i + \gamma \mathbf{o}_i
 $$
 
-While the scaling parameter $$\gamma$$ is increased gradually from 0 during the training, the network is configured to first rely on the cues in the local regions and then gradually learn to assign more weight to the regions that are further away.
+While the scaling parameter$$\gamma$$is increased gradually from 0 during the training, the network is configured to first rely on the cues in the local regions and then gradually learn to assign more weight to the regions that are further away.
 
 ![SAGAN examples](assets/images/transformer/SAGAN-examples.png)
 _Fig. 21. 128×128 example images generated by SAGAN for different classes. (Image source: Partial Fig. 6 in [Zhang et al., 2018](https://arxiv.org/pdf/1805.08318.pdf))_
