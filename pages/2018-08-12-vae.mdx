@@ -91,7 +91,7 @@ It consists of two networks:
 - _Encoder_ network: It translates the original high-dimension input into the latent low-dimensional code. The input size is larger than the output size.
 - _Decoder_ network: The decoder network recovers the data from the code, likely with larger and larger output layers.
 
-![](autoencoder-architecture.png)
+![](assets/images/2018-08-12-vae/autoencoder-architecture.png)
 
 Fig. 1. Illustration of autoencoder model architecture.
 
@@ -113,7 +113,7 @@ $$\begin{aligned} \tilde{\mathbf{x}}^{(i)} &\sim \mathcal{M}_\mathcal{D}(\tilde{
 
 where $\mathcal{M}_\mathcal{D}$ defines the mapping from the true data samples to the noisy or corrupted ones.
 
-![](denoising-autoencoder-architecture.png)
+![](assets/images/2018-08-12-vae/denoising-autoencoder-architecture.png)
 
 Fig. 2. Illustration of denoising autoencoder model architecture.
 
@@ -139,7 +139,7 @@ This constraint is achieved by adding a penalty term into the loss function. The
 
 $$\begin{aligned} L_\text{SAE}(\theta) &= L(\theta) + \beta \sum_{l=1}^L \sum_{j=1}^{s_l} D_\text{KL}(\rho \| \hat{\rho}_j^{(l)}) \\ &= L(\theta) + \beta \sum_{l=1}^L \sum_{j=1}^{s_l} \rho\log\frac{\rho}{\hat{\rho}_j^{(l)}} + (1-\rho)\log\frac{1-\rho}{1-\hat{\rho}_j^{(l)}} \end{aligned}$$
 
-![](kl-metric-sparse-autoencoder.png)
+![](assets/images/2018-08-12-vae/kl-metric-sparse-autoencoder.png)
 
 Fig. 4. The KL divergence between a Bernoulli distribution with mean $\rho=0.25$ and a Bernoulli distribution with mean $0 \leq \hat{\rho} \leq 1$.
 
@@ -147,7 +147,7 @@ Fig. 4. The KL divergence between a Bernoulli distribution with mean $\rho=0.25$
 
 In $k$-Sparse Autoencoder ([Makhzani and Frey, 2013](https://arxiv.org/abs/1312.5663)), the sparsity is enforced by only keeping the top k highest activations in the bottleneck layer with linear activation function. First we run feedforward through the encoder network to get the compressed code: $\mathbf{z} = g(\mathbf{x})$. Sort the values in the code vector $\mathbf{z}$. Only the k largest values are kept while other neurons are set to 0. This can be done in a ReLU layer with an adjustable threshold too. Now we have a sparsified code: $\mathbf{z}' = \text{Sparsify}(\mathbf{z})$. Compute the output and the loss from the sparsified code, $L = |\mathbf{x} - f(\mathbf{z}') |_2^2$. And, the back-propagation only goes through the top k activated hidden units!
 
-![](k-sparse-autoencoder.png)
+![](assets/images/2018-08-12-vae/k-sparse-autoencoder.png)
 
 Fig. 5. Filters of the k-sparse autoencoder for different sparsity levels k, learnt from MNIST with 1000 hidden units.. (Image source: [Makhzani and Frey, 2013](https://arxiv.org/abs/1312.5663))
 
@@ -192,7 +192,7 @@ $$p_\theta(\mathbf{x}^{(i)}) = \int p_\theta(\mathbf{x}^{(i)}\vert\mathbf{z}) p_
 
 Unfortunately it is not easy to compute $p_\theta(\mathbf{x}^{(i)})$ in this way, as it is very expensive to check all the possible values of $\mathbf{z}$ and sum them up. To narrow down the value space to facilitate faster search, we would like to introduce a new approximation function to output what is a likely code given an input $\mathbf{x}$, $q_\phi(\mathbf{z}\vert\mathbf{x})$, parameterized by $\phi$.
 
-![](VAE-graphical-model.png)
+![](assets/images/2018-08-12-vae/VAE-graphical-model.png)
 
 Fig. 6. The graphical model involved in Variational Autoencoder. Solid lines denote the generative distribution $p\\_\theta(.)$ and dashed lines denote the distribution $q\\_\phi (\mathbf{z}\vert\mathbf{x})$ to approximate the intractable posterior $p\\_\theta (\mathbf{z}\vert\mathbf{x})$.
 
@@ -209,7 +209,7 @@ In our case we want to minimize $D_\text{KL}( q_\phi(\mathbf{z}\vert\mathbf{x}) 
 
 But why use $D_\text{KL}(q_\phi | p_\theta)$ (reversed KL) instead of $D_\text{KL}(p_\theta | q_\phi)$ (forward KL)? Eric Jang has a great explanation in his [post](https://blog.evjang.com/2016/08/variational-bayes.html) on Bayesian Variational methods. As a quick recap:
 
-![](forward_vs_reversed_KL.png)
+![](assets/images/2018-08-12-vae/forward_vs_reversed_KL.png)
 
 Fig. 7. Forward and reversed KL divergence have different demands on how to match two distributions. (Image source: [blog.evjang.com/2016/08/variational-bayes.html](https://blog.evjang.com/2016/08/variational-bayes.html))
 
@@ -250,13 +250,13 @@ $$\begin{aligned} \mathbf{z} &\sim q_\phi(\mathbf{z}\vert\mathbf{x}^{(i)}) = \ma
 
 where $\odot$ refers to element-wise product.
 
-![](reparameterization-trick.png)
+![](assets/images/2018-08-12-vae/reparameterization-trick.png)
 
 Fig. 8. Illustration of how the reparameterization trick makes the $\mathbf{z}$ sampling process trainable.(Image source: Slide 12 in Kingma's NIPS 2015 workshop [talk](http://dpkingma.com/wordpress/wp-content/uploads/2015/12/talk_nips_workshop_2015.pdf))
 
 The reparameterization trick works for other types of distributions too, not only Gaussian. In the multivariate Gaussian case, we make the model trainable by learning the mean and variance of the distribution, $\mu$ and $\sigma$, explicitly using the reparameterization trick, while the stochasticity remains in the random variable $\boldsymbol{\\epsilon} \sim \mathcal{N}(0, \boldsymbol{I})$.
 
-![](vae-gaussian.png)
+![](assets/images/2018-08-12-vae/vae-gaussian.png)
 
 Fig. 9. Illustration of variational autoencoder model with the multivariate Gaussian assumption.
 
@@ -300,7 +300,7 @@ $$\mathbf{z}_q(\mathbf{x}) = \text{Quantize}(E(\mathbf{x})) = \mathbf{e}_k \text
 
 Note that the discrete latent variables can have different shapes in differnet applications; for example, 1D for speech, 2D for image and 3D for video.
 
-![](VQ-VAE.png)
+![](assets/images/2018-08-12-vae/VQ-VAE.png)
 
 Fig. 10. The architecture of VQ-VAE (Image source: [van den Oord, et al. 2017](http://papers.nips.cc/paper/7210-neural-discrete-representation-learning.pdf))
 
@@ -326,11 +326,11 @@ VQ-VAE-2 ([Ali Razavi, et al. 2019](https://arxiv.org/abs/1906.00446)) is a two-
 
 Considering that VQ-VAE-2 depends on discrete latent variables configured in a simple hierarchical setting, the quality of its generated images are pretty amazing.
 
-![](VQ-VAE-2.png)
+![](assets/images/2018-08-12-vae/VQ-VAE-2.png)
 
 Fig. 11. Architecture of hierarchical VQ-VAE and multi-stage image generation. (Image source: [Ali Razavi, et al. 2019](https://arxiv.org/abs/1906.00446))
 
-![](VQ-VAE-2-algo.png)
+![](assets/images/2018-08-12-vae/VQ-VAE-2-algo.png)
 
 Fig. 12. The VQ-VAE-2 algorithm. (Image source: [Ali Razavi, et al. 2019](https://arxiv.org/abs/1906.00446))
 
@@ -338,7 +338,7 @@ Fig. 12. The VQ-VAE-2 algorithm. (Image source: [Ali Razavi, et al. 2019](https:
 
 **TD-VAE** ("Temporal Difference VAE"; [Gregor et al., 2019](https://arxiv.org/abs/1806.03107)) works with sequential data. It relies on three main ideas, described below.
 
-![](TD-VAE-state-space.png)
+![](assets/images/2018-08-12-vae/TD-VAE-state-space.png)
 
 Fig. 13. State-space model as a Markov Chain model.
 
@@ -396,7 +396,7 @@ To incorporate the idea of jumpy prediction, the sequential ELBO has to not only
 
 $$J_{t_1, t_2} = \mathbb{E}\[ \log p_D(x_{t_2}|z_{t_2}) + \log p_B(z_{t_1}|b_{t_1}) + \log p_T(z_{t_2}|z_{t_1}) - \log p_B(z_{t_2}|b_{t_2}) - \log p_S(z_{t_1}|z_{t_2}, b_{t_1}, b_{t_2})\]$$
 
-![](TD-VAE.png)
+![](assets/images/2018-08-12-vae/TD-VAE.png)
 
 Fig. 14. A detailed overview of TD-VAE architecture, very nicely done. (Image source: [TD-VAE paper](https://arxiv.org/abs/1806.03107))
 
@@ -404,6 +404,7 @@ Fig. 14. A detailed overview of TD-VAE architecture, very nicely done. (Image so
 
 Cited as:
 
+```
     @article{weng2018VAE,
       title   = "From Autoencoder to Beta-VAE",
       author  = "Weng, Lilian",
@@ -411,6 +412,7 @@ Cited as:
       year    = "2018",
       url     = "https://lilianweng.github.io/posts/2018-08-12-vae/"
     }
+```
 
 # References[#](#references)
 
