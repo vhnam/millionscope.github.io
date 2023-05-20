@@ -19,7 +19,7 @@
   "homepage": "https://github.com/MillionScope/millionscope.github.io#readme",
   "dependencies": {
     "@vercel/analytics": "^1.0.1",
-    "next": "^13.4.2",
+    "next": "^13.4.3",
     "nextra": "latest",
     "nextra-theme-blog": "^2.5.2",
     "nextra-theme-docs": "latest",
@@ -29,7 +29,7 @@
     "remark-math": "^5.1.1"
   },
   "devDependencies": {
-    "@types/node": "20.1.4",
+    "@types/node": "20.2.1",
     "typescript": "^5.0.4"
   }
 }
