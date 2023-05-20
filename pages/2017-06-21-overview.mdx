@@ -12,8 +12,6 @@ Source : https://lilianweng.github.io/posts/2017-06-21-overview/
 
 # An Overview of Deep Learning for Curious People
 
-June 21, 2017 · 12 min · Lilian Weng
-
 Table of Contents
 
 - [Why Does Deep Learning Work Now?](#why-does-deep-learning-work-now)
@@ -42,7 +40,7 @@ Meanwhile, many companies are spending resources on pushing the edges of AI appl
 
 Deep learning models, in simple words, are large and deep artificial neural nets. A neural network ("NN") can be well presented in a [directed acyclic graph](https://en.wikipedia.org/wiki/Directed_acyclic_graph): the input layer takes in signal vectors; one or multiple hidden layers process the outputs of the previous layer. The initial concept of a neural network can be traced back to more than [half a century ago](https://cs.stanford.edu/people/eroberts/courses/soco/projects/neural-networks/History/history1.html). But why does it work now? Why do people start talking about them all of a sudden?
 
-![](ANN.png)
+![](assets/images/2017-06-21-overview/ANN.png)
 
 Fig. 1. A three-layer artificial neural network. (Image source: [http://cs231n.github.io/convolutional-networks/#conv](http://cs231n.github.io/convolutional-networks/#conv))
 
@@ -55,7 +53,7 @@ A large and deep neural network has many more layers + many more nodes in each l
 
 Here is an interesting plot presenting the relationship between the data scale and the model performance, proposed by Andrew Ng in his "[Nuts and Bolts of Applying Deep Learning](https://youtu.be/F1ka6a13S9I)" talk. On a small dataset, traditional algorithms (Regression, Random Forests, SVM, GBM, etc.) or statistical learning does a great job, but once the data scale goes up to the sky, the large NN outperforms others. Partially because compared to a traditional ML model, a neural network model has many more parameters and has the capability to learn complicated nonlinear patterns. Thus we expect the model to pick the most helpful features by itself without too much expert-involved manual feature engineering.
 
-![](data_size_vs_model_performance.png)
+![](assets/images/2017-06-21-overview/data_size_vs_model_performance.png)
 
 Fig. 2. The data scale versus the model performance. (Recreated based on: [https://youtu.be/F1ka6a13S9I](https://youtu.be/F1ka6a13S9I))
 
@@ -67,13 +65,13 @@ Next, let's go through a few classical deep learning models.
 
 Convolutional neural networks, short for "CNN", is a type of feed-forward artificial neural networks, in which the connectivity pattern between its neurons is inspired by the organization of the visual cortex system. The primary visual cortex (V1) does edge detection out of the raw visual input from the retina. The secondary visual cortex (V2), also called prestriate cortex, receives the edge features from V1 and extracts simple visual properties such as orientation, spatial frequency, and color. The visual area V4 handles more complicated object attributes. All the processed visual features flow into the final logic unit, inferior temporal gyrus (IT), for object recognition. The shortcut between V1 and V4 inspires a special type of CNN with connections between non-adjacent layers: Residual Net ([He, et al. 2016](http://www.cv-foundation.org/openaccess/content_cvpr_2016/papers/He_Deep_Residual_Learning_CVPR_2016_paper.pdf)) containing "Residual Block" which supports some input of one layer to be passed to the component two layers later.
 
-![](visual_cortex_system.png)
+![](assets/images/2017-06-21-overview/visual_cortex_system.png)
 
 Fig. 3. Illustration of the human visual cortex system. (Image source: [Wang & Raj 2017](https://arxiv.org/abs/1702.07800))
 
 Convolution is a mathematical term, here referring to an operation between two matrices. The convolutional layer has a fixed small matrix defined, also called kernel or filter. As the kernel is sliding, or convolving, across the matrix representation of the input image, it is computing the element-wise multiplication of the values in the kernel matrix and the original image values. [Specially designed kernels](http://setosa.io/ev/image-kernels/) can process images for common purposes like blurring, sharpening, edge detection and many others, fast and efficiently.
 
-![](lenet.png)
+![](assets/images/2017-06-21-overview/lenet.png)
 
 Fig. 4. The LeNet architecture consists of two sets of convolutional, activation, and pooling layers, followed by a fully-connected layer, activation, another fully-connected layer, and finally a softmax classifier (Image source: [http://deeplearning.net/tutorial/lenet.html](http://deeplearning.net/tutorial/lenet.html))
 
@@ -85,19 +83,19 @@ A sequence model is usually designed to transform an input sequence into an outp
 
 A recurrent neural network model is born with the capability to process long sequential data and to tackle tasks with context spreading in time. The model processes one element in the sequence at one time step. After computation, the newly updated unit state is passed down to the next time step to facilitate the computation of the next element. Imagine the case when an RNN model reads all the Wikipedia articles, character by character, and then it can predict the following words given the context.
 
-![](RNN.png)
+![](assets/images/2017-06-21-overview/RNN.png)
 
 Fig. 5. A recurrent neural network with one hidden unit (left) and its unrolling version in time (right). The unrolling version illustrates what happens in time: $s\\_{t-1}$, $s\\_{t}$, and $s\\_{t+1}$ are the same unit with different states at different time steps $t-1$, $t$, and $t+1$. (Image source: [LeCun, Bengio, and Hinton, 2015](http://pages.cs.wisc.edu/~dyer/cs540/handouts/deep-learning-nature2015.pdf); [Fig. 5](https://www.nature.com/nature/journal/v521/n7553/fig_tab/nature14539_F5.html))
 
 However, simple perceptron neurons that linearly combine the current input element and the last unit state may easily lose the long-term dependencies. For example, we start a sentence with "Alice is working at …" and later after a whole paragraph, we want to start the next sentence with "She" or "He" correctly. If the model forgets the character's name "Alice", we can never know. To resolve the issue, researchers created a special neuron with a much more complicated internal structure for memorizing long-term context, named ["Long-short term memory (LSTM)"](http://web.eecs.utk.edu/~itamar/courses/ECE-692/Bobby_paper1.pdf) cell. It is smart enough to learn for how long it should memorize the old information, when to forget, when to make use of the new data, and how to combine the old memory with new input. This [introduction](http://colah.github.io/posts/2015-08-Understanding-LSTMs/) is so well written that I recommend everyone with interest in LSTM to read it. It has been officially promoted in the [Tensorflow documentation](https://www.tensorflow.org/tutorials/recurrent) ;-)
 
-![](LSTM.png)
+![](assets/images/2017-06-21-overview/LSTM.png)
 
 Fig. 6. The structure of a LSTM cell. (Image source: [http://colah.github.io/posts/2015-08-Understanding-LSTMs](http://colah.github.io/posts/2015-08-Understanding-LSTMs))
 
 To demonstrate the power of RNNs, [Andrej Karpathy](http://karpathy.github.io/2015/05/21/rnn-effectiveness/) built a character-based language model using RNN with LSTM cells. Without knowing any English vocabulary beforehand, the model could learn the relationship between characters to form words and then the relationship between words to form sentences. It could achieve a decent performance even without a huge set of training data.
 
-![](rnn_shakespeare.png)
+![](assets/images/2017-06-21-overview/rnn_shakespeare.png)
 
 Fig. 7. A character-based recurrent neural network model writes like a Shakespeare. (Image source: [http://karpathy.github.io/2015/05/21/rnn-effectiveness](http://karpathy.github.io/2015/05/21/rnn-effectiveness))
 
@@ -105,7 +103,7 @@ Fig. 7. A character-based recurrent neural network model writes like a Shakespea
 
 The [sequence-to-sequence model](https://arxiv.org/pdf/1406.1078.pdf) is an extended version of RNN, but its application field is distinguishable enough that I would like to list it in a separated section. Same as RNN, a sequence-to-sequence model operates on sequential data, but particularly it is commonly used to develop chatbots or personal assistants, both generating meaningful response for input questions. A sequence-to-sequence model consists of two RNNs, encoder and decoder. The encoder learns the contextual information from the input words and then hands over the knowledge to the decoder side through a "**context vector**" (or "thought vector", as shown in Fig 8.). Finally, the decoder consumes the context vector and generates proper responses.
 
-![](seq2seq_gmail.png)
+![](assets/images/2017-06-21-overview/seq2seq_gmail.png)
 
 Fig. 8. A sequence-to-sequence model for generating Gmail auto replies. (Image source: [https://research.googleblog.com/2015/11/computer-respond-to-this-email.html](https://research.googleblog.com/2015/11/computer-respond-to-this-email.html))
 
@@ -113,13 +111,13 @@ Fig. 8. A sequence-to-sequence model for generating Gmail auto replies. (Image s
 
 Different from the previous models, autoencoders are for unsupervised learning. It is designed to learn a **low-dimensional** representation of a **high-dimensional** data set, similar to what [Principal Components Analysis (PCA)](https://en.wikipedia.org/wiki/Principal_component_analysis) does. The autoencoder model tries to learn an approximation function $ f(x) \approx x $ to reproduce the input data. However, it is restricted by a bottleneck layer in the middle with a very small number of nodes. With limited capacity, the model is forced to form a very efficient encoding of the data, that is essentially the low-dimensional code we learned.
 
-![](autoencoder.png)
+![](assets/images/2017-06-21-overview/autoencoder.png)
 
 Fig. 9. An autoencoder model has a bottleneck layer with only a few neurons. (Image source: Geoffrey Hinton's Coursera class ["Neural Networks for Machine Learning"](https://www.coursera.org/learn/neural-networks) - [Week 15](https://www.coursera.org/learn/neural-networks/home/week/15))
 
 [Hinton and Salakhutdinov](https://pdfs.semanticscholar.org/7d76/b71b700846901ac4ac119403aa737a285e36.pdf) used autoencoders to compress documents on a variety of topics. As shown in Fig 10, when both PCA and autoencoder were applied to reduce the documents onto two dimensions, autoencoder demonstrated a much better outcome. With the help of autoencoder, we can do efficient data compression to speed up the information retrieval including both documents and images.
 
-![](autoencoder_experiment.png)
+![](assets/images/2017-06-21-overview/autoencoder_experiment.png)
 
 Fig. 10. The outputs of PCA (left) and autoencoder (right) when both try to compress documents into two numbers. (Image source: [Hinton & Salakhutdinov 2006](https://www.cs.toronto.edu/~hinton/science.pdf))
 
@@ -127,7 +125,7 @@ Fig. 10. The outputs of PCA (left) and autoencoder (right) when both try to comp
 
 Since I started my post with AlphaGo, let us dig a bit more on why AlphaGo worked out. [Reinforcement learning ("RL")](https://en.wikipedia.org/wiki/Reinforcement_learning) is one of the secrets behind its success. RL is a subfield of machine learning which allows machines and software agents to automatically determine the optimal behavior within a given context, with a goal to maximize the long-term performance measured by a given metric.
 
-![](alphago_paper.png) ![](alphago_model.png)
+![](assets/images/2017-06-21-overview/alphago_paper.png) ![](assets/images/2017-06-21-overview/alphago_model.png)
 
 Fig. 11. AlphaGo neural network training pipeline and architecture. (Image source: [Silver et al. 2016](https://www.nature.com/articles/nature16961))
 
@@ -137,7 +135,7 @@ The AlphaGo system starts with a supervised learning process to train a fast rol
 
 [Generative adversarial network](https://arxiv.org/pdf/1406.2661.pdf), short for "GAN", is a type of deep generative models. GAN is able to create new examples after learning through the real data. It is consist of two models competing against each other in a zero-sum game framework. The famous deep learning researcher [Yann LeCun](http://yann.lecun.com/) gave it a super high praise: Generative Adversarial Network is the most interesting idea in the last ten years in machine learning. (See the Quora question: ["What are some recent and potentially upcoming breakthroughs in deep learning?"](https://www.quora.com/What-are-some-recent-and-potentially-upcoming-breakthroughs-in-deep-learning))
 
-![](GAN.png)
+![](assets/images/2017-06-21-overview/GAN.png)
 
 Fig. 12. The architecture of a generative adversarial network. (Image source: [http://www.kdnuggets.com/2017/01/generative-adversarial-networks-hot-topic-machine-learning.html](http://www.kdnuggets.com/2017/01/generative-adversarial-networks-hot-topic-machine-learning.html))
 
@@ -147,7 +145,7 @@ In the [original GAN paper](https://arxiv.org/pdf/1406.2661.pdf), GAN was propos
 
 After learning all these models, you may start wondering how you can implement the models and use them for real. Fortunately, we have many open source toolkits and libraries for building deep learning models. [Tensorflow](https://www.tensorflow.org/) is fairly new but has attracted a lot of popularity. It turns out, TensorFlow was [the most forked Github project of 2015](http://deliprao.com/archives/168). All that happened in a period of 2 months after its release in Nov 2015.
 
-![](deep_learning_toolkits.png)
+![](assets/images/2017-06-21-overview/deep_learning_toolkits.png)
 
 # How to Learn?[#](#how-to-learn)
 
