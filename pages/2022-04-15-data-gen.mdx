@@ -275,7 +275,7 @@ Since it is known some labels are incorrect, noise-robust training can explicitl
 
 One approach is to rely on the estimation of a noise transition matrix and use that to correct the forward or backward loss, named **F-correction** ([Patrini et al. 2017](https://arxiv.org/abs/1609.03683)). Let's first assume that there are $k$ classes and the noise transition matrix $C \in \[0, 1\]^{k\\times k}$ is observable and the label flipping probability does not depend on the sample input but only the label (i.e. known as random classification noise, RCN). Let $\\tilde{y}$ denote a corrupted label. Each entry of $C$ represents the probability of one label flipping to another[1](#fn:1),
 
-$$ C\_{ij} = p(\\tilde{y}= j \vert y =i, \mathbf{x}) \\approx p(\\tilde{y}= j \vert y =i) $$
+$$ C\_{ij} = p(\\tilde{y}= j \vert y =i, \mathbf{x}) \approx p(\\tilde{y}= j \vert y =i) $$
 
 Then we can proceed a forward label correction procedure to incorporate the prior knowledge of noisy transition matrix into the prediction.
 
@@ -283,7 +283,7 @@ $$ \begin{aligned} \mathcal{L}(\hat{p}(\\tilde{y}\vert\mathbf{x}), y) &= - \\log
 
 In matrix form, we have $\mathcal{L}(\hat{p}(y \vert \mathbf{x})) = - \\log C^\top \hat{p}(y \vert \mathbf{x})$. However, such a noise transition matrix is usually _unknown_. If we have access to a clean dataset, the noise matrix $C$ can be estimated ([Hendrycks et al. 2018](https://arxiv.org/abs/1802.05300)) by calculating confusion matrix on the clean data. Let's denote a clean trusted dataset as $\mathcal{D}\_c$ and a noisy dataset as $\mathcal{D}\_n$ going forward.
 
-$$ \hat{C}\_{ij} = \frac{1}{\vert \mathcal{A}\_i\vert} \sum\_{\mathbf{x} \in \mathcal{A}\_i} \hat{p}(\\tilde{y}=j \vert y=i, \mathbf{x}) \\approx p(\\tilde{y}=j \vert y=i) $$
+$$ \hat{C}\_{ij} = \frac{1}{\vert \mathcal{A}\_i\vert} \sum\_{\mathbf{x} \in \mathcal{A}\_i} \hat{p}(\\tilde{y}=j \vert y=i, \mathbf{x}) \approx p(\\tilde{y}=j \vert y=i) $$
 
 where $\mathcal{A}\_i$ is a subset of data points from $\mathcal{D}\_c$ with label $i$.
 
@@ -343,7 +343,7 @@ Fig. 13. Left: Imbalanced classes on MNIST (class 4 and 9); Right: Effect of the
 
 **MentorNet** ([Jiang et al. 2018](https://arxiv.org/abs/1712.05055)) uses teach-student curriculum learning to weight data. It incorporates two different networks, a mentor and a student. The mentor network provides a data-driven curriculum (i.e. sample training weighting scheme) for the student to focus on learning likely correct labels.
 
-Let $g\_\\psi$ be the MentorNet parameterized by $\\psi$ , $f\_\\theta$ be the StudentNet parametrized by $\\theta$ and $G$ be a predefined curriculum parameterized by $\\lambda$. Given the training data $\mathcal{D} = \{(\mathbf{x}\_i, y\_i)\}\_{i=1}^n$ for a $k$-class classification task, the MentorNet needs to predict a time-varying latent weight variable $\mathbf{w} \in \[0, 1\]^{n \\times k}$ to guide the learning of StudentNet, taking an intermediate feature processed by StudentNet $f$ , $\mathbf{z}\_i = \\phi\_{f\_\\theta}(\mathbf{x}\_i, y\_i)$:
+Let $g\_\\psi$ be the MentorNet parameterized by $\\psi$ , $f\_\\theta$ be the StudentNet parametrized by $\\theta$ and $G$ be a predefined curriculum parameterized by $\\lambda$. Given the training data $\mathcal{D} = \{(\mathbf{x}\_i, y\_i)\}\_{i=1}^n$ for a $k$-class classification task, the MentorNet needs to predict a time-varying latent weight variable $\mathbf{w} \in \[0, 1\]^{n \\times k}$ to guide the learning of StudentNet, taking an intermediate feature processed by StudentNet $f$ , $\mathbf{z}\_i = \phi\_{f\_\\theta}(\mathbf{x}\_i, y\_i)$:
 
 $$ g\_{\\psi^{\*}}(\mathbf{z}\_i) = \arg\min\_{w_i \in \[0,1\]} \mathcal{L}(\\theta, \mathbf{w}), \\forall i \in \[1, n\] $$
 
@@ -351,7 +351,7 @@ StudentNet learns to minimize the following learning objective,
 
 $$ \begin{aligned} \mathcal{L}(\\theta, \mathbf{w}) &= \frac{1}{n}\sum\_{i=1}^n \mathbf{w}\_i^\top \ell(y_i, f\_\\theta(\mathbf{x}\_i)) + G\_\\lambda(\mathbf{w}) + \\alpha |\\theta|^2_2 \\ &= \frac{1}{n}\sum\_{i=1}^n g\_\\psi(\mathbf{z}\_i)^\top \ell_i + G\_\\lambda(\mathbf{w}) + \\alpha |\\theta|^2_2 & \text{; Let }\ell_i = \ell(y_i, f\_\\theta(\mathbf{x}\_i)) \\ \end{aligned} $$
 
-The mentor network $g\_\\psi$ is trained with cross entropy on the input $(\\phi\_{f\_\\theta}(\mathbf{x}\_i, y\_i), w^{\*}\_i)$ , where $v^\*\_i=1$ if $y\_i$ is known to be a correct label, otherwise 0. The architecture of MentorNet does not have to be very complicated. In the paper, they adopted a LSTM layer to capture the prediction variance in time.
+The mentor network $g\_\\psi$ is trained with cross entropy on the input $(\phi\_{f\_\\theta}(\mathbf{x}\_i, y\_i), w^{\*}\_i)$ , where $v^\*\_i=1$ if $y\_i$ is known to be a correct label, otherwise 0. The architecture of MentorNet does not have to be very complicated. In the paper, they adopted a LSTM layer to capture the prediction variance in time.
 
 ![](MentorNet.png)
 

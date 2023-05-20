@@ -128,7 +128,7 @@ $$ \begin{aligned} \text{Split }A &= \[A_1, A_2\] \\ Y &=\text{GeLU}(XA) \\ \[Y_
 
 The attention block runs GEMM with query ($Q$), key ($K$), and value weights ($V$) according to the above partitioning in parallel and then combines them with another GEMM to produce the attention head results.
 
-$$ \text{Attention}(X, Q, K, V) = \text{softmax}(\frac{(XQ) (XK)^\top}{\\sqrt{d_k}}) XV $$
+$$ \text{Attention}(X, Q, K, V) = \text{softmax}(\frac{(XQ) (XK)^\top}{\sqrt{d_k}}) XV $$
 
 ![](Megatron-LM.png)
 
@@ -197,7 +197,7 @@ Fig. 13. Switch transformer. The sparse switch FFN layer is in the blue boxes. (
 To improve training stability, switch transformer incorporates the following designs:
 
 - _Selective precision_. They showed that selectively casting only a local part of the model to FP32 precision improves stability, while avoiding the expensive communication cost of FP32 tensors. The FP32 precision is only used within the body of the router function and the results are recast to FP16.
-- _Smaller initialization_. The initialization of weight matrices is sampled from a truncated normal distribution with mean $\\mu=0$ and stdev $\sigma = \\sqrt{s/n}$. They also recommended reducing the transformer initialization scale parameter $s=1$ to $s=0.1$.
+- _Smaller initialization_. The initialization of weight matrices is sampled from a truncated normal distribution with mean $\\mu=0$ and stdev $\sigma = \sqrt{s/n}$. They also recommended reducing the transformer initialization scale parameter $s=1$ to $s=0.1$.
 - _Use higher expert dropout_. Fine-tuning often works with a small dataset. To avoid overfitting, the dropout rate within each expert is increased by a significant amount. Interestingly they found that increasing dropout across all layers lead to poor performance. In the paper, they used a dropout rate 0.1 at non-expert layers but 0.4 within expert FF layers.
 
 The switch transformer paper summarized different data and model parallelism strategies for training large models with a nice illustration:
@@ -232,13 +232,13 @@ When the GPU memory is full, one option is to offload temporarily unused data to
 
 ## Activation Recomputation[#](#activation-recomputation)
 
-**Activation recomputation** (also known as “activation checkpointing” or “gradient checkpointing”; [Chen et al. 2016](https://arvix.org/abs/1604.06174)) is a smart yet simple idea to reduce memory footprint at the cost of computation time. It reduces the memory cost of training a $\ell$ layer deep neural net to $O(\\sqrt{\ell})$, which only additionally consumes an extra forward pass computation per batch.
+**Activation recomputation** (also known as “activation checkpointing” or “gradient checkpointing”; [Chen et al. 2016](https://arvix.org/abs/1604.06174)) is a smart yet simple idea to reduce memory footprint at the cost of computation time. It reduces the memory cost of training a $\ell$ layer deep neural net to $O(\sqrt{\ell})$, which only additionally consumes an extra forward pass computation per batch.
 
 Let's say, we evenly divide an $\ell$-layer network into $d$ partitions. Only activations at partition boundaries are saved and communicated between workers. Intermediate activations at intra-partition layers are still needed for computing gradients so they are recomputed during backward passes. With activation recomputation, the memory cost for training $M(\ell)$ is:
 
 $$ M(\ell) =\max\_{i=1,\dots,k} \\underbrace{\text{cost-of-one-partition}(i)}\_\text{cost of back-propagation on the i-th partition} + \\underbrace{O(d)}\_\text{store intermediate outputs} = O(\frac{\ell}{d}) + O(d) $$
 
-The minimum cost is $O(\\sqrt{\ell})$ at $d=\\sqrt{\ell}$.
+The minimum cost is $O(\sqrt{\ell})$ at $d=\sqrt{\ell}$.
 
 Activation recompuation trick can give sublinear memory cost with respect to the model size.
 

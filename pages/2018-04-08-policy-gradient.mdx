@@ -140,11 +140,11 @@ This session is pretty dense, as it is the time for us to go through the proof (
 
 We first start with the derivative of the state value function:
 
-$$ \begin{aligned} & \\nabla\_\\theta V^\\pi(s) \\ =& \\nabla\_\\theta \\Big(\sum\_{a \in \mathcal{A}} \\pi\_\\theta(a \vert s)Q^\\pi(s, a) \\Big) & \\ =& \sum\_{a \in \mathcal{A}} \\Big( \\nabla\_\\theta \\pi\_\\theta(a \vert s)Q^\\pi(s, a) + \\pi\_\\theta(a \vert s) \\color{red}{\\nabla\_\\theta Q^\\pi(s, a)} \\Big) & \\scriptstyle{\text{; Derivative product rule.}} \\ =& \sum\_{a \in \mathcal{A}} \\Big( \\nabla\_\\theta \\pi\_\\theta(a \vert s)Q^\\pi(s, a) + \\pi\_\\theta(a \vert s) \\color{red}{\\nabla\_\\theta \sum\_{s', r} P(s',r \vert s,a)(r + V^\\pi(s'))} \\Big) & \\scriptstyle{\text{; Extend } Q^\\pi \text{ with future state value.}} \\ =& \sum\_{a \in \mathcal{A}} \\Big( \\nabla\_\\theta \\pi\_\\theta(a \vert s)Q^\\pi(s, a) + \\pi\_\\theta(a \vert s) \\color{red}{\sum\_{s', r} P(s',r \vert s,a) \\nabla\_\\theta V^\\pi(s')} \\Big) & \\scriptstyle{P(s',r \vert s,a) \text{ or } r \text{ is not a func of }\\theta}\\ =& \sum\_{a \in \mathcal{A}} \\Big( \\nabla\_\\theta \\pi\_\\theta(a \vert s)Q^\\pi(s, a) + \\pi\_\\theta(a \vert s) \\color{red}{\sum\_{s'} P(s' \vert s,a) \\nabla\_\\theta V^\\pi(s')} \\Big) & \\scriptstyle{\text{; Because } P(s' \vert s, a) = \sum_r P(s', r \vert s, a)} \end{aligned} $$
+$$ \begin{aligned} & \\nabla\_\\theta V^\\pi(s) \\ =& \\nabla\_\\theta \\Big(\sum\_{a \in \mathcal{A}} \\pi\_\\theta(a \vert s)Q^\\pi(s, a) \\Big) & \\ =& \sum\_{a \in \mathcal{A}} \\Big( \\nabla\_\\theta \\pi\_\\theta(a \vert s)Q^\\pi(s, a) + \\pi\_\\theta(a \vert s) \color{red}{\\nabla\_\\theta Q^\\pi(s, a)} \\Big) & \\scriptstyle{\text{; Derivative product rule.}} \\ =& \sum\_{a \in \mathcal{A}} \\Big( \\nabla\_\\theta \\pi\_\\theta(a \vert s)Q^\\pi(s, a) + \\pi\_\\theta(a \vert s) \color{red}{\\nabla\_\\theta \sum\_{s', r} P(s',r \vert s,a)(r + V^\\pi(s'))} \\Big) & \\scriptstyle{\text{; Extend } Q^\\pi \text{ with future state value.}} \\ =& \sum\_{a \in \mathcal{A}} \\Big( \\nabla\_\\theta \\pi\_\\theta(a \vert s)Q^\\pi(s, a) + \\pi\_\\theta(a \vert s) \color{red}{\sum\_{s', r} P(s',r \vert s,a) \\nabla\_\\theta V^\\pi(s')} \\Big) & \\scriptstyle{P(s',r \vert s,a) \text{ or } r \text{ is not a func of }\\theta}\\ =& \sum\_{a \in \mathcal{A}} \\Big( \\nabla\_\\theta \\pi\_\\theta(a \vert s)Q^\\pi(s, a) + \\pi\_\\theta(a \vert s) \color{red}{\sum\_{s'} P(s' \vert s,a) \\nabla\_\\theta V^\\pi(s')} \\Big) & \\scriptstyle{\text{; Because } P(s' \vert s, a) = \sum_r P(s', r \vert s, a)} \end{aligned} $$
 
 Now we have:
 
-$$ \\color{red}{\\nabla\_\\theta V^\\pi(s)} = \sum\_{a \in \mathcal{A}} \\Big( \\nabla\_\\theta \\pi\_\\theta(a \vert s)Q^\\pi(s, a) + \\pi\_\\theta(a \vert s) \sum\_{s'} P(s' \vert s,a) \\color{red}{\\nabla\_\\theta V^\\pi(s')} \\Big) $$
+$$ \color{red}{\\nabla\_\\theta V^\\pi(s)} = \sum\_{a \in \mathcal{A}} \\Big( \\nabla\_\\theta \\pi\_\\theta(a \vert s)Q^\\pi(s, a) + \\pi\_\\theta(a \vert s) \sum\_{s'} P(s' \vert s,a) \color{red}{\\nabla\_\\theta V^\\pi(s')} \\Big) $$
 
 This equation has a nice recursive form (see the red parts!) and the future state value function $V^\\pi(s')$ can be repeated unrolled by following the same equation.
 
@@ -156,13 +156,13 @@ $$ s \\xrightarrow\[\]{a \\sim \\pi\_\\theta(.\vert s)} s' \\xrightarrow\[\]{a \
 - When k = 1, we scan through all possible actions and sum up the transition probabilities to the target state: $\rho^\\pi(s \to s', k=1) = \sum\_a \\pi\_\\theta(a \vert s) P(s' \vert s, a)$.
 - Imagine that the goal is to go from state s to x after k+1 steps while following policy $\\pi\_\\theta$. We can first travel from s to a middle point s' (any state can be a middle point, $s' \in \mathcal{S}$) after k steps and then go to the final state x during the last step. In this way, we are able to update the visitation probability recursively: $\rho^\\pi(s \to x, k+1) = \sum\_{s'} \rho^\\pi(s \to s', k) \rho^\\pi(s' \to x, 1)$.
 
-Then we go back to unroll the recursive representation of $\\nabla\_\\theta V^\\pi(s)$! Let $\\phi(s) = \sum\_{a \in \mathcal{A}} \\nabla\_\\theta \\pi\_\\theta(a \vert s)Q^\\pi(s, a)$ to simplify the maths. If we keep on extending $\\nabla\_\\theta V^\\pi(.)$ infinitely, it is easy to find out that we can transition from the starting state s to any state after any number of steps in this unrolling process and by summing up all the visitation probabilities, we get $\\nabla\_\\theta V^\\pi(s)$!
+Then we go back to unroll the recursive representation of $\\nabla\_\\theta V^\\pi(s)$! Let $\phi(s) = \sum\_{a \in \mathcal{A}} \\nabla\_\\theta \\pi\_\\theta(a \vert s)Q^\\pi(s, a)$ to simplify the maths. If we keep on extending $\\nabla\_\\theta V^\\pi(.)$ infinitely, it is easy to find out that we can transition from the starting state s to any state after any number of steps in this unrolling process and by summing up all the visitation probabilities, we get $\\nabla\_\\theta V^\\pi(s)$!
 
-$$ \begin{aligned} & \\color{red}{\\nabla\_\\theta V^\\pi(s)} \\ =& \\phi(s) + \sum_a \\pi\_\\theta(a \vert s) \sum\_{s'} P(s' \vert s,a) \\color{red}{\\nabla\_\\theta V^\\pi(s')} \\ =& \\phi(s) + \sum\_{s'} \sum_a \\pi\_\\theta(a \vert s) P(s' \vert s,a) \\color{red}{\\nabla\_\\theta V^\\pi(s')} \\ =& \\phi(s) + \sum\_{s'} \rho^\\pi(s \to s', 1) \\color{red}{\\nabla\_\\theta V^\\pi(s')} \\ =& \\phi(s) + \sum\_{s'} \rho^\\pi(s \to s', 1) \\color{red}{\\nabla\_\\theta V^\\pi(s')} \\ =& \\phi(s) + \sum\_{s'} \rho^\\pi(s \to s', 1) \\color{red}{\[ \\phi(s') + \sum\_{s''} \rho^\\pi(s' \to s'', 1) \\nabla\_\\theta V^\\pi(s'')\]} \\ =& \\phi(s) + \sum\_{s'} \rho^\\pi(s \to s', 1) \\phi(s') + \sum\_{s''} \rho^\\pi(s \to s'', 2)\\color{red}{\\nabla\_\\theta V^\\pi(s'')} \\scriptstyle{\text{ ; Consider }s'\text{ as the middle point for }s \to s''}\\ =& \\phi(s) + \sum\_{s'} \rho^\\pi(s \to s', 1) \\phi(s') + \sum\_{s''} \rho^\\pi(s \to s'', 2)\\phi(s'') + \sum\_{s'''} \rho^\\pi(s \to s''', 3)\\color{red}{\\nabla\_\\theta V^\\pi(s''')} \\ =& \dots \\scriptstyle{\text{; Repeatedly unrolling the part of }\\nabla\_\\theta V^\\pi(.)} \\ =& \sum\_{x\in\mathcal{S}}\sum\_{k=0}^\infty \rho^\\pi(s \to x, k) \\phi(x) \end{aligned} $$
+$$ \begin{aligned} & \color{red}{\\nabla\_\\theta V^\\pi(s)} \\ =& \phi(s) + \sum_a \\pi\_\\theta(a \vert s) \sum\_{s'} P(s' \vert s,a) \color{red}{\\nabla\_\\theta V^\\pi(s')} \\ =& \phi(s) + \sum\_{s'} \sum_a \\pi\_\\theta(a \vert s) P(s' \vert s,a) \color{red}{\\nabla\_\\theta V^\\pi(s')} \\ =& \phi(s) + \sum\_{s'} \rho^\\pi(s \to s', 1) \color{red}{\\nabla\_\\theta V^\\pi(s')} \\ =& \phi(s) + \sum\_{s'} \rho^\\pi(s \to s', 1) \color{red}{\\nabla\_\\theta V^\\pi(s')} \\ =& \phi(s) + \sum\_{s'} \rho^\\pi(s \to s', 1) \color{red}{\[ \phi(s') + \sum\_{s''} \rho^\\pi(s' \to s'', 1) \\nabla\_\\theta V^\\pi(s'')\]} \\ =& \phi(s) + \sum\_{s'} \rho^\\pi(s \to s', 1) \phi(s') + \sum\_{s''} \rho^\\pi(s \to s'', 2)\color{red}{\\nabla\_\\theta V^\\pi(s'')} \\scriptstyle{\text{ ; Consider }s'\text{ as the middle point for }s \to s''}\\ =& \phi(s) + \sum\_{s'} \rho^\\pi(s \to s', 1) \phi(s') + \sum\_{s''} \rho^\\pi(s \to s'', 2)\phi(s'') + \sum\_{s'''} \rho^\\pi(s \to s''', 3)\color{red}{\\nabla\_\\theta V^\\pi(s''')} \\ =& \dots \\scriptstyle{\text{; Repeatedly unrolling the part of }\\nabla\_\\theta V^\\pi(.)} \\ =& \sum\_{x\in\mathcal{S}}\sum\_{k=0}^\infty \rho^\\pi(s \to x, k) \phi(x) \end{aligned} $$
 
 The nice rewriting above allows us to exclude the derivative of Q-value function, $\\nabla\_\\theta Q^\\pi(s, a)$. By plugging it into the objective function $J(\\theta)$, we are getting the following:
 
-$$ \begin{aligned} \\nabla\_\\theta J(\\theta) &= \\nabla\_\\theta V^\\pi(s_0) & \\scriptstyle{\text{; Starting from a random state } s_0} \\ &= \sum\_{s}\\color{blue}{\sum\_{k=0}^\infty \rho^\\pi(s_0 \to s, k)} \\phi(s) &\\scriptstyle{\text{; Let }\\color{blue}{\\eta(s) = \sum\_{k=0}^\infty \rho^\\pi(s_0 \to s, k)}} \\ &= \sum\_{s}\\eta(s) \\phi(s) & \\ &= \\Big( {\sum_s \\eta(s)} \\Big)\sum\_{s}\frac{\\eta(s)}{\sum_s \\eta(s)} \\phi(s) & \\scriptstyle{\text{; Normalize } \\eta(s), s\in\mathcal{S} \text{ to be a probability distribution.}}\\ &\\propto \sum_s \frac{\\eta(s)}{\sum_s \\eta(s)} \\phi(s) & \\scriptstyle{\sum_s \\eta(s)\text{ is a constant}} \\ &= \sum_s d^\\pi(s) \sum_a \\nabla\_\\theta \\pi\_\\theta(a \vert s)Q^\\pi(s, a) & \\scriptstyle{d^\\pi(s) = \frac{\\eta(s)}{\sum_s \\eta(s)}\text{ is stationary distribution.}} \end{aligned} $$
+$$ \begin{aligned} \\nabla\_\\theta J(\\theta) &= \\nabla\_\\theta V^\\pi(s_0) & \\scriptstyle{\text{; Starting from a random state } s_0} \\ &= \sum\_{s}\color{blue}{\sum\_{k=0}^\infty \rho^\\pi(s_0 \to s, k)} \phi(s) &\\scriptstyle{\text{; Let }\color{blue}{\\eta(s) = \sum\_{k=0}^\infty \rho^\\pi(s_0 \to s, k)}} \\ &= \sum\_{s}\\eta(s) \phi(s) & \\ &= \\Big( {\sum_s \\eta(s)} \\Big)\sum\_{s}\frac{\\eta(s)}{\sum_s \\eta(s)} \phi(s) & \\scriptstyle{\text{; Normalize } \\eta(s), s\in\mathcal{S} \text{ to be a probability distribution.}}\\ &\\propto \sum_s \frac{\\eta(s)}{\sum_s \\eta(s)} \phi(s) & \\scriptstyle{\sum_s \\eta(s)\text{ is a constant}} \\ &= \sum_s d^\\pi(s) \sum_a \\nabla\_\\theta \\pi\_\\theta(a \vert s)Q^\\pi(s, a) & \\scriptstyle{d^\\pi(s) = \frac{\\eta(s)}{\sum_s \\eta(s)}\text{ is stationary distribution.}} \end{aligned} $$
 
 In the episodic case, the constant of proportionality ($\sum\_s \\eta(s)$) is the average length of an episode; in the continuing case, it is 1 ([Sutton & Barto, 2017](http://incompleteideas.net/book/bookdraft2017nov5.pdf); Sec. 13.2). The gradient can be further written as:
 
@@ -241,7 +241,7 @@ where $d^\\beta(s)$ is the stationary distribution of the behavior policy $\\bet
 
 Given that the training observations are sampled by $a \\sim \\beta(a \vert s)$, we can rewrite the gradient as:
 
-$$ \begin{aligned} \\nabla\_\\theta J(\\theta) &= \\nabla\_\\theta \mathbb{E}\_{s \\sim d^\\beta} \\Big\[ \sum\_{a \in \mathcal{A}} Q^\\pi(s, a) \\pi\_\\theta(a \vert s) \\Big\] & \\ &= \mathbb{E}\_{s \\sim d^\\beta} \\Big\[ \sum\_{a \in \mathcal{A}} \\big( Q^\\pi(s, a) \\nabla\_\\theta \\pi\_\\theta(a \vert s) + \\color{red}{\\pi\_\\theta(a \vert s) \\nabla\_\\theta Q^\\pi(s, a)} \\big) \\Big\] & \\scriptstyle{\text{; Derivative product rule.}}\\ &\\stackrel{(i)}{\\approx} \mathbb{E}\_{s \\sim d^\\beta} \\Big\[ \sum\_{a \in \mathcal{A}} Q^\\pi(s, a) \\nabla\_\\theta \\pi\_\\theta(a \vert s) \\Big\] & \\scriptstyle{\text{; Ignore the red part: } \\color{red}{\\pi\_\\theta(a \vert s) \\nabla\_\\theta Q^\\pi(s, a)}}. \\ &= \mathbb{E}\_{s \\sim d^\\beta} \\Big\[ \sum\_{a \in \mathcal{A}} \\beta(a \vert s) \frac{\\pi\_\\theta(a \vert s)}{\\beta(a \vert s)} Q^\\pi(s, a) \frac{\\nabla\_\\theta \\pi\_\\theta(a \vert s)}{\\pi\_\\theta(a \vert s)} \\Big\] & \\ &= \mathbb{E}\_\\beta \\Big\[\frac{\\color{blue}{\\pi\_\\theta(a \vert s)}}{\\color{blue}{\\beta(a \vert s)}} Q^\\pi(s, a) \\nabla\_\\theta \\ln \\pi\_\\theta(a \vert s) \\Big\] & \\scriptstyle{\text{; The blue part is the importance weight.}} \end{aligned} $$
+$$ \begin{aligned} \\nabla\_\\theta J(\\theta) &= \\nabla\_\\theta \mathbb{E}\_{s \\sim d^\\beta} \\Big\[ \sum\_{a \in \mathcal{A}} Q^\\pi(s, a) \\pi\_\\theta(a \vert s) \\Big\] & \\ &= \mathbb{E}\_{s \\sim d^\\beta} \\Big\[ \sum\_{a \in \mathcal{A}} \\big( Q^\\pi(s, a) \\nabla\_\\theta \\pi\_\\theta(a \vert s) + \color{red}{\\pi\_\\theta(a \vert s) \\nabla\_\\theta Q^\\pi(s, a)} \\big) \\Big\] & \\scriptstyle{\text{; Derivative product rule.}}\\ &\\stackrel{(i)}{\approx} \mathbb{E}\_{s \\sim d^\\beta} \\Big\[ \sum\_{a \in \mathcal{A}} Q^\\pi(s, a) \\nabla\_\\theta \\pi\_\\theta(a \vert s) \\Big\] & \\scriptstyle{\text{; Ignore the red part: } \color{red}{\\pi\_\\theta(a \vert s) \\nabla\_\\theta Q^\\pi(s, a)}}. \\ &= \mathbb{E}\_{s \\sim d^\\beta} \\Big\[ \sum\_{a \in \mathcal{A}} \\beta(a \vert s) \frac{\\pi\_\\theta(a \vert s)}{\\beta(a \vert s)} Q^\\pi(s, a) \frac{\\nabla\_\\theta \\pi\_\\theta(a \vert s)}{\\pi\_\\theta(a \vert s)} \\Big\] & \\ &= \mathbb{E}\_\\beta \\Big\[\frac{\color{blue}{\\pi\_\\theta(a \vert s)}}{\color{blue}{\\beta(a \vert s)}} Q^\\pi(s, a) \\nabla\_\\theta \\ln \\pi\_\\theta(a \vert s) \\Big\] & \\scriptstyle{\text{; The blue part is the importance weight.}} \end{aligned} $$
 
 where $\frac{\\pi\_\\theta(a \vert s)}{\\beta(a \vert s)}$ is the [importance weight](http://timvieira.github.io/blog/post/2014/12/21/importance-sampling/). Because $Q^\\pi$ is a function of the target policy and thus a function of policy parameter $\\theta$, we should take the derivative of $\\nabla\_\\theta Q^\\pi(s, a)$ as well according to the product rule. However, it is super hard to compute $\\nabla\_\\theta Q^\\pi(s, a)$ in reality. Fortunately if we use an approximated gradient with the gradient of Q ignored, we still guarantee the policy improvement and eventually achieve the true local minimum. This is justified in the proof [here](https://arxiv.org/pdf/1205.4839.pdf) (Degris, White & Sutton, 2012).
 
@@ -316,7 +316,7 @@ The deterministic policy gradient theorem can be plugged into common policy grad
 
 Let's consider an example of on-policy actor-critic algorithm to showcase the procedure. In each iteration of on-policy actor-critic, two actions are taken deterministically $a = \\mu\_\\theta(s)$ and the [SARSA](https://lilianweng.github.io/posts/2018-02-19-rl-overview/#sarsa-on-policy-td-control) update on policy parameters relies on the new gradient that we just computed above:
 
-$$ \begin{aligned} \\delta_t &= R_t + \\gamma Q_w(s\_{t+1}, a\_{t+1}) - Q_w(s_t, a_t) & \\small{\text{; TD error in SARSA}}\\ w\_{t+1} &= w_t + \\alpha_w \\delta_t \\nabla_w Q_w(s_t, a_t) & \\ \\theta\_{t+1} &= \\theta_t + \\alpha\_\\theta \\color{red}{\\nabla_a Q_w(s_t, a_t) \\nabla\_\\theta \\mu\_\\theta(s) \\rvert\_{a=\\mu\_\\theta(s)}} & \\small{\text{; Deterministic policy gradient theorem}} \end{aligned} $$
+$$ \begin{aligned} \\delta_t &= R_t + \\gamma Q_w(s\_{t+1}, a\_{t+1}) - Q_w(s_t, a_t) & \\small{\text{; TD error in SARSA}}\\ w\_{t+1} &= w_t + \\alpha_w \\delta_t \\nabla_w Q_w(s_t, a_t) & \\ \\theta\_{t+1} &= \\theta_t + \\alpha\_\\theta \color{red}{\\nabla_a Q_w(s_t, a_t) \\nabla\_\\theta \\mu\_\\theta(s) \\rvert\_{a=\\mu\_\\theta(s)}} & \\small{\text{; Deterministic policy gradient theorem}} \end{aligned} $$
 
 However, unless there is sufficient noise in the environment, it is very hard to guarantee enough [exploration](https://lilianweng.github.io/posts/2018-02-19-rl-overview/#exploration-exploitation-dilemma) due to the determinacy of the policy. We can either add noise into the policy (ironically this makes it nondeterministic!) or learn it off-policy-ly by following a different stochastic behavior policy to collect samples.
 
@@ -354,7 +354,7 @@ Fig 3. DDPG Algorithm. (Image source: [Lillicrap, et al., 2015](https://arxiv.or
 
 The deterministic policy gradient update becomes:
 
-$$ \begin{aligned} \\nabla\_\\theta J(\\theta) &\\approx \mathbb{E}\_{\rho^\\mu} \[\\nabla_a Q_w(s, a) \\nabla\_\\theta \\mu\_\\theta(s) \\rvert\_{a=\\mu\_\\theta(s)}\] & \\scriptstyle{\text{; gradient update in DPG}} \\ &= \mathbb{E}\_{\rho^\\mu} \[\mathbb{E}\[\\nabla_a Z_w(s, a)\] \\nabla\_\\theta \\mu\_\\theta(s) \\rvert\_{a=\\mu\_\\theta(s)}\] & \\scriptstyle{\text{; expectation of the Q-value distribution.}} \end{aligned} $$
+$$ \begin{aligned} \\nabla\_\\theta J(\\theta) &\approx \mathbb{E}\_{\rho^\\mu} \[\\nabla_a Q_w(s, a) \\nabla\_\\theta \\mu\_\\theta(s) \\rvert\_{a=\\mu\_\\theta(s)}\] & \\scriptstyle{\text{; gradient update in DPG}} \\ &= \mathbb{E}\_{\rho^\\mu} \[\mathbb{E}\[\\nabla_a Z_w(s, a)\] \\nabla\_\\theta \\mu\_\\theta(s) \\rvert\_{a=\\mu\_\\theta(s)}\] & \\scriptstyle{\text{; expectation of the Q-value distribution.}} \end{aligned} $$
 
 (2) **$N$-step returns**: When calculating the TD error, D4PG computes $N$-step TD target rather than one-step to incorporate rewards in more future steps. Thus the new TD target is:
 
@@ -428,7 +428,7 @@ $$ J(\\theta) = \mathbb{E}\_{s \\sim \rho^{\\pi\_{\\theta\_\text{old}}}, a \\sim
 
 TRPO aims to maximize the objective function $J(\\theta)$ subject to, _trust region constraint_ which enforces the distance between old and new policies measured by [KL-divergence](https://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence) to be small enough, within a parameter δ:
 
-$$ \mathbb{E}\_{s \\sim \rho^{\\pi\_{\\theta\_\text{old}}}} \[D\_\text{KL}(\\pi\_{\\theta\_\text{old}}(.\vert s) \\| \\pi\_\\theta(.\vert s)\] \leq \\delta $$
+$$ \mathbb{E}\_{s \\sim \rho^{\\pi\_{\\theta\_\text{old}}}} \[D\_\text{KL}(\\pi\_{\\theta\_\text{old}}(.\vert s) \| \\pi\_\\theta(.\vert s)\] \leq \\delta $$
 
 In this way, the old and new policies would not diverge too much when this hard constraint is met. While still, TRPO can guarantee a monotonic improvement over policy iteration (Neat, right?). Please read the proof in the [paper](https://arxiv.org/pdf/1502.05477.pdf) if interested :)
 
@@ -454,7 +454,7 @@ The function $\text{clip}(r(\\theta), 1 - \\epsilon, 1 + \\epsilon)$ clips the r
 
 When applying PPO on the network architecture with shared parameters for both policy (actor) and value (critic) functions, in addition to the clipped reward, the objective function is augmented with an error term on the value estimation (formula in red) and an entropy term (formula in blue) to encourage sufficient exploration.
 
-$$ J^\text{CLIP'} (\\theta) = \mathbb{E} \[ J^\text{CLIP} (\\theta) - \\color{red}{c_1 (V\_\\theta(s) - V\_\text{target})^2} + \\color{blue}{c_2 H(s, \\pi\_\\theta(.))} \] $$
+$$ J^\text{CLIP'} (\\theta) = \mathbb{E} \[ J^\text{CLIP} (\\theta) - \color{red}{c_1 (V\_\\theta(s) - V\_\text{target})^2} + \color{blue}{c_2 H(s, \\pi\_\\theta(.))} \] $$
 
 where Both $c\_1$ and $c\_2$ are two hyperparameter constants.
 
@@ -534,7 +534,7 @@ ACER uses $Q^\text{ret}$ as the target to train the critic by minimizing the L2 
 
 To reduce the high variance of the policy gradient $\hat{g}$, ACER truncates the importance weights by a constant c, plus a correction term. The label $\hat{g}\_t^\text{acer}$ is the ACER policy gradient at time t.
 
-$$ \begin{aligned} \hat{g}\_t^\text{acer} = & \\omega_t \\big( Q^\text{ret}(S_t, A_t) - V\_{\\theta_v}(S_t) \\big) \\nabla\_\\theta \\ln \\pi\_\\theta(A_t \vert S_t) & \\scriptstyle{\text{; Let }\\omega_t=\frac{\\pi(A_t \vert S_t)}{\\beta(A_t \vert S_t)}} \\ = & \\color{blue}{\min(c, \\omega_t) \\big( Q^\text{ret}(S_t, A_t) - V_w(S_t) \\big) \\nabla\_\\theta \\ln \\pi\_\\theta(A_t \vert S_t)} \\ & + \\color{red}{\mathbb{E}\_{a \\sim \\pi} \\big\[ \max(0, \frac{\\omega_t(a) - c}{\\omega_t(a)}) \\big( Q_w(S_t, a) - V_w(S_t) \\big) \\nabla\_\\theta \\ln \\pi\_\\theta(a \vert S_t) \\big\]} & \\scriptstyle{\text{; Let }\\omega_t (a) =\frac{\\pi(a \vert S_t)}{\\beta(a \vert S_t)}} \end{aligned} $$
+$$ \begin{aligned} \hat{g}\_t^\text{acer} = & \\omega_t \\big( Q^\text{ret}(S_t, A_t) - V\_{\\theta_v}(S_t) \\big) \\nabla\_\\theta \\ln \\pi\_\\theta(A_t \vert S_t) & \\scriptstyle{\text{; Let }\\omega_t=\frac{\\pi(A_t \vert S_t)}{\\beta(A_t \vert S_t)}} \\ = & \color{blue}{\min(c, \\omega_t) \\big( Q^\text{ret}(S_t, A_t) - V_w(S_t) \\big) \\nabla\_\\theta \\ln \\pi\_\\theta(A_t \vert S_t)} \\ & + \color{red}{\mathbb{E}\_{a \\sim \\pi} \\big\[ \max(0, \frac{\\omega_t(a) - c}{\\omega_t(a)}) \\big( Q_w(S_t, a) - V_w(S_t) \\big) \\nabla\_\\theta \\ln \\pi\_\\theta(a \vert S_t) \\big\]} & \\scriptstyle{\text{; Let }\\omega_t (a) =\frac{\\pi(a \vert S_t)}{\\beta(a \vert S_t)}} \end{aligned} $$
 
 where $Q\_w(.)$ and $V\_w(.)$ are value functions predicted by the critic with parameter w. The first term (blue) contains the clipped important weight. The clipping helps reduce the variance, in addition to subtracting state value function $V\_w(.)$ as a baseline. The second term (red) makes a correction to achieve unbiased estimation.
 
@@ -612,7 +612,7 @@ where $\\bar{\\psi}$ is the target value function which is the exponential movin
 
 SAC updates the policy to minimize the [KL-divergence](https://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence):
 
-$$ \begin{aligned} \\pi\_\text{new} &= \arg\min\_{\\pi' \in \\Pi} D\_\text{KL} \\Big( \\pi'(.\vert s_t) \\| \frac{\exp(Q^{\\pi\_\text{old}}(s_t, .))}{Z^{\\pi\_\text{old}}(s_t)} \\Big) \\\[6pt\] &= \arg\min\_{\\pi' \in \\Pi} D\_\text{KL} \\big( \\pi'(.\vert s_t) \\| \exp(Q^{\\pi\_\text{old}}(s_t, .) - \\log Z^{\\pi\_\text{old}}(s_t)) \\big) \\\[6pt\] \text{objective for update: } J\_\\pi(\\theta) &= \\nabla\_\\theta D\_\text{KL} \\big( \\pi\_\\theta(. \vert s_t) \\| \exp(Q_w(s_t, .) - \\log Z_w(s_t)) \\big) \\\[6pt\] &= \mathbb{E}\_{a_t\\sim\\pi} \\Big\[ - \\log \\big( \frac{\exp(Q_w(s_t, a_t) - \\log Z_w(s_t))}{\\pi\_\\theta(a_t \vert s_t)} \\big) \\Big\] \\\[6pt\] &= \mathbb{E}\_{a_t\\sim\\pi} \[ \\log \\pi\_\\theta(a_t \vert s_t) - Q_w(s_t, a_t) + \\log Z_w(s_t) \] \end{aligned} $$
+$$ \begin{aligned} \\pi\_\text{new} &= \arg\min\_{\\pi' \in \\Pi} D\_\text{KL} \\Big( \\pi'(.\vert s_t) \| \frac{\exp(Q^{\\pi\_\text{old}}(s_t, .))}{Z^{\\pi\_\text{old}}(s_t)} \\Big) \\\[6pt\] &= \arg\min\_{\\pi' \in \\Pi} D\_\text{KL} \\big( \\pi'(.\vert s_t) \| \exp(Q^{\\pi\_\text{old}}(s_t, .) - \\log Z^{\\pi\_\text{old}}(s_t)) \\big) \\\[6pt\] \text{objective for update: } J\_\\pi(\\theta) &= \\nabla\_\\theta D\_\text{KL} \\big( \\pi\_\\theta(. \vert s_t) \| \exp(Q_w(s_t, .) - \\log Z_w(s_t)) \\big) \\\[6pt\] &= \mathbb{E}\_{a_t\\sim\\pi} \\Big\[ - \\log \\big( \frac{\exp(Q_w(s_t, a_t) - \\log Z_w(s_t))}{\\pi\_\\theta(a_t \vert s_t)} \\big) \\Big\] \\\[6pt\] &= \mathbb{E}\_{a_t\\sim\\pi} \[ \\log \\pi\_\\theta(a_t \vert s_t) - Q_w(s_t, a_t) + \\log Z_w(s_t) \] \end{aligned} $$
 
 where $\\Pi$ is the set of potential policies that we can model our policy as to keep them tractable; for example, $\\Pi$ can be the family of Gaussian mixture distributions, expensive to model but highly expressive and still tractable. $Z^{\\pi\_\text{old}}(s\_t)$ is the partition function to normalize the distribution. It is usually intractable but does not contribute to the gradient. How to minimize $J\_\\pi(\\theta)$ depends our choice of $\\Pi$.
 
@@ -675,7 +675,7 @@ $$ \begin{aligned} \max\_{\\pi_T} \mathbb{E}\[ r(s_T, a_T) \] &= \max\_{\\pi_T} 
 
 We could compute the optimal $\\pi\_T$ and $\\alpha\_T$ iteratively. First given the current $\\alpha\_T$, get the best policy $\\pi\_T^{\*}$ that maximizes $L(\\pi\_T^{\*}, \\alpha\_T)$. Then plug in $\\pi\_T^{\*}$ and compute $\\alpha\_T^{\*}$ that minimizes $L(\\pi\_T^{\*}, \\alpha\_T)$. Assuming we have one neural network for policy and one network for temperature parameter, the iterative update process is more aligned with how we update network parameters during training.
 
-$$ \begin{aligned} \\pi^{\*}\_T &= \arg\max\_{\\pi_T} \mathbb{E}\_{(s_T, a_T) \\sim \rho\_{\\pi}} \[ r(s_T, a_T) + \\alpha_T \mathcal{H}(\\pi_T) - \\alpha_T \mathcal{H}\_0 \] \\ \\color{blue}{\\alpha^{\*}\_T} &\\color{blue}{=} \\color{blue}{\arg\min\_{\\alpha_T \\geq 0} \mathbb{E}\_{(s_T, a_T) \\sim \rho\_{\\pi^{\*}}} \[\\alpha_T \mathcal{H}(\\pi^{\*}\_T) - \\alpha_T \mathcal{H}\_0 \]} \end{aligned} $$
+$$ \begin{aligned} \\pi^{\*}\_T &= \arg\max\_{\\pi_T} \mathbb{E}\_{(s_T, a_T) \\sim \rho\_{\\pi}} \[ r(s_T, a_T) + \\alpha_T \mathcal{H}(\\pi_T) - \\alpha_T \mathcal{H}\_0 \] \\ \color{blue}{\\alpha^{\*}\_T} &\color{blue}{=} \color{blue}{\arg\min\_{\\alpha_T \\geq 0} \mathbb{E}\_{(s_T, a_T) \\sim \rho\_{\\pi^{\*}}} \[\\alpha_T \mathcal{H}(\\pi^{\*}\_T) - \\alpha_T \mathcal{H}\_0 \]} \end{aligned} $$
 
 $$ \text{Thus, }\max\_{\\pi_T} \mathbb{E} \[ r(s_T, a_T) \] = \mathbb{E}\_{(s_T, a_T) \\sim \rho\_{\\pi^{\*}}} \[ r(s_T, a_T) + \\alpha^{\*}\_T \mathcal{H}(\\pi^{\*}\_T) - \\alpha^{\*}\_T \mathcal{H}\_0 \] $$
 
@@ -689,7 +689,7 @@ $$ \begin{aligned} &\max\_{\\pi\_{T-1}}\\Big(\mathbb{E}\[r(s\_{T-1}, a\_{T-1})\]
 
 Similar to the previous step,
 
-$$ \begin{aligned} \\pi^{\*}\_{T-1} &= \arg\max\_{\\pi\_{T-1}} \mathbb{E}\_{(s\_{T-1}, a\_{T-1}) \\sim \rho\_\\pi} \[Q^{\*}\_{T-1}(s\_{T-1}, a\_{T-1}) + \\alpha\_{T-1} \mathcal{H}(\\pi\_{T-1}) - \\alpha\_{T-1} \mathcal{H}\_0 \] \\ \\color{green}{\\alpha^{\*}\_{T-1}} &\\color{green}{=} \\color{green}{\arg\min\_{\\alpha\_{T-1} \\geq 0} \mathbb{E}\_{(s\_{T-1}, a\_{T-1}) \\sim \rho\_{\\pi^{\*}}} \[ \\alpha\_{T-1} \mathcal{H}(\\pi^{\*}\_{T-1}) - \\alpha\_{T-1}\mathcal{H}\_0 \]} \end{aligned} $$
+$$ \begin{aligned} \\pi^{\*}\_{T-1} &= \arg\max\_{\\pi\_{T-1}} \mathbb{E}\_{(s\_{T-1}, a\_{T-1}) \\sim \rho\_\\pi} \[Q^{\*}\_{T-1}(s\_{T-1}, a\_{T-1}) + \\alpha\_{T-1} \mathcal{H}(\\pi\_{T-1}) - \\alpha\_{T-1} \mathcal{H}\_0 \] \\ \color{green}{\\alpha^{\*}\_{T-1}} &\color{green}{=} \color{green}{\arg\min\_{\\alpha\_{T-1} \\geq 0} \mathbb{E}\_{(s\_{T-1}, a\_{T-1}) \\sim \rho\_{\\pi^{\*}}} \[ \\alpha\_{T-1} \mathcal{H}(\\pi^{\*}\_{T-1}) - \\alpha\_{T-1}\mathcal{H}\_0 \]} \end{aligned} $$
 
 The equation for updating $\\alpha\_{T-1}$ in green has the same format as the equation for updating $\\alpha\_{T-1}$ in blue above. By repeating this process, we can learn the optimal temperature parameter in every step by minimizing the same objective function:
 
@@ -741,17 +741,17 @@ Stein Variational Policy Gradient (**SVPG**; [Liu et al, 2017](https://arxiv.org
 
 In the setup of maximum entropy policy optimization, $\\theta$ is considered as a random variable $\\theta \\sim q(\\theta)$ and the model is expected to learn this distribution $q(\\theta)$. Assuming we know a prior on how $q$ might look like, $q\_0$, and we would like to guide the learning process to not make $\\theta$ too far away from $q\_0$ by optimizing the following objective function:
 
-$$ \hat{J}(\\theta) = \mathbb{E}\_{\\theta \\sim q} \[J(\\theta)\] - \\alpha D\_\text{KL}(q\\|q_0) $$
+$$ \hat{J}(\\theta) = \mathbb{E}\_{\\theta \\sim q} \[J(\\theta)\] - \\alpha D\_\text{KL}(q\|q_0) $$
 
 where $\mathbb{E}\_{\\theta \\sim q} \[R(\\theta)\]$ is the expected reward when $\\theta \\sim q(\\theta)$ and $D\_\text{KL}$ is the KL divergence.
 
 If we don't have any prior information, we might set $q\_0$ as a uniform distribution and set $q\_0(\\theta)$ to a constant. Then the above objective function becomes [SAC](#SAC), where the entropy term encourages exploration:
 
-$$ \begin{aligned} \hat{J}(\\theta) &= \mathbb{E}\_{\\theta \\sim q} \[J(\\theta)\] - \\alpha D\_\text{KL}(q\\|q_0) \\ &= \mathbb{E}\_{\\theta \\sim q} \[J(\\theta)\] - \\alpha \mathbb{E}\_{\\theta \\sim q} \[\\log q(\\theta) - \\log q_0(\\theta)\] \\ &= \mathbb{E}\_{\\theta \\sim q} \[J(\\theta)\] + \\alpha H(q(\\theta)) \end{aligned} $$
+$$ \begin{aligned} \hat{J}(\\theta) &= \mathbb{E}\_{\\theta \\sim q} \[J(\\theta)\] - \\alpha D\_\text{KL}(q\|q_0) \\ &= \mathbb{E}\_{\\theta \\sim q} \[J(\\theta)\] - \\alpha \mathbb{E}\_{\\theta \\sim q} \[\\log q(\\theta) - \\log q_0(\\theta)\] \\ &= \mathbb{E}\_{\\theta \\sim q} \[J(\\theta)\] + \\alpha H(q(\\theta)) \end{aligned} $$
 
 Let's take the derivative of $\hat{J}(\\theta) = \mathbb{E}\_{\\theta \\sim q} \[J(\\theta)\] - \\alpha D\_\text{KL}(q|q\_0)$ w.r.t. $q$:
 
-$$ \begin{aligned} \\nabla_q \hat{J}(\\theta) &= \\nabla_q \\big( \mathbb{E}\_{\\theta \\sim q} \[J(\\theta)\] - \\alpha D\_\text{KL}(q\\|q_0) \\big) \\ &= \\nabla_q \int\_\\theta \\big( q(\\theta) J(\\theta) - \\alpha q(\\theta)\\log q(\\theta) + \\alpha q(\\theta) \\log q_0(\\theta) \\big) \\ &= \int\_\\theta \\big( J(\\theta) - \\alpha \\log q(\\theta) -\\alpha + \\alpha \\log q_0(\\theta) \\big) \\ &= 0 \end{aligned} $$
+$$ \begin{aligned} \\nabla_q \hat{J}(\\theta) &= \\nabla_q \\big( \mathbb{E}\_{\\theta \\sim q} \[J(\\theta)\] - \\alpha D\_\text{KL}(q\|q_0) \\big) \\ &= \\nabla_q \int\_\\theta \\big( q(\\theta) J(\\theta) - \\alpha q(\\theta)\\log q(\\theta) + \\alpha q(\\theta) \\log q_0(\\theta) \\big) \\ &= \int\_\\theta \\big( J(\\theta) - \\alpha \\log q(\\theta) -\\alpha + \\alpha \\log q_0(\\theta) \\big) \\ &= 0 \end{aligned} $$
 
 The optimal distribution is:
 
@@ -761,9 +761,9 @@ The temperature $\\alpha$ decides a tradeoff between exploitation and exploratio
 
 When using the SVGD method to estimate the target posterior distribution $q(\\theta)$, it relies on a set of particle $\{\\theta\_i\}\_{i=1}^n$ (independently trained policy agents) and each is updated:
 
-$$ \\theta_i \\gets \\theta_i + \\epsilon \\phi^{\*}(\\theta_i) \text{ where } \\phi^{\*} = \max\_{\\phi \in \mathcal{H}} \{ - \\nabla\_\\epsilon D\_\text{KL} (q'\_{\[\\theta + \\epsilon \\phi(\\theta)\]} \\| q) \text{ s.t. } \\|\\phi\\|\_{\mathcal{H}} \leq 1\} $$
+$$ \\theta_i \\gets \\theta_i + \\epsilon \phi^{\*}(\\theta_i) \text{ where } \phi^{\*} = \max\_{\phi \in \mathcal{H}} \{ - \\nabla\_\\epsilon D\_\text{KL} (q'\_{\[\\theta + \\epsilon \phi(\\theta)\]} \| q) \text{ s.t. } \|\phi\|\_{\mathcal{H}} \leq 1\} $$
 
-where $\\epsilon$ is a learning rate and $\\phi^{\*}$ is the unit ball of a [RKHS](http://mlss.tuebingen.mpg.de/2015/slides/gretton/part_1.pdf) (reproducing kernel Hilbert space) $\mathcal{H}$ of $\\theta$-shaped value vectors that maximally decreases the KL divergence between the particles and the target distribution. $q'(.)$ is the distribution of $\\theta + \\epsilon \\phi(\\theta)$.
+where $\\epsilon$ is a learning rate and $\phi^{\*}$ is the unit ball of a [RKHS](http://mlss.tuebingen.mpg.de/2015/slides/gretton/part_1.pdf) (reproducing kernel Hilbert space) $\mathcal{H}$ of $\\theta$-shaped value vectors that maximally decreases the KL divergence between the particles and the target distribution. $q'(.)$ is the distribution of $\\theta + \\epsilon \phi(\\theta)$.
 
 Comparing different gradient-based update methods:
 
@@ -783,9 +783,9 @@ SVGD
 
 $\\Delta \\theta$ on the kernel function space (edited)
 
-One [estimation](https://arxiv.org/abs/1608.04471) of $\\phi^{\*}$ has the following form. A positive definite kernel $k(\\vartheta, \\theta)$, i.e. a Gaussian [radial basis function](https://en.wikipedia.org/wiki/Radial_basis_function), measures the similarity between particles.
+One [estimation](https://arxiv.org/abs/1608.04471) of $\phi^{\*}$ has the following form. A positive definite kernel $k(\\vartheta, \\theta)$, i.e. a Gaussian [radial basis function](https://en.wikipedia.org/wiki/Radial_basis_function), measures the similarity between particles.
 
-$$ \begin{aligned} \\phi^{\*}(\\theta_i) &= \mathbb{E}\_{\\vartheta \\sim q'} \[\\nabla\_\\vartheta \\log q(\\vartheta) k(\\vartheta, \\theta_i) + \\nabla\_\\vartheta k(\\vartheta, \\theta_i)\]\\ &= \frac{1}{n} \sum\_{j=1}^n \[\\color{red}{\\nabla\_{\\theta_j} \\log q(\\theta_j) k(\\theta_j, \\theta_i)} + \\color{green}{\\nabla\_{\\theta_j} k(\\theta_j, \\theta_i)}\] & \\scriptstyle{\text{;approximate }q'\text{ with current particle values}} \end{aligned} $$
+$$ \begin{aligned} \phi^{\*}(\\theta_i) &= \mathbb{E}\_{\\vartheta \\sim q'} \[\\nabla\_\\vartheta \\log q(\\vartheta) k(\\vartheta, \\theta_i) + \\nabla\_\\vartheta k(\\vartheta, \\theta_i)\]\\ &= \frac{1}{n} \sum\_{j=1}^n \[\color{red}{\\nabla\_{\\theta_j} \\log q(\\theta_j) k(\\theta_j, \\theta_i)} + \color{green}{\\nabla\_{\\theta_j} k(\\theta_j, \\theta_i)}\] & \\scriptstyle{\text{;approximate }q'\text{ with current particle values}} \end{aligned} $$
 
 - The first term in red encourages $\\theta\_i$ learning towards the high probability regions of $q$ that is shared across similar particles. => to be similar to other particles
 - The second term in green pushes particles away from each other and therefore diversifies the policy. => to be dissimilar to other particles
@@ -804,11 +804,11 @@ Multiple actors generate experience in parallel, while the learner optimizes bot
 
 ![](IMPALA.png)
 
-Let the value function $V\_\\theta$ parameterized by $\\theta$ and the policy $\\pi\_\\phi$ parameterized by $\\phi$. Also we know the trajectories in the replay buffer are collected by a slightly older policy $\\mu$.
+Let the value function $V\_\\theta$ parameterized by $\\theta$ and the policy $\\pi\_\phi$ parameterized by $\phi$. Also we know the trajectories in the replay buffer are collected by a slightly older policy $\\mu$.
 
 At the training time $t$, given $(s\_t, a\_t, s\_{t+1}, r\_t)$, the value function parameter $\\theta$ is learned through an L2 loss between the current value and a V-trace value target. The $n$-step V-trace target is defined as:
 
-$$ \begin{aligned} v_t &= V\_\\theta(s_t) + \sum\_{i=t}^{t+n-1} \\gamma^{i-t} \\big(\\prod\_{j=t}^{i-1} c_j\\big) \\color{red}{\\delta_i V} \\ &= V\_\\theta(s_t) + \sum\_{i=t}^{t+n-1} \\gamma^{i-t} \\big(\\prod\_{j=t}^{i-1} c_j\\big) \\color{red}{\rho_i (r_i + \\gamma V\_\\theta(s\_{i+1}) - V\_\\theta(s_i))} \end{aligned} $$
+$$ \begin{aligned} v_t &= V\_\\theta(s_t) + \sum\_{i=t}^{t+n-1} \\gamma^{i-t} \\big(\\prod\_{j=t}^{i-1} c_j\\big) \color{red}{\\delta_i V} \\ &= V\_\\theta(s_t) + \sum\_{i=t}^{t+n-1} \\gamma^{i-t} \\big(\\prod\_{j=t}^{i-1} c_j\\big) \color{red}{\rho_i (r_i + \\gamma V\_\\theta(s\_{i+1}) - V\_\\theta(s_i))} \end{aligned} $$
 
 where the red part $\\delta\_i V$ is a temporal difference for $V$. $\rho\_i = \min\\big(\\bar{\rho}, \frac{\\pi(a\_i \vert s\_i)}{\\mu(a\_i \vert s\_i)}\\big)$ and $c\_j = \min\\big(\\bar{c}, \frac{\\pi(a\_j \vert s\_j)}{\\mu(a\_j \vert s\_j)}\\big)$ are _truncated [importance sampling (IS)](#off-policy-policy-gradient) weights_. The product of $c\_t, \dots, c\_{i-1}$ measures how much a temporal difference $\\delta\_i V$ observed at time $i$ impacts the update of the value function at a previous time $t$. In the on-policy case, we have $\rho\_i=1$ and $c\_j=1$ (assuming $\\bar{c} \\geq 1$) and therefore the V-trace target becomes on-policy $n$-step Bellman target.
 
@@ -818,11 +818,11 @@ The value function parameter is therefore updated in the direction of:
 
 $$ \\Delta\\theta = (v_t - V\_\\theta(s_t))\\nabla\_\\theta V\_\\theta(s_t) $$
 
-The policy parameter $\\phi$ is updated through policy gradient,
+The policy parameter $\phi$ is updated through policy gradient,
 
-$$ \begin{aligned} \\Delta \\phi &= \rho_t \\nabla\_\\phi \\log \\pi\_\\phi(a_t \vert s_t) \\big(r_t + \\gamma v\_{t+1} - V\_\\theta(s_t)\\big) + \\nabla\_\\phi H(\\pi\_\\phi)\\ &= \rho_t \\nabla\_\\phi \\log \\pi\_\\phi(a_t \vert s_t) \\big(r_t + \\gamma v\_{t+1} - V\_\\theta(s_t)\\big) - \\nabla\_\\phi \sum_a \\pi\_\\phi(a\vert s_t)\\log \\pi\_\\phi(a\vert s_t) \end{aligned} $$
+$$ \begin{aligned} \\Delta \phi &= \rho_t \\nabla\_\phi \\log \\pi\_\phi(a_t \vert s_t) \\big(r_t + \\gamma v\_{t+1} - V\_\\theta(s_t)\\big) + \\nabla\_\phi H(\\pi\_\phi)\\ &= \rho_t \\nabla\_\phi \\log \\pi\_\phi(a_t \vert s_t) \\big(r_t + \\gamma v\_{t+1} - V\_\\theta(s_t)\\big) - \\nabla\_\phi \sum_a \\pi\_\phi(a\vert s_t)\\log \\pi\_\phi(a\vert s_t) \end{aligned} $$
 
-where $r\_t + \\gamma v\_{t+1}$ is the estimated Q value, from which a state-dependent baseline $V\_\\theta(s\_t)$ is subtracted. $H(\\pi\_\\phi)$ is an entropy bonus to encourage exploration.
+where $r\_t + \\gamma v\_{t+1}$ is the estimated Q value, from which a state-dependent baseline $V\_\\theta(s\_t)$ is subtracted. $H(\\pi\_\phi)$ is an entropy bonus to encourage exploration.
 
 In the experiments, IMPALA is used to train one agent over multiple tasks. Two different model architectures are involved, a shallow model (left) and a deep residual model (right).
 

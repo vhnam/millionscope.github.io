@@ -414,7 +414,7 @@ Compared to GPT, other than having many more transformer layers and parameters, 
 - [Layer normalization](https://arxiv.org/abs/1607.06450) was moved to the input of each sub-block, similar to a residual unit of type [“building block”](https://arxiv.org/abs/1603.05027) (differently from the original type [“bottleneck”](https://arxiv.org/abs/1512.03385), it has batch normalization applied before weight layers).
 - An additional layer normalization was added after the final self-attention block.
 - A modified initialization was constructed as a function of the model depth.
-- The weights of residual layers were initially scaled by a factor of $1/ \\sqrt{N}$ where N is the number of residual layers.
+- The weights of residual layers were initially scaled by a factor of $1/ \sqrt{N}$ where N is the number of residual layers.
 - Use larger vocabulary size and context size.
 
 # RoBERTa[#](#roberta)
@@ -460,7 +460,7 @@ The _Autoregressive (AR)_ model such as GPT and _autoencoder (AE)_ model such as
 
 **XLNet** ([Yang et al. 2019](https://arxiv.org/abs/1906.08237)) generalizes the AE method to incorporate the benefits of AR. XLNet proposed the **permutation language modeling** objective. For a text sequence, it samples a factorization order $\mathbf{z}$ and decomposes the likelihood $p\_\\theta(\mathbf{x})$ according to this factorization order,
 
-$$ \begin{aligned} \mathcal{L}\_\text{XLNet} &= - \mathbb{E}\_{\mathbf{z} \\sim \mathcal{Z}\_T} \\Big\[ \sum\_{t=1}^T \\log p\_\\theta (X\_{z_t} = x \mid \mathbf{x}\_{\mathbf{z}\_{<{t}}})\\Big\] \\ &= - \mathbb{E}\_{\mathbf{z} \\sim \mathcal{Z}\_T} \\Big\[ \\log \frac{ \exp(e(x)^\top \\color{red}{h\_\\theta (\mathbf{x}\_{\mathbf{z}\_{<{t}}})}) }{ \sum\_{x'} \exp(e(x')^\top \\color{red}{h\_\\theta (\mathbf{x}\_{\mathbf{z}\_{<{t}}})}) } \\Big\] \\ &= - \mathbb{E}\_{\mathbf{z} \\sim \mathcal{Z}\_T} \\Big\[ \\log \frac{ \exp(e(x)^\top \\color{blue}{g\_\\theta (\mathbf{x}\_{\mathbf{z}\_{<{t}}}, z_t)}) }{ \sum\_{x'} \exp(e(x')^\top \\color{blue}{g\_\\theta (\mathbf{x}\_{\mathbf{z}\_{<{t}}}, z_t)}) } \\Big\] \end{aligned} $$
+$$ \begin{aligned} \mathcal{L}\_\text{XLNet} &= - \mathbb{E}\_{\mathbf{z} \\sim \mathcal{Z}\_T} \\Big\[ \sum\_{t=1}^T \\log p\_\\theta (X\_{z_t} = x \mid \mathbf{x}\_{\mathbf{z}\_{<{t}}})\\Big\] \\ &= - \mathbb{E}\_{\mathbf{z} \\sim \mathcal{Z}\_T} \\Big\[ \\log \frac{ \exp(e(x)^\top \color{red}{h\_\\theta (\mathbf{x}\_{\mathbf{z}\_{<{t}}})}) }{ \sum\_{x'} \exp(e(x')^\top \color{red}{h\_\\theta (\mathbf{x}\_{\mathbf{z}\_{<{t}}})}) } \\Big\] \\ &= - \mathbb{E}\_{\mathbf{z} \\sim \mathcal{Z}\_T} \\Big\[ \\log \frac{ \exp(e(x)^\top \color{blue}{g\_\\theta (\mathbf{x}\_{\mathbf{z}\_{<{t}}}, z_t)}) }{ \sum\_{x'} \exp(e(x')^\top \color{blue}{g\_\\theta (\mathbf{x}\_{\mathbf{z}\_{<{t}}}, z_t)}) } \\Big\] \end{aligned} $$
 
 where $\mathcal{Z}\_T$ is a set of all possible permutation of length $T$; $z\_t$ and $\mathbf{z}\_{<t}$ denote the $t$-th element and the first $t-1$ elements of a permutation $\mathbf{z} \in \mathcal{Z}\_T$.
 
@@ -477,7 +477,7 @@ Fig. 16. The illustration of two-stream self-attention mechanism in XLNet. (Imag
 
 Conceptually, the two streams of representations are updated as follows,
 
-$$ \begin{aligned} g\_{z_t}^{(m)} &\\gets \text{Attention}(Q = g^{(m-1)}\_{z_t}, KV=\mathbf{h}^{(m-1)}\_{\\color{red}{\mathbf{z}\_{<{t}}}}; \\theta) &\text{(query stream: use }z_t\text{ but cannot see }x\_{z_t}\text{)}\\ h\_{z_t}^{(m)} &\\gets \text{Attention}(Q = h^{(m-1)}\_{z_t}, KV=\mathbf{h}^{(m-1)}\_{\\color{blue}{\mathbf{z}\_{\leq t}}}; \\theta) &\text{(content stream: use both }x\_{z_t}\text{ and }x\_{z_t}\text{)}\\ \end{aligned} $$
+$$ \begin{aligned} g\_{z_t}^{(m)} &\\gets \text{Attention}(Q = g^{(m-1)}\_{z_t}, KV=\mathbf{h}^{(m-1)}\_{\color{red}{\mathbf{z}\_{<{t}}}}; \\theta) &\text{(query stream: use }z_t\text{ but cannot see }x\_{z_t}\text{)}\\ h\_{z_t}^{(m)} &\\gets \text{Attention}(Q = h^{(m-1)}\_{z_t}, KV=\mathbf{h}^{(m-1)}\_{\color{blue}{\mathbf{z}\_{\leq t}}}; \\theta) &\text{(content stream: use both }x\_{z_t}\text{ and }x\_{z_t}\text{)}\\ \end{aligned} $$
 
 Given the difficulty of optimization in permutation language modeling, XLNet is set to only predict the last chunk of tokens in a factorization order.
 

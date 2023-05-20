@@ -193,7 +193,7 @@ Fig. 2. Three scenarios of how single steps are correlated in different ways and
 
 Each time the evolution path is updated with the average of moving step $y\_i$ in the same generation.
 
-$$ \begin{aligned} &\frac{1}{\\lambda}\sum\_{i=1}^\\lambda y_i^{(t+1)} = \frac{1}{\\lambda} \frac{\sum\_{i=1}^\\lambda x_i^{(t+1)} - \\lambda \\mu^{(t)}}{\sigma^{(t)}} = \frac{\\mu^{(t+1)} - \\mu^{(t)}}{\sigma^{(t)}} \\ &\frac{1}{\\lambda}\sum\_{i=1}^\\lambda y_i^{(t+1)} \\sim \frac{1}{\\lambda}\mathcal{N}(0, \\lambda C^{(t)}) \\sim \frac{1}{\\sqrt{\\lambda}}{C^{(t)}}^{\frac{1}{2}}\mathcal{N}(0, I) \\ &\text{Thus } \\sqrt{\\lambda}\\;{C^{(t)}}^{-\frac{1}{2}} \frac{\\mu^{(t+1)} - \\mu^{(t)}}{\sigma^{(t)}} \\sim \mathcal{N}(0, I) \end{aligned} $$
+$$ \begin{aligned} &\frac{1}{\\lambda}\sum\_{i=1}^\\lambda y_i^{(t+1)} = \frac{1}{\\lambda} \frac{\sum\_{i=1}^\\lambda x_i^{(t+1)} - \\lambda \\mu^{(t)}}{\sigma^{(t)}} = \frac{\\mu^{(t+1)} - \\mu^{(t)}}{\sigma^{(t)}} \\ &\frac{1}{\\lambda}\sum\_{i=1}^\\lambda y_i^{(t+1)} \\sim \frac{1}{\\lambda}\mathcal{N}(0, \\lambda C^{(t)}) \\sim \frac{1}{\sqrt{\\lambda}}{C^{(t)}}^{\frac{1}{2}}\mathcal{N}(0, I) \\ &\text{Thus } \sqrt{\\lambda}\\;{C^{(t)}}^{-\frac{1}{2}} \frac{\\mu^{(t+1)} - \\mu^{(t)}}{\sigma^{(t)}} \\sim \mathcal{N}(0, I) \end{aligned} $$
 
 > By multiplying with $C^{-\frac{1}{2}}$, the evolution path is transformed to be independent of its direction. The term ${C^{(t)}}^{-\frac{1}{2}} = {B^{(t)}}^\top {D^{(t)}}^{-\frac{1}{2}} {B^{(t)}}$ transformation works as follows:
 
@@ -203,13 +203,13 @@ $$ \begin{aligned} &\frac{1}{\\lambda}\sum\_{i=1}^\\lambda y_i^{(t+1)} = \frac{1
 
 In order to assign higher weights to recent generations, we use polyak averaging to update the evolution path with learning rate $\\alpha\_\sigma$. Meanwhile, the weights are balanced so that $p\_\sigma$ is [conjugate](https://en.wikipedia.org/wiki/Conjugate_prior), $\\sim \mathcal{N}(0, I)$ both before and after one update.
 
-$$ \begin{aligned} p\_\sigma^{(t+1)} & = (1 - \\alpha\_\sigma) p\_\sigma^{(t)} + \\sqrt{1 - (1 - \\alpha\_\sigma)^2}\\;\\sqrt{\\lambda}\\; {C^{(t)}}^{-\frac{1}{2}} \frac{\\mu^{(t+1)} - \\mu^{(t)}}{\sigma^{(t)}} \\ & = (1 - \\alpha\_\sigma) p\_\sigma^{(t)} + \\sqrt{c\_\sigma (2 - \\alpha\_\sigma)\\lambda}\\;{C^{(t)}}^{-\frac{1}{2}} \frac{\\mu^{(t+1)} - \\mu^{(t)}}{\sigma^{(t)}} \end{aligned} $$
+$$ \begin{aligned} p\_\sigma^{(t+1)} & = (1 - \\alpha\_\sigma) p\_\sigma^{(t)} + \sqrt{1 - (1 - \\alpha\_\sigma)^2}\\;\sqrt{\\lambda}\\; {C^{(t)}}^{-\frac{1}{2}} \frac{\\mu^{(t+1)} - \\mu^{(t)}}{\sigma^{(t)}} \\ & = (1 - \\alpha\_\sigma) p\_\sigma^{(t)} + \sqrt{c\_\sigma (2 - \\alpha\_\sigma)\\lambda}\\;{C^{(t)}}^{-\frac{1}{2}} \frac{\\mu^{(t+1)} - \\mu^{(t)}}{\sigma^{(t)}} \end{aligned} $$
 
 The expected length of $p\_\sigma$ under random selection is $\mathbb{E}|\mathcal{N}(0,I)|$, that is the expectation of the L2-norm of a $\mathcal{N}(0,I)$ random variable. Following the idea in Fig. 2, we adjust the step size according to the ratio of $|p\_\sigma^{(t+1)}| / \mathbb{E}|\mathcal{N}(0,I)|$:
 
-$$ \begin{aligned} \\ln\sigma^{(t+1)} &= \\ln\sigma^{(t)} + \frac{\\alpha\_\sigma}{d\_\sigma} \\Big(\frac{\\|p\_\sigma^{(t+1)}\\|}{\mathbb{E}\\|\mathcal{N}(0,I)\\|} - 1\\Big) \\ \sigma^{(t+1)} &= \sigma^{(t)} \exp\\Big(\frac{\\alpha\_\sigma}{d\_\sigma} \\Big(\frac{\\|p\_\sigma^{(t+1)}\\|}{\mathbb{E}\\|\mathcal{N}(0,I)\\|} - 1\\Big)\\Big) \end{aligned} $$
+$$ \begin{aligned} \\ln\sigma^{(t+1)} &= \\ln\sigma^{(t)} + \frac{\\alpha\_\sigma}{d\_\sigma} \\Big(\frac{\|p\_\sigma^{(t+1)}\|}{\mathbb{E}\|\mathcal{N}(0,I)\|} - 1\\Big) \\ \sigma^{(t+1)} &= \sigma^{(t)} \exp\\Big(\frac{\\alpha\_\sigma}{d\_\sigma} \\Big(\frac{\|p\_\sigma^{(t+1)}\|}{\mathbb{E}\|\mathcal{N}(0,I)\|} - 1\\Big)\\Big) \end{aligned} $$
 
-where $d\_\sigma \\approx 1$ is a damping parameter, scaling how fast $\\ln\sigma$ should be changed.
+where $d\_\sigma \approx 1$ is a damping parameter, scaling how fast $\\ln\sigma$ should be changed.
 
 ## Adapting the Covariance Matrix[#](#adapting-the-covariance-matrix)
 
@@ -222,17 +222,17 @@ The above estimation is only reliable when the selected population is large enou
 - _Rank-min(λ, n) update_: uses the history of $\{C\_\\lambda\}$, each estimated from scratch in one generation.
 - _Rank-one update_: estimates the moving steps $y\_i$ and the sign information from the history.
 
-The first route considers the estimation of $C$ from the entire history of $\{C\_\\lambda\}$. For example, if we have experienced a large number of generations, $C^{(t+1)} \\approx \text{avg}(C\_\\lambda^{(i)}; i=1,\dots,t)$ would be a good estimator. Similar to $p\_\sigma$, we also use polyak averaging with a learning rate to incorporate the history:
+The first route considers the estimation of $C$ from the entire history of $\{C\_\\lambda\}$. For example, if we have experienced a large number of generations, $C^{(t+1)} \approx \text{avg}(C\_\\lambda^{(i)}; i=1,\dots,t)$ would be a good estimator. Similar to $p\_\sigma$, we also use polyak averaging with a learning rate to incorporate the history:
 
 $$ C^{(t+1)} = (1 - \\alpha\_{c\\lambda}) C^{(t)} + \\alpha\_{c\\lambda} C\_\\lambda^{(t+1)} = (1 - \\alpha\_{c\\lambda}) C^{(t)} + \\alpha\_{c\\lambda} \frac{1}{\\lambda} \sum\_{i=1}^\\lambda y^{(t+1)}\_i {y^{(t+1)}\_i}^\top $$
 
-A common choice for the learning rate is $\\alpha\_{c\\lambda} \\approx \min(1, \\lambda/n^2)$.
+A common choice for the learning rate is $\\alpha\_{c\\lambda} \approx \min(1, \\lambda/n^2)$.
 
 The second route tries to solve the issue that $y\_i{y\_i}^\top = (-y\_i)(-y\_i)^\top$ loses the sign information. Similar to how we adjust the step size $\sigma$, an evolution path $p\_c$ is used to track the sign information and it is constructed in a way that $p\_c$ is conjugate, $\\sim \mathcal{N}(0, C)$ both before and after a new generation.
 
-We may consider $p\_c$ as another way to compute $\text{avg}\_i(y\_i)$ (notice that both $\\sim \mathcal{N}(0, C)$) while the entire history is used and the sign information is maintained. Note that we've known $\\sqrt{k}\frac{\\mu^{(t+1)} - \\mu^{(t)}}{\sigma^{(t)}} \\sim \mathcal{N}(0, C)$ in the [last section](#controlling-the-step-size),
+We may consider $p\_c$ as another way to compute $\text{avg}\_i(y\_i)$ (notice that both $\\sim \mathcal{N}(0, C)$) while the entire history is used and the sign information is maintained. Note that we've known $\sqrt{k}\frac{\\mu^{(t+1)} - \\mu^{(t)}}{\sigma^{(t)}} \\sim \mathcal{N}(0, C)$ in the [last section](#controlling-the-step-size),
 
-$$ \begin{aligned} p_c^{(t+1)} &= (1-\\alpha\_{cp}) p_c^{(t)} + \\sqrt{1 - (1-\\alpha\_{cp})^2}\\;\\sqrt{\\lambda}\\;\frac{\\mu^{(t+1)} - \\mu^{(t)}}{\sigma^{(t)}} \\ &= (1-\\alpha\_{cp}) p_c^{(t)} + \\sqrt{\\alpha\_{cp}(2 - \\alpha\_{cp})\\lambda}\\;\frac{\\mu^{(t+1)} - \\mu^{(t)}}{\sigma^{(t)}} \end{aligned} $$
+$$ \begin{aligned} p_c^{(t+1)} &= (1-\\alpha\_{cp}) p_c^{(t)} + \sqrt{1 - (1-\\alpha\_{cp})^2}\\;\sqrt{\\lambda}\\;\frac{\\mu^{(t+1)} - \\mu^{(t)}}{\sigma^{(t)}} \\ &= (1-\\alpha\_{cp}) p_c^{(t)} + \sqrt{\\alpha\_{cp}(2 - \\alpha\_{cp})\\lambda}\\;\frac{\\mu^{(t+1)} - \\mu^{(t)}}{\sigma^{(t)}} \end{aligned} $$
 
 Then the covariance matrix is updated according to $p\_c$:
 
@@ -260,17 +260,17 @@ Natural Evolution Strategies (**NES**; [Wierstra, et al, 2008](https://arxiv.org
 
 Given an objective function $\mathcal{J}(\\theta)$ parameterized by $\\theta$, let's say our goal is to find the optimal $\\theta$ to maximize the objective function value. A _plain gradient_ finds the steepest direction within a small Euclidean distance from the current $\\theta$; the distance restriction is applied on the parameter space. In other words, we compute the plain gradient with respect to a small change of the absolute value of $\\theta$. The optimal step is:
 
-$$ d^{\*} = \\operatorname\*{argmax}\_{\\|d\\| = \\epsilon} \mathcal{J}(\\theta + d)\text{, where }\\epsilon \to 0 $$
+$$ d^{\*} = \\operatorname\*{argmax}\_{\|d\| = \\epsilon} \mathcal{J}(\\theta + d)\text{, where }\\epsilon \to 0 $$
 
 Differently, _natural gradient_ works with a probability [distribution](https://arxiv.org/abs/1301.3584v7) [space](https://wiseodd.github.io/techblog/2018/03/14/natural-gradient/) parameterized by $\\theta$, $p\_\\theta(x)$ (referred to as “search distribution” in NES [paper](https://arxiv.org/abs/1106.4487)). It looks for the steepest direction within a small step in the distribution space where the distance is measured by KL divergence. With this constraint we ensure that each update is moving along the distributional manifold with constant speed, without being slowed down by its curvature.
 
-$$ d^{\*}\_\text{N} = \\operatorname\*{argmax}\_{\text{KL}\[p\_\\theta \\| p\_{\\theta+d}\] = \\epsilon} \mathcal{J}(\\theta + d) $$
+$$ d^{\*}\_\text{N} = \\operatorname\*{argmax}\_{\text{KL}\[p\_\\theta \| p\_{\\theta+d}\] = \\epsilon} \mathcal{J}(\\theta + d) $$
 
 ## Estimation using Fisher Information Matrix[#](#estimation-using-fisher-information-matrix)
 
 But, how to compute $\text{KL}\[p\_\\theta | p\_{\\theta+\\Delta\\theta}\]$ precisely? By running Taylor expansion of $\\log p\_{\\theta + d}$ at $\\theta$, we get:
 
-$$ \begin{aligned} & \text{KL}\[p\_\\theta \\| p\_{\\theta+d}\] \\ &= \mathbb{E}\_{x \\sim p\_\\theta} \[\\log p\_\\theta(x) - \\log p\_{\\theta+d}(x)\] & \\ &\\approx \mathbb{E}\_{x \\sim p\_\\theta} \[ \\log p\_\\theta(x) -( \\log p\_{\\theta}(x) + \\nabla\_\\theta \\log p\_{\\theta}(x) d + \frac{1}{2}d^\top \\nabla^2\_\\theta \\log p\_{\\theta}(x) d)\] & \\scriptstyle{\text{; Taylor expand }\\log p\_{\\theta+d}} \\ &\\approx - \mathbb{E}\_x \[\\nabla\_\\theta \\log p\_{\\theta}(x)\] d - \frac{1}{2}d^\top \mathbb{E}\_x \[\\nabla^2\_\\theta \\log p\_{\\theta}(x)\] d & \end{aligned} $$
+$$ \begin{aligned} & \text{KL}\[p\_\\theta \| p\_{\\theta+d}\] \\ &= \mathbb{E}\_{x \\sim p\_\\theta} \[\\log p\_\\theta(x) - \\log p\_{\\theta+d}(x)\] & \\ &\approx \mathbb{E}\_{x \\sim p\_\\theta} \[ \\log p\_\\theta(x) -( \\log p\_{\\theta}(x) + \\nabla\_\\theta \\log p\_{\\theta}(x) d + \frac{1}{2}d^\top \\nabla^2\_\\theta \\log p\_{\\theta}(x) d)\] & \\scriptstyle{\text{; Taylor expand }\\log p\_{\\theta+d}} \\ &\approx - \mathbb{E}\_x \[\\nabla\_\\theta \\log p\_{\\theta}(x)\] d - \frac{1}{2}d^\top \mathbb{E}\_x \[\\nabla^2\_\\theta \\log p\_{\\theta}(x)\] d & \end{aligned} $$
 
 where
 
@@ -278,13 +278,13 @@ $$ \begin{aligned} \mathbb{E}\_x \[\\nabla\_\\theta \\log p\_{\\theta}\] d &= \i
 
 Finally we have,
 
-$$ \text{KL}\[p\_\\theta \\| p\_{\\theta+d}\] = - \frac{1}{2}d^\top \mathbf{F}\_\\theta d \text{, where }\mathbf{F}\_\\theta = \mathbb{E}\_x \[(\\nabla\_\\theta \\log p\_{\\theta}) (\\nabla\_\\theta \\log p\_{\\theta})^\top\] $$
+$$ \text{KL}\[p\_\\theta \| p\_{\\theta+d}\] = - \frac{1}{2}d^\top \mathbf{F}\_\\theta d \text{, where }\mathbf{F}\_\\theta = \mathbb{E}\_x \[(\\nabla\_\\theta \\log p\_{\\theta}) (\\nabla\_\\theta \\log p\_{\\theta})^\top\] $$
 
 where $\mathbf{F}\_\\theta$ is called the **[Fisher Information Matrix](http://mathworld.wolfram.com/FisherInformationMatrix.html)** and [it is](https://wiseodd.github.io/techblog/2018/03/11/fisher-information/) the covariance matrix of $\\nabla\_\\theta \\log p\_\\theta$ since $\mathbb{E}\[\\nabla\_\\theta \\log p\_\\theta\] = 0$.
 
 The solution to the following optimization problem:
 
-$$ \max \mathcal{J}(\\theta + d) \\approx \max \\big( \mathcal{J}(\\theta) + {\\nabla\_\\theta\mathcal{J}(\\theta)}^\top d \\big)\\;\text{ s.t. }\text{KL}\[p\_\\theta \\| p\_{\\theta+d}\] - \\epsilon = 0 $$
+$$ \max \mathcal{J}(\\theta + d) \approx \max \\big( \mathcal{J}(\\theta) + {\\nabla\_\\theta\mathcal{J}(\\theta)}^\top d \\big)\\;\text{ s.t. }\text{KL}\[p\_\\theta \| p\_{\\theta+d}\] - \\epsilon = 0 $$
 
 can be found using a Lagrangian multiplier,
 
@@ -346,7 +346,7 @@ Novelty-Search ES (**NS-ES**; [Conti et al, 2018](https://arxiv.org/abs/1712.065
 1.  Every policy's $b(\\pi\_\\theta)$ is pushed to an archive set $\mathcal{A}$.
 2.  Novelty of a policy $\\pi\_\\theta$ is measured as the k-nearest neighbor score between $b(\\pi\_\\theta)$ and all other entries in $\mathcal{A}$. (The use case of the archive set sounds quite similar to [episodic memory](https://lilianweng.github.io/posts/2019-06-23-meta-rl/#episodic-control).)
 
-$$ N(\\theta, \mathcal{A}) = \frac{1}{\\lambda} \sum\_{i=1}^\\lambda \\| b(\\pi\_\\theta), b^\text{knn}\_i \\|\_2 \text{, where }b^\text{knn}\_i \in \text{kNN}(b(\\pi\_\\theta), \mathcal{A}) $$
+$$ N(\\theta, \mathcal{A}) = \frac{1}{\\lambda} \sum\_{i=1}^\\lambda \| b(\\pi\_\\theta), b^\text{knn}\_i \|\_2 \text{, where }b^\text{knn}\_i \in \text{kNN}(b(\\pi\_\\theta), \mathcal{A}) $$
 
 The ES optimization step relies on the novelty score instead of fitness:
 

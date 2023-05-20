@@ -166,7 +166,7 @@ Meanwhile, let's say we have a meta-objective function $J(\tau, \\theta, \\eta)$
 2.  Then we continue running the policy $\\pi\_{\\theta'}$ to collect a new set of experiences $\tau'$, just following $\tau$ consecutively in time. The performance is measured as $J(\tau', \\theta', \\bar{\\eta})$ with a fixed meta-parameter $\\bar{\\eta}$.
 3.  The gradient of meta-objective $J(\tau', \\theta', \\bar{\\eta})$ w.r.t. $\\eta$ is used to update $\\eta$:
 
-$$ \begin{aligned} \\Delta \\eta &= -\\beta \frac{\\partial J(\tau', \\theta', \\bar{\\eta})}{\\partial \\eta} \\ &= -\\beta \frac{\\partial J(\tau', \\theta', \\bar{\\eta})}{\\partial \\theta'} \frac{d\\theta'}{d\\eta} & \\scriptstyle{\text{ ; single variable chain rule.}} \\ &= -\\beta \frac{\\partial J(\tau', \\theta', \\bar{\\eta})}{\\partial \\theta'} \frac{\\partial (\\theta + f(\tau, \\theta, \\eta))}{\\partial\\eta} \\ &= -\\beta \frac{\\partial J(\tau', \\theta', \\bar{\\eta})}{\\partial \\theta'} \\Big(\frac{d\\theta}{d\\eta} + \frac{\\partial f(\tau, \\theta, \\eta)}{\\partial\\theta}\frac{d\\theta}{d\\eta} + \frac{\\partial f(\tau, \\theta, \\eta)}{\\partial\\eta}\frac{d\\eta}{d\\eta} \\Big) & \\scriptstyle{\text{; multivariable chain rule.}}\\ &= -\\beta \frac{\\partial J(\tau', \\theta', \\bar{\\eta})}{\\partial \\theta'} \\Big( \\color{red}{\\big(\mathbf{I} + \frac{\\partial f(\tau, \\theta, \\eta)}{\\partial\\theta}\\big)}\frac{d\\theta}{d\\eta} + \frac{\\partial f(\tau, \\theta, \\eta)}{\\partial\\eta}\\Big) & \\scriptstyle{\text{; secondary gradient term in red.}} \end{aligned} $$
+$$ \begin{aligned} \\Delta \\eta &= -\\beta \frac{\\partial J(\tau', \\theta', \\bar{\\eta})}{\\partial \\eta} \\ &= -\\beta \frac{\\partial J(\tau', \\theta', \\bar{\\eta})}{\\partial \\theta'} \frac{d\\theta'}{d\\eta} & \\scriptstyle{\text{ ; single variable chain rule.}} \\ &= -\\beta \frac{\\partial J(\tau', \\theta', \\bar{\\eta})}{\\partial \\theta'} \frac{\\partial (\\theta + f(\tau, \\theta, \\eta))}{\\partial\\eta} \\ &= -\\beta \frac{\\partial J(\tau', \\theta', \\bar{\\eta})}{\\partial \\theta'} \\Big(\frac{d\\theta}{d\\eta} + \frac{\\partial f(\tau, \\theta, \\eta)}{\\partial\\theta}\frac{d\\theta}{d\\eta} + \frac{\\partial f(\tau, \\theta, \\eta)}{\\partial\\eta}\frac{d\\eta}{d\\eta} \\Big) & \\scriptstyle{\text{; multivariable chain rule.}}\\ &= -\\beta \frac{\\partial J(\tau', \\theta', \\bar{\\eta})}{\\partial \\theta'} \\Big( \color{red}{\\big(\mathbf{I} + \frac{\\partial f(\tau, \\theta, \\eta)}{\\partial\\theta}\\big)}\frac{d\\theta}{d\\eta} + \frac{\\partial f(\tau, \\theta, \\eta)}{\\partial\\eta}\\Big) & \\scriptstyle{\text{; secondary gradient term in red.}} \end{aligned} $$
 
 where $\\beta$ is the learning rate for $\\eta$.
 
@@ -188,26 +188,26 @@ where the candidates for $\\Psi\_t$ include the trajectory return $G\_t$, the Q 
 
 $$ L\_\text{pg} = \mathbb{E}\[\sum\_{t=0}^\infty \\Psi_t \\log \\pi\_\\theta (a_t \mid s_t)\] $$
 
-This loss function is a measure over a history of trajectories, $(s\_0, a\_0, r\_0, \dots, s\_t, a\_t, r\_t, \dots)$. **Evolved Policy Gradient** (**EPG**; [Houthooft, et al, 2018](https://papers.nips.cc/paper/7785-evolved-policy-gradients.pdf)) takes a step further by defining the policy gradient loss function as a temporal convolution (1-D convolution) over the agent's past experience, $L\_\\phi$. The parameters $\\phi$ of the loss function network are evolved in a way that an agent can achieve higher returns.
+This loss function is a measure over a history of trajectories, $(s\_0, a\_0, r\_0, \dots, s\_t, a\_t, r\_t, \dots)$. **Evolved Policy Gradient** (**EPG**; [Houthooft, et al, 2018](https://papers.nips.cc/paper/7785-evolved-policy-gradients.pdf)) takes a step further by defining the policy gradient loss function as a temporal convolution (1-D convolution) over the agent's past experience, $L\_\phi$. The parameters $\phi$ of the loss function network are evolved in a way that an agent can achieve higher returns.
 
 Similar to many meta-learning algorithms, EPG has two optimization loops:
 
 - In the internal loop, an agent learns to improve its policy $\\pi\_\\theta$.
-- In the outer loop, the model updates the parameters $\\phi$ of the loss function $L\_\\phi$. Because there is no explicit way to write down a differentiable equation between the return and the loss, EPG turned to [_Evolutionary Strategies_](https://en.wikipedia.org/wiki/Evolution_strategy) (ES).
+- In the outer loop, the model updates the parameters $\phi$ of the loss function $L\_\phi$. Because there is no explicit way to write down a differentiable equation between the return and the loss, EPG turned to [_Evolutionary Strategies_](https://en.wikipedia.org/wiki/Evolution_strategy) (ES).
 
-A general idea is to train a population of $N$ agents, each of them is trained with the loss function $L\_{\\phi + \sigma \\epsilon\_i}$ parameterized with $\\phi$ added with a small Gaussian noise $\\epsilon\_i \\sim \mathcal{N}(0, \mathbf{I})$ of standard deviation $\sigma$. During the inner loop's training, EPG tracks a history of experience and updates the policy parameters according to the loss function $L\_{\\phi + \sigma\\epsilon\_i}$ for each agent:
+A general idea is to train a population of $N$ agents, each of them is trained with the loss function $L\_{\phi + \sigma \\epsilon\_i}$ parameterized with $\phi$ added with a small Gaussian noise $\\epsilon\_i \\sim \mathcal{N}(0, \mathbf{I})$ of standard deviation $\sigma$. During the inner loop's training, EPG tracks a history of experience and updates the policy parameters according to the loss function $L\_{\phi + \sigma\\epsilon\_i}$ for each agent:
 
-$$ \\theta_i \\leftarrow \\theta - \\alpha\_\text{in} \\nabla\_\\theta L\_{\\phi + \sigma \\epsilon_i} (\\pi\_\\theta, \tau\_{t-K, \dots, t}) $$
+$$ \\theta_i \\leftarrow \\theta - \\alpha\_\text{in} \\nabla\_\\theta L\_{\phi + \sigma \\epsilon_i} (\\pi\_\\theta, \tau\_{t-K, \dots, t}) $$
 
 where $\\alpha\_\text{in}$ is the learning rate of the inner loop and $\tau\_{t-K, \dots, t}$ is a sequence of $M$ transitions up to the current time step $t$.
 
-Once the inner loop policy is mature enough, the policy is evaluated by the mean return $\\bar{G}\_{\\phi+\sigma\\epsilon\_i}$ over multiple randomly sampled trajectories. Eventually, we are able to estimate the gradient of $\\phi$ according to [NES](http://blog.otoro.net/2017/10/29/visual-evolution-strategies/) numerically ([Salimans et al, 2017](https://arxiv.org/abs/1703.03864)). While repeating this process, both the policy parameters $\\theta$ and the loss function weights $\\phi$ are being updated simultaneously to achieve higher returns.
+Once the inner loop policy is mature enough, the policy is evaluated by the mean return $\\bar{G}\_{\phi+\sigma\\epsilon\_i}$ over multiple randomly sampled trajectories. Eventually, we are able to estimate the gradient of $\phi$ according to [NES](http://blog.otoro.net/2017/10/29/visual-evolution-strategies/) numerically ([Salimans et al, 2017](https://arxiv.org/abs/1703.03864)). While repeating this process, both the policy parameters $\\theta$ and the loss function weights $\phi$ are being updated simultaneously to achieve higher returns.
 
-$$ \\phi \\leftarrow \\phi + \\alpha\_\text{out} \frac{1}{\sigma N} \sum\_{i=1}^N \\epsilon_i G\_{\\phi+\sigma\\epsilon_i} $$
+$$ \phi \\leftarrow \phi + \\alpha\_\text{out} \frac{1}{\sigma N} \sum\_{i=1}^N \\epsilon_i G\_{\phi+\sigma\\epsilon_i} $$
 
 where $\\alpha\_\text{out}$ is the learning rate of the outer loop.
 
-In practice, the loss $L\_\\phi$ is bootstrapped with an ordinary policy gradient (such as REINFORCE or PPO) surrogate loss $L\_\text{pg}$, $\hat{L} = (1-\\alpha) L\_\\phi + \\alpha L\_\text{pg}$. The weight $\\alpha$ is annealing from 1 to 0 gradually during training. At test time, the loss function parameter $\\phi$ stays fixed and the loss value is computed over a history of experience to update the policy parameters $\\theta$.
+In practice, the loss $L\_\phi$ is bootstrapped with an ordinary policy gradient (such as REINFORCE or PPO) surrogate loss $L\_\text{pg}$, $\hat{L} = (1-\\alpha) L\_\phi + \\alpha L\_\text{pg}$. The weight $\\alpha$ is annealing from 1 to 0 gradually during training. At test time, the loss function parameter $\phi$ stays fixed and the loss value is computed over a history of experience to update the policy parameters $\\theta$.
 
 ## Meta-learning the Exploration Strategies[#](#meta-learning-the-exploration-strategies)
 
@@ -249,7 +249,7 @@ Further, **Episodic LSTM** ([Ritter et al., 2018](https://arxiv.org/abs/1805.096
 
 Fig. 7. Illustration of the episodic LSTM architecture. The additional structure of episodic memory is in bold. (Image source: [Ritter et al., 2018](https://arxiv.org/abs/1805.09692))
 
-$$ \begin{aligned} \mathbf{c}\_t &= \mathbf{i}\_t \\circ \mathbf{c}\_\text{in} + \mathbf{f}\_t \\circ \mathbf{c}\_{t-1} + \\color{green}{\mathbf{r}\_t \\circ \mathbf{c}\_\text{ep}} &\\ \mathbf{i}\_t &= \sigma(\mathbf{W}\_{i} \cdot \[\mathbf{h}\_{t-1}, \mathbf{x}\_t\] + \mathbf{b}\_i) & \\scriptstyle{\text{; input gate}} \\ \mathbf{f}\_t &= \sigma(\mathbf{W}\_{f} \cdot \[\mathbf{h}\_{t-1}, \mathbf{x}\_t\] + \mathbf{b}\_f) & \\scriptstyle{\text{; forget gate}} \\ \\color{green}{\mathbf{r}\_t} & \\color{green}{=} \\color{green}{\sigma(\mathbf{W}\_{r} \cdot \[\mathbf{h}\_{t-1}, \mathbf{x}\_t\] + \mathbf{b}\_r)} & \\scriptstyle{\text{; reinstatement gate}} \end{aligned} $$
+$$ \begin{aligned} \mathbf{c}\_t &= \mathbf{i}\_t \\circ \mathbf{c}\_\text{in} + \mathbf{f}\_t \\circ \mathbf{c}\_{t-1} + \color{green}{\mathbf{r}\_t \\circ \mathbf{c}\_\text{ep}} &\\ \mathbf{i}\_t &= \sigma(\mathbf{W}\_{i} \cdot \[\mathbf{h}\_{t-1}, \mathbf{x}\_t\] + \mathbf{b}\_i) & \\scriptstyle{\text{; input gate}} \\ \mathbf{f}\_t &= \sigma(\mathbf{W}\_{f} \cdot \[\mathbf{h}\_{t-1}, \mathbf{x}\_t\] + \mathbf{b}\_f) & \\scriptstyle{\text{; forget gate}} \\ \color{green}{\mathbf{r}\_t} & \color{green}{=} \color{green}{\sigma(\mathbf{W}\_{r} \cdot \[\mathbf{h}\_{t-1}, \mathbf{x}\_t\] + \mathbf{b}\_r)} & \\scriptstyle{\text{; reinstatement gate}} \end{aligned} $$
 
 where $\mathbf{c}\_t$ and $\mathbf{h}\_t$ are hidden and cell state at time $t$; $\mathbf{i}\_t$, $\mathbf{f}\_t$ and $\mathbf{r}\_t$ are input, forget and reinstatement gates, respectively; $\mathbf{c}\_\text{ep}$ is the retrieved cell state from episodic memory. The newly added episodic memory components are marked in green.
 
@@ -292,7 +292,7 @@ An MDP without a reward function $R$ is known as a _Controlled Markov process_ (
 
 [Gupta et al. (2018)](https://arxiv.org/abs/1806.04640) proposed two unsupervised approaches for growing the task distribution in the context of CMP. Assuming there is an underlying latent variable $z \\sim p(z)$ associated with every task, it parameterizes/determines a reward function: $r\_z(s) = \\log D(z|s)$, where a “discriminator” function $D(.)$ is used to extract the latent variable from the state. The paper described two ways to construct a discriminator function:
 
-- Sample random weights $\\phi\_\text{rand}$ of the discriminator, $D\_{\\phi\_\text{rand}}(z \mid s)$.
+- Sample random weights $\phi\_\text{rand}$ of the discriminator, $D\_{\phi\_\text{rand}}(z \mid s)$.
 - Learn a discriminator function to encourage diversity-driven exploration. This method is introduced in more details in another sister paper “DIAYN” ([Eysenbach et al., 2018](https://arxiv.org/abs/1802.06070)).
 
 DIAYN, short for “Diversity is all you need”, is a framework to encourage a policy to learn useful skills without a reward function. It explicitly models the latent variable $z$ as a _skill_ embedding and makes the policy conditioned on $z$ in addition to state $s$, $\\pi\_\\theta(a \mid s, z)$. (Ok, this part is same as [MAESN](#meta-learning-the-exploration-strategies) unsurprisingly, as the papers are from the same group.) The design of DIAYN is motivated by a few hypotheses:
@@ -302,9 +302,9 @@ DIAYN, short for “Diversity is all you need”, is a framework to encourage a 
 
 The objective function to maximize is as follows, where the policy entropy is also added to encourage diversity:
 
-$$ \begin{aligned} \mathcal{F}(\\theta) &= I(S; Z) + H\[A \mid S\] - I(A; Z \mid S) & \\ &= (H(Z) - H(Z \mid S)) + H\[A \mid S\] - (H\[A\mid S\] - H\[A\mid S, Z\]) & \\ &= H\[A\mid S, Z\] \\color{green}{- H(Z \mid S) + H(Z)} & \\ &= H\[A\mid S, Z\] + \mathbb{E}\_{z\\sim p(z), s\\sim\rho(s)}\[\\log p(z \mid s)\] - \mathbb{E}\_{z\\sim p(z)}\[\\log p(z)\] & \\scriptstyle{\text{; can infer skills from states & p(z) is diverse.}} \\ &\\ge H\[A\mid S, Z\] + \mathbb{E}\_{z\\sim p(z), s\\sim\rho(s)}\[\\color{red}{\\log D\_\\phi(z \mid s) - \\log p(z)}\] & \\scriptstyle{\text{; according to Jensen's inequality; "pseudo-reward" in red.}} \end{aligned} $$
+$$ \begin{aligned} \mathcal{F}(\\theta) &= I(S; Z) + H\[A \mid S\] - I(A; Z \mid S) & \\ &= (H(Z) - H(Z \mid S)) + H\[A \mid S\] - (H\[A\mid S\] - H\[A\mid S, Z\]) & \\ &= H\[A\mid S, Z\] \color{green}{- H(Z \mid S) + H(Z)} & \\ &= H\[A\mid S, Z\] + \mathbb{E}\_{z\\sim p(z), s\\sim\rho(s)}\[\\log p(z \mid s)\] - \mathbb{E}\_{z\\sim p(z)}\[\\log p(z)\] & \\scriptstyle{\text{; can infer skills from states & p(z) is diverse.}} \\ &\\ge H\[A\mid S, Z\] + \mathbb{E}\_{z\\sim p(z), s\\sim\rho(s)}\[\color{red}{\\log D\_\phi(z \mid s) - \\log p(z)}\] & \\scriptstyle{\text{; according to Jensen's inequality; "pseudo-reward" in red.}} \end{aligned} $$
 
-where $I(.)$ is mutual information and $H\[.\]$ is entropy measure. We cannot integrate all states to compute $p(z \mid s)$, so approximate it with $D\_\\phi(z \mid s)$ — that is the diversity-driven discriminator function.
+where $I(.)$ is mutual information and $H\[.\]$ is entropy measure. We cannot integrate all states to compute $p(z \mid s)$, so approximate it with $D\_\phi(z \mid s)$ — that is the diversity-driven discriminator function.
 
 ![](DIAYN.png)
 

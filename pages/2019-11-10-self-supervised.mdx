@@ -134,20 +134,20 @@ The paper considers two transformations:
 1.  _Scaling_: If an image is scaled up by 2x, the number of visual primitives should stay the same.
 2.  _Tiling_: If an image is tiled into a 2x2 grid, the number of visual primitives is expected to be the sum, 4 times the original feature counts.
 
-The model learns a feature encoder $\\phi(.)$ using the above feature counting relationship. Given an input image $\mathbf{x} \in \mathbb{R}^{m \\times n \\times 3}$, considering two types of transformation operators:
+The model learns a feature encoder $\phi(.)$ using the above feature counting relationship. Given an input image $\mathbf{x} \in \mathbb{R}^{m \\times n \\times 3}$, considering two types of transformation operators:
 
 1.  Downsampling operator, $D: \mathbb{R}^{m \\times n \\times 3} \\mapsto \mathbb{R}^{\frac{m}{2} \\times \frac{n}{2} \\times 3}$: downsample by a factor of 2
 2.  Tiling operator $T\_i: \mathbb{R}^{m \\times n \\times 3} \\mapsto \mathbb{R}^{\frac{m}{2} \\times \frac{n}{2} \\times 3}$: extract the $i$-th tile from a 2x2 grid of the image.
 
 We expect to learn:
 
-$$ \\phi(\mathbf{x}) = \\phi(D \\circ \mathbf{x}) = \sum\_{i=1}^4 \\phi(T_i \\circ \mathbf{x}) $$
+$$ \phi(\mathbf{x}) = \phi(D \\circ \mathbf{x}) = \sum\_{i=1}^4 \phi(T_i \\circ \mathbf{x}) $$
 
-[Thus the MSE loss is: $\mathcal{L}\_\text{feat} = |\\phi(D \\circ \mathbf{x}) - \sum\_{i=1}^4 \\phi(T\_i \\circ \mathbf{x})|^2\_2$. To avoid trivial solution $\\phi(\mathbf{x}) = \mathbf{0}, \\forall{\mathbf{x}}$, another loss term is added to encourage the difference between features of two different images: $\mathcal{L}\_\text{diff} = \max(0, c -|\\phi(D \\circ \mathbf{y}) - \sum\_{i=1}^4 \\phi(T\_i \\circ \mathbf{x})|^2\_2)$, where $\mathbf{y}$ is another input image different from $\mathbf{x}$ and $c$ is a scalar constant. The final loss is:](#counting-feature-loss)
+[Thus the MSE loss is: $\mathcal{L}\_\text{feat} = |\phi(D \\circ \mathbf{x}) - \sum\_{i=1}^4 \phi(T\_i \\circ \mathbf{x})|^2\_2$. To avoid trivial solution $\phi(\mathbf{x}) = \mathbf{0}, \\forall{\mathbf{x}}$, another loss term is added to encourage the difference between features of two different images: $\mathcal{L}\_\text{diff} = \max(0, c -|\phi(D \\circ \mathbf{y}) - \sum\_{i=1}^4 \phi(T\_i \\circ \mathbf{x})|^2\_2)$, where $\mathbf{y}$ is another input image different from $\mathbf{x}$ and $c$ is a scalar constant. The final loss is:](#counting-feature-loss)
 
 [
 
-$$ \mathcal{L} = \mathcal{L}\_\text{feat} + \mathcal{L}\_\text{diff} = \\|\\phi(D \\circ \mathbf{x}) - \sum\_{i=1}^4 \\phi(T_i \\circ \mathbf{x})\\|^2_2 + \max(0, M -\\|\\phi(D \\circ \mathbf{y}) - \sum\_{i=1}^4 \\phi(T_i \\circ \mathbf{x})\\|^2_2) $$
+$$ \mathcal{L} = \mathcal{L}\_\text{feat} + \mathcal{L}\_\text{diff} = \|\phi(D \\circ \mathbf{x}) - \sum\_{i=1}^4 \phi(T_i \\circ \mathbf{x})\|^2_2 + \max(0, M -\|\phi(D \\circ \mathbf{y}) - \sum\_{i=1}^4 \phi(T_i \\circ \mathbf{x})\|^2_2) $$
 
 ![](self-sup-counting-features.png)](#counting-feature-loss)
 
@@ -175,7 +175,7 @@ The **denoising autoencoder** ([Vincent, et al, 2008](https://www.cs.toronto.edu
 
 The **context encoder** ([Pathak, et al., 2016](https://arxiv.org/abs/1604.07379)) is trained to fill in a missing piece in the image. Let $\hat{M}$ be a binary mask, 0 for dropped pixels and 1 for remaining input pixels. The model is trained with a combination of the reconstruction (L2) loss and the adversarial loss. The removed regions defined by the mask could be of any shape.
 
-$$ \begin{aligned} \mathcal{L}(\mathbf{x}) &= \mathcal{L}\_\text{recon}(\mathbf{x}) + \mathcal{L}\_\text{adv}(\mathbf{x})\\ \mathcal{L}\_\text{recon}(\mathbf{x}) &= \\|(1 - \hat{M}) \\odot (\mathbf{x} - E(\hat{M} \\odot \mathbf{x})) \\|\_2^2 \\ \mathcal{L}\_\text{adv}(\mathbf{x}) &= \max_D \mathbb{E}\_{\mathbf{x}} \[\\log D(\mathbf{x}) + \\log(1 - D(E(\hat{M} \\odot \mathbf{x})))\] \end{aligned} $$
+$$ \begin{aligned} \mathcal{L}(\mathbf{x}) &= \mathcal{L}\_\text{recon}(\mathbf{x}) + \mathcal{L}\_\text{adv}(\mathbf{x})\\ \mathcal{L}\_\text{recon}(\mathbf{x}) &= \|(1 - \hat{M}) \\odot (\mathbf{x} - E(\hat{M} \\odot \mathbf{x})) \|\_2^2 \\ \mathcal{L}\_\text{adv}(\mathbf{x}) &= \max_D \mathbb{E}\_{\mathbf{x}} \[\\log D(\mathbf{x}) + \\log(1 - D(E(\hat{M} \\odot \mathbf{x})))\] \end{aligned} $$
 
 where $E(.)$ is the encoder and $D(.)$ is the decoder.
 
@@ -253,7 +253,7 @@ The movement of an object is traced by a sequence of video frames. The differenc
 
 Precisely patches with motion are tracked over a small time window (e.g. 30 frames). The first patch $\mathbf{x}$ and the last patch $\mathbf{x}^+$ are selected and used as training data points. If we train the model directly to minimize the difference between feature vectors of two patches, the model may only learn to map everything to the same value. To avoid such a trivial solution, same as [above](#counting-feature-loss), a random third patch $\mathbf{x}^-$ is added. The model learns the representation by enforcing the distance between two tracked patches to be closer than the distance between the first patch and a random one in the feature space, $D(\mathbf{x}, \mathbf{x}^-)) > D(\mathbf{x}, \mathbf{x}^+)$, where $D(.)$ is the cosine distance,
 
-$$ D(\mathbf{x}\_1, \mathbf{x}\_2) = 1 - \frac{f(\mathbf{x}\_1) f(\mathbf{x}\_2)}{\\|f(\mathbf{x}\_1)\\| \\|f(\mathbf{x}\_2\\|)} $$
+$$ D(\mathbf{x}\_1, \mathbf{x}\_2) = 1 - \frac{f(\mathbf{x}\_1) f(\mathbf{x}\_2)}{\|f(\mathbf{x}\_1)\| \|f(\mathbf{x}\_2\|)} $$
 
 The loss function is:
 
@@ -263,7 +263,7 @@ where $M$ is a scalar constant controlling for the minimum gap between two dista
 
 [This form of loss function is also known as](#triplet-loss) [triplet loss](https://arxiv.org/abs/1503.03832) in the face recognition task, in which the dataset contains images of multiple people from multiple camera angles. Let $\mathbf{x}^a$ be an anchor image of a specific person, $\mathbf{x}^p$ be a positive image of this same person from a different angle and $\mathbf{x}^n$ be a negative image of a different person. In the embedding space, $\mathbf{x}^a$ should be closer to $\mathbf{x}^p$ than $\mathbf{x}^n$:
 
-$$ \mathcal{L}\_\text{triplet}(\mathbf{x}^a, \mathbf{x}^p, \mathbf{x}^n) = \max(0, \\|\\phi(\mathbf{x}^a) - \\phi(\mathbf{x}^p) \\|\_2^2 - \\|\\phi(\mathbf{x}^a) - \\phi(\mathbf{x}^n) \\|\_2^2 + M) $$
+$$ \mathcal{L}\_\text{triplet}(\mathbf{x}^a, \mathbf{x}^p, \mathbf{x}^n) = \max(0, \|\phi(\mathbf{x}^a) - \phi(\mathbf{x}^p) \|\_2^2 - \|\phi(\mathbf{x}^a) - \phi(\mathbf{x}^n) \|\_2^2 + M) $$
 
 [A slightly different form of the triplet loss, named](#n-pair-loss) [n-pair loss](https://papers.nips.cc/paper/6200-improved-deep-metric-learning-with-multi-class-n-pair-loss-objective) is also commonly used for learning observation embedding in robotics tasks. See a [later section](#multi-view-metric-learning) for more related content.
 
@@ -347,7 +347,7 @@ All the cases discussed in this section are in robotic learning, mainly for stat
 
 ## Multi-View Metric Learning[#](#multi-view-metric-learning)
 
-The concept of metric learning has been mentioned multiple times in the [previous](#counting-feature-loss) [sections](#tracking). A common setting is: Given a triple of samples, (_anchor_ $s\_a$, _positive_ sample $s\_p$, _negative_ sample $s\_n$), the learned representation embedding $\\phi(s)$ fulfills that $s\_a$ stays close to $s\_p$ but far away from $s\_n$ in the latent space.
+The concept of metric learning has been mentioned multiple times in the [previous](#counting-feature-loss) [sections](#tracking). A common setting is: Given a triple of samples, (_anchor_ $s\_a$, _positive_ sample $s\_p$, _negative_ sample $s\_n$), the learned representation embedding $\phi(s)$ fulfills that $s\_a$ stays close to $s\_p$ but far away from $s\_n$ in the latent space.
 
 [**Grasp2Vec** (](#grasp2vec)[Jang & Devin et al., 2018](https://arxiv.org/abs/1811.06964)) aims to learn an object-centric vision representation in the robot grasping task from free, unlabelled grasping activities. By object-centric, it means that, irrespective of how the environment or the robot looks like, if two images contain similar items, they should be mapped to similar representation; otherwise the embeddings should be far apart.
 
@@ -363,19 +363,19 @@ The grasping system can tell whether it moves an object but cannot tell which ob
 
 To learn object-centric representation, we expect the difference between embeddings of $s\_\text{pre}$ and $s\_\text{post}$ to capture the removed object $o$. The idea is quite interesting and similar to relationships that have been observed in [word embedding](https://lilianweng.github.io/posts/2017-10-15-word-embedding/), [e.g.](https://developers.google.com/machine-learning/crash-course/embeddings/translating-to-a-lower-dimensional-space) distance(“king”, “queen”) ≈ distance(“man”, “woman”).
 
-Let $\\phi\_s$ and $\\phi\_o$ be the embedding functions for the scene and the object respectively. The model learns the representation by minimizing the distance between $\\phi\_s(s\_\text{pre}) - \\phi\_s(s\_\text{post})$ and $\\phi\_o(o)$ using _n-pair loss_:
+Let $\phi\_s$ and $\phi\_o$ be the embedding functions for the scene and the object respectively. The model learns the representation by minimizing the distance between $\phi\_s(s\_\text{pre}) - \phi\_s(s\_\text{post})$ and $\phi\_o(o)$ using _n-pair loss_:
 
-$$ \begin{aligned} \mathcal{L}\_\text{grasp2vec} &= \text{NPair}(\\phi_s(s\_\text{pre}) - \\phi_s(s\_\text{post}), \\phi_o(o)) + \text{NPair}(\\phi_o(o), \\phi_s(s\_\text{pre}) - \\phi_s(s\_\text{post})) \\ \text{where }\text{NPair}(a, p) &= \sum\_{i<{B}} -\\log\frac{\exp(a_i^\top p_j)}{\sum\_{j<{B}, i\\neq j}\exp(a_i^\top p_j)} + \\lambda (\\|a_i\\|\_2^2 + \\|p_i\\|\_2^2) \end{aligned} $$
+$$ \begin{aligned} \mathcal{L}\_\text{grasp2vec} &= \text{NPair}(\phi_s(s\_\text{pre}) - \phi_s(s\_\text{post}), \phi_o(o)) + \text{NPair}(\phi_o(o), \phi_s(s\_\text{pre}) - \phi_s(s\_\text{post})) \\ \text{where }\text{NPair}(a, p) &= \sum\_{i<{B}} -\\log\frac{\exp(a_i^\top p_j)}{\sum\_{j<{B}, i\\neq j}\exp(a_i^\top p_j)} + \\lambda (\|a_i\|\_2^2 + \|p_i\|\_2^2) \end{aligned} $$
 
 where $B$ refers to a batch of (anchor, positive) sample pairs.
 
 When framing representation learning as metric learning, [**n-pair loss**](https://papers.nips.cc/paper/6200-improved-deep-metric-learning-with-multi-class-n-pair-loss-objective) is a common choice. Rather than processing explicit a triple of (anchor, positive, negative) samples, the n-pairs loss treats all other positive instances in one mini-batch across pairs as negatives.
 
-The embedding function $\\phi\_o$ works great for presenting a goal $g$ with an image. The reward function that quantifies how close the actually grasped object $o$ is close to the goal is defined as $r = \\phi\_o(g) \cdot \\phi\_o(o)$. Note that computing rewards only relies on the learned latent space and doesn't involve ground truth positions, so it can be used for training on real robots.
+The embedding function $\phi\_o$ works great for presenting a goal $g$ with an image. The reward function that quantifies how close the actually grasped object $o$ is close to the goal is defined as $r = \phi\_o(g) \cdot \phi\_o(o)$. Note that computing rewards only relies on the learned latent space and doesn't involve ground truth positions, so it can be used for training on real robots.
 
 ![](grasp2vec-attention-map.png)
 
-Fig. 19. Localization results of grasp2vec embedding. The heatmap of localizing a goal object in a pre-grasping scene is defined as $\\phi\\\_o(o)^\top \\phi\\\_{s, \text{spatial}} (s\\\_\text{pre})$, where $\\phi\\\_{s, \text{spatial}}$ is the output of the last resnet block after ReLU. The fourth column is a failure case and the last three columns take real images as goals. (Image source: [Jang & Devin et al., 2018](https://arxiv.org/abs/1811.06964))
+Fig. 19. Localization results of grasp2vec embedding. The heatmap of localizing a goal object in a pre-grasping scene is defined as $\phi\\\_o(o)^\top \phi\\\_{s, \text{spatial}} (s\\\_\text{pre})$, where $\phi\\\_{s, \text{spatial}}$ is the output of the last resnet block after ReLU. The fourth column is a failure case and the last three columns take real images as goals. (Image source: [Jang & Devin et al., 2018](https://arxiv.org/abs/1811.06964))
 
 Other than the embedding-similarity-based reward function, there are a few other tricks for training the RL policy in the grasp2vec framework:
 
@@ -416,9 +416,9 @@ Fig. 22. The workflow of RIG. (Image source: [Nair et al., 2018](https://arxiv.o
 
 The task is to control a robot arm to push a small puck on a table to a desired position. The desired position, or the goal, is present in an image. During training, it learns latent embedding of both state $s$ and goal $g$ through $\\beta$-VAE encoder and the control policy operates entirely in the latent space.
 
-Let's say a [$\\beta$-VAE](https://lilianweng.github.io/posts/2018-08-12-vae/#beta-vae) has an encoder $q\_\\phi$ mapping input states to latent variable $z$ which is modeled by a Gaussian distribution and a decoder $p\_\\psi$ mapping $z$ back to the states. The state encoder in RIG is set to be the mean of $\\beta$-VAE encoder.
+Let's say a [$\\beta$-VAE](https://lilianweng.github.io/posts/2018-08-12-vae/#beta-vae) has an encoder $q\_\phi$ mapping input states to latent variable $z$ which is modeled by a Gaussian distribution and a decoder $p\_\\psi$ mapping $z$ back to the states. The state encoder in RIG is set to be the mean of $\\beta$-VAE encoder.
 
-$$ \begin{aligned} z &\\sim q\_\\phi(z \vert s) = \mathcal{N}(z; \\mu\_\\phi(s), \sigma^2\_\\phi(s)) \\ \mathcal{L}\_{\\beta\text{-VAE}} &= - \mathbb{E}\_{z \\sim q\_\\phi(z \vert s)} \[\\log p\_\\psi (s \vert z)\] + \\beta D\_\text{KL}(q\_\\phi(z \vert s) \\| p\_\\psi(s)) \\ e(s) &\\triangleq \\mu\_\\phi(s) \end{aligned} $$
+$$ \begin{aligned} z &\\sim q\_\phi(z \vert s) = \mathcal{N}(z; \\mu\_\phi(s), \sigma^2\_\phi(s)) \\ \mathcal{L}\_{\\beta\text{-VAE}} &= - \mathbb{E}\_{z \\sim q\_\phi(z \vert s)} \[\\log p\_\\psi (s \vert z)\] + \\beta D\_\text{KL}(q\_\phi(z \vert s) \| p\_\\psi(s)) \\ e(s) &\\triangleq \\mu\_\phi(s) \end{aligned} $$
 
 The reward is the Euclidean distance between state and goal embedding vectors: $r(s, g) = -|e(s) - e(g)|$. Similar to [grasp2vec](#grasp2vec), RIG applies data augmentation as well by latent goal relabeling: precisely half of the goals are generated from the prior at random and the other half are selected using HER. Also same as grasp2vec, rewards do not depend on any ground truth states but only the learned state encoding, so it can be used for training on real robots.
 
@@ -432,13 +432,13 @@ The problem with RIG is a lack of object variations in the imagined goal picture
 
 Fig. 24. The workflow of context-conditioned RIG. (Image source: [Nair, et al., 2019](https://arxiv.org/abs/1910.11670)).
 
-A CVAE conditions on a context variable $c$. It trains an encoder $q\_\\phi(z \vert s, c)$ and a decoder $p\_\\psi (s \vert z, c)$ and note that both have access to $c$. The CVAE loss penalizes information passing from the input state $s$ through an information bottleneck but allows for _unrestricted_ information flow from $c$ to both encoder and decoder.
+A CVAE conditions on a context variable $c$. It trains an encoder $q\_\phi(z \vert s, c)$ and a decoder $p\_\\psi (s \vert z, c)$ and note that both have access to $c$. The CVAE loss penalizes information passing from the input state $s$ through an information bottleneck but allows for _unrestricted_ information flow from $c$ to both encoder and decoder.
 
-$$ \mathcal{L}\_\text{CVAE} = - \mathbb{E}\_{z \\sim q\_\\phi(z \vert s,c)} \[\\log p\_\\psi (s \vert z, c)\] + \\beta D\_\text{KL}(q\_\\phi(z \vert s, c) \\| p\_\\psi(s)) $$
+$$ \mathcal{L}\_\text{CVAE} = - \mathbb{E}\_{z \\sim q\_\phi(z \vert s,c)} \[\\log p\_\\psi (s \vert z, c)\] + \\beta D\_\text{KL}(q\_\phi(z \vert s, c) \| p\_\\psi(s)) $$
 
 To create plausible goals, CC-VAE conditions on a starting state $s\_0$ so that the generated goal presents a consistent type of object as in $s\_0$. This goal consistency is necessary; e.g. if the current scene contains a red puck but the goal has a blue block, it would confuse the policy.
 
-Other than the state encoder $e(s) \\triangleq \\mu\_\\phi(s)$, CC-VAE trains a second convolutional encoder $e\_0(.)$ to translate the starting state $s\_0$ into a compact context representation $c = e\_0(s\_0)$. Two encoders, $e(.)$ and $e\_0(.)$, are intentionally different without shared weights, as they are expected to encode different factors of image variation. In addition to the loss function of CVAE, CC-VAE adds an extra term to learn to reconstruct $c$ back to $s\_0$, $\hat{s}\_0 = d\_0(c)$.
+Other than the state encoder $e(s) \\triangleq \\mu\_\phi(s)$, CC-VAE trains a second convolutional encoder $e\_0(.)$ to translate the starting state $s\_0$ into a compact context representation $c = e\_0(s\_0)$. Two encoders, $e(.)$ and $e\_0(.)$, are intentionally different without shared weights, as they are expected to encode different factors of image variation. In addition to the loss function of CVAE, CC-VAE adds an extra term to learn to reconstruct $c$ back to $s\_0$, $\hat{s}\_0 = d\_0(c)$.
 
 $$ \mathcal{L}\_\text{CC-VAE} = \mathcal{L}\_\text{CVAE} + \\log p(s_0\vert c) $$
 
@@ -471,9 +471,9 @@ With a goal similar to bisimulation metric, **DeepMDP** ([Gelada, et al. 2019](h
 1.  prediction of rewards and
 2.  prediction of the distribution over next latent states.
 
-$$ \begin{aligned} \mathcal{L}\_{\\bar{\mathcal{R}}}(s, a) = \vert \mathcal{R}(s, a) - \\bar{\mathcal{R}}(\\phi(s), a) \vert \\ \mathcal{L}\_{\\bar{\mathcal{P}}}(s, a) = D(\\phi \mathcal{P}(s, a), \\bar{\mathcal{P}}(. \vert \\phi(s), a)) \end{aligned} $$
+$$ \begin{aligned} \mathcal{L}\_{\\bar{\mathcal{R}}}(s, a) = \vert \mathcal{R}(s, a) - \\bar{\mathcal{R}}(\phi(s), a) \vert \\ \mathcal{L}\_{\\bar{\mathcal{P}}}(s, a) = D(\phi \mathcal{P}(s, a), \\bar{\mathcal{P}}(. \vert \phi(s), a)) \end{aligned} $$
 
-where $\\phi(s)$ is the embedding of state $s$; symbols with bar are functions (reward function $R$ and transition function $P$) in the same MDP but running in the latent low-dimensional observation space. Here the embedding representation $\\phi$ can be connected to bisimulation metrics, as the bisimulation distance is proved to be upper-bounded by the L2 distance in the latent space.
+where $\phi(s)$ is the embedding of state $s$; symbols with bar are functions (reward function $R$ and transition function $P$) in the same MDP but running in the latent low-dimensional observation space. Here the embedding representation $\phi$ can be connected to bisimulation metrics, as the bisimulation distance is proved to be upper-bounded by the L2 distance in the latent space.
 
 The function $D$ quantifies the distance between two probability distributions and should be chosen carefully. DeepMDP focuses on _Wasserstein-1_ metric (also known as [“earth-mover distance”](https://lilianweng.github.io/posts/2017-08-20-gan/#what-is-wasserstein-distance)). The Wasserstein-1 distance between distributions $P$ and $Q$ on a metric space $(M, d)$ (i.e., $d: M \\times M \to \mathbb{R}$) is:
 
@@ -495,7 +495,7 @@ DeepMDP generalizes the model to the Norm Maximum Mean Discrepancy (Norm-[MMD](h
 
 Fig. 27. The Deep Bisimulation for Control algorithm learns a bisimulation metric representation via learning a reward model and a dynamics model. The model architecture is a siamese network. (Image source: [Zhang et al. 2020](https://arxiv.org/abs/2006.10742))
 
-Similar to DeepMDP, DBC models the dynamics by learning a reward model and a transition model. Both models operate in the latent space, $\\phi(s)$. The optimization of embedding $\\phi$ depends on one important conclusion from [Ferns, et al. 2004](https://arxiv.org/abs/1207.4114) (Theorem 4.5) and [Ferns, et al 2011](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.295.2114&rep=rep1&type=pdf) (Theorem 2.6):
+Similar to DeepMDP, DBC models the dynamics by learning a reward model and a transition model. Both models operate in the latent space, $\phi(s)$. The optimization of embedding $\phi$ depends on one important conclusion from [Ferns, et al. 2004](https://arxiv.org/abs/1207.4114) (Theorem 4.5) and [Ferns, et al 2011](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.295.2114&rep=rep1&type=pdf) (Theorem 2.6):
 
 > Given $c \in (0, 1)$ a discounting factor, $\\pi$ a policy that is being improved continuously, and $M$ the space of bounded [pseudometric](https://mathworld.wolfram.com/Pseudometric.html) on the state space $\mathcal{S}$, we can define $\mathcal{F}: M \\mapsto M$:
 >
@@ -505,11 +505,11 @@ Similar to DeepMDP, DBC models the dynamics by learning a reward model and a tra
 
 \[The proof is not trivial. I may or may not add it in the future \_(:3」∠)\_ …\]
 
-Given batches of observations pairs, the training loss for $\\phi$, $J(\\phi)$, minimizes the mean square error between the on-policy bisimulation metric and Euclidean distance in the latent space:
+Given batches of observations pairs, the training loss for $\phi$, $J(\phi)$, minimizes the mean square error between the on-policy bisimulation metric and Euclidean distance in the latent space:
 
-$$ J(\\phi) = \\Big( \\|\\phi(s_i) - \\phi(s_j)\\|\_1 - \vert \hat{\mathcal{R}}(\\bar{\\phi}(s_i)) - \hat{\mathcal{R}}(\\bar{\\phi}(s_j)) \vert - \\gamma W_2(\hat{\mathcal{P}}(\cdot \vert \\bar{\\phi}(s_i), \\bar{\\pi}(\\bar{\\phi}(s_i))), \hat{\mathcal{P}}(\cdot \vert \\bar{\\phi}(s_j), \\bar{\\pi}(\\bar{\\phi}(s_j)))) \\Big)^2 $$
+$$ J(\phi) = \\Big( \|\phi(s_i) - \phi(s_j)\|\_1 - \vert \hat{\mathcal{R}}(\\bar{\phi}(s_i)) - \hat{\mathcal{R}}(\\bar{\phi}(s_j)) \vert - \\gamma W_2(\hat{\mathcal{P}}(\cdot \vert \\bar{\phi}(s_i), \\bar{\\pi}(\\bar{\phi}(s_i))), \hat{\mathcal{P}}(\cdot \vert \\bar{\phi}(s_j), \\bar{\\pi}(\\bar{\phi}(s_j)))) \\Big)^2 $$
 
-where $\\bar{\\phi}(s)$ denotes $\\phi(s)$ with stop gradient and $\\bar{\\pi}$ is the mean policy output. The learned reward model $\hat{\mathcal{R}}$ is deterministic and the learned forward dynamics model $\hat{\mathcal{P}}$ outputs a Gaussian distribution.
+where $\\bar{\phi}(s)$ denotes $\phi(s)$ with stop gradient and $\\bar{\\pi}$ is the mean policy output. The learned reward model $\hat{\mathcal{R}}$ is deterministic and the learned forward dynamics model $\hat{\mathcal{P}}$ outputs a Gaussian distribution.
 
 DBC is based on SAC but operates on the latent space:
 

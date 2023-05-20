@@ -74,7 +74,7 @@ In early versions of loss functions for contrastive learning, only one positive 
 
 Given a list of input samples $\{ \mathbf{x}\_i \}$, each has a corresponding label $y\_i \in \{1, \dots, L\}$ among $L$ classes. We would like to learn a function $f\_\\theta(.): \mathcal{X}\to\mathbb{R}^d$ that encodes $x\_i$ into an embedding vector such that examples from the same class have similar embeddings and samples from different classes have very different ones. Thus, contrastive loss takes a pair of inputs $(x\_i, x\_j)$ and minimizes the embedding distance when they are from the same class but maximizes the distance otherwise.
 
-$$ \mathcal{L}\_\text{cont}(\mathbf{x}\_i, \mathbf{x}\_j, \\theta) = \mathbb{1}\[y_i=y_j\] \\| f\_\\theta(\mathbf{x}\_i) - f\_\\theta(\mathbf{x}\_j) \\|^2_2 + \mathbb{1}\[y_i\\neq y_j\]\max(0, \\epsilon - \\|f\_\\theta(\mathbf{x}\_i) - f\_\\theta(\mathbf{x}\_j)\\|\_2)^2 $$
+$$ \mathcal{L}\_\text{cont}(\mathbf{x}\_i, \mathbf{x}\_j, \\theta) = \mathbb{1}\[y_i=y_j\] \| f\_\\theta(\mathbf{x}\_i) - f\_\\theta(\mathbf{x}\_j) \|^2_2 + \mathbb{1}\[y_i\\neq y_j\]\max(0, \\epsilon - \|f\_\\theta(\mathbf{x}\_i) - f\_\\theta(\mathbf{x}\_j)\|\_2)^2 $$
 
 where $\\epsilon$ is a hyperparameter, defining the lower bound distance between samples of different classes.
 
@@ -88,7 +88,7 @@ Fig. 1. Illustration of triplet loss given one positive and one negative per anc
 
 Given one anchor input $\mathbf{x}$, we select one positive sample $\mathbf{x}^+$ and one negative $\mathbf{x}^-$, meaning that $\mathbf{x}^+$ and $\mathbf{x}$ belong to the same class and $\mathbf{x}^-$ is sampled from another different class. Triplet loss learns to minimize the distance between the anchor $\mathbf{x}$ and positive $\mathbf{x}^+$ and maximize the distance between the anchor $\mathbf{x}$ and negative $\mathbf{x}^-$ at the same time with the following equation:
 
-$$ \mathcal{L}\_\text{triplet}(\mathbf{x}, \mathbf{x}^+, \mathbf{x}^-) = \sum\_{\mathbf{x} \in \mathcal{X}} \max\\big( 0, \\|f(\mathbf{x}) - f(\mathbf{x}^+)\\|^2_2 - \\|f(\mathbf{x}) - f(\mathbf{x}^-)\\|^2_2 + \\epsilon \\big) $$
+$$ \mathcal{L}\_\text{triplet}(\mathbf{x}, \mathbf{x}^+, \mathbf{x}^-) = \sum\_{\mathbf{x} \in \mathcal{X}} \max\\big( 0, \|f(\mathbf{x}) - f(\mathbf{x}^+)\|^2_2 - \|f(\mathbf{x}) - f(\mathbf{x}^-)\|^2_2 + \\epsilon \\big) $$
 
 where the margin parameter $\\epsilon$ is configured as the minimum offset between distances of similar vs dissimilar pairs.
 
@@ -104,7 +104,7 @@ Fig. 2. Illustration compares contrastive loss, triplet loss and lifted structur
 
 Let $D\_{ij} = | f(\mathbf{x}\_i) - f(\mathbf{x}\_j) |\_2$, a structured loss function is defined as
 
-$$ \begin{aligned} \mathcal{L}\_\text{struct} &= \frac{1}{2\vert \mathcal{P} \vert} \sum\_{(i,j) \in \mathcal{P}} \max(0, \mathcal{L}\_\text{struct}^{(ij)})^2 \\ \text{where } \mathcal{L}\_\text{struct}^{(ij)} &= D\_{ij} + \\color{red}{\max \\big( \max\_{(i,k)\in \mathcal{N}} \\epsilon - D\_{ik}, \max\_{(j,l)\in \mathcal{N}} \\epsilon - D\_{jl} \\big)} \end{aligned} $$
+$$ \begin{aligned} \mathcal{L}\_\text{struct} &= \frac{1}{2\vert \mathcal{P} \vert} \sum\_{(i,j) \in \mathcal{P}} \max(0, \mathcal{L}\_\text{struct}^{(ij)})^2 \\ \text{where } \mathcal{L}\_\text{struct}^{(ij)} &= D\_{ij} + \color{red}{\max \\big( \max\_{(i,k)\in \mathcal{N}} \\epsilon - D\_{ik}, \max\_{(j,l)\in \mathcal{N}} \\epsilon - D\_{jl} \\big)} \end{aligned} $$
 
 where $\mathcal{P}$ contains the set of positive pairs and $\mathcal{N}$ is the set of negative pairs. Note that the dense pairwise squared distance matrix can be easily computed per training batch.
 
@@ -154,7 +154,7 @@ $$ \mathcal{L}\_\text{InfoNCE} = - \mathbb{E} \\Big\[\\log \frac{f(\mathbf{x}, \
 
 The fact that $f(x, c)$ estimates the density ratio $\frac{p(x\vert c)}{p(x)}$ has a connection with mutual information optimization. To maximize the the mutual information between input $x$ and context vector $c$, we have:
 
-$$ I(\mathbf{x}; \mathbf{c}) = \sum\_{\mathbf{x}, \mathbf{c}} p(\mathbf{x}, \mathbf{c}) \\log\frac{p(\mathbf{x}, \mathbf{c})}{p(\mathbf{x})p(\mathbf{c})} = \sum\_{\mathbf{x}, \mathbf{c}} p(\mathbf{x}, \mathbf{c})\\log\\color{blue}{\frac{p(\mathbf{x}|\mathbf{c})}{p(\mathbf{x})}} $$
+$$ I(\mathbf{x}; \mathbf{c}) = \sum\_{\mathbf{x}, \mathbf{c}} p(\mathbf{x}, \mathbf{c}) \\log\frac{p(\mathbf{x}, \mathbf{c})}{p(\mathbf{x})p(\mathbf{c})} = \sum\_{\mathbf{x}, \mathbf{c}} p(\mathbf{x}, \mathbf{c})\\log\color{blue}{\frac{p(\mathbf{x}|\mathbf{c})}{p(\mathbf{x})}} $$
 
 where the logarithmic term in blue is estimated by $f$.
 
@@ -185,7 +185,7 @@ Most recent studies follow the following definition of contrastive learning obje
 
 To learn an encoder $f(\mathbf{x})$ to learn a _L2-normalized feature vector_, the contrastive learning objective is:
 
-$$ \begin{aligned} \mathcal{L}\_\text{contrastive} &= \mathbb{E}\_{(\mathbf{x},\mathbf{x}^+)\\sim p\_\texttt{pos}, \{\mathbf{x}^-\_i\}^M\_{i=1} \\overset{\text{i.i.d}}{\\sim} p\_\texttt{data} } \\Big\[ -\\log\frac{\exp(f(\mathbf{x})^\top f(\mathbf{x}^+) / \tau)}{ \exp(f(\mathbf{x})^\top f(\mathbf{x}^+) / \tau) + \sum\_{i=1}^M \exp(f(\mathbf{x})^\top f(\mathbf{x}\_i^-) / \tau)} \\Big\] & \\ &\\approx \mathbb{E}\_{(\mathbf{x},\mathbf{x}^+)\\sim p\_\texttt{pos}, \{\mathbf{x}^-\_i\}^M\_{i=1} \\overset{\text{i.i.d}}{\\sim} p\_\texttt{data} }\\Big\[ - f(\mathbf{x})^\top f(\mathbf{x}^+) / \tau + \\log\\big(\sum\_{i=1}^M \exp(f(\mathbf{x})^\top f(\mathbf{x}\_i^-) / \tau)\\big) \\Big\] & \\scriptstyle{\text{; Assuming infinite negatives}} \\ &= -\frac{1}{\tau}\mathbb{E}\_{(\mathbf{x},\mathbf{x}^+)\\sim p\_\texttt{pos}}f(\mathbf{x})^\top f(\mathbf{x}^+) + \mathbb{E}\_{ \mathbf{x} \\sim p\_\texttt{data}} \\Big\[ \\log \mathbb{E}\_{\mathbf{x}^- \\sim p\_\texttt{data}} \\big\[ \sum\_{i=1}^M \exp(f(\mathbf{x})^\top f(\mathbf{x}\_i^-) / \tau)\\big\] \\Big\] & \end{aligned} $$
+$$ \begin{aligned} \mathcal{L}\_\text{contrastive} &= \mathbb{E}\_{(\mathbf{x},\mathbf{x}^+)\\sim p\_\texttt{pos}, \{\mathbf{x}^-\_i\}^M\_{i=1} \\overset{\text{i.i.d}}{\\sim} p\_\texttt{data} } \\Big\[ -\\log\frac{\exp(f(\mathbf{x})^\top f(\mathbf{x}^+) / \tau)}{ \exp(f(\mathbf{x})^\top f(\mathbf{x}^+) / \tau) + \sum\_{i=1}^M \exp(f(\mathbf{x})^\top f(\mathbf{x}\_i^-) / \tau)} \\Big\] & \\ &\approx \mathbb{E}\_{(\mathbf{x},\mathbf{x}^+)\\sim p\_\texttt{pos}, \{\mathbf{x}^-\_i\}^M\_{i=1} \\overset{\text{i.i.d}}{\\sim} p\_\texttt{data} }\\Big\[ - f(\mathbf{x})^\top f(\mathbf{x}^+) / \tau + \\log\\big(\sum\_{i=1}^M \exp(f(\mathbf{x})^\top f(\mathbf{x}\_i^-) / \tau)\\big) \\Big\] & \\scriptstyle{\text{; Assuming infinite negatives}} \\ &= -\frac{1}{\tau}\mathbb{E}\_{(\mathbf{x},\mathbf{x}^+)\\sim p\_\texttt{pos}}f(\mathbf{x})^\top f(\mathbf{x}^+) + \mathbb{E}\_{ \mathbf{x} \\sim p\_\texttt{data}} \\Big\[ \\log \mathbb{E}\_{\mathbf{x}^- \\sim p\_\texttt{data}} \\big\[ \sum\_{i=1}^M \exp(f(\mathbf{x})^\top f(\mathbf{x}\_i^-) / \tau)\\big\] \\Big\] & \end{aligned} $$
 
 # Key Ingredients[#](#key-ingredients)
 
@@ -326,7 +326,7 @@ Fig. 8. Illustration of Barlow Twins learning pipeline. (Image source: [Zbontar 
 
 Let $\mathcal{C}$ be a cross-correlation matrix computed between outputs from two identical networks along the batch dimension. $\mathcal{C}$ is a square matrix with the size same as the feature network's output dimensionality. Each entry in the matrix $\mathcal{C}\_{ij}$ is the cosine similarity between network output vector dimension at index $i, j$ and batch index $b$, $\mathbf{z}\_{b,i}^A$ and $\mathbf{z}\_{b,j}^B$, with a value between -1 (i.e. perfect anti-correlation) and 1 (i.e. perfect correlation).
 
-$$ \begin{aligned} \mathcal{L}\_\text{BT} &= \\underbrace{\sum_i (1-\mathcal{C}\_{ii})^2}\_\text{invariance term} + \\lambda \\underbrace{\sum_i\sum\_{i\\neq j} \mathcal{C}\_{ij}^2}\_\text{redundancy reduction term} \\ \text{where } \mathcal{C}\_{ij} &= \frac{\sum_b \mathbf{z}^A\_{b,i} \mathbf{z}^B\_{b,j}}{\\sqrt{\sum_b (\mathbf{z}^A\_{b,i})^2}\\sqrt{\sum_b (\mathbf{z}^B\_{b,j})^2}} \end{aligned} $$
+$$ \begin{aligned} \mathcal{L}\_\text{BT} &= \\underbrace{\sum_i (1-\mathcal{C}\_{ii})^2}\_\text{invariance term} + \\lambda \\underbrace{\sum_i\sum\_{i\\neq j} \mathcal{C}\_{ij}^2}\_\text{redundancy reduction term} \\ \text{where } \mathcal{C}\_{ij} &= \frac{\sum_b \mathbf{z}^A\_{b,i} \mathbf{z}^B\_{b,j}}{\sqrt{\sum_b (\mathbf{z}^A\_{b,i})^2}\sqrt{\sum_b (\mathbf{z}^B\_{b,j})^2}} \end{aligned} $$
 
 Barlow Twins is competitive with SOTA methods for self-supervised learning. It naturally avoids trivial constants (i.e. collapsed representations), and is robust to different training batch sizes.
 
@@ -392,7 +392,7 @@ $$ P(i\vert \mathbf{v}) = \frac{\exp(\mathbf{v}^\top \mathbf{f}\_i / \tau)}{\sum
 
 Because there is only one instance per class, the training is unstable and fluctuates a lot. To improve the training smoothness, they introduced an extra term for positive samples in the loss function based on the [proximal optimization method](https://web.stanford.edu/~boyd/papers/prox_algs.html). The final NCE loss objective looks like:
 
-$$ \begin{aligned} \mathcal{L}\_\text{instance} &= - \mathbb{E}\_{P_d}\\big\[\\log h(i, \mathbf{v}^{(t-1)}\_i) - \\lambda \\|\mathbf{v}^{(t)}\_i - \mathbf{v}^{(t-1)}\_i\\|^2_2\\big\] - M\mathbb{E}\_{P_n}\\big\[\\log(1 - h(i, \mathbf{v}'^{(t-1)})\\big\] \\ h(i, \mathbf{v}) &= \frac{P(i\vert\mathbf{v})}{P(i\vert\mathbf{v}) + MP_n(i)} \text{ where the noise distribution is uniform }P_n = 1/N \end{aligned} $$
+$$ \begin{aligned} \mathcal{L}\_\text{instance} &= - \mathbb{E}\_{P_d}\\big\[\\log h(i, \mathbf{v}^{(t-1)}\_i) - \\lambda \|\mathbf{v}^{(t)}\_i - \mathbf{v}^{(t-1)}\_i\|^2_2\\big\] - M\mathbb{E}\_{P_n}\\big\[\\log(1 - h(i, \mathbf{v}'^{(t-1)})\\big\] \\ h(i, \mathbf{v}) &= \frac{P(i\vert\mathbf{v})}{P(i\vert\mathbf{v}) + MP_n(i)} \text{ where the noise distribution is uniform }P_n = 1/N \end{aligned} $$
 
 where $\{ \mathbf{v}^{(t-1)} \}$ are embeddings stored in the memory bank from the previous iteration. The difference between iterations $|\mathbf{v}^{(t)}\_i - \mathbf{v}^{(t-1)}\_i|^2\_2$ will gradually vanish as the learned embedding converges.
 
@@ -582,7 +582,7 @@ The pre-trained BERT sentence embedding without any fine-tuning has been found t
 They experimented with a few different prediction heads on top of BERT model:
 
 - Softmax classification objective: The classification head of the siamese network is built on the concatenation of two embeddings $f(\mathbf{x}), f(\mathbf{x}')$ and $\vert f(\mathbf{x}) - f(\mathbf{x}') \vert$. The predicted output is $\hat{y}=\text{softmax}(\mathbf{W}\_t \[f(\mathbf{x}); f(\mathbf{x}'); \vert f(\mathbf{x}) - f(\mathbf{x}') \vert\])$. They showed that the most important component is the element-wise difference $\vert f(\mathbf{x}) - f(\mathbf{x}') \vert$.
-- Regression objective: This is the regression loss on $\\cos(f(\mathbf{x}), f(\mathbf{x}'))$, in which the pooling strategy has a big impact. In the experiments, they observed that `max` performs much worse than `mean` and `CLS`\-token.
+- Regression objective: This is the regression loss on $\cos(f(\mathbf{x}), f(\mathbf{x}'))$, in which the pooling strategy has a big impact. In the experiments, they observed that `max` performs much worse than `mean` and `CLS`\-token.
 - Triplet objective: $\max(0, |f(\mathbf{x}) - f(\mathbf{x}^+)|- |f(\mathbf{x}) - f(\mathbf{x}^-)| + \\epsilon)$, where $\mathbf{x}, \mathbf{x}^+, \mathbf{x}^-$ are embeddings of the anchor, positive and negative sentences.
 
 In the experiments, which objective function works the best depends on the datasets, so there is no universal winner.
@@ -607,15 +607,15 @@ The embedding representation space is deemed _isotropic_ if embeddings are unifo
 
 Fig. 26. Illustration of the flow-based calibration over the original sentence embedding space in BERT-flow. (Image source: [Li et al, 2020](https://arxiv.org/abs/2011.05864))
 
-Let $\mathcal{U}$ be the observed BERT sentence embedding space and $\mathcal{Z}$ be the desired latent space which is a standard Gaussian. Thus, $p\_\mathcal{Z}$ is a Gaussian density function and $f\_\\phi: \mathcal{Z}\to\mathcal{U}$ is an invertible transformation:
+Let $\mathcal{U}$ be the observed BERT sentence embedding space and $\mathcal{Z}$ be the desired latent space which is a standard Gaussian. Thus, $p\_\mathcal{Z}$ is a Gaussian density function and $f\_\phi: \mathcal{Z}\to\mathcal{U}$ is an invertible transformation:
 
-$$ \mathbf{z}\\sim p\_\mathcal{Z}(\mathbf{z}) \quad \mathbf{u}=f\_\\phi(\mathbf{z}) \quad \mathbf{z}=f^{-1}\_\\phi(\mathbf{u}) $$
+$$ \mathbf{z}\\sim p\_\mathcal{Z}(\mathbf{z}) \quad \mathbf{u}=f\_\phi(\mathbf{z}) \quad \mathbf{z}=f^{-1}\_\phi(\mathbf{u}) $$
 
 A flow-based generative model learns the invertible mapping function by maximizing the likelihood of $\mathcal{U}$'s marginal:
 
-$$ \max\_\\phi\mathbb{E}\_{\mathbf{u}=\text{BERT}(s), s\\sim\mathcal{D}} \\Big\[ \\log p\_\mathcal{Z}(f^{-1}\_\\phi(\mathbf{u})) + \\log\\big\vert\\det\frac{\\partial f^{-1}\_\\phi(\mathbf{u})}{\\partial\mathbf{u}}\\big\vert \\Big\] $$
+$$ \max\_\phi\mathbb{E}\_{\mathbf{u}=\text{BERT}(s), s\\sim\mathcal{D}} \\Big\[ \\log p\_\mathcal{Z}(f^{-1}\_\phi(\mathbf{u})) + \\log\\big\vert\\det\frac{\\partial f^{-1}\_\phi(\mathbf{u})}{\\partial\mathbf{u}}\\big\vert \\Big\] $$
 
-where $s$ is a sentence sampled from the text corpus $\mathcal{D}$. Only the flow parameters $\\phi$ are optimized while parameters in the pretrained BERT stay unchanged.
+where $s$ is a sentence sampled from the text corpus $\mathcal{D}$. Only the flow parameters $\phi$ are optimized while parameters in the pretrained BERT stay unchanged.
 
 BERT-flow was shown to improve the performance on most STS tasks either with or without supervision from NLI datasets. Because learning normalizing flows for calibration does not require labels, it can utilize the entire dataset including validation and test sets.
 
@@ -627,7 +627,7 @@ They transform the mean value of the sentence vectors to 0 and the covariance ma
 
 $$ \begin{aligned} \\mu &= \frac{1}{N}\sum\_{i=1}^N \mathbf{x}\_i \quad \sigma = \frac{1}{N}\sum\_{i=1}^N (\mathbf{x}\_i - \\mu)^\top (\mathbf{x}\_i - \\mu) \\ \\tilde{\mathbf{x}}\_i &= (\mathbf{x}\_i - \\mu)W \quad \\tilde{\sigma} = W^\top\sigma W = I \text{ thus } \sigma = (W^{-1})^\top W^{-1} \end{aligned} $$
 
-If we get [SVD](https://en.wikipedia.org/wiki/Singular_value_decomposition) decomposition of $\sigma = U\\Lambda U^\top$, we will have $W^{-1}=\\sqrt{\\Lambda} U^\top$ and $W=U\\sqrt{\\Lambda^{-1}}$. Note that within SVD, $U$ is an orthogonal matrix with column vectors as eigenvectors and $\\Lambda$ is a diagonal matrix with all positive elements as sorted eigenvalues.
+If we get [SVD](https://en.wikipedia.org/wiki/Singular_value_decomposition) decomposition of $\sigma = U\\Lambda U^\top$, we will have $W^{-1}=\sqrt{\\Lambda} U^\top$ and $W=U\sqrt{\\Lambda^{-1}}$. Note that within SVD, $U$ is an orthogonal matrix with column vectors as eigenvectors and $\\Lambda$ is a diagonal matrix with all positive elements as sorted eigenvalues.
 
 A dimensionality reduction strategy can be applied by only taking the first $k$ columns of $W$, named `Whitening`\-$k$.
 

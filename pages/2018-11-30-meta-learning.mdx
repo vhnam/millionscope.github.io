@@ -92,7 +92,7 @@ In few-shot classification, the goal is to reduce the prediction error on data s
 
 You may consider each pair of sampled dataset $(S^L, B^L)$ as one data point. The model is trained such that it can generalize to other datasets. Symbols in red are added for meta-learning in addition to the supervised learning objective.
 
-$$ \\theta = \arg\max\_\\theta \\color{red}{E\_{L\\subset\mathcal{L}}\[} E\_{\\color{red}{S^L \\subset\mathcal{D}, }B^L \\subset\mathcal{D}} \[\sum\_{(x, y)\in B^L} P\_\\theta(x, y\\color{red}{, S^L})\] \\color{red}{\]} $$
+$$ \\theta = \arg\max\_\\theta \color{red}{E\_{L\\subset\mathcal{L}}\[} E\_{\color{red}{S^L \\subset\mathcal{D}, }B^L \\subset\mathcal{D}} \[\sum\_{(x, y)\in B^L} P\_\\theta(x, y\color{red}{, S^L})\] \color{red}{\]} $$
 
 The idea is to some extent similar to using a pre-trained model in image classification (ImageNet) or language modeling (big text corpora) when only a limited set of task-specific data samples are available. Meta-learning takes this idea one step further, rather than fine-tuning according to one down-steam task, it optimizes the model to be good at many, if not all.
 
@@ -101,11 +101,11 @@ The idea is to some extent similar to using a pre-trained model in image classif
 Another popular view of meta-learning decomposes the model update into two stages:
 
 - A classifier $f\_\\theta$ is the “learner” model, trained for operating a given task;
-- In the meantime, a optimizer $g\_\\phi$ learns how to update the learner model's parameters via the support set $S$, $\\theta' = g\_\\phi(\\theta, S)$.
+- In the meantime, a optimizer $g\_\phi$ learns how to update the learner model's parameters via the support set $S$, $\\theta' = g\_\phi(\\theta, S)$.
 
-Then in final optimization step, we need to update both $\\theta$ and $\\phi$ to maximize:
+Then in final optimization step, we need to update both $\\theta$ and $\phi$ to maximize:
 
-$$ \mathbb{E}\_{L\\subset\mathcal{L}}\[ \mathbb{E}\_{S^L \\subset\mathcal{D}, B^L \\subset\mathcal{D}} \[\sum\_{(\mathbf{x}, y)\in B^L} P\_{g\_\\phi(\\theta, S^L)}(y \vert \mathbf{x})\]\] $$
+$$ \mathbb{E}\_{L\\subset\mathcal{L}}\[ \mathbb{E}\_{S^L \\subset\mathcal{D}, B^L \\subset\mathcal{D}} \[\sum\_{(\mathbf{x}, y)\in B^L} P\_{g\_\phi(\\theta, S^L)}(y \vert \mathbf{x})\]\] $$
 
 ## Common Approaches[#](#common-approaches)
 
@@ -133,7 +133,7 @@ $f\_\\theta(\mathbf{x}, S)$
 
 $\sum\_{(\mathbf{x}\_i, y\_i) \in S} k\_\\theta(\mathbf{x}, \mathbf{x}\_i)y\_i$ (\*)
 
-$P\_{g\_\\phi(\\theta, S^L)}(y \vert \mathbf{x})$
+$P\_{g\_\phi(\\theta, S^L)}(y \vert \mathbf{x})$
 
 (\*) $k\_\\theta$ is a kernel function measuring the similarity between $\mathbf{x}\_i$ and $\mathbf{x}$.
 
@@ -218,7 +218,7 @@ $$ \\theta^\* = \arg\max\_\\theta \mathbb{E}\_{L\\subset\mathcal{L}}\[ \mathbb{E
 
 **Relation Network (RN)** ([Sung et al., 2018](http://openaccess.thecvf.com/content_cvpr_2018/papers_backup/Sung_Learning_to_Compare_CVPR_2018_paper.pdf)) is similar to [siamese network](#convolutional-siamese-neural-network) but with a few differences:
 
-1.  The relationship is not captured by a simple L1 distance in the feature space, but predicted by a CNN classifier $g\_\\phi$. The relation score between a pair of inputs, $\mathbf{x}\_i$ and $\mathbf{x}\_j$, is $r\_{ij} = g\_\\phi(\[\mathbf{x}\_i, \mathbf{x}\_j\])$ where $\[.,.\]$ is concatenation.
+1.  The relationship is not captured by a simple L1 distance in the feature space, but predicted by a CNN classifier $g\_\phi$. The relation score between a pair of inputs, $\mathbf{x}\_i$ and $\mathbf{x}\_j$, is $r\_{ij} = g\_\phi(\[\mathbf{x}\_i, \mathbf{x}\_j\])$ where $\[.,.\]$ is concatenation.
 2.  The objective function is MSE loss instead of cross-entropy, because conceptually RN focuses more on predicting relation scores which is more like regression, rather than binary classification, $\mathcal{L}(B) = \sum\_{(\mathbf{x}\_i, \mathbf{x}\_j, y\_i, y\_j)\in B} (r\_{ij} - \mathbf{1}\_{y\_i=y\_j})^2$.
 
 ![](relation-network.png)
@@ -284,7 +284,7 @@ The read attention is constructed purely based on the content similarity.
 
 First, a key feature vector $\mathbf{k}\_t$ is produced at the time step t by the controller as a function of the input $\mathbf{x}$. Similar to NTM, a read weighting vector $\mathbf{w}\_t^r$ of N elements is computed as the cosine similarity between the key vector and every memory vector row, normalized by softmax. The read vector $\mathbf{r}\_t$ is a sum of memory records weighted by such weightings:
 
-$$ \mathbf{r}\_i = \sum\_{i=1}^N w_t^r(i)\mathbf{M}\_t(i) \text{, where } w_t^r(i) = \text{softmax}(\frac{\mathbf{k}\_t \cdot \mathbf{M}\_t(i)}{\\|\mathbf{k}\_t\\| \cdot \\|\mathbf{M}\_t(i)\\|}) $$
+$$ \mathbf{r}\_i = \sum\_{i=1}^N w_t^r(i)\mathbf{M}\_t(i) \text{, where } w_t^r(i) = \text{softmax}(\frac{\mathbf{k}\_t \cdot \mathbf{M}\_t(i)}{\|\mathbf{k}\_t\| \cdot \|\mathbf{M}\_t(i)\|}) $$
 
 where $M\_t$ is the memory matrix at time t and $M\_t(i)$ is the i-th row in this matrix.
 
@@ -329,16 +329,16 @@ Fig. 8. Combining slow and fast weights in a MLP. $\\bigoplus$ is element-wise s
 Key components of MetaNet are:
 
 - An embedding function $f\_\\theta$, parameterized by $\\theta$, encodes raw inputs into feature vectors. Similar to [Siamese Neural Network](#convolutional-siamese-neural-network), these embeddings are trained to be useful for telling whether two inputs are of the same class (verification task).
-- A base learner model $g\_\\phi$, parameterized by weights $\\phi$, completes the actual learning task.
+- A base learner model $g\_\phi$, parameterized by weights $\phi$, completes the actual learning task.
 
 If we stop here, it looks just like [Relation Network](#relation-network). MetaNet, in addition, explicitly models the fast weights of both functions and then aggregates them back into the model (See Fig. 8).
 
 Therefore we need additional two functions to output fast weights for $f$ and $g$ respectively.
 
 - $F\_w$: a LSTM parameterized by $w$ for learning fast weights $\\theta^+$ of the embedding function $f$. It takes as input gradients of $f$'s embedding loss for verification task.
-- $G\_v$: a neural network parameterized by $v$ learning fast weights $\\phi^+$ for the base learner $g$ from its loss gradients. In MetaNet, the learner's loss gradients are viewed as the _meta information_ of the task.
+- $G\_v$: a neural network parameterized by $v$ learning fast weights $\phi^+$ for the base learner $g$ from its loss gradients. In MetaNet, the learner's loss gradients are viewed as the _meta information_ of the task.
 
-Ok, now let's see how meta networks are trained. The training data contains multiple pairs of datasets: a support set $S=\{\mathbf{x}'\_i, y'\_i\}\_{i=1}^K$ and a test set $U=\{\mathbf{x}\_i, y\_i\}\_{i=1}^L$. Recall that we have four networks and four sets of model parameters to learn, $(\\theta, \\phi, w, v)$.
+Ok, now let's see how meta networks are trained. The training data contains multiple pairs of datasets: a support set $S=\{\mathbf{x}'\_i, y'\_i\}\_{i=1}^K$ and a test set $U=\{\mathbf{x}\_i, y\_i\}\_{i=1}^L$. Recall that we have four networks and four sets of model parameters to learn, $(\\theta, \phi, w, v)$.
 
 ![](meta-network.png)
 
@@ -356,9 +356,9 @@ Fig.9. The MetaNet architecture.
 3.  Next go through examples in the support set $S$ and compute the example-level fast weights. Meanwhile, update the memory with learned representations.  
     for $i=1, \dots, K$:
 
-    - a. The base learner outputs a probability distribution: $P(\hat{y}\_i \vert \mathbf{x}\_i) = g\_\\phi(\mathbf{x}\_i)$ and the loss can be cross-entropy or MSE: $\mathcal{L}^\text{task}\_i = y'\_i \\log g\_\\phi(\mathbf{x}'\_i) + (1- y'\_i) \\log (1 - g\_\\phi(\mathbf{x}'\_i))$
-    - b. Extract meta information (loss gradients) of the task and compute the example-level fast weights: $\\phi\_i^+ = G\_v(\\nabla\_\\phi\mathcal{L}^\text{task}\_i)$
-      - Then store $\\phi^+\_i$ into $i$-th location of the “value” memory $\mathbf{M}$.
+    - a. The base learner outputs a probability distribution: $P(\hat{y}\_i \vert \mathbf{x}\_i) = g\_\phi(\mathbf{x}\_i)$ and the loss can be cross-entropy or MSE: $\mathcal{L}^\text{task}\_i = y'\_i \\log g\_\phi(\mathbf{x}'\_i) + (1- y'\_i) \\log (1 - g\_\phi(\mathbf{x}'\_i))$
+    - b. Extract meta information (loss gradients) of the task and compute the example-level fast weights: $\phi\_i^+ = G\_v(\\nabla\_\phi\mathcal{L}^\text{task}\_i)$
+      - Then store $\phi^+\_i$ into $i$-th location of the “value” memory $\mathbf{M}$.
     - d. Encode the support sample into a task-specific input representation using both slow and fast weights: $r'\_i = f\_{\\theta, \\theta^+}(\mathbf{x}'\_i)$
       - Then store $r'\_i$ into $i$-th location of the “key” memory $\mathbf{R}$.
 
@@ -369,11 +369,11 @@ Fig.9. The MetaNet architecture.
     - a. Encode the test sample into a task-specific input representation: $r\_j = f\_{\\theta, \\theta^+}(\mathbf{x}\_j)$
     - b. The fast weights are computed by attending to representations of support set samples in memory $\mathbf{R}$. The attention function is of your choice. Here MetaNet uses cosine similarity:
 
-    $$ \begin{aligned} a_j &= \text{cosine}(\mathbf{R}, r_j) = \[\frac{r'\_1\cdot r_j}{\\|r'\_1\\|\cdot\\|r_j\\|}, \dots, \frac{r'\_N\cdot r_j}{\\|r'\_N\\|\cdot\\|r_j\\|}\]\\ \\phi^+\_j &= \text{softmax}(a_j)^\top \mathbf{M} \end{aligned} $$
+    $$ \begin{aligned} a_j &= \text{cosine}(\mathbf{R}, r_j) = \[\frac{r'\_1\cdot r_j}{\|r'\_1\|\cdot\|r_j\|}, \dots, \frac{r'\_N\cdot r_j}{\|r'\_N\|\cdot\|r_j\|}\]\\ \phi^+\_j &= \text{softmax}(a_j)^\top \mathbf{M} \end{aligned} $$
 
-    - c. Update the training loss: $\mathcal{L}\_\text{train} \\leftarrow \mathcal{L}\_\text{train} + \mathcal{L}^\text{task}(g\_{\\phi, \\phi^+}(\mathbf{x}\_i), y_i) $
+    - c. Update the training loss: $\mathcal{L}\_\text{train} \\leftarrow \mathcal{L}\_\text{train} + \mathcal{L}^\text{task}(g\_{\phi, \phi^+}(\mathbf{x}\_i), y_i) $
 
-5.  Update all the parameters $(\\theta, \\phi, w, v)$ using $\mathcal{L}\_\text{train}$.
+5.  Update all the parameters $(\\theta, \phi, w, v)$ using $\mathcal{L}\_\text{train}$.
 
 # Optimization-Based[#](#optimization-based)
 
@@ -455,7 +455,7 @@ $$ \begin{aligned} \\theta\_\text{meta} &\\leftarrow \\theta\_\text{meta} - \\be
 
 The MAML gradient is:
 
-$$ g\_\text{MAML} = \\nabla\_{\\theta_k} \mathcal{L}^{(1)}(\\theta_k) \cdot \\prod\_{i=1}^k (I - \\alpha \\color{red}{\\nabla\_{\\theta\_{i-1}}(\\nabla\_\\theta\mathcal{L}^{(0)}(\\theta\_{i-1}))}) $$
+$$ g\_\text{MAML} = \\nabla\_{\\theta_k} \mathcal{L}^{(1)}(\\theta_k) \cdot \\prod\_{i=1}^k (I - \\alpha \color{red}{\\nabla\_{\\theta\_{i-1}}(\\nabla\_\\theta\mathcal{L}^{(0)}(\\theta\_{i-1}))}) $$
 
 The First-Order MAML ignores the second derivative part in red. It is simplified as follows, equivalent to the derivative of the last inner gradient update result.
 

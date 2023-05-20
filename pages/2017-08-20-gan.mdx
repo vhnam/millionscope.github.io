@@ -46,7 +46,7 @@ Before we start examining GANs closely, let us first review two metrics for quan
 
 (1) [KL (Kullback–Leibler) divergence](https://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence) measures how one probability distribution $p$ diverges from a second expected probability distribution $q$.
 
-$$ D\_{KL}(p \\| q) = \int_x p(x) \\log \frac{p(x)}{q(x)} dx $$
+$$ D\_{KL}(p \| q) = \int_x p(x) \\log \frac{p(x)}{q(x)} dx $$
 
 $D\_{KL}$ achieves the minimum zero when $p(x)$ == $q(x)$ everywhere.
 
@@ -54,7 +54,7 @@ It is noticeable according to the formula that KL divergence is asymmetric. In c
 
 (2) [Jensen–Shannon Divergence](https://en.wikipedia.org/wiki/Jensen%E2%80%93Shannon_divergence) is another measure of similarity between two probability distributions, bounded by $\[0, 1\]$. JS divergence is symmetric (yay!) and more smooth. Check this [Quora post](https://www.quora.com/Why-isnt-the-Jensen-Shannon-divergence-used-more-often-than-the-Kullback-Leibler-since-JS-is-symmetric-thus-possibly-a-better-indicator-of-distance) if you are interested in reading more about the comparison between KL divergence and JS divergence.
 
-$$ D\_{JS}(p \\| q) = \frac{1}{2} D\_{KL}(p \\| \frac{p + q}{2}) + \frac{1}{2} D\_{KL}(q \\| \frac{p + q}{2}) $$
+$$ D\_{JS}(p \| q) = \frac{1}{2} D\_{KL}(p \| \frac{p + q}{2}) + \frac{1}{2} D\_{KL}(q \| \frac{p + q}{2}) $$
 
 ![](KL_JS_divergence.png)
 
@@ -135,11 +135,11 @@ $$ \begin{aligned} L(G, D^\*) &= \int_x \\bigg( p\_{r}(x) \\log(D^\*(x)) + p_g (
 
 According to the formula listed in the [previous section](https://lilianweng.github.io/posts/2017-08-20-gan/#kullbackleibler-and-jensenshannon-divergence), JS divergence between $p\_{r}$ and $p\_g$ can be computed as:
 
-$$ \begin{aligned} D\_{JS}(p\_{r} \\| p_g) =& \frac{1}{2} D\_{KL}(p\_{r} || \frac{p\_{r} + p_g}{2}) + \frac{1}{2} D\_{KL}(p\_{g} || \frac{p\_{r} + p_g}{2}) \\ =& \frac{1}{2} \\bigg( \\log2 + \int_x p\_{r}(x) \\log \frac{p\_{r}(x)}{p\_{r} + p_g(x)} dx \\bigg) + \\& \frac{1}{2} \\bigg( \\log2 + \int_x p_g(x) \\log \frac{p_g(x)}{p\_{r} + p_g(x)} dx \\bigg) \\ =& \frac{1}{2} \\bigg( \\log4 + L(G, D^\*) \\bigg) \end{aligned} $$
+$$ \begin{aligned} D\_{JS}(p\_{r} \| p_g) =& \frac{1}{2} D\_{KL}(p\_{r} || \frac{p\_{r} + p_g}{2}) + \frac{1}{2} D\_{KL}(p\_{g} || \frac{p\_{r} + p_g}{2}) \\ =& \frac{1}{2} \\bigg( \\log2 + \int_x p\_{r}(x) \\log \frac{p\_{r}(x)}{p\_{r} + p_g(x)} dx \\bigg) + \\& \frac{1}{2} \\bigg( \\log2 + \int_x p_g(x) \\log \frac{p_g(x)}{p\_{r} + p_g(x)} dx \\bigg) \\ =& \frac{1}{2} \\bigg( \\log4 + L(G, D^\*) \\bigg) \end{aligned} $$
 
 Thus,
 
-$$ L(G, D^\*) = 2D\_{JS}(p\_{r} \\| p_g) - 2\\log2 $$
+$$ L(G, D^\*) = 2D\_{JS}(p\_{r} \| p_g) - 2\\log2 $$
 
 Essentially the loss function of GAN quantifies the similarity between the generative data distribution $p\_g$ and the real sample distribution $p\_{r}$ by JS divergence when the discriminator is optimal. The best $G^\*$ that replicates the real data distribution leads to the minimum $L(G^\*, D^\*) = -2\\log2$ which is aligned with equations above.
 
@@ -284,13 +284,13 @@ Fig. 7. Step-by-step plan of moving dirt between piles in $P$ and $Q$ to make th
 
 When dealing with the continuous probability domain, the distance formula becomes:
 
-$$ W(p_r, p_g) = \inf\_{\\gamma \\sim \\Pi(p_r, p_g)} \mathbb{E}\_{(x, y) \\sim \\gamma}\[\\| x-y \\|\] $$
+$$ W(p_r, p_g) = \inf\_{\\gamma \\sim \\Pi(p_r, p_g)} \mathbb{E}\_{(x, y) \\sim \\gamma}\[\| x-y \|\] $$
 
 In the formula above, $\\Pi(p\_r, p\_g)$ is the set of all possible joint probability distributions between $p\_r$ and $p\_g$. One joint distribution $\\gamma \in \\Pi(p\_r, p\_g)$ describes one dirt transport plan, same as the discrete example above, but in the continuous probability space. Precisely $\\gamma(x, y)$ states the percentage of dirt should be transported from point $x$ to $y$ so as to make $x$ follows the same probability distribution of $y$. That's why the marginal distribution over $x$ adds up to $p\_g$, $\sum\_{x} \\gamma(x, y) = p\_g(y)$ (Once we finish moving the planned amount of dirt from every possible $x$ to the target $y$, we end up with exactly what $y$ has according to $p\_g$.) and vice versa $\sum\_{y} \\gamma(x, y) = p\_r(x)$.
 
 When treating $x$ as the starting point and $y$ as the destination, the total amount of dirt moved is $\\gamma(x, y)$ and the travelling distance is $| x-y |$ and thus the cost is $\\gamma(x, y) \cdot | x-y |$. The expected cost averaged across all the $(x,y)$ pairs can be easily computed as:
 
-$$ \sum\_{x, y} \\gamma(x, y) \\| x-y \\| = \mathbb{E}\_{x, y \\sim \\gamma} \\| x-y \\| $$
+$$ \sum\_{x, y} \\gamma(x, y) \| x-y \| = \mathbb{E}\_{x, y \\sim \\gamma} \| x-y \| $$
 
 Finally, we take the minimum one among the costs of all dirt moving solutions as the EM distance. In the definition of Wasserstein distance, the $\inf$ ([infimum](https://en.wikipedia.org/wiki/Infimum_and_supremum), also known as _greatest lower bound_) indicates that we are only interested in the smallest cost.
 
@@ -310,11 +310,11 @@ Fig. 8. There is no overlap between $P$ and $Q$ when $\\theta \\neq 0$.
 
 When $\\theta \\neq 0$:
 
-$$ \begin{aligned} D\_{KL}(P \\| Q) &= \sum\_{x=0, y \\sim U(0, 1)} 1 \cdot \\log\frac{1}{0} = +\infty \\ D\_{KL}(Q \\| P) &= \sum\_{x=\\theta, y \\sim U(0, 1)} 1 \cdot \\log\frac{1}{0} = +\infty \\ D\_{JS}(P, Q) &= \frac{1}{2}(\sum\_{x=0, y \\sim U(0, 1)} 1 \cdot \\log\frac{1}{1/2} + \sum\_{x=0, y \\sim U(0, 1)} 1 \cdot \\log\frac{1}{1/2}) = \\log 2\\ W(P, Q) &= |\\theta| \end{aligned} $$
+$$ \begin{aligned} D\_{KL}(P \| Q) &= \sum\_{x=0, y \\sim U(0, 1)} 1 \cdot \\log\frac{1}{0} = +\infty \\ D\_{KL}(Q \| P) &= \sum\_{x=\\theta, y \\sim U(0, 1)} 1 \cdot \\log\frac{1}{0} = +\infty \\ D\_{JS}(P, Q) &= \frac{1}{2}(\sum\_{x=0, y \\sim U(0, 1)} 1 \cdot \\log\frac{1}{1/2} + \sum\_{x=0, y \\sim U(0, 1)} 1 \cdot \\log\frac{1}{1/2}) = \\log 2\\ W(P, Q) &= |\\theta| \end{aligned} $$
 
 But when $\\theta = 0$, two distributions are fully overlapped:
 
-$$ \begin{aligned} D\_{KL}(P \\| Q) &= D\_{KL}(Q \\| P) = D\_{JS}(P, Q) = 0\\ W(P, Q) &= 0 = \\lvert \\theta \\rvert \end{aligned} $$
+$$ \begin{aligned} D\_{KL}(P \| Q) &= D\_{KL}(Q \| P) = D\_{JS}(P, Q) = 0\\ W(P, Q) &= 0 = \\lvert \\theta \\rvert \end{aligned} $$
 
 $D\_{KL}$ gives us inifity when two distributions are disjoint. The value of $D\_{JS}$ has sudden jump, not differentiable at $\\theta = 0$. Only Wasserstein metric provides a smooth measure, which is super helpful for a stable learning process using gradient descents.
 
@@ -322,7 +322,7 @@ $D\_{KL}$ gives us inifity when two distributions are disjoint. The value of $D\
 
 It is intractable to exhaust all the possible joint distributions in $\\Pi(p\_r, p\_g)$ to compute $\inf\_{\\gamma \\sim \\Pi(p\_r, p\_g)}$. Thus the authors proposed a smart transformation of the formula based on the Kantorovich-Rubinstein duality to:
 
-$$ W(p_r, p_g) = \frac{1}{K} \\sup\_{\\| f \\|\_L \leq K} \mathbb{E}\_{x \\sim p_r}\[f(x)\] - \mathbb{E}\_{x \\sim p_g}\[f(x)\] $$
+$$ W(p_r, p_g) = \frac{1}{K} \\sup\_{\| f \|\_L \leq K} \mathbb{E}\_{x \\sim p_r}\[f(x)\] - \mathbb{E}\_{x \\sim p_g}\[f(x)\] $$
 
 where $\\sup$ ([supremum](https://en.wikipedia.org/wiki/Infimum_and_supremum)) is the opposite of $inf$ (infimum); we want to measure the least upper bound or, in even simpler words, the maximum value.
 

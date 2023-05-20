@@ -44,7 +44,7 @@ A Markov process is a [“memoryless”](http://mathworld.wolfram.com/Memoryless
 
 KL divergence measures how one probability distribution $p$ diverges from a second expected probability distribution $q$. It is asymmetric.
 
-$$ \begin{aligned} D\_{KL}(p \\| q) &= \sum_x p(x) \\log \frac{p(x)}{q(x)} \\ &= - \sum_x p(x)\\log q(x) + \sum_x p(x)\\log p(x) \\ &= H(P, Q) - H(P) \end{aligned} $$
+$$ \begin{aligned} D\_{KL}(p \| q) &= \sum_x p(x) \\log \frac{p(x)}{q(x)} \\ &= - \sum_x p(x)\\log q(x) + \sum_x p(x)\\log p(x) \\ &= H(P, Q) - H(P) \end{aligned} $$
 
 $D\_{KL}$ achieves the minimum zero when $p(x)$ == $q(x)$ everywhere.
 
@@ -52,7 +52,7 @@ $D\_{KL}$ achieves the minimum zero when $p(x)$ == $q(x)$ everywhere.
 
 Mutual information measures the mutual dependence between two variables. It quantifies the “amount of information” obtained about one random variable through the other random variable. Mutual information is symmetric.
 
-$$ \begin{aligned} I(X;Y) &= D\_{KL}\[p(x,y) \\| p(x)p(y)\] \\ &= \sum\_{x \in X, y \in Y} p(x, y) \\log(\frac{p(x, y)}{p(x)p(y)}) \\ &= \sum\_{x \in X, y \in Y} p(x, y) \\log(\frac{p(x|y)}{p(x)}) \\ &= H(X) - H(X|Y) \\ \end{aligned} $$
+$$ \begin{aligned} I(X;Y) &= D\_{KL}\[p(x,y) \| p(x)p(y)\] \\ &= \sum\_{x \in X, y \in Y} p(x, y) \\log(\frac{p(x, y)}{p(x)p(y)}) \\ &= \sum\_{x \in X, y \in Y} p(x, y) \\log(\frac{p(x|y)}{p(x)}) \\ &= H(X) - H(X|Y) \\ \end{aligned} $$
 
 [**Data Processing Inequality (DPI)**](https://en.wikipedia.org/wiki/Data_processing_inequality)
 
@@ -62,7 +62,7 @@ A deep neural network can be viewed as a Markov chain, and thus when we are movi
 
 [**Reparametrization invariance**](https://en.wikipedia.org/wiki/Parametrization#Parametrization_invariance)
 
-For two invertible functions $\\phi$, $\\psi$, the mutual information still holds: $I(X; Y) = I(\\phi(X); \\psi(Y))$.
+For two invertible functions $\phi$, $\\psi$, the mutual information still holds: $I(X; Y) = I(\phi(X); \\psi(Y))$.
 
 For example, if we shuffle the weights in one layer of DNN, it would not affect the mutual information between this layer and another.
 

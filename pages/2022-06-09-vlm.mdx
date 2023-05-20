@@ -238,7 +238,7 @@ Data processing of the Internet dataset includes:
 
 - The input Web page text is processed by inserting `<image>` tags at the location of visual inputs, as well as special tokens, `<BOS>` (beginning of sentence) and `<EOC>` (end of chunks; always at the end of the document, before any image tag).
 - From each document, they sample a random subsequence of $L = 256$ tokens and take up to $N = 5$ images included in the sampled sequence (using only the first $N$ within that sampled subsequence if there are more, or padding to $N$ if fewer)
-- A function $\\phi: \[1,L\] \to \[0,N\]$ is computed to track the text and image interleaving order, which assigns to each text position the index of the last image/video appearing before this position; 0 if no preceding visual data.
+- A function $\phi: \[1,L\] \to \[0,N\]$ is computed to track the text and image interleaving order, which assigns to each text position the index of the last image/video appearing before this position; 0 if no preceding visual data.
 
 Since Flamingo is trained on a mixture of three different datasets, it optimizes for a weighted sum of dataset-specific NLL losses. Tuning the dataset weights is very important for the final performance. In practice, instead of round-robin between datasets, they actually sample one batch from each dataset and apply a weighted sum of these gradients in each update. Gradient accumulation across different heterogeneous datasets can be viewed as a mean to stabilize training, as it reduces the gradient variance between each update.
 

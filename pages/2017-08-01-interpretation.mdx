@@ -118,7 +118,7 @@ $$ \text{probDiff}\_i (y | x) = p(y| x) - p(y | x \\backslash A_i) $$
 
 **Another problem**: If we generate $x \\backslash A\_i$ by replacing $A\_i$ with a missing value (like `None`, `NaN`, etc.), we have to rely on the model's internal mechanism for missing value imputation. A model which replaces these missing cases with the median should have output very different from a model which imputes a special placeholder. One solution as presented in the paper is to replace $A\_i$ with all possible values of this feature and then sum up the prediction weighted by how likely each value shows in the data:
 
-$$ \begin{aligned} p(y \vert x \\backslash A_i) &= \sum\_{s=1}^{m_i} p(A_i=a_s \vert x \\backslash A_i) p(y \vert x \\leftarrow A_i=a_s) \\ &\\approx \sum\_{s=1}^{m_i} p(A_i=a_s) p(y \vert x \\leftarrow A_i=a_s) \end{aligned} $$
+$$ \begin{aligned} p(y \vert x \\backslash A_i) &= \sum\_{s=1}^{m_i} p(A_i=a_s \vert x \\backslash A_i) p(y \vert x \\leftarrow A_i=a_s) \\ &\approx \sum\_{s=1}^{m_i} p(A_i=a_s) p(y \vert x \\leftarrow A_i=a_s) \end{aligned} $$
 
 Where $p(y \vert x \\leftarrow A\_i=a\_s)$ is the probability of getting label $y$ if we replace the feature $A\_i$ with value $a\_s$ in the feature vector of $x$. There are $m\_i$ unique values of $A\_i$ in the training set.
 
@@ -148,7 +148,7 @@ Where $I\_c$ is the index set containing the indices of data points assigned to 
 
 (2) Then, apply the Bayes' rule to approximate the probability $p(Y=c \vert X=x)$ for all classes:
 
-$$ \begin{aligned} \hat{p}\_{\sigma}(y=c | x) &= \frac{\hat{p}\_{\sigma}(x, y=c)}{\hat{p}\_{\sigma}(x, y=c) + \hat{p}\_{\sigma}(x, y \\neq c)} \\ &\\approx \frac{\sum\_{i \in I_c} k\_{\sigma} (x - x_i)}{\sum_i k\_{\sigma} (x - x_i)} \end{aligned} $$
+$$ \begin{aligned} \hat{p}\_{\sigma}(y=c | x) &= \frac{\hat{p}\_{\sigma}(x, y=c)}{\hat{p}\_{\sigma}(x, y=c) + \hat{p}\_{\sigma}(x, y \\neq c)} \\ &\approx \frac{\sum\_{i \in I_c} k\_{\sigma} (x - x_i)}{\sum_i k\_{\sigma} (x - x_i)} \end{aligned} $$
 
 (3) The final estimated Bayes classifier takes the form:
 

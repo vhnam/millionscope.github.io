@@ -167,13 +167,13 @@ $\text{score}(\\boldsymbol{s}\_t, \\boldsymbol{h}\_i) = \\boldsymbol{s}\_t^\top\
 
 Scaled Dot-Product(^)
 
-$\text{score}(\\boldsymbol{s}\_t, \\boldsymbol{h}\_i) = \frac{\\boldsymbol{s}\_t^\top\\boldsymbol{h}\_i}{\\sqrt{n}}$  
+$\text{score}(\\boldsymbol{s}\_t, \\boldsymbol{h}\_i) = \frac{\\boldsymbol{s}\_t^\top\\boldsymbol{h}\_i}{\sqrt{n}}$  
 Note: very similar to the dot-product attention except for a scaling factor; where n is the dimension of the source hidden state.
 
 [Vaswani2017](http://papers.nips.cc/paper/7181-attention-is-all-you-need.pdf)
 
 (\*) Referred to as “concat” in Luong, et al., 2015 and as “additive attention” in Vaswani, et al., 2017.  
-(^) It adds a scaling factor $1/\\sqrt{n}$, motivated by the concern when the input is large, the softmax function may have an extremely small gradient, hard for efficient learning.
+(^) It adds a scaling factor $1/\sqrt{n}$, motivated by the concern when the input is large, the softmax function may have an extremely small gradient, hard for efficient learning.
 
 Here are a summary of broader categories of attention mechanisms:
 
@@ -276,7 +276,7 @@ In Neural Turing Machine, how to generate the attention distribution $\mathbf{w}
 
 The content-addressing creates attention vectors based on the similarity between the key vector $\mathbf{k}\_t$ extracted by the controller from the input and memory rows. The content-based attention scores are computed as cosine similarity and then normalized by softmax. In addition, NTM adds a strength multiplier $\\beta\_t$ to amplify or attenuate the focus of the distribution.
 
-$$ w_t^c(i) = \text{softmax}(\\beta_t \cdot \text{cosine}\[\mathbf{k}\_t, \mathbf{M}\_t(i)\]) = \frac{\exp(\\beta_t \frac{\mathbf{k}\_t \cdot \mathbf{M}\_t(i)}{\\|\mathbf{k}\_t\\| \cdot \\|\mathbf{M}\_t(i)\\|})}{\sum\_{j=1}^N \exp(\\beta_t \frac{\mathbf{k}\_t \cdot \mathbf{M}\_t(j)}{\\|\mathbf{k}\_t\\| \cdot \\|\mathbf{M}\_t(j)\\|})} $$
+$$ w_t^c(i) = \text{softmax}(\\beta_t \cdot \text{cosine}\[\mathbf{k}\_t, \mathbf{M}\_t(i)\]) = \frac{\exp(\\beta_t \frac{\mathbf{k}\_t \cdot \mathbf{M}\_t(i)}{\|\mathbf{k}\_t\| \cdot \|\mathbf{M}\_t(i)\|})}{\sum\_{j=1}^N \exp(\\beta_t \frac{\mathbf{k}\_t \cdot \mathbf{M}\_t(j)}{\|\mathbf{k}\_t\| \cdot \|\mathbf{M}\_t(j)\|})} $$
 
 **Interpolation**
 
@@ -328,7 +328,7 @@ The major component in the transformer is the unit of _multi-head self-attention
 
 The transformer adopts the [scaled dot-product attention](#summary): the output is a weighted sum of the values, where the weight assigned to each value is determined by the dot-product of the query with all the keys:
 
-$$ \text{Attention}(\mathbf{Q}, \mathbf{K}, \mathbf{V}) = \text{softmax}(\frac{\mathbf{Q}\mathbf{K}^\top}{\\sqrt{n}})\mathbf{V} $$
+$$ \text{Attention}(\mathbf{Q}, \mathbf{K}, \mathbf{V}) = \text{softmax}(\frac{\mathbf{Q}\mathbf{K}^\top}{\sqrt{n}})\mathbf{V} $$
 
 ## Multi-Head Self-Attention[#](#multi-head-self-attention)
 

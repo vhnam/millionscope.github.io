@@ -85,7 +85,7 @@ All the above standard decoding strategies sample tokens according to the predic
 
 [Ghazvininejad et al. (2017)](https://www.aclweb.org/anthology/P17-4008/) built a system called “Hafez” for generating poetry in desired style by adjusting sampling weights in beam search at decoding steps. The likelihood of sampling for the next token $x\_{t+1}$ at step $t$ is augmented by a scoring function:
 
-$$ \text{score}(x\_{t+1}, b_t) = \text{score}(b_t) + \\log p(x\_{t+1}) + \\color{green}{\sum_i \\alpha_i f_i(x\_{t+1})} $$
+$$ \text{score}(x\_{t+1}, b_t) = \text{score}(b_t) + \\log p(x\_{t+1}) + \color{green}{\sum_i \\alpha_i f_i(x\_{t+1})} $$
 
 where $\\log p(x\_{t+1})$ is the log-likelihood predicted by LM. $\text{score}(b\_t)$ is the accumulated score of the already-generated words in the current beam state $b\_t$. The green part can incorporate many different features for steering the style of the output. A set of feature functions $f\_i(.)$ define the preferences and the associated weights $alpha\_i$ work like “control knobs” that can be easily customized at decoding time. Features can measure a variety of attributes and can be easily combined; for example,
 
@@ -144,25 +144,25 @@ Given a trained language model, [Gu et al (2017)](https://arxiv.org/abs/1702.024
 
 Let $p$ be the real data distribution and $p\_\\theta$ be a learned generative model. A classical approach for evaluating the expectation of a given function $f$ under $p$ using samples from $p\_\\theta$ is to use importance sampling.
 
-$$ \mathbb{E}\_{\mathbf{x}\\sim p} \[f(\mathbf{x})\] = \mathbb{E}\_{\mathbf{x}\\sim p\_\\theta} \\Big\[\frac{p(\mathbf{x})}{p\_\\theta(\mathbf{x})} f(\mathbf{x})\\Big\] \\approx \frac{1}{N} \sum\_{i=1}^N w(\mathbf{x}\_i)f(\mathbf{x}\_i) $$
+$$ \mathbb{E}\_{\mathbf{x}\\sim p} \[f(\mathbf{x})\] = \mathbb{E}\_{\mathbf{x}\\sim p\_\\theta} \\Big\[\frac{p(\mathbf{x})}{p\_\\theta(\mathbf{x})} f(\mathbf{x})\\Big\] \approx \frac{1}{N} \sum\_{i=1}^N w(\mathbf{x}\_i)f(\mathbf{x}\_i) $$
 
-However, $p(\mathbf{x})$ can only be estimated via finite datasets. Let $c\_\\phi: \mathcal{X} \to \[0,1\]$ be a probabilistic binary classifier for predicting whether a sample $\mathbf{x}$ is from the true data distribution ($y=1$). The joint distribution over $\mathcal{X}\\times\mathcal{Y}$ is denoted as $q(\mathbf{x}, y)$.
+However, $p(\mathbf{x})$ can only be estimated via finite datasets. Let $c\_\phi: \mathcal{X} \to \[0,1\]$ be a probabilistic binary classifier for predicting whether a sample $\mathbf{x}$ is from the true data distribution ($y=1$). The joint distribution over $\mathcal{X}\\times\mathcal{Y}$ is denoted as $q(\mathbf{x}, y)$.
 
 $$ q(\mathbf{x}\vert y) = \begin{cases} p\_\\theta(\mathbf{x}) & \text{ if }y=0\text{; predicted to be generated data} \\ p(\mathbf{x}) & \text{ otherwise; from the true data distribution} \end{cases} $$
 
-Then if $c\_\\phi$ is [Bayes optimal](https://svivek.com/teaching/lectures/slides/prob-learning/bayes-optimal-classifier.pdf), the importance weight can be estimated by:
+Then if $c\_\phi$ is [Bayes optimal](https://svivek.com/teaching/lectures/slides/prob-learning/bayes-optimal-classifier.pdf), the importance weight can be estimated by:
 
-$$ w\_\\phi(\mathbf{x}) = \frac{p(\mathbf{x})}{p\_\\theta(\mathbf{x})} = \frac{q(\mathbf{x} \vert y=1)}{q(\mathbf{x} \vert y=0)} = \frac{q(y=0)}{q(y=1)} \frac{q(y=1 \vert \mathbf{x})}{q(y=0 \vert \mathbf{x})} = \\gamma \frac{c\_\\phi(\mathbf{x})}{1 - c\_\\phi(\mathbf{x})} $$
+$$ w\_\phi(\mathbf{x}) = \frac{p(\mathbf{x})}{p\_\\theta(\mathbf{x})} = \frac{q(\mathbf{x} \vert y=1)}{q(\mathbf{x} \vert y=0)} = \frac{q(y=0)}{q(y=1)} \frac{q(y=1 \vert \mathbf{x})}{q(y=0 \vert \mathbf{x})} = \\gamma \frac{c\_\phi(\mathbf{x})}{1 - c\_\phi(\mathbf{x})} $$
 
 where $\\gamma = \frac{q(y=0)}{q(y=1)} > 0$ is a fixed odd ratio.
 
-Since we cannot learn a perfect optimal classifier, the importance weight would be an estimation $\hat{w}\_\\phi$. A couple of practical tricks can be applied to offset cases when the classifier exploits artifacts in the generated samples to make very confident predictions (i.e. very small importance weights):
+Since we cannot learn a perfect optimal classifier, the importance weight would be an estimation $\hat{w}\_\phi$. A couple of practical tricks can be applied to offset cases when the classifier exploits artifacts in the generated samples to make very confident predictions (i.e. very small importance weights):
 
-1.  Self-normalization: normalize the weight by the sum $\hat{w}\_\\phi(\mathbf{x}\_i) / \sum\_{j=1}^N \hat{w}\_\\phi(\mathbf{x}\_j)$.
-2.  Flattening: add a power scaling parameter $\\alpha > 0$, $\hat{w}\_\\phi(\mathbf{x}\_i)^\\alpha$.
-3.  Clipping: specify a lower bound $\max(\hat{w}\_\\phi(\mathbf{x}\_i), \\beta)$.
+1.  Self-normalization: normalize the weight by the sum $\hat{w}\_\phi(\mathbf{x}\_i) / \sum\_{j=1}^N \hat{w}\_\phi(\mathbf{x}\_j)$.
+2.  Flattening: add a power scaling parameter $\\alpha > 0$, $\hat{w}\_\phi(\mathbf{x}\_i)^\\alpha$.
+3.  Clipping: specify a lower bound $\max(\hat{w}\_\phi(\mathbf{x}\_i), \\beta)$.
 
-To sample from an importance resampled generative model, $\mathbf{x}\\sim p\_{\\theta, \\phi}(\mathbf{x}) \\propto p\_\\theta(\mathbf{x})\hat{w}\_\\phi(\mathbf{x})$, they adopt SIR (Sampling-Importance-Resampling),
+To sample from an importance resampled generative model, $\mathbf{x}\\sim p\_{\\theta, \phi}(\mathbf{x}) \\propto p\_\\theta(\mathbf{x})\hat{w}\_\phi(\mathbf{x})$, they adopt SIR (Sampling-Importance-Resampling),
 
 ![](SIR-importance-resampling.png)
 
@@ -216,9 +216,9 @@ Fig. 8. Example prompts discovered by AutoPrompt for different tasks. (Image sou
 
 Smart prompt design essentially produces efficient context that can lead to desired completion. Motivated by this observation, [Li & Liang (2021)](https://arxiv.org/abs/2101.00190) proposed **Prefix-Tuning** which assigns a small number of trainable parameters at the beginning of an input sequence (named “prefix”) to steer a LM, $\[\text{PREFIX}; x; y\]$. Let $\mathcal{P}\_\text{idx}$ be a set of prefix indices and $\text{dim}(h\_i)$ be the embedding size. The prefix parameters $P\_\\theta$ has the dimension $\vert\mathcal{P}\_\text{idx}\vert \\times \text{dim}(h_i) $ and the hidden state takes the form:
 
-$$ h_i = \begin{cases} P\_\\theta\[i,:\], & \text{if }i \in \mathcal{P}\_\text{idx}\\ \text{LM}\_\\phi(z_i, h\_{<{i}}), & \text{otherwise} \end{cases} $$
+$$ h_i = \begin{cases} P\_\\theta\[i,:\], & \text{if }i \in \mathcal{P}\_\text{idx}\\ \text{LM}\_\phi(z_i, h\_{<{i}}), & \text{otherwise} \end{cases} $$
 
-Note that only $P\_\\theta$ is trainable and the LM parameters $\\phi$ is frozen during training.
+Note that only $P\_\\theta$ is trainable and the LM parameters $\phi$ is frozen during training.
 
 ![](prefix-tuning.png)
 
@@ -409,7 +409,7 @@ To shift the output, at decoding time, PPLM runs one forward → one backward �
 1.  First a forward pass is performed to compute the likelihood of attribute $a$ by $p(a\vert x)$;
 2.  Let $\\Delta H\_t$ be a stepwise update to the hidden state $H\_t$ such that $(H\_t + \\Delta H\_t)$ shifts the distribution of generated text closer to having the attribute $a$. $\\Delta H\_t$ is initialized at zero. Then a backward pass updates the LM hidden states using normalized gradients from the attribute model $\\nabla\_{\\Delta H\_t} \\log p(a \vert H\_t + \\Delta H\_t)$ as
 
-$$ \\Delta H_t \\leftarrow \\Delta H_t + \\alpha \frac{\\nabla\_{\\Delta H_t} \\log p(a|H_t + \\Delta H_t)}{\\| \\nabla\_{\\Delta H_t} \\log p(a|H_t + \\Delta H_t) \\|^\\gamma} $$
+$$ \\Delta H_t \\leftarrow \\Delta H_t + \\alpha \frac{\\nabla\_{\\Delta H_t} \\log p(a|H_t + \\Delta H_t)}{\| \\nabla\_{\\Delta H_t} \\log p(a|H_t + \\Delta H_t) \|^\\gamma} $$
 
 where $\\gamma$ is a normalization scaling coefficient, set per layer. $\\alpha$ is step size. This update can be repeated $m \in \[3, 10\]$ times 3. The final forward pass recomputes a new distribution over the vocabulary, generated from the updated latents $\\tilde{H}\_t = H\_t + \\Delta H\_t$. The next token is sampled from the updated distribution.
 
@@ -501,23 +501,23 @@ GeDi guided generation in their experiments showed strong controllability and ra
 
 **Step 1: Learn a EBM of the target model**
 
-Let's label a pretrained LM as $a$ and a target LM with desired features as $p$. The desired features can be defined by a set of pre-defined real-valued feature functions $\\phi\_i(x), i=1,\dots,k$ over $x \in X$, denoted as a vector $\\boldsymbol{\\phi}$. When sequences $x \in X$ are sampled according to the desired model $p$, the expectations of features $\mathbb{E}\_{x\\sim p}\\boldsymbol{\\phi}(x)$ should be close to $\\bar{\\boldsymbol{\\mu}}$ , named “_moment constraints_”. The feature function $\\phi\_i$ can have distinct values (e.g. identity function for binary classifier) or continuous probabilities. In the meantime, the fine-tuned model $p$ should not diverge from $a$ too much by maintaining a small KL divergence measure.
+Let's label a pretrained LM as $a$ and a target LM with desired features as $p$. The desired features can be defined by a set of pre-defined real-valued feature functions $\phi\_i(x), i=1,\dots,k$ over $x \in X$, denoted as a vector $\\boldsymbol{\phi}$. When sequences $x \in X$ are sampled according to the desired model $p$, the expectations of features $\mathbb{E}\_{x\\sim p}\\boldsymbol{\phi}(x)$ should be close to $\\bar{\\boldsymbol{\\mu}}$ , named “_moment constraints_”. The feature function $\phi\_i$ can have distinct values (e.g. identity function for binary classifier) or continuous probabilities. In the meantime, the fine-tuned model $p$ should not diverge from $a$ too much by maintaining a small KL divergence measure.
 
 In summary, given a pretrained model $a$, we would like to find a target model $p$ such that:
 
-$$ \begin{aligned} \\bar{\\boldsymbol{\\mu}} &= \mathbb{E}\_{x\\sim p}\\boldsymbol{\\phi}(x) \\ p &= \arg\min\_{c \in \mathcal{C}} D\_\text{KL}(c, a) \end{aligned} $$
+$$ \begin{aligned} \\bar{\\boldsymbol{\\mu}} &= \mathbb{E}\_{x\\sim p}\\boldsymbol{\phi}(x) \\ p &= \arg\min\_{c \in \mathcal{C}} D\_\text{KL}(c, a) \end{aligned} $$
 
 where $\mathcal{C}$ is the set of all distributions over $X$ that satisfy the moment constraints.
 
 According to theorems in Information Geometry, $p$ can be approximated by an EBM (energy-based model; an unnormalized probability distribution) $P$ in the form of exponential function, such that $p(x) \\propto P(x)$ and $p(x)=\frac{1}{Z}P(x)$ where $Z=\sum\_x P(x)$. The energy-based model can be approximated by:
 
-$$ P(x)=a(x)\exp\\big(\sum_i \\lambda_i \\phi_i(x)\\big)=a(x)\exp(\\boldsymbol{\\lambda}\cdot\\boldsymbol{\\phi}(x)) $$
+$$ P(x)=a(x)\exp\\big(\sum_i \\lambda_i \phi_i(x)\\big)=a(x)\exp(\\boldsymbol{\\lambda}\cdot\\boldsymbol{\phi}(x)) $$
 
-Let's define _importance weight_ $w(x, \\boldsymbol{\\lambda}) = \frac{P(x)}{a(x)} = \exp\langle\\boldsymbol{\\lambda}\cdot\\boldsymbol{\\phi}(x)\rangle$. Given a large number of sequences sampled from the pretrained model $x\_1, \dots, x\_N \\sim a(x)$,
+Let's define _importance weight_ $w(x, \\boldsymbol{\\lambda}) = \frac{P(x)}{a(x)} = \exp\langle\\boldsymbol{\\lambda}\cdot\\boldsymbol{\phi}(x)\rangle$. Given a large number of sequences sampled from the pretrained model $x\_1, \dots, x\_N \\sim a(x)$,
 
-$$ \begin{aligned} \\mu(\\boldsymbol{\\lambda}) &= \mathbb{E}\_{x\\sim p}\\boldsymbol{\\phi}(x) = \mathbb{E}\_{x\\sim a} \frac{p(x)}{a(x)}\\boldsymbol{\\phi}(x) = \frac{1}{Z}\mathbb{E}\_{x\\sim a} w(x, \\boldsymbol{\\lambda}) \\boldsymbol{\\phi}(x) \\ &= \frac{\mathbb{E}\_{x\\sim a} w(x, \\boldsymbol{\\lambda}) \\boldsymbol{\\phi}(x)}{\sum\_{x\in X} P(x)} = \frac{\mathbb{E}\_{x\\sim a} w(x, \\boldsymbol{\\lambda}) \\boldsymbol{\\phi}(x)}{\sum\_{x\in X} w(x, \\boldsymbol{\\lambda})a(x)} = \frac{\mathbb{E}\_{x\\sim a} w(x, \\boldsymbol{\\lambda}) \\boldsymbol{\\phi}(x)}{\mathbb{E}\_{x\\sim a} w(x, \\boldsymbol{\\lambda})} \\ &\\simeq \frac{\sum\_{i=1}^N w(x_i,\\boldsymbol{\\lambda}) \\boldsymbol{\\phi}(x_i)}{\sum\_{i=1}^N w(x_i, \\boldsymbol{\\lambda})} = \frac{\sum\_{i=1}^N \exp\langle\\boldsymbol{\\lambda}\cdot\\boldsymbol{\\phi}(x)\rangle \\boldsymbol{\\phi}(x_i)}{\sum\_{i=1}^N \exp\langle\\boldsymbol{\\lambda}\cdot\\boldsymbol{\\phi}(x)\rangle} \end{aligned} $$
+$$ \begin{aligned} \\mu(\\boldsymbol{\\lambda}) &= \mathbb{E}\_{x\\sim p}\\boldsymbol{\phi}(x) = \mathbb{E}\_{x\\sim a} \frac{p(x)}{a(x)}\\boldsymbol{\phi}(x) = \frac{1}{Z}\mathbb{E}\_{x\\sim a} w(x, \\boldsymbol{\\lambda}) \\boldsymbol{\phi}(x) \\ &= \frac{\mathbb{E}\_{x\\sim a} w(x, \\boldsymbol{\\lambda}) \\boldsymbol{\phi}(x)}{\sum\_{x\in X} P(x)} = \frac{\mathbb{E}\_{x\\sim a} w(x, \\boldsymbol{\\lambda}) \\boldsymbol{\phi}(x)}{\sum\_{x\in X} w(x, \\boldsymbol{\\lambda})a(x)} = \frac{\mathbb{E}\_{x\\sim a} w(x, \\boldsymbol{\\lambda}) \\boldsymbol{\phi}(x)}{\mathbb{E}\_{x\\sim a} w(x, \\boldsymbol{\\lambda})} \\ &\\simeq \frac{\sum\_{i=1}^N w(x_i,\\boldsymbol{\\lambda}) \\boldsymbol{\phi}(x_i)}{\sum\_{i=1}^N w(x_i, \\boldsymbol{\\lambda})} = \frac{\sum\_{i=1}^N \exp\langle\\boldsymbol{\\lambda}\cdot\\boldsymbol{\phi}(x)\rangle \\boldsymbol{\phi}(x_i)}{\sum\_{i=1}^N \exp\langle\\boldsymbol{\\lambda}\cdot\\boldsymbol{\phi}(x)\rangle} \end{aligned} $$
 
-Using SGD over the objective $|\\boldsymbol{\\mu}(\\boldsymbol{\\lambda}) - \\bar{\\boldsymbol{\\mu}}|^2\_2$, we can obtain an estimated value for $\\boldsymbol{\\lambda}$ and a representation of $P(x)=a(x)\exp\langle\\boldsymbol{\\lambda}\cdot\\boldsymbol{\\phi}(x)\rangle$. $P(x)$ is a sequential EBM because $a$ is an autoregressive model.
+Using SGD over the objective $|\\boldsymbol{\\mu}(\\boldsymbol{\\lambda}) - \\bar{\\boldsymbol{\\mu}}|^2\_2$, we can obtain an estimated value for $\\boldsymbol{\\lambda}$ and a representation of $P(x)=a(x)\exp\langle\\boldsymbol{\\lambda}\cdot\\boldsymbol{\phi}(x)\rangle$. $P(x)$ is a sequential EBM because $a$ is an autoregressive model.
 
 **Step 2: Learn the target probability distribution**
 
@@ -533,8 +533,8 @@ Fig. 25. The algorithm of distributional policy gradient to make it possible to 
 
 This approach can be used to model various constraints in controllable text generation:
 
-1.  Pointwise constraints: $\\phi\_i$ is a binary feature; such as constraining the presence or absence of words, or classifier-based constraints.
-2.  Distributional constraints: $\\phi\_i$ represents a probability distribution; such as constraining the probability of gender, topic, etc. Their experiments showed great progress in debiasing a GPT-2 model that was trained on Wikipedia Biographies corpus. The percentage of generated biographies on females increased from 7.4% to 35.6%.
+1.  Pointwise constraints: $\phi\_i$ is a binary feature; such as constraining the presence or absence of words, or classifier-based constraints.
+2.  Distributional constraints: $\phi\_i$ represents a probability distribution; such as constraining the probability of gender, topic, etc. Their experiments showed great progress in debiasing a GPT-2 model that was trained on Wikipedia Biographies corpus. The percentage of generated biographies on females increased from 7.4% to 35.6%.
 3.  Hybrid constraints: combine multiple constraints by simply summing them up.
 
 ![](GDC-debiasing.png)
@@ -547,7 +547,7 @@ Compared to other baselines, GDC using pointwise constraints diverges less from 
 
 Fig. 27. Compare pointwise constrained GDC with several baselines. Low Self-BLEU-5 and high Dist-1 indicate high diversity. (Image source: [Khalifa, et al. 2020](https://arxiv.org/abs/2012.11635))
 
-- REINFORCE that optimizes the reward $\\phi$ directly ($\text{REINFORCE}$ in Fig. X.) without constraints converges fast but has a high deviation from the original model.
+- REINFORCE that optimizes the reward $\phi$ directly ($\text{REINFORCE}$ in Fig. X.) without constraints converges fast but has a high deviation from the original model.
 - REINFORCE that optimizes $P(x)$ ($\text{REINFORCE}\_{P(x)}$ in Fig. X.) has low sample diversity.
 - Compared to [Ziegler et al., 2019](https://arxiv.org/abs/1909.08593) GDC has smoother learning curves and produces a richer vocabulary.
 

@@ -200,19 +200,19 @@ Fig. 5. Consistency training with noisy samples.
 
 Adversarial Training ([Goodfellow et al. 2014](https://arxiv.org/abs/1412.6572)) applies adversarial noise onto the input and trains the model to be robust to such adversarial attack. The setup works in supervised learning,
 
-$$ \begin{aligned} \mathcal{L}\_\text{adv}(\mathbf{x}^l, \\theta) &= D\[q(y\mid \mathbf{x}^l), p\_\\theta(y\mid \mathbf{x}^l + r\_\text{adv})\] \\ r\_\text{adv} &= {\arg\max}\_{r; \\|r\\| \leq \\epsilon} D\[q(y\mid \mathbf{x}^l), p\_\\theta(y\mid \mathbf{x}^l + r\_\text{adv})\] \\ r\_\text{adv} &\\approx \\epsilon \frac{g}{\\|g\\|\_2} \\approx \\epsilon\text{sign}(g)\quad\text{where }g = \\nabla\_{r} D\[y, p\_\\theta(y\mid \mathbf{x}^l + r)\] \end{aligned} $$
+$$ \begin{aligned} \mathcal{L}\_\text{adv}(\mathbf{x}^l, \\theta) &= D\[q(y\mid \mathbf{x}^l), p\_\\theta(y\mid \mathbf{x}^l + r\_\text{adv})\] \\ r\_\text{adv} &= {\arg\max}\_{r; \|r\| \leq \\epsilon} D\[q(y\mid \mathbf{x}^l), p\_\\theta(y\mid \mathbf{x}^l + r\_\text{adv})\] \\ r\_\text{adv} &\approx \\epsilon \frac{g}{\|g\|\_2} \approx \\epsilon\text{sign}(g)\quad\text{where }g = \\nabla\_{r} D\[y, p\_\\theta(y\mid \mathbf{x}^l + r)\] \end{aligned} $$
 
 where $q(y \mid \mathbf{x}^l)$ is the true distribution, approximated by one-hot encoding of the ground truth label, $y$. $p\_\\theta(y \mid \mathbf{x}^l)$ is the model prediction. $D\[.,.\]$ is a distance function measuring the divergence between two distributions.
 
 **Virtual Adversarial Training** (**VAT**; [Miyato et al. 2018](https://arxiv.org/abs/1704.03976)) extends the idea to work in semi-supervised learning. Because $q(y \mid \mathbf{x}^l)$ is unknown, VAT replaces it with the current model prediction for the original input with the current weights $\hat{\\theta}$. Note that $\hat{\\theta}$ is a fixed copy of model weights, so there is no gradient update on $\hat{\\theta}$.
 
-$$ \begin{aligned} \mathcal{L}\_u^\text{VAT}(\mathbf{x}, \\theta) &= D\[p\_{\hat{\\theta}}(y\mid \mathbf{x}), p\_\\theta(y\mid \mathbf{x} + r\_\text{vadv})\] \\ r\_\text{vadv} &= {\arg\max}\_{r; \\|r\\| \leq \\epsilon} D\[p\_{\hat{\\theta}}(y\mid \mathbf{x}), p\_\\theta(y\mid \mathbf{x} + r)\] \end{aligned} $$
+$$ \begin{aligned} \mathcal{L}\_u^\text{VAT}(\mathbf{x}, \\theta) &= D\[p\_{\hat{\\theta}}(y\mid \mathbf{x}), p\_\\theta(y\mid \mathbf{x} + r\_\text{vadv})\] \\ r\_\text{vadv} &= {\arg\max}\_{r; \|r\| \leq \\epsilon} D\[p\_{\hat{\\theta}}(y\mid \mathbf{x}), p\_\\theta(y\mid \mathbf{x} + r)\] \end{aligned} $$
 
 The VAT loss applies to both labeled and unlabeled samples. It is a negative smoothness measure of the current model's prediction manifold at each data point. The optimization of such loss motivates the manifold to be smoother.
 
 **Interpolation Consistency Training** (**ICT**; [Verma et al. 2019](https://arxiv.org/abs/1903.03825)) enhances the dataset by adding more interpolations of data points and expects the model prediction to be consistent with interpolations of the corresponding labels. MixUp ([Zheng et al. 2018](https://arxiv.org/abs/1710.09412)) operation mixes two images via a simple weighted sum and combines it with label smoothing. Following the idea of MixUp, ICT expects the prediction model to produce a label on a mixup sample to match the interpolation of predictions of corresponding inputs:
 
-$$ \begin{aligned} \text{mixup}\_\\lambda (\mathbf{x}\_i, \mathbf{x}\_j) &= \\lambda \mathbf{x}\_i + (1-\\lambda)\mathbf{x}\_j \\ p(\text{mixup}\_\\lambda (y \mid \mathbf{x}\_i, \mathbf{x}\_j)) &\\approx \\lambda p(y \mid \mathbf{x}\_i) + (1-\\lambda) p(y \mid \mathbf{x}\_j) \end{aligned} $$
+$$ \begin{aligned} \text{mixup}\_\\lambda (\mathbf{x}\_i, \mathbf{x}\_j) &= \\lambda \mathbf{x}\_i + (1-\\lambda)\mathbf{x}\_j \\ p(\text{mixup}\_\\lambda (y \mid \mathbf{x}\_i, \mathbf{x}\_j)) &\approx \\lambda p(y \mid \mathbf{x}\_i) + (1-\\lambda) p(y \mid \mathbf{x}\_j) \end{aligned} $$
 
 where $\\theta'$ is a moving average of $\\theta$, which is a [mean teacher](#mean-teachers).
 
@@ -307,14 +307,14 @@ $$ \begin{aligned} \min\_{\\theta_T} &\mathcal{L}\_s(\\theta^\text{PL}\_S(\\thet
 
 However, it is not trivial to optimize the above equation. Borrowing the idea of [MAML](https://arxiv.org/abs/1703.03400), it approximates the multi-step $\arg\min\_{\\theta\_S}$ with the one-step gradient update of $\\theta\_S$,
 
-$$ \begin{aligned} \\theta^\text{PL}\_S(\\theta_T) &\\approx \\theta_S - \\eta_S \cdot \\nabla\_{\\theta_S} \mathcal{L}\_u(\\theta_T, \\theta_S) \\ \min\_{\\theta_T} \mathcal{L}\_s (\\theta^\text{PL}\_S(\\theta_T)) &\\approx \min\_{\\theta_T} \mathcal{L}\_s \\big( \\theta_S - \\eta_S \cdot \\nabla\_{\\theta_S} \mathcal{L}\_u(\\theta_T, \\theta_S) \\big) \end{aligned} $$
+$$ \begin{aligned} \\theta^\text{PL}\_S(\\theta_T) &\approx \\theta_S - \\eta_S \cdot \\nabla\_{\\theta_S} \mathcal{L}\_u(\\theta_T, \\theta_S) \\ \min\_{\\theta_T} \mathcal{L}\_s (\\theta^\text{PL}\_S(\\theta_T)) &\approx \min\_{\\theta_T} \mathcal{L}\_s \\big( \\theta_S - \\eta_S \cdot \\nabla\_{\\theta_S} \mathcal{L}\_u(\\theta_T, \\theta_S) \\big) \end{aligned} $$
 
 With soft pseudo labels, the above objective is differentiable. But if using hard pseudo labels, it is not differentiable and thus we need to use RL, e.g. REINFORCE.
 
 The optimization procedure is alternative between training two models:
 
-- _Student model update_: Given a batch of unlabeled samples $\{ \mathbf{u} \}$, we generate pseudo labels by $f\_{\\theta\_T}(\mathbf{u})$ and optimize $\\theta\_S$ with one step SGD: $\\theta'\_S = \\color{green}{\\theta\_S - \\eta\_S \cdot \\nabla\_{\\theta\_S} \mathcal{L}\_u(\\theta\_T, \\theta\_S)}$.
-- _Teacher model update_: Given a batch of labeled samples $\{(\mathbf{x}^l, y)\}$, we reuse the student's update to optimize $\\theta\_T$: $\\theta'\_T = \\theta\_T - \\eta\_T \cdot \\nabla\_{\\theta\_T} \mathcal{L}\_s ( \\color{green}{\\theta\_S - \\eta\_S \cdot \\nabla\_{\\theta\_S} \mathcal{L}\_u(\\theta\_T, \\theta\_S)} )$. In addition, the UDA objective is applied to the teacher model to incorporate consistency regularization.
+- _Student model update_: Given a batch of unlabeled samples $\{ \mathbf{u} \}$, we generate pseudo labels by $f\_{\\theta\_T}(\mathbf{u})$ and optimize $\\theta\_S$ with one step SGD: $\\theta'\_S = \color{green}{\\theta\_S - \\eta\_S \cdot \\nabla\_{\\theta\_S} \mathcal{L}\_u(\\theta\_T, \\theta\_S)}$.
+- _Teacher model update_: Given a batch of labeled samples $\{(\mathbf{x}^l, y)\}$, we reuse the student's update to optimize $\\theta\_T$: $\\theta'\_T = \\theta\_T - \\eta\_T \cdot \\nabla\_{\\theta\_T} \mathcal{L}\_s ( \color{green}{\\theta\_S - \\eta\_S \cdot \\nabla\_{\\theta\_S} \mathcal{L}\_u(\\theta\_T, \\theta\_S)} )$. In addition, the UDA objective is applied to the teacher model to incorporate consistency regularization.
 
 ![](MPL-results.png)
 
@@ -334,7 +334,7 @@ It is possible to combine the above two approaches together, running semi-superv
 
 Given a batch of labeled data $\mathcal{X}$ and unlabeled data $\mathcal{U}$, we create augmented versions of them via $\text{MixMatch}(.)$, $\\bar{\mathcal{X}}$ and $\\bar{\mathcal{U}}$, containing augmented samples and guessed labels for unlabeled examples.
 
-$$ \begin{aligned} \\bar{\mathcal{X}}, \\bar{\mathcal{U}} &= \text{MixMatch}(\mathcal{X}, \mathcal{U}, T, K, \\alpha) \\ \mathcal{L}^\text{MM}\_s &= \frac{1}{\vert \\bar{\mathcal{X}} \vert} \sum\_{(\\bar{\mathbf{x}}^l, y)\in \\bar{\mathcal{X}}} D\[y, p\_\\theta(y \mid \\bar{\mathbf{x}}^l)\] \\ \mathcal{L}^\text{MM}\_u &= \frac{1}{L\vert \\bar{\mathcal{U}} \vert} \sum\_{(\\bar{\mathbf{u}}, \hat{y})\in \\bar{\mathcal{U}}} \\| \hat{y} - p\_\\theta(y \mid \\bar{\mathbf{u}}) \\|^2_2 \\ \end{aligned} $$
+$$ \begin{aligned} \\bar{\mathcal{X}}, \\bar{\mathcal{U}} &= \text{MixMatch}(\mathcal{X}, \mathcal{U}, T, K, \\alpha) \\ \mathcal{L}^\text{MM}\_s &= \frac{1}{\vert \\bar{\mathcal{X}} \vert} \sum\_{(\\bar{\mathbf{x}}^l, y)\in \\bar{\mathcal{X}}} D\[y, p\_\\theta(y \mid \\bar{\mathbf{x}}^l)\] \\ \mathcal{L}^\text{MM}\_u &= \frac{1}{L\vert \\bar{\mathcal{U}} \vert} \sum\_{(\\bar{\mathbf{u}}, \hat{y})\in \\bar{\mathcal{U}}} \| \hat{y} - p\_\\theta(y \mid \\bar{\mathbf{u}}) \|^2_2 \\ \end{aligned} $$
 
 where $T$ is the sharpening temperature to reduce the guessed label overlap; $K$ is the number of augmentations generated per unlabeled example; $\\alpha$ is the parameter in MixUp.
 

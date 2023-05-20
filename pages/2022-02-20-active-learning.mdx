@@ -166,7 +166,7 @@ Unfortunately all the cheap implicit ensemble options above perform worse than n
 
 **Bayes-by-backprop** ([Blundell et al. 2015](https://arxiv.org/abs/1505.05424)) measures weight uncertainty in neural networks directly. The method maintains a probability distribution over the weights $\mathbf{w}$, which is modeled as a variational distribution $q(\mathbf{w} \vert \\theta)$ since the true posterior $p(\mathbf{w} \vert \mathcal{D})$ is not tractable directly. The loss is to minimize the KL divergence between $q(\mathbf{w} \vert \\theta)$ and $p(\mathbf{w} \vert \mathcal{D})$,
 
-$$ \begin{aligned} \mathcal{L}(\\theta) &= \text{KL}\[q(\mathbf{w}\vert\\theta) \\| p(\mathbf{w} \vert \mathcal{D})\] \\ &= \int q(\mathbf{w}\vert\\theta) \\log \frac{q(\mathbf{w}\vert\\theta)}{p(\mathbf{w}) p(\mathcal{D}\vert \mathbf{w})} d\mathbf{w} \\ &= \text{KL}\[q(\mathbf{w}\vert\\theta) \\| p(w)\] - \mathbb{E}\_{q(\mathbf{w}\vert\\theta)} \[\\log p(\mathcal{D} \vert \mathbf{w})\] \\ &\\approx \\log q(\mathbf{w} \vert \\theta) - \\log p(\mathbf{w}) p(\mathcal{D}\vert \mathbf{w}) & \text{; monte carlo sampling; }q(\mathbf{w} \vert \\theta)\text{ & }p(\mathbf{w})\text{ are close.} \end{aligned} $$
+$$ \begin{aligned} \mathcal{L}(\\theta) &= \text{KL}\[q(\mathbf{w}\vert\\theta) \| p(\mathbf{w} \vert \mathcal{D})\] \\ &= \int q(\mathbf{w}\vert\\theta) \\log \frac{q(\mathbf{w}\vert\\theta)}{p(\mathbf{w}) p(\mathcal{D}\vert \mathbf{w})} d\mathbf{w} \\ &= \text{KL}\[q(\mathbf{w}\vert\\theta) \| p(w)\] - \mathbb{E}\_{q(\mathbf{w}\vert\\theta)} \[\\log p(\mathcal{D} \vert \mathbf{w})\] \\ &\approx \\log q(\mathbf{w} \vert \\theta) - \\log p(\mathbf{w}) p(\mathcal{D}\vert \mathbf{w}) & \text{; monte carlo sampling; }q(\mathbf{w} \vert \\theta)\text{ & }p(\mathbf{w})\text{ are close.} \end{aligned} $$
 
 The variational distribution $q$ is typically a Gaussian with diagonal covariance and each weight is sampled from $\mathcal{N}(\\mu\_i, \sigma\_i^2)$. To ensure non-negativity of $\sigma\_i$, it is further parameterized via softplus, $\sigma\_i = \\log(1 + \exp(\rho\_i))$ where the variational parameters are $\\theta = \{\\mu\_i , \rho\_i\}^d\_{i=1}$.
 
@@ -210,15 +210,15 @@ Fig. 5. Illustration of VAAL (Variational adversarial active learning). (Image s
 - The $\\beta$-VAE learns a latent feature space $\mathbf{z}^l \\cup \mathbf{z}^u$, for labeled and unlabeled data respectively, aiming to _trick_ the discriminator $D(.)$ that all the data points are from the labeled pool;
 - The discriminator $D(.)$ predicts whether a sample is labeled (1) or not (0) based on a latent representation $\mathbf{z}$. VAAL selects unlabeled samples with low discriminator scores, which indicates that those samples are sufficiently different from previously labeled ones.
 
-The loss for VAE representation learning in VAAL contains both a reconstruction part (minimizing the ELBO of given samples) and an adversarial part (labeled and unlabeled data is drawn from the same probability distribution $q\_\\phi$):
+The loss for VAE representation learning in VAAL contains both a reconstruction part (minimizing the ELBO of given samples) and an adversarial part (labeled and unlabeled data is drawn from the same probability distribution $q\_\phi$):
 
-$$ \begin{aligned} \mathcal{L}\_\text{VAE} &= \\lambda_1 \mathcal{L}^\text{rec}\_\text{VAE} + \\lambda_2 \mathcal{L}^\text{adv}\_\text{VAE} \\ \mathcal{L}^\text{rec}\_\text{VAE} &= \mathbb{E}\[\\log p\_\\theta(\mathbf{x}^l \vert \mathbf{z}^l)\] - \\beta \text{KL}(q\_\\phi(\mathbf{z}^l \vert \mathbf{x}^l) \\| p(\mathbf{\\tilde{z}})) + \mathbb{E}\[\\log p\_\\theta(\mathbf{u} \vert \mathbf{z}^u)\] - \\beta \text{KL}(q\_\\phi(\mathbf{z}^u \vert \mathbf{u}) \\| p(\mathbf{\\tilde{z}})) \\ \mathcal{L}^\text{adv}\_\text{VAE} &= - \mathbb{E}\[\\log D(q\_\\phi (\mathbf{z}^l \vert \mathbf{x}^l))\] - \mathbb{E}\[\\log D(q\_\\phi(\mathbf{z}^u \vert \mathbf{u}))\] \end{aligned} $$
+$$ \begin{aligned} \mathcal{L}\_\text{VAE} &= \\lambda_1 \mathcal{L}^\text{rec}\_\text{VAE} + \\lambda_2 \mathcal{L}^\text{adv}\_\text{VAE} \\ \mathcal{L}^\text{rec}\_\text{VAE} &= \mathbb{E}\[\\log p\_\\theta(\mathbf{x}^l \vert \mathbf{z}^l)\] - \\beta \text{KL}(q\_\phi(\mathbf{z}^l \vert \mathbf{x}^l) \| p(\mathbf{\\tilde{z}})) + \mathbb{E}\[\\log p\_\\theta(\mathbf{u} \vert \mathbf{z}^u)\] - \\beta \text{KL}(q\_\phi(\mathbf{z}^u \vert \mathbf{u}) \| p(\mathbf{\\tilde{z}})) \\ \mathcal{L}^\text{adv}\_\text{VAE} &= - \mathbb{E}\[\\log D(q\_\phi (\mathbf{z}^l \vert \mathbf{x}^l))\] - \mathbb{E}\[\\log D(q\_\phi(\mathbf{z}^u \vert \mathbf{u}))\] \end{aligned} $$
 
 where $p(\mathbf{\\tilde{z}})$ is a unit Gaussian as a predefined prior and $\\beta$ is the Lagrangian parameter.
 
 The discriminator loss is:
 
-$$ \mathcal{L}\_D = -\mathbb{E}\[\\log D(q\_\\phi (\mathbf{z}^l \vert \mathbf{x}^l))\] - \mathbb{E}\[\\log (1 - D(q\_\\phi (\mathbf{z}^u \vert \mathbf{u})))\] $$
+$$ \mathcal{L}\_D = -\mathbb{E}\[\\log D(q\_\phi (\mathbf{z}^l \vert \mathbf{x}^l))\] - \mathbb{E}\[\\log (1 - D(q\_\phi (\mathbf{z}^u \vert \mathbf{u})))\] $$
 
 ![](VAAL-exp.png)
 
@@ -236,7 +236,7 @@ A feature encoder $F$ encodes a sample into a $\ell\_2$-normalized $d$-dimension
 
 (1) First $F$ and $C$ are trained on labeled samples by a simple cross entropy loss to achieve good classification results,
 
-$$ \mathcal{L}\_\text{CE} = -\mathbb{E}\_{(\mathbf{x}^l, y) \\sim \mathcal{X}} \sum\_{k=1}^K \mathbb{1}\[k=y\] \\log\\Big( \sigma(\frac{1}{T} \frac{\mathbf{W}^\top F\\big(\mathbf{x}^l)}{\\|F(\mathbf{x}^l)\\|}\\big) \\Big) $$
+$$ \mathcal{L}\_\text{CE} = -\mathbb{E}\_{(\mathbf{x}^l, y) \\sim \mathcal{X}} \sum\_{k=1}^K \mathbb{1}\[k=y\] \\log\\Big( \sigma(\frac{1}{T} \frac{\mathbf{W}^\top F\\big(\mathbf{x}^l)}{\|F(\mathbf{x}^l)\|}\\big) \\Big) $$
 
 (2) When training on the unlabeled examples, MAL relies on a _minimax_ game setup
 
@@ -260,9 +260,9 @@ The experiments compared MAL to random, entropy, core-set, BALD and VAAL baselin
 
 Fig. 8. Performance of MAL on ImageNet. (Table source: [Ebrahimiet al. 2021](https://arxiv.org/abs/2012.10467))
 
-**CAL** (Contrastive Active Learning; [Margatina et al. 2021](https://arxiv.org/abs/2109.03764)) intends to select [contrastive](https://lilianweng.github.io/posts/2021-05-31-contrastive/) examples. If two data points with different labels share similar network representations $\\Phi(.)$, they are considered as contrastive examples in CAL. Given a pair of contrastive examples $(\mathbf{x}\_i, \mathbf{x}\_j)$, they should
+**CAL** (Contrastive Active Learning; [Margatina et al. 2021](https://arxiv.org/abs/2109.03764)) intends to select [contrastive](https://lilianweng.github.io/posts/2021-05-31-contrastive/) examples. If two data points with different labels share similar network representations $\phi(.)$, they are considered as contrastive examples in CAL. Given a pair of contrastive examples $(\mathbf{x}\_i, \mathbf{x}\_j)$, they should
 
-$$ d(\\Phi(\mathbf{x}\_i), \\Phi(\mathbf{x}\_j)) < \\epsilon \quad\text{and}\quad \text{KL}(p(y\vert \mathbf{x}\_i) \\| p(y\vert \mathbf{x}\_j)) \\rightarrow \infty $$
+$$ d(\phi(\mathbf{x}\_i), \phi(\mathbf{x}\_j)) < \\epsilon \quad\text{and}\quad \text{KL}(p(y\vert \mathbf{x}\_i) \| p(y\vert \mathbf{x}\_j)) \\rightarrow \infty $$
 
 Given an unlabeled sample $\mathbf{x}$, CAL runs the following process:
 
@@ -315,7 +315,7 @@ Fig. 10. Algorithm of BADGE (batch active learning by diverse gradient embedding
 
 Let $\\nabla \mathcal{L}(\\theta)$ be the gradient of the loss function with respect to the model parameters. Specifically, given an unlabeled sample $\mathbf{x}\_i$, we need to calculate the gradient assuming the label is $y \in \mathcal{Y}$, $\\nabla \mathcal{L}^{(y)}(\\theta)$. Because the true label $y\_i$ is unknown, EGL relies on the current model belief to compute the expected gradient change:
 
-$$ \text{EGL}(\mathbf{x}\_i) = \sum\_{y_i \in \mathcal{Y}} p(y=y_i \vert \mathbf{x}) \\|\\nabla \mathcal{L}^{(y_i)}(\\theta)\\| $$
+$$ \text{EGL}(\mathbf{x}\_i) = \sum\_{y_i \in \mathcal{Y}} p(y=y_i \vert \mathbf{x}) \|\\nabla \mathcal{L}^{(y_i)}(\\theta)\| $$
 
 **BALD** (Bayesian Active Learning by Disagreement; [Houlsby et al. 2011](https://arxiv.org/abs/1112.5745)) aims to identify samples to maximize the information gain about the model weights, that is equivalent to maximize the decrease in expected posterior entropy.
 

@@ -139,7 +139,7 @@ Given a question $x$ and a fixed set of (Wikipedia) documents, $z\_1, \dots, z\_
 The phrase representation $z\_k^{(i:j)}$ combines both dense and sparse vectors, $z\_k^{(i:j)} = \[d\_k^{(i:j)}, s\_k^{(i:j)}\] \in \mathbb{R}^{d^d + d^s}$ (note that $d^d \\ll d^s$):
 
 - The dense vector $d\_k^{(i:j)}$ is effective for encoding local _syntactic_ and _semantic_ cues, as what can be learned by a pretrained language model.
-- The sparse vector $s\_k^{(i:j)}$ is superior at encoding precise _lexical_ information. The sparse vector is term-frequency-based encoding. DenSPI uses 2-gram term-frequency same as DrQA, resulting a highly sparse representation ($d^s \\approx 16$M)
+- The sparse vector $s\_k^{(i:j)}$ is superior at encoding precise _lexical_ information. The sparse vector is term-frequency-based encoding. DenSPI uses 2-gram term-frequency same as DrQA, resulting a highly sparse representation ($d^s \approx 16$M)
 
 The dense vector $d^{(i:j)}$ is further decomposed into three parts, $d^{(i:j)} = \[a\_i, b\_j, c\_{ij}\] \in \mathbb{R}^{2d^b + 1}$ where $2d^b + 1 = d^d$. All three components are learned based on different columns of the fine-tuned BERT representations.
 
@@ -248,7 +248,7 @@ where $y$ is the ground-truth answer and the passage $z$ is sampled by the retri
 
 The training objective for the end-to-end R^3 QA system is to minimize the negative log-likelihood of obtaining the correct answer $y$ given a question $x$,
 
-$$ \begin{aligned} \mathcal{J}(\\theta) &= -\mathbb{E}\_{z\\sim\\pi(.\vert x)} \[L(y \vert z, x)\] \\ \\nabla \mathcal{J}(\\theta) &= - \\nabla\_\\theta \sum_z \\pi(z \vert x) L(y \vert z, x) \\ &= - \sum_z \\big( L(y \vert z, x) \\nabla\_\\theta\\pi(z \vert x) + \\pi(z \vert x) \\nabla\_\\theta L(y \vert z, x) \\big) \\ &= - \mathbb{E}\_{z\\sim\\pi(.\vert x)} \\big( \\color{red}{L(y \vert z, x)\\nabla\_\\theta\\log\\pi(z \vert x)} + \\nabla\_\\theta L(y \vert z, x) \\big) \\ &\\approx - \mathbb{E}\_{z\\sim\\pi(.\vert x)} \\big( \\underbrace{\\color{red}{R(y \vert z, x)\\nabla\_\\theta\\log\\pi(z \vert x)}}\_\text{REINFORCE} + \\nabla\_\\theta L(y \vert z, x) \\big) \end{aligned} $$
+$$ \begin{aligned} \mathcal{J}(\\theta) &= -\mathbb{E}\_{z\\sim\\pi(.\vert x)} \[L(y \vert z, x)\] \\ \\nabla \mathcal{J}(\\theta) &= - \\nabla\_\\theta \sum_z \\pi(z \vert x) L(y \vert z, x) \\ &= - \sum_z \\big( L(y \vert z, x) \\nabla\_\\theta\\pi(z \vert x) + \\pi(z \vert x) \\nabla\_\\theta L(y \vert z, x) \\big) \\ &= - \mathbb{E}\_{z\\sim\\pi(.\vert x)} \\big( \color{red}{L(y \vert z, x)\\nabla\_\\theta\\log\\pi(z \vert x)} + \\nabla\_\\theta L(y \vert z, x) \\big) \\ &\approx - \mathbb{E}\_{z\\sim\\pi(.\vert x)} \\big( \\underbrace{\color{red}{R(y \vert z, x)\\nabla\_\\theta\\log\\pi(z \vert x)}}\_\text{REINFORCE} + \\nabla\_\\theta L(y \vert z, x) \\big) \end{aligned} $$
 
 Essentially in training, given a passage $z$ sampled by the retriever, the reader is trained by gradient descent while the retriever is trained by [REINFORCE](https://lilianweng.github.io/posts/2018-04-08-policy-gradient/#reinforce) using $L(y \vert z, x)$ as the reward function. However, $L(y \vert z, x)$ is not bounded and may introduce a lot of variance. The paper replaces the reward with a customized scoring function by comparing the ground truth $y$ and the answer extracted by the reader $\hat{y}$:
 
@@ -300,7 +300,7 @@ Some issues in SQuAD dataset were discussed in the ORQA paper:
 
 **REALM** (“Retrieval-Augmented Language Model pre-training”; [Guu et al., 2020](https://arxiv.org/abs/2002.08909)) also jointly trains retriever + reader by optimizing the marginal likelihood of obtaining the true answer:
 
-$$ p(y \vert x) = \sum\_{z \in \mathcal{Z}} \\underbrace{p(y \vert x, z)}\_\text{reader} \\underbrace{p(z \vert x)}\_\text{retriever} \\approx \sum\_{z \in \text{TOP}\_k(\mathcal{Z})} p(y \vert x, z) p(z \vert x) $$
+$$ p(y \vert x) = \sum\_{z \in \mathcal{Z}} \\underbrace{p(y \vert x, z)}\_\text{reader} \\underbrace{p(z \vert x)}\_\text{retriever} \approx \sum\_{z \in \text{TOP}\_k(\mathcal{Z})} p(y \vert x, z) p(z \vert x) $$
 
 ![](REALM-train.png)
 

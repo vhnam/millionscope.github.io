@@ -283,7 +283,7 @@ Let $s$ and $\hat{s}$ be two mutually exclusive style variables and $\mathbf{x}$
 - Cycle-consistency loss: $\mathcal{L}\_\text{cycle} = - p\_\\theta (\mathbf{x} \vert f\_\\theta(\mathbf{x}, \hat{s}), s)$
 - Style controlling loss: This is necessary because otherwise the model would simply learn to copy the input over.
 
-$$ \mathcal{L}\_\text{style} = - p\_\\phi(\text{class} = 1 \vert f\_\\theta(\mathbf{x}, \hat{s}), \hat{s}) $$
+$$ \mathcal{L}\_\text{style} = - p\_\phi(\text{class} = 1 \vert f\_\\theta(\mathbf{x}, \hat{s}), \hat{s}) $$
 
 , where the discriminator is a simple binary classifier trained to optimize the negative log-likelihood of the correct style. The discriminator is trained by labelling
 
