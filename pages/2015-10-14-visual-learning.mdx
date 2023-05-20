@@ -320,7 +320,7 @@ Now we can figure out the optimal codewords for events of these probabilities an
 
 We call this the joint entropy of $$X$$ and $$Y$$, defined
 
-$$H(X,Y) = \sum\_{x,y} p(x,y) \log_2\left(\frac{1}{p(x,y)}\right)$$
+$$H(X,Y) = \sum_{x,y} p(x,y) \log_2\left(\frac{1}{p(x,y)}\right)$$
 
 This is the exact same as our normal definition, except with two variables instead of one.
 
@@ -340,7 +340,7 @@ In both cases, I don't need to send very much information on average, because th
 
 We call this the conditional entropy. If you formalize it into an equation, you get:
 
-$$H(X|Y) = \sum\_y p(y) \sum\_x p(x|y) \log\_2\left(\frac{1}{p(x|y)}\right)$$ $$~~~~ = \sum\_{x,y} p(x,y) \log\_2\left(\frac{1}{p(x|y)}\right)$$
+$$H(X|Y) = \sum_y p(y) \sum_x p(x|y) \log_2\left(\frac{1}{p(x|y)}\right)$$ $$~~~~ = \sum_{x,y} p(x,y) \log_2\left(\frac{1}{p(x|y)}\right)$$
 
 ## Mutual Information
 
@@ -451,7 +451,7 @@ Finally, thanks to the readers who caught errors and omissions. In particular, t
 7.  This builds off the set interpretation of information theory layed out in Raymond W. Yeung's paper [A New Outlook on Shannon's Information Measures](http://www.cnd.mcgill.ca/~ivan/it_ineq_script/Raymond%20Yeung%20papers/A%20New%20Outlook%20on%20Shannon%E2%80%99s%20Information%20Measures%2000079902.pdf).[↩](#fnref7)
 8.  If you expand the definition of mutual information out, you get:
 
-    $$I(X,Y) = \sum\_{x,y} p(x,y) \log_2\left(\frac{p(x,y)}{p(x)p(y)} \right)$$
+    $$I(X,Y) = \sum_{x,y} p(x,y) \log_2\left(\frac{p(x,y)}{p(x)p(y)} \right)$$
 
     That looks suspiciously like KL divergence!
 

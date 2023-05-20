@@ -50,11 +50,11 @@ One straightforward approach to fuse visual information into language models is 
 
 Fig. 1. VisualBERT is trained on the combination of both text and image embeddings. (Image source: [Li et al. 2019](https://arxiv.org/abs/1908.03557))
 
-Similar to [text embedding in BERT](https://lilianweng.github.io/posts/2019-01-31-lm/#input-embedding), each visual embedding in VisualBERT also sums up three types of embeddings, tokenized features $f\_o$, segmentation embedding $f\_s$ and position embedding $f\_p$, precisely:
+Similar to [text embedding in BERT](https://lilianweng.github.io/posts/2019-01-31-lm/#input-embedding), each visual embedding in VisualBERT also sums up three types of embeddings, tokenized features $f_o$, segmentation embedding $f_s$ and position embedding $f_p$, precisely:
 
-1.  $f\_o$ is a visual feature vector computed for a bounding region of the image by a convolutional neural network;
-2.  $f\_s$ is a segment embedding to indicate whether the embedding is for vision not for text;
-3.  $f\_p$ is a position embedding used for aligning the order of bounding regions.
+1.  $f_o$ is a visual feature vector computed for a bounding region of the image by a convolutional neural network;
+2.  $f_s$ is a segment embedding to indicate whether the embedding is for vision not for text;
+3.  $f_p$ is a position embedding used for aligning the order of bounding regions.
 
 The model is trained on MS COCO image caption dataset with both text and image as inputs to predict text captions, using two visually-grounded language model objectives:
 
@@ -144,7 +144,7 @@ The vision encoder of Frozen is based on NF-ResNet-50 and uses the final output 
 
 Fig. 6. Illustration of Frozen model (left) training architecture and (right) testing pipeline. (Image source: [Tsimpoukelli et al. 2021](https://arxiv.org/abs/2106.13884))
 
-Experiments showed that fine-tuning the pre-trained LM interestingly leads to worse performance on VQA tasks. It is important to initialize the language model from a pre-trained version, as training from scratch (${Frozen}\_\text{scratch}$) does not show any meaningful progress. The baseline ${Frozen}\_\text{train-blind}$ blacks out the image but still can achieve decent performance because of the innate power of the pre-trained LM.
+Experiments showed that fine-tuning the pre-trained LM interestingly leads to worse performance on VQA tasks. It is important to initialize the language model from a pre-trained version, as training from scratch (${Frozen}_\text{scratch}$) does not show any meaningful progress. The baseline ${Frozen}_\text{train-blind}$ blacks out the image but still can achieve decent performance because of the innate power of the pre-trained LM.
 
 ![](Frozen-results.png)
 
@@ -201,13 +201,13 @@ Fig. 13. Performance of VC-GPT on the MS COCO test set, in comparison with other
 
 **MERLOT** ([Zellers, et al. 2021](https://arxiv.org/abs/2106.02636)) is trained with 6 millions of YouTube videos with transcribed speech ([YT-Temporal-180M](https://rowanzellers.com/merlot/#data)) to learn both spatial (frame-level) and temporal (video-level) objectives and demonstrated strong performance on VQA and visual reasoning tasks when fine-tuned.
 
-Each video $\mathcal{V}$ is split into multiple segments $\{ \\boldsymbol{s}\_t \}$, each segment $\\boldsymbol{s}\_t$ containing an image frame $\mathbf{I}\_t$ extracted from the middle timestep and $L=32$ tokens of words associated. Images are encoded by a learned image encoder and words are encoded using a learned embedding. Then both are encoded together within a joint vision-language transformer.
+Each video $\mathcal{V}$ is split into multiple segments $\{ \\boldsymbol{s}_t \}$, each segment $\\boldsymbol{s}_t$ containing an image frame $\mathbf{I}_t$ extracted from the middle timestep and $L=32$ tokens of words associated. Images are encoded by a learned image encoder and words are encoded using a learned embedding. Then both are encoded together within a joint vision-language transformer.
 
 There are 3 learning objectives in MERLOT:
 
 1.  _Masked language modeling_ (MLM) is useful especially because in videos, people tend to ramble, resulting in many repeated keywords or filler words.
-2.  _Contrastive frame-caption matching_ uses the language-only part from the joint vision-language transformer. Matched representations for each frame $\mathbf{I}\_t$ and caption $\\boldsymbol{w}\_t$ are treated as positive examples, while the negative examples come from all other frame-caption pairs in the minibatch.
-3.  _Temporal reordering_ learns temporal reasoning: scramble random $i$ frames and replace the segment-level position embeddings with a random and unique position embedding. The random position embeddings are learned, allowing the model to unshuffle these “‘shuffled'” frames conditioned on correctly-ordered ones. The loss is to predict whether $t\_i < t\_j$ or $t\_j < t\_i$ for each frame-frame pair.
+2.  _Contrastive frame-caption matching_ uses the language-only part from the joint vision-language transformer. Matched representations for each frame $\mathbf{I}_t$ and caption $\\boldsymbol{w}_t$ are treated as positive examples, while the negative examples come from all other frame-caption pairs in the minibatch.
+3.  _Temporal reordering_ learns temporal reasoning: scramble random $i$ frames and replace the segment-level position embeddings with a random and unique position embedding. The random position embeddings are learned, allowing the model to unshuffle these “‘shuffled'” frames conditioned on correctly-ordered ones. The loss is to predict whether $t_i < t_j$ or $t_j < t_i$ for each frame-frame pair.
 
 ![](MERLOT.png)
 
@@ -263,10 +263,10 @@ Fig. 19. Overview of CoCa training framework.
 
 CoCa is pretrained from _scratch_, using web-scale alt-text data [ALIGN](#pair-image-text-datasets) and annotated images by treating all labels as texts in [JTB-3B](#pair-image-text-datasets).
 
-There are two major training components in CoCa. The final loss is a weighted sum of the following two losses, with weight scalars $\\lambda\_\text{cap}=2.0, \\lambda\_\text{con} = 1.0$.:
+There are two major training components in CoCa. The final loss is a weighted sum of the following two losses, with weight scalars $\\lambda_\text{cap}=2.0, \\lambda_\text{con} = 1.0$.:
 
-1.  $\mathcal{L}\_\text{con}$ - _Dual-encoder contrastive learning_ optimizes the symmetric contrastive learning loss, similar to CLIP.
-2.  $\mathcal{L}\_\text{cap}$ - _Encoder-decoder captioning_ has the decoder predict the caption based on the latent encoded features from the image encoder, by optimizing an autoregressive loss. The text decoder is decoupled into two components, _unimodal_ and _multimodal_; a good balance is to split the decoder by half for these two components:
+1.  $\mathcal{L}_\text{con}$ - _Dual-encoder contrastive learning_ optimizes the symmetric contrastive learning loss, similar to CLIP.
+2.  $\mathcal{L}_\text{cap}$ - _Encoder-decoder captioning_ has the decoder predict the caption based on the latent encoded features from the image encoder, by optimizing an autoregressive loss. The text decoder is decoupled into two components, _unimodal_ and _multimodal_; a good balance is to split the decoder by half for these two components:
     - The bottom unimodal component encodes the input text with causally-masked self-attention.
     - The top multimodal component applies both causally-masked self-attention and cross-attention to the output of the vision encoder.
 
@@ -276,7 +276,7 @@ CoCa performs better than the contrastive-only model and on par with the caption
 
 Fig. 20. Illustration of how CoCa can be used to solve various downstream tasks at test time. (Image source: [Yu & Wang et al., 2022](https://arxiv.org/abs/2205.01917))
 
-They use task-specific attention pooling, or attention pooler, as a natural task adapter, as they found that a single pooled image embedding helps visual recognition tasks (e.g. ImageNet classification), while a more fine-grained embedding helps multimodal understanding tasks (e.g. VQA). A pooler is a single multi-head attention layer with $n\_\text{query}$ learnable queries (note that $\mathbf{X} \in \mathbb{R}^{L \\times d}$, $\mathbf{W}^q \in \mathbb{R}^{d \\times d\_q}$, and $d\_k = d\_q$), with the encoder output as both keys and values. CoCa uses attentional poolers in pretraining for generative loss $n\_\text{query} = 256$ and contrastive loss $n\_\text{query} = 1$. This enables the model to obtain strong performance as a _frozen_ encoder where we only learn a new pooler to aggregate features.
+They use task-specific attention pooling, or attention pooler, as a natural task adapter, as they found that a single pooled image embedding helps visual recognition tasks (e.g. ImageNet classification), while a more fine-grained embedding helps multimodal understanding tasks (e.g. VQA). A pooler is a single multi-head attention layer with $n_\text{query}$ learnable queries (note that $\mathbf{X} \in \mathbb{R}^{L \\times d}$, $\mathbf{W}^q \in \mathbb{R}^{d \\times d_q}$, and $d_k = d_q$), with the encoder output as both keys and values. CoCa uses attentional poolers in pretraining for generative loss $n_\text{query} = 256$ and contrastive loss $n_\text{query} = 1$. This enables the model to obtain strong performance as a _frozen_ encoder where we only learn a new pooler to aggregate features.
 
 ![](CoCa-code.png)
 
@@ -291,11 +291,11 @@ Finally it is possible to solve vision language tasks by stitching pretrained la
 
 **MAGiC** (iMAge-Guided text generatIon with CLIP; [Su et al. 2022](https://arxiv.org/abs/2205.02655)) does [guided decoding](https://lilianweng.github.io/posts/2021-01-02-controllable-text-generation/#guided-decoding) according to a CLIP-based score named _magic score_ to sample the next token, without fine-tuning. The generated text is encouraged to be relevant to the given image, while still stay coherent to the previously generated text.
 
-The next token $x\_t$ at a time step $t$ is selected according to the following equation. Model confidence and degeneration penalty ([Su et al. 2022](https://arxiv.org/abs/2202.06417)) are added to avoid corrupted generation from LM.
+The next token $x_t$ at a time step $t$ is selected according to the following equation. Model confidence and degeneration penalty ([Su et al. 2022](https://arxiv.org/abs/2202.06417)) are added to avoid corrupted generation from LM.
 
-$$ \begin{aligned} & x_t = \arg\max\_{v \in \mathcal{V}^{(k)}} \\big\{ (1-\\alpha) \\underbrace{p(v \vert \\boldsymbol{x}\_{<t})}\_\text{model confidence} - \\alpha \\underbrace{\max\_{1 \leq j \leq t-1} { \text{cosine}(h_v, h\_{x_j})}}\_\text{degeneration penalty} + \\beta \\underbrace{f\_\text{magic}(v \vert \mathcal{I}, \\boldsymbol{x}\_{<t}, \mathcal{V}^{(k)})}\_\text{magic score} \\big\} \\ \text{where } & f\_\text{magic} ( v \vert \mathcal{I}, \mathbf{x}\_{<t}, \mathcal{V}^{(k)} ) = \frac{ \exp(\text{CLIP}(\mathcal{I}, \[\\boldsymbol{x}\_{<t}:v\])) }{ \sum\_{z \in \mathcal{V}^{(k)}} \exp(\text{CLIP}(\mathcal{I}, \[\\boldsymbol{x}\_{<t}:z\])) } = \frac{ \exp\\big({h^\text{image}(\mathcal{I})}^\top h^\text{text}(\[\\boldsymbol{x}\_{<t}:v\])\\big) }{ \sum\_{z \in \mathcal{V}^{(k)}} \exp\\big({h^\text{image}(\mathcal{I})}^\top h^\text{text}(\[\\boldsymbol{x}\_{<t}:z\])\\big) } \end{aligned} $$
+$$ \begin{aligned} & x_t = \arg\max_{v \in \mathcal{V}^{(k)}} \\big\{ (1-\\alpha) \\underbrace{p(v \vert \\boldsymbol{x}_{<t})}_\text{model confidence} - \\alpha \\underbrace{\max_{1 \leq j \leq t-1} { \text{cosine}(h_v, h_{x_j})}}_\text{degeneration penalty} + \\beta \\underbrace{f_\text{magic}(v \vert \mathcal{I}, \\boldsymbol{x}_{<t}, \mathcal{V}^{(k)})}_\text{magic score} \\big\} \\ \text{where } & f_\text{magic} ( v \vert \mathcal{I}, \mathbf{x}_{<t}, \mathcal{V}^{(k)} ) = \frac{ \exp(\text{CLIP}(\mathcal{I}, \[\\boldsymbol{x}_{<t}:v\])) }{ \sum_{z \in \mathcal{V}^{(k)}} \exp(\text{CLIP}(\mathcal{I}, \[\\boldsymbol{x}_{<t}:z\])) } = \frac{ \exp\\big({h^\text{image}(\mathcal{I})}^\top h^\text{text}(\[\\boldsymbol{x}_{<t}:v\])\\big) }{ \sum_{z \in \mathcal{V}^{(k)}} \exp\\big({h^\text{image}(\mathcal{I})}^\top h^\text{text}(\[\\boldsymbol{x}_{<t}:z\])\\big) } \end{aligned} $$
 
-where $\mathcal{I}$ is the input image; $\mathcal{V}^{(k)}$ contains top-$k$ possible tokens predicted by the language model $p$; $\\boldsymbol{x}\_{<t}$ refers to the past generated tokens before time step $t$; $h\_v$ is the representation of the token $v$ computed by LM conditioned on the concatenation of $\\boldsymbol{x}\_{<t}$ and $v$; $h^\text{image}(.)$ and $h^\text{text}(.)$ are embeddings generated by CLIP image and text encoders, respectively.
+where $\mathcal{I}$ is the input image; $\mathcal{V}^{(k)}$ contains top-$k$ possible tokens predicted by the language model $p$; $\\boldsymbol{x}_{<t}$ refers to the past generated tokens before time step $t$; $h_v$ is the representation of the token $v$ computed by LM conditioned on the concatenation of $\\boldsymbol{x}_{<t}$ and $v$; $h^\text{image}(.)$ and $h^\text{text}(.)$ are embeddings generated by CLIP image and text encoders, respectively.
 
 MAGiC has decent performance compared to other unsupervised approaches, but still has big gaps with supervised methods.
 

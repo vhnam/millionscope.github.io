@@ -134,18 +134,18 @@ An extreme approach, investigated by **DenSPI** (“Dense-Sparse Phrase Index”
 
 DenSPI introduces a _query-agnostic_ indexable representation of document phrases. Precisely it encodes query-agnostic representations of text spans in Wikipedia offline and looks for the answer at inference time by performing nearest neighbor search. It can drastically speed up the inference time, because there is no need to re-encode documents for every new query, which is often required by a reader model.
 
-Given a question $x$ and a fixed set of (Wikipedia) documents, $z\_1, \dots, z\_K$ and each document $z\_k$ contains $N\_k$ words, $z\_k = \langle z\_k^{(1)}, \dots, z\_k^{(N\_k)}\rangle$. An ODQA model is a scoring function $F$ for each candidate phrase span $z\_k^{(i:j)}, 1 \leq i \leq j \leq N\_k$, such that the truth answer is the phrase with maximum score: $y = {\arg\max}\_{k,i,j} F(x, z\_k^{(i:j)})$.
+Given a question $x$ and a fixed set of (Wikipedia) documents, $z_1, \dots, z_K$ and each document $z_k$ contains $N_k$ words, $z_k = \langle z_k^{(1)}, \dots, z_k^{(N_k)}\rangle$. An ODQA model is a scoring function $F$ for each candidate phrase span $z_k^{(i:j)}, 1 \leq i \leq j \leq N_k$, such that the truth answer is the phrase with maximum score: $y = {\arg\max}_{k,i,j} F(x, z_k^{(i:j)})$.
 
-The phrase representation $z\_k^{(i:j)}$ combines both dense and sparse vectors, $z\_k^{(i:j)} = \[d\_k^{(i:j)}, s\_k^{(i:j)}\] \in \mathbb{R}^{d^d + d^s}$ (note that $d^d \\ll d^s$):
+The phrase representation $z_k^{(i:j)}$ combines both dense and sparse vectors, $z_k^{(i:j)} = \[d_k^{(i:j)}, s_k^{(i:j)}\] \in \mathbb{R}^{d^d + d^s}$ (note that $d^d \\ll d^s$):
 
-- The dense vector $d\_k^{(i:j)}$ is effective for encoding local _syntactic_ and _semantic_ cues, as what can be learned by a pretrained language model.
-- The sparse vector $s\_k^{(i:j)}$ is superior at encoding precise _lexical_ information. The sparse vector is term-frequency-based encoding. DenSPI uses 2-gram term-frequency same as DrQA, resulting a highly sparse representation ($d^s \approx 16$M)
+- The dense vector $d_k^{(i:j)}$ is effective for encoding local _syntactic_ and _semantic_ cues, as what can be learned by a pretrained language model.
+- The sparse vector $s_k^{(i:j)}$ is superior at encoding precise _lexical_ information. The sparse vector is term-frequency-based encoding. DenSPI uses 2-gram term-frequency same as DrQA, resulting a highly sparse representation ($d^s \approx 16$M)
 
-The dense vector $d^{(i:j)}$ is further decomposed into three parts, $d^{(i:j)} = \[a\_i, b\_j, c\_{ij}\] \in \mathbb{R}^{2d^b + 1}$ where $2d^b + 1 = d^d$. All three components are learned based on different columns of the fine-tuned BERT representations.
+The dense vector $d^{(i:j)}$ is further decomposed into three parts, $d^{(i:j)} = \[a_i, b_j, c_{ij}\] \in \mathbb{R}^{2d^b + 1}$ where $2d^b + 1 = d^d$. All three components are learned based on different columns of the fine-tuned BERT representations.
 
-- A vector $a\_i$ encodes the _start_ position for the $i$-th word of the document;
-- A vector $b\_j$ encodes the _end_ position for the $j$-th word of the document;
-- A scalar $c\_{ij}$ measures the _coherency_ between the start and the end vectors, helping avoid non-constituent phrases during inference.
+- A vector $a_i$ encodes the _start_ position for the $i$-th word of the document;
+- A vector $b_j$ encodes the _end_ position for the $j$-th word of the document;
+- A scalar $c_{ij}$ measures the _coherency_ between the start and the end vectors, helping avoid non-constituent phrases during inference.
 
 For all possible $(i,j,k)$ tuples where $j-i < J$, the text span embeddings are precomputed and stored as a _phrase index_. The maximum span length $J$ is a predefined scalar constant.
 
@@ -153,7 +153,7 @@ For all possible $(i,j,k)$ tuples where $j-i < J$, the text span embeddings are 
 
 Fig. 4. An illustration of Dense-Sparse Phrase Index (DenSPI) architecture. (Image source: [Seo et al., 2019](https://arxiv.org/abs/1906.05807))
 
-At the inference time, the question is mapped into the same vector space $x=\[d', s'\] \in \mathbb{R}^{d^d + d^s}$, where the dense vector $d'$ is extracted from the BERT embedding of the special `[CLS]` symbol. The same BERT model is shared for encoding both questions and phrases. The final answer is predicted by $k^\*, i^\*, j^\* = \arg\max x^\top z\_k^{(i:j)}$.
+At the inference time, the question is mapped into the same vector space $x=\[d', s'\] \in \mathbb{R}^{d^d + d^s}$, where the dense vector $d'$ is extracted from the BERT embedding of the special `[CLS]` symbol. The same BERT model is shared for encoding both questions and phrases. The final answer is predicted by $k^\*, i^\*, j^\* = \arg\max x^\top z_k^{(i:j)}$.
 
 ## Reader Model[#](#reader-model)
 
@@ -161,20 +161,20 @@ The reader model learns to solve the reading comprehension task — extract an a
 
 ### Bi-directional LSTM[#](#bi-directional-lstm)
 
-The reader model for answer detection of **DrQA** ([Chen et al., 2017](https://arxiv.org/abs/1704.00051)) is a 3-layer bidirectional LSTM with hidden size 128. Every relevant paragraph of retrieved Wikipedia articles is encoded by a sequence of feature vector, $\{\\tilde{\mathbf{z}}\_1, \dots, \\tilde{\mathbf{z}}\_m \}$. Each feature vector $\hat{\mathbf{z}}\_i \in \mathbb{R}^{d\_z}$ is expected to capture useful contextual information around one token $z\_i$. The feature consists of several categories of features:
+The reader model for answer detection of **DrQA** ([Chen et al., 2017](https://arxiv.org/abs/1704.00051)) is a 3-layer bidirectional LSTM with hidden size 128. Every relevant paragraph of retrieved Wikipedia articles is encoded by a sequence of feature vector, $\{\\tilde{\mathbf{z}}_1, \dots, \\tilde{\mathbf{z}}_m \}$. Each feature vector $\hat{\mathbf{z}}_i \in \mathbb{R}^{d_z}$ is expected to capture useful contextual information around one token $z_i$. The feature consists of several categories of features:
 
-1.  Word embeddings: A 300d [Glove](https://lilianweng.github.io/posts/2017-10-15-word-embedding/#glove-global-vectors) word embedding trained from 800B Web crawl data, $f\_\text{embed} = E\_g(z\_i)$.
-2.  Exact match: Whether a word $z\_i$ appears in the question $x$, $f\_\text{match} = \mathbb{I}(z\_i \in x)$.
-3.  Token features: This includes POS (part-of-speech) tagging, NER (named entity recognition), and TF (term-frequency), $f\_\text{token}(z\_i) = (\text{POS}(z\_i), \text{NER}(z\_i), \text{TF}(z\_i))$.
-4.  Aligned question embedding: The attention score $y\_{ij}$ is designed to capture inter-sentence matching and similarity between the paragraph token $z\_i$ and the question word $x\_j$. This feature adds soft alignments between similar but non-identical words.
+1.  Word embeddings: A 300d [Glove](https://lilianweng.github.io/posts/2017-10-15-word-embedding/#glove-global-vectors) word embedding trained from 800B Web crawl data, $f_\text{embed} = E_g(z_i)$.
+2.  Exact match: Whether a word $z_i$ appears in the question $x$, $f_\text{match} = \mathbb{I}(z_i \in x)$.
+3.  Token features: This includes POS (part-of-speech) tagging, NER (named entity recognition), and TF (term-frequency), $f_\text{token}(z_i) = (\text{POS}(z_i), \text{NER}(z_i), \text{TF}(z_i))$.
+4.  Aligned question embedding: The attention score $y_{ij}$ is designed to capture inter-sentence matching and similarity between the paragraph token $z_i$ and the question word $x_j$. This feature adds soft alignments between similar but non-identical words.
 
-$$ \begin{aligned} f\_\text{align}(z_i) &= \sum_j y\_{i,j} E_g(x_j) \\ y\_{i,j} &= \frac{\exp(\\alpha(E_g(z_i))^\top \\alpha(E_g(x_j)) )}{\sum\_{j'} \exp(\\alpha(E_g(z_i))^\top \\alpha(E_g(x\_{j'})) ) } \end{aligned} $$
+$$ \begin{aligned} f_\text{align}(z_i) &= \sum_j y_{i,j} E_g(x_j) \\ y_{i,j} &= \frac{\exp(\\alpha(E_g(z_i))^\top \\alpha(E_g(x_j)) )}{\sum_{j'} \exp(\\alpha(E_g(z_i))^\top \\alpha(E_g(x_{j'})) ) } \end{aligned} $$
 
-where $\\alpha$ is a single dense layer with ReLU and $E\_g(.)$ is the glove word embedding.
+where $\\alpha$ is a single dense layer with ReLU and $E_g(.)$ is the glove word embedding.
 
 The feature vector of a paragraph of $m$ tokens is fed into LSTM to obtain the final paragraph vectors:
 
-$$ \begin{aligned} \mathbf{z} = \{\mathbf{z}\_1, \dots, \mathbf{z}\_m\} &= \text{LSTM}(\{\\tilde{\mathbf{z}}\_1, \dots, \\tilde{\mathbf{z}}\_m\}) \\ \text{where } \\tilde{\mathbf{z}}\_i &= \{f\_\text{embed}, f\_\text{match}, f\_\text{token}, f\_\text{align}\} \end{aligned} $$
+$$ \begin{aligned} \mathbf{z} = \{\mathbf{z}_1, \dots, \mathbf{z}_m\} &= \text{LSTM}(\{\\tilde{\mathbf{z}}_1, \dots, \\tilde{\mathbf{z}}_m\}) \\ \text{where } \\tilde{\mathbf{z}}_i &= \{f_\text{embed}, f_\text{match}, f_\text{token}, f_\text{align}\} \end{aligned} $$
 
 The question is encoded as a weighted sum of the embeddings of every word in the question:
 
@@ -182,11 +182,11 @@ $$ \mathbf{x} = \sum_j b_j E(x_j) \quad b_j = \text{softmax}(\mathbf{w}^\top E(x
 
 where $\mathbf{w}$ is a weight vector to learn.
 
-Once the feature vectors are constructed for the question and all the related paragraphs, the reader needs to predict the probabilities of each position in a paragraph to be the start and the end of an answer span, $p\_\text{start}(i\_s)$ and $p\_\text{end}(i\_s)$, respectively. Across all the paragraphs, the optimal span is returned as the final answer with maximum $p\_\text{start}(i_s) \\times p\_\text{end}(i_e) $.
+Once the feature vectors are constructed for the question and all the related paragraphs, the reader needs to predict the probabilities of each position in a paragraph to be the start and the end of an answer span, $p_\text{start}(i_s)$ and $p_\text{end}(i_s)$, respectively. Across all the paragraphs, the optimal span is returned as the final answer with maximum $p_\text{start}(i_s) \\times p_\text{end}(i_e) $.
 
-$$ \begin{aligned} p\_\text{start}(i_s) \\propto \exp(\mathbf{z}\_{i_s} \mathbf{W}\_s \mathbf{x}) \\ p\_\text{end}(i_e) \\propto \exp(\mathbf{z}\_{i_e} \mathbf{W}\_e \mathbf{x}) \\ \text{ s.t. } i_s \leq i_e \leq i_s + 15 \end{aligned} $$
+$$ \begin{aligned} p_\text{start}(i_s) \\propto \exp(\mathbf{z}_{i_s} \mathbf{W}_s \mathbf{x}) \\ p_\text{end}(i_e) \\propto \exp(\mathbf{z}_{i_e} \mathbf{W}_e \mathbf{x}) \\ \text{ s.t. } i_s \leq i_e \leq i_s + 15 \end{aligned} $$
 
-where $\mathbf{W}\_s$ and $\mathbf{W}\_e$ are learned parameters.
+where $\mathbf{W}_s$ and $\mathbf{W}_e$ are learned parameters.
 
 ### BERT-universe[#](#bert-universe)
 
@@ -196,7 +196,7 @@ $$ \text{BERT}(s_1, s_2, \dots) = \[\mathbf{h}^\texttt{\[CLS\]}, \mathbf{h}^{(1)
 
 where $\mathbf{h}^\texttt{\[CLS\]}$ is the embedding vector for the special `[CLS]` token and $\mathbf{h}^{(i)}$ is the embedding vector for the $i$-th token.
 
-To use BERT for reading comprehension, it learns two additional weights, $\mathbf{W}\_s$ and $\mathbf{W}\_e$, and $\text{softmax}(\mathbf{h}^{(i)}\mathbf{W}\_s)$ and $\text{softmax}(\mathbf{h}^{(i)}\mathbf{W}\_e)$ define two probability distributions of start and end position of the predicted span per token.
+To use BERT for reading comprehension, it learns two additional weights, $\mathbf{W}_s$ and $\mathbf{W}_e$, and $\text{softmax}(\mathbf{h}^{(i)}\mathbf{W}_s)$ and $\text{softmax}(\mathbf{h}^{(i)}\mathbf{W}_e)$ define two probability distributions of start and end position of the predicted span per token.
 
 **BERTserini** ([Yang et al., 2019](https://arxiv.org/abs/1902.01718)) utilizes a pre-trained BERT model to work as the reader. Their experiments showed that _fine-tuning_ pretrained BERT with SQuAD is sufficient to achieve high accuracy in identifying answer spans.
 
@@ -220,11 +220,11 @@ The retriever and reader components can be jointly trained. This section covers 
 
 The retriever and reader models in the **R^3** (“Reinforced Ranker-Reader”; [Wang, et al., 2017](https://arxiv.org/abs/1709.00023)) QA system are jointly trained via [reinforcement learning](https://lilianweng.github.io/posts/2018-02-19-rl-overview/). (Note that to keep the term consistent between papers in this section, the “ranker” model in the original R^3 paper is referred to as the “retriever” model here.) Both components are variants of [Match-LSTM](https://arxiv.org/abs/1512.08849), which relies on an attention mechanism to compute word similarities between the passage and question sequences.
 
-**How does the Match-LSTM module work?** Given a question $\mathbf{X}$ of $d\_x$ words and a passage $\mathbf{Z}$ of $d\_z$ words, both representations use fixed [Glove](https://lilianweng.github.io/posts/2017-10-15-word-embedding/#glove-global-vectors) word embeddings,
+**How does the Match-LSTM module work?** Given a question $\mathbf{X}$ of $d_x$ words and a passage $\mathbf{Z}$ of $d_z$ words, both representations use fixed [Glove](https://lilianweng.github.io/posts/2017-10-15-word-embedding/#glove-global-vectors) word embeddings,
 
-$$ \begin{aligned} \mathbf{H}^x &= \text{BiLSTM}(\mathbf{X}) \in \mathbb{R}^{l \\times d_x} \\ \mathbf{H}^z &= \text{BiLSTM}(\mathbf{Z}) \in \mathbb{R}^{l \\times d_z} \\ \mathbf{G} &= \text{softmax}((\mathbf{W}^g \mathbf{H}^x + \mathbf{b}^g \otimes \mathbf{e}\_{d_x})^\top \mathbf{H}^z) \in \mathbb{R}^{d_x \\times d_z} & \text{; an attention matrix}\\ \\bar{\mathbf{H}}^x &= \mathbf{H}^x \mathbf{G} \in \mathbb{R}^{l \\times d_z} \\ \mathbf{M} &= \text{ReLU} \\Big( \mathbf{W}^m \begin{bmatrix} \mathbf{H}^z \\ \\bar{\mathbf{H}}^x \\ \mathbf{H}^z \\odot \\bar{\mathbf{H}}^x \\ \mathbf{H}^z - \\bar{\mathbf{H}}^x \end{bmatrix} \\Big) \in \mathbb{R}^{2l \\times d_z} \\ \mathbf{H}^m &= \text{BiLSTM}(M) \in \mathbb{R}^{l \\times d_z} \end{aligned} $$
+$$ \begin{aligned} \mathbf{H}^x &= \text{BiLSTM}(\mathbf{X}) \in \mathbb{R}^{l \\times d_x} \\ \mathbf{H}^z &= \text{BiLSTM}(\mathbf{Z}) \in \mathbb{R}^{l \\times d_z} \\ \mathbf{G} &= \text{softmax}((\mathbf{W}^g \mathbf{H}^x + \mathbf{b}^g \otimes \mathbf{e}_{d_x})^\top \mathbf{H}^z) \in \mathbb{R}^{d_x \\times d_z} & \text{; an attention matrix}\\ \\bar{\mathbf{H}}^x &= \mathbf{H}^x \mathbf{G} \in \mathbb{R}^{l \\times d_z} \\ \mathbf{M} &= \text{ReLU} \\Big( \mathbf{W}^m \begin{bmatrix} \mathbf{H}^z \\ \\bar{\mathbf{H}}^x \\ \mathbf{H}^z \\odot \\bar{\mathbf{H}}^x \\ \mathbf{H}^z - \\bar{\mathbf{H}}^x \end{bmatrix} \\Big) \in \mathbb{R}^{2l \\times d_z} \\ \mathbf{H}^m &= \text{BiLSTM}(M) \in \mathbb{R}^{l \\times d_z} \end{aligned} $$
 
-where $l$ is the hidden dimension of the bidirectional LSTM module. $\mathbf{W}^g \in \mathbb{R}^{l\\times l}$, $\mathbf{b}^g \in \mathbb{R}^l$, and $\mathbf{W}^m \in \mathbb{R}^{2l \\times 4l}$ are parameters to learn. The operator $\otimes \mathbf{e}\_{d\_x}$ is the outer product to repeat the column vector $\mathbf{b}^g$ $d\_x$ times.
+where $l$ is the hidden dimension of the bidirectional LSTM module. $\mathbf{W}^g \in \mathbb{R}^{l\\times l}$, $\mathbf{b}^g \in \mathbb{R}^l$, and $\mathbf{W}^m \in \mathbb{R}^{2l \\times 4l}$ are parameters to learn. The operator $\otimes \mathbf{e}_{d_x}$ is the outer product to repeat the column vector $\mathbf{b}^g$ $d_x$ times.
 
 The ranker and reader components share the same Match-LSTM module with two separate prediction heads in the last layer, resulting in $\mathbf{H}^\text{rank}$ and $\mathbf{H}^\text{reader}$.
 
@@ -234,7 +234,7 @@ Fig. 6. The overview of R^3 (reinforced ranker-reader) architecture. Both compon
 
 The retriever runs a max-pooling operation per passage and then aggregates to output a probability of each passage entailing the answer.
 
-$$ \begin{aligned} \mathbf{u}\_i &= \text{max-pooling}(\mathbf{H}^\text{rank}\_i) \in \mathbb{R}^l \\ \mathbf{C} &= \text{tanh}(\mathbf{W}^c\[\mathbf{u}\_1;\dots;\mathbf{u}\_N\] + \mathbf{b}^c \otimes \mathbf{e}\_N) \in \mathbb{R}^{l \\times n} \\ \\gamma &= \text{softmax}(\mathbf{w}^c \mathbf{C}) \in \mathbb{R}^n \end{aligned} $$
+$$ \begin{aligned} \mathbf{u}_i &= \text{max-pooling}(\mathbf{H}^\text{rank}_i) \in \mathbb{R}^l \\ \mathbf{C} &= \text{tanh}(\mathbf{W}^c\[\mathbf{u}_1;\dots;\mathbf{u}_N\] + \mathbf{b}^c \otimes \mathbf{e}_N) \in \mathbb{R}^{l \\times n} \\ \\gamma &= \text{softmax}(\mathbf{w}^c \mathbf{C}) \in \mathbb{R}^n \end{aligned} $$
 
 Finally, the retriever is viewed as a _policy_ to output action to sample a passage according to predicted $\\gamma$,
 
@@ -242,13 +242,13 @@ $$ \\pi(z \vert x; \\theta^\\gamma) = \\gamma_z $$
 
 The reader predicts the start position $\\beta^s$ and the end position $\\beta^e$ of the answer span. Two positions are computed in the same way, with independent parameters to learn. There are $V$ words in all the passages involved.
 
-$$ \begin{aligned} \mathbf{H}^\text{read} &= \[\mathbf{H}^\text{read}\_\tau; \mathbf{H}^\text{read}\_{\text{neg}\_1}; \dots; \mathbf{H}^\text{read}\_{\text{neg}\_n}\] \\ \mathbf{F}^s &= \text{tanh}(\mathbf{W}^s \mathbf{H}^\text{read} + \mathbf{b}^s \otimes \mathbf{e}\_V) \quad \\beta^s = \text{softmax}(\mathbf{w}^s \mathbf{F}^s) \in \mathbb{R}^V \\ \mathbf{F}^e &= \text{tanh}(\mathbf{W}^e \mathbf{H}^\text{read} + \mathbf{b}^e \otimes \mathbf{e}\_V) \quad \\beta^e = \text{softmax}(\mathbf{w}^e \mathbf{F}^e) \in \mathbb{R}^V \\ L(y \vert z, x) &= -\\log(\\beta^s\_{y_z^s})-\\log(\\beta^e\_{y_z^e}) \end{aligned} $$
+$$ \begin{aligned} \mathbf{H}^\text{read} &= \[\mathbf{H}^\text{read}_\tau; \mathbf{H}^\text{read}_{\text{neg}_1}; \dots; \mathbf{H}^\text{read}_{\text{neg}_n}\] \\ \mathbf{F}^s &= \text{tanh}(\mathbf{W}^s \mathbf{H}^\text{read} + \mathbf{b}^s \otimes \mathbf{e}_V) \quad \\beta^s = \text{softmax}(\mathbf{w}^s \mathbf{F}^s) \in \mathbb{R}^V \\ \mathbf{F}^e &= \text{tanh}(\mathbf{W}^e \mathbf{H}^\text{read} + \mathbf{b}^e \otimes \mathbf{e}_V) \quad \\beta^e = \text{softmax}(\mathbf{w}^e \mathbf{F}^e) \in \mathbb{R}^V \\ L(y \vert z, x) &= -\\log(\\beta^s_{y_z^s})-\\log(\\beta^e_{y_z^e}) \end{aligned} $$
 
-where $y$ is the ground-truth answer and the passage $z$ is sampled by the retriever. $\\beta^s\_{y\_z^s}$ and $\\beta^s\_{y\_z^e}$ represent the probabilities of the start and end positions of $y$ in passage $z$.
+where $y$ is the ground-truth answer and the passage $z$ is sampled by the retriever. $\\beta^s_{y_z^s}$ and $\\beta^s_{y_z^e}$ represent the probabilities of the start and end positions of $y$ in passage $z$.
 
 The training objective for the end-to-end R^3 QA system is to minimize the negative log-likelihood of obtaining the correct answer $y$ given a question $x$,
 
-$$ \begin{aligned} \mathcal{J}(\\theta) &= -\mathbb{E}\_{z\\sim\\pi(.\vert x)} \[L(y \vert z, x)\] \\ \\nabla \mathcal{J}(\\theta) &= - \\nabla\_\\theta \sum_z \\pi(z \vert x) L(y \vert z, x) \\ &= - \sum_z \\big( L(y \vert z, x) \\nabla\_\\theta\\pi(z \vert x) + \\pi(z \vert x) \\nabla\_\\theta L(y \vert z, x) \\big) \\ &= - \mathbb{E}\_{z\\sim\\pi(.\vert x)} \\big( \color{red}{L(y \vert z, x)\\nabla\_\\theta\\log\\pi(z \vert x)} + \\nabla\_\\theta L(y \vert z, x) \\big) \\ &\approx - \mathbb{E}\_{z\\sim\\pi(.\vert x)} \\big( \\underbrace{\color{red}{R(y \vert z, x)\\nabla\_\\theta\\log\\pi(z \vert x)}}\_\text{REINFORCE} + \\nabla\_\\theta L(y \vert z, x) \\big) \end{aligned} $$
+$$ \begin{aligned} \mathcal{J}(\\theta) &= -\mathbb{E}_{z\\sim\\pi(.\vert x)} \[L(y \vert z, x)\] \\ \\nabla \mathcal{J}(\\theta) &= - \\nabla_\\theta \sum_z \\pi(z \vert x) L(y \vert z, x) \\ &= - \sum_z \\big( L(y \vert z, x) \\nabla_\\theta\\pi(z \vert x) + \\pi(z \vert x) \\nabla_\\theta L(y \vert z, x) \\big) \\ &= - \mathbb{E}_{z\\sim\\pi(.\vert x)} \\big( \color{red}{L(y \vert z, x)\\nabla_\\theta\\log\\pi(z \vert x)} + \\nabla_\\theta L(y \vert z, x) \\big) \\ &\approx - \mathbb{E}_{z\\sim\\pi(.\vert x)} \\big( \\underbrace{\color{red}{R(y \vert z, x)\\nabla_\\theta\\log\\pi(z \vert x)}}_\text{REINFORCE} + \\nabla_\\theta L(y \vert z, x) \\big) \end{aligned} $$
 
 Essentially in training, given a passage $z$ sampled by the retriever, the reader is trained by gradient descent while the retriever is trained by [REINFORCE](https://lilianweng.github.io/posts/2018-04-08-policy-gradient/#reinforce) using $L(y \vert z, x)$ as the reward function. However, $L(y \vert z, x)$ is not bounded and may introduce a lot of variance. The paper replaces the reward with a customized scoring function by comparing the ground truth $y$ and the answer extracted by the reader $\hat{y}$:
 
@@ -266,15 +266,15 @@ Fig. 8. An illustration of the retriever component in ORQA. (Image source: replo
 
 All the evidence blocks are ranked by a retrieval score, defined as the inner product of BERT embedding vectors of the `[CLS]` token of the question $x$ and the evidence block $z$. Note that the encoders for questions and context are independent.
 
-$$ \begin{aligned} h_x &= \mathbf{W}\_x \text{BERT}\_x(x)^{\\mathtt{\[CLS\]}} \\ h_z &= \mathbf{W}\_z \text{BERT}\_z(z)^{\\mathtt{\[CLS\]}} \\ S\_\text{retr}(z, x) &= h_x^\top h_z \end{aligned} $$
+$$ \begin{aligned} h_x &= \mathbf{W}_x \text{BERT}_x(x)^{\\mathtt{\[CLS\]}} \\ h_z &= \mathbf{W}_z \text{BERT}_z(z)^{\\mathtt{\[CLS\]}} \\ S_\text{retr}(z, x) &= h_x^\top h_z \end{aligned} $$
 
 The retriever module is pretrained with _Inverse Cloze Task (ICT)_, which is to predict the context given a sentence, opposite to the standard [Cloze Task](https://en.wikipedia.org/wiki/Cloze_test). The ICT objective is to maximize the retrieval score of the correct context $z$ given a random sentence $x$:
 
-$$ L\_\text{ICT} = p\_\text{early}(z \vert x) = \frac{\exp(S\_\text{retr}(z, x))}{\sum\_{z'\in\text{BATCH}(\mathcal{Z})} \exp(S\_\text{retr}(z', x))} $$
+$$ L_\text{ICT} = p_\text{early}(z \vert x) = \frac{\exp(S_\text{retr}(z, x))}{\sum_{z'\in\text{BATCH}(\mathcal{Z})} \exp(S_\text{retr}(z', x))} $$
 
 where $\text{BATCH}(\mathcal{Z})$ is the set of evidence blocks in the same batch used as sampled negatives.
 
-After such pretraining, the BERT retriever is expected to have representations good enough for evidence retrieval. Only the question encoder needs to be fine-tuned for answer extraction. In other words, the evidence block encoder (i.e., $\mathbf{W}\_z$ and $\text{BERT}\_z$) is fixed and thus all the evidence block encodings can be pre-computed with support for [fast Maximum Inner Product Search (MIPS)](#fast-maximum-inner-product-search-mips).
+After such pretraining, the BERT retriever is expected to have representations good enough for evidence retrieval. Only the question encoder needs to be fine-tuned for answer extraction. In other words, the evidence block encoder (i.e., $\mathbf{W}_z$ and $\text{BERT}_z$) is fixed and thus all the evidence block encodings can be pre-computed with support for [fast Maximum Inner Product Search (MIPS)](#fast-maximum-inner-product-search-mips).
 
 ![](ORQA-reader.png)
 
@@ -282,17 +282,17 @@ Fig. 9. An illustration of the reader component in ORQA. (Image source: [acl2020
 
 The reader follows the same design as in the original [BERT RC](https://lilianweng.github.io/posts/2019-01-31-lm/#use-bert-in-downstream-tasks) experiments. It learns in a supervised manner, while the parameters of the evidence block encoder are fixed and all other parameters are fine-tuned. Given a question $x$ and a gold answer string $y$, the reader loss contains two parts:
 
-$$ \mathcal{L}(x, y) = \mathcal{L}\_\text{early}(x, y) + \mathcal{L}\_\text{full}(x, y) $$
+$$ \mathcal{L}(x, y) = \mathcal{L}_\text{early}(x, y) + \mathcal{L}_\text{full}(x, y) $$
 
 (1) Find all correct text spans within top $k$ evidence blocks and optimize for the marginal likelihood of a text span $s$ that matches the true answer $y$:
 
-$$ \begin{aligned} h_s &= \text{BERT}\_R(x, y)^{(\text{START}(s))} \\ h_e &= \text{BERT}\_R(x, y)^{(\text{END}(s))} \\ S\_\text{read}(z, s, x) &= \text{MLP}(\[h_s; h_e\]) \\ p(z, s \vert x) &= \frac{\exp(S\_\text{read}(z, s, x))}{\sum\_{z'\in\text{TOP}(k)} \sum\_{s'\in z'} \exp(S\_\text{read}(z', s', x))} \\ L\_\text{full}(x, y) &= - \\log \sum\_{\\substack{z \in \text{TOP}(k)\\ s \in z}} \sum\_{y=\text{TEXT}(s)} p(z, s \vert x) \end{aligned} $$
+$$ \begin{aligned} h_s &= \text{BERT}_R(x, y)^{(\text{START}(s))} \\ h_e &= \text{BERT}_R(x, y)^{(\text{END}(s))} \\ S_\text{read}(z, s, x) &= \text{MLP}(\[h_s; h_e\]) \\ p(z, s \vert x) &= \frac{\exp(S_\text{read}(z, s, x))}{\sum_{z'\in\text{TOP}(k)} \sum_{s'\in z'} \exp(S_\text{read}(z', s', x))} \\ L_\text{full}(x, y) &= - \\log \sum_{\\substack{z \in \text{TOP}(k)\\ s \in z}} \sum_{y=\text{TEXT}(s)} p(z, s \vert x) \end{aligned} $$
 
-where $y=\text{TEXT}(s)$ indicates whether the answer $y$ matches the text span $s$. $\text{TOP}(k)$ is the top $k$ retrieved blocks according to $S\_\text{retr}(z, x)$. The paper sets $k=5$.
+where $y=\text{TEXT}(s)$ indicates whether the answer $y$ matches the text span $s$. $\text{TOP}(k)$ is the top $k$ retrieved blocks according to $S_\text{retr}(z, x)$. The paper sets $k=5$.
 
 (2) At the early stage of learning, when the retriever is not strong enough, it is possible none of the top $k$ blocks contains the answer. To avoid such sparse learning signals, ORQA considers a larger set of $c$ evidence blocks for more aggressive learning. The paper has $c=5000$.
 
-$$ L\_\text{early}(x, y) = -\\log \sum\_{\\substack{z\in \text{TOP}(c)\\y\in\text{TEXT}(z)}} p\_\text{early}(z\vert x) = -\\log \sum\_{\\substack{z\in \text{TOP}(c)\\y\in\text{TEXT}(z)}} \frac{\exp(S\_\text{retr}(z, x)}{\sum\_{z'\in\text{TOP}(c)} \exp(S\_\text{retr}(z', x)} $$
+$$ L_\text{early}(x, y) = -\\log \sum_{\\substack{z\in \text{TOP}(c)\\y\in\text{TEXT}(z)}} p_\text{early}(z\vert x) = -\\log \sum_{\\substack{z\in \text{TOP}(c)\\y\in\text{TEXT}(z)}} \frac{\exp(S_\text{retr}(z, x)}{\sum_{z'\in\text{TOP}(c)} \exp(S_\text{retr}(z', x)} $$
 
 Some issues in SQuAD dataset were discussed in the ORQA paper:
 
@@ -300,7 +300,7 @@ Some issues in SQuAD dataset were discussed in the ORQA paper:
 
 **REALM** (“Retrieval-Augmented Language Model pre-training”; [Guu et al., 2020](https://arxiv.org/abs/2002.08909)) also jointly trains retriever + reader by optimizing the marginal likelihood of obtaining the true answer:
 
-$$ p(y \vert x) = \sum\_{z \in \mathcal{Z}} \\underbrace{p(y \vert x, z)}\_\text{reader} \\underbrace{p(z \vert x)}\_\text{retriever} \approx \sum\_{z \in \text{TOP}\_k(\mathcal{Z})} p(y \vert x, z) p(z \vert x) $$
+$$ p(y \vert x) = \sum_{z \in \mathcal{Z}} \\underbrace{p(y \vert x, z)}_\text{reader} \\underbrace{p(z \vert x)}_\text{retriever} \approx \sum_{z \in \text{TOP}_k(\mathcal{Z})} p(y \vert x, z) p(z \vert x) $$
 
 ![](REALM-train.png)
 
@@ -351,22 +351,22 @@ They pair the BERT model with different types of context, including adversarial 
 
 **RAG** (“Retrieval-Augmented Generation”; [Lewis et al., 2020](https://arxiv.org/abs/2005.11401)) combines pre-trained parametric (language model) and non-parametric memory (external knowledge index) together for language generation. RAG can be fine-tuned on any seq2seq task, whereby both the retriever and the sequence generator are jointly learned. They found that unconstrained generation outperforms previous extractive approaches.
 
-RAG consists of a retriever model $p\_\\eta(z \vert x)$ and a generator model $p\_\\theta(y\_i \vert x, z, y\_{1:i-1})$:
+RAG consists of a retriever model $p_\\eta(z \vert x)$ and a generator model $p_\\theta(y_i \vert x, z, y_{1:i-1})$:
 
-- The retriever uses the input sequence $x$ to retrieve text passages $z$, implemented as a [DPR](#DPR) retriever. $\\log p\_\\eta(z \vert x) \\propto E\_z(z)^\top E\_x(x)$.
+- The retriever uses the input sequence $x$ to retrieve text passages $z$, implemented as a [DPR](#DPR) retriever. $\\log p_\\eta(z \vert x) \\propto E_z(z)^\top E_x(x)$.
 - The generator uses $z$ as additional context when generating the target sequence $y$, where the context and the question are simply concatenated.
 
 Depending on whether using the same or different retrieved documents for each token generation, there are two versions of RAG:
 
-$$ \begin{aligned} p\_\text{RAG-seq}(y \vert x) &= \sum\_{z \in \text{TOP}\_k(p\_\\eta(.\vert x))} p\_\\eta(z \vert x) \\prod_i^N p\_\\theta(y_i \vert x, z, y\_{1:i-1}) \\ p\_\text{RAG-token}(y \vert x) &= \\prod_i^N \sum\_{z \in \text{TOP}\_k(p\_\\eta(.\vert x))} p\_\\eta(z_i\vert x) p\_\\theta(y_i \vert x, z_i, y\_{1:i-1}) \end{aligned} $$
+$$ \begin{aligned} p_\text{RAG-seq}(y \vert x) &= \sum_{z \in \text{TOP}_k(p_\\eta(.\vert x))} p_\\eta(z \vert x) \\prod_i^N p_\\theta(y_i \vert x, z, y_{1:i-1}) \\ p_\text{RAG-token}(y \vert x) &= \\prod_i^N \sum_{z \in \text{TOP}_k(p_\\eta(.\vert x))} p_\\eta(z_i\vert x) p_\\theta(y_i \vert x, z_i, y_{1:i-1}) \end{aligned} $$
 
-The retriever + generator in RAG is jointly trained to minimize the NLL loss, $\mathcal{L}\_\text{RAG} = \sum\_j -\\log p(y\_j \vert x\_j)$. Updating the passage encoder $E\_z(.)$ is expensive as it requires the model to re-index the documents for fast MIPS. RAG does not find fine-tuning $E\_z(.)$ necessary (like in [ORQA](#ORQA)) and only updates the query encoder + generator.
+The retriever + generator in RAG is jointly trained to minimize the NLL loss, $\mathcal{L}_\text{RAG} = \sum_j -\\log p(y_j \vert x_j)$. Updating the passage encoder $E_z(.)$ is expensive as it requires the model to re-index the documents for fast MIPS. RAG does not find fine-tuning $E_z(.)$ necessary (like in [ORQA](#ORQA)) and only updates the query encoder + generator.
 
 ![](RAG.png)
 
 Fig. 12. An illustration of retrieval-augmented generation (RAG) architecture. (Image source: [Lewis et al., 2020](https://arxiv.org/abs/2005.11401))
 
-At decoding/test time, RAG-token can be evaluated via a [beam search](https://d2l.ai/chapter_recurrent-modern/beam-search.html#id1). RAG-seq cannot be broken down into a set of per-token likelihood, so it runs beam search for each candidate document $z$ and picks the one with optimal $p\_\\theta(y\_i \vert x, z, y\_{1:i-1})$.
+At decoding/test time, RAG-token can be evaluated via a [beam search](https://d2l.ai/chapter_recurrent-modern/beam-search.html#id1). RAG-seq cannot be broken down into a set of per-token likelihood, so it runs beam search for each candidate document $z$ and picks the one with optimal $p_\\theta(y_i \vert x, z, y_{1:i-1})$.
 
 The _Fusion-in-Decoder_ approach, proposed by [Izacard & Grave (2020)](https://arxiv.org/abs/2007.01282) is also based on a pre-trained T5. It works similar to RAG but differently for how the context is integrated into the decoder.
 

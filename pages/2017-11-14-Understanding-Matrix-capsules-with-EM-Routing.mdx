@@ -140,7 +140,7 @@ EM routing clusters capsules to form a higher level capsule in runtime. It also 
 
 The output of a capsule is computed differently than a deep network neuron. In EM clustering, we represent datapoints by a Gaussian distribution. In EM routing, we model the pose matrix of the parent capsule with a Gaussian also. The pose matrix is a $$4 \times 4$$ matrix, i.e. 16 components. We model the pose matrix with a Gaussian having 16 $$\mu$$ and 16 $$\sigma$$ and each $$\mu$$ represents a pose matrix's component.
 
-Let $$v_{ij}$$ be the vote from capsule $$i$$ for the parent capsule $$j$$, and $$ v^h\_{ij} $$ be its $$h$$-th component. We apply the probability density function of a Gaussian
+Let $$v_{ij}$$ be the vote from capsule $$i$$ for the parent capsule $$j$$, and $$ v^h_{ij} $$ be its $$h$$-th component. We apply the probability density function of a Gaussian
 
 $$
 \begin{split}

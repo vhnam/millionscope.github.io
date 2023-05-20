@@ -55,21 +55,21 @@ A general form of a linear regression model is:
 
 $$ y = w_0 + w_1 x_1 + w_2 x_2 + … + w_n x_n $$
 
-The coefficients describe the change of the response triggered by one unit increase of the independent variables. The coefficients are not comparable directly unless the features have been standardized (check sklearn.preprocessing.[StandardScalar](http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html#sklearn.preprocessing.StandardScaler) and [RobustScaler](http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.RobustScaler.html#sklearn.preprocessing.RobustScaler)), since one unit of different features can refer to very different things. Without standardization, the product $w\_i \\dot x\_i$ can be used to quantify one feature's contribution to the response.
+The coefficients describe the change of the response triggered by one unit increase of the independent variables. The coefficients are not comparable directly unless the features have been standardized (check sklearn.preprocessing.[StandardScalar](http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html#sklearn.preprocessing.StandardScaler) and [RobustScaler](http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.RobustScaler.html#sklearn.preprocessing.RobustScaler)), since one unit of different features can refer to very different things. Without standardization, the product $w_i \\dot x_i$ can be used to quantify one feature's contribution to the response.
 
 ## Naive Bayes[#](#naive-bayes)
 
 Naive Bayes is named as “Naive” because it works on a very simplified assumption that features are independent of each other and each contributes to the output independently.
 
-Given a feature vector $\mathbf{x} = \[x\_1, x\_2, \dots, x\_n\]$ and a class label $c \in \{1, 2, \dots, C\}$, the probability of this data point belonging to this class is:
+Given a feature vector $\mathbf{x} = \[x_1, x_2, \dots, x_n\]$ and a class label $c \in \{1, 2, \dots, C\}$, the probability of this data point belonging to this class is:
 
-$$ \begin{aligned} p(c | x_1, x_2, \dots, x_n) &\\propto p(c, x_1, x_2, \dots, x_n)\\ &\\propto p(c) p(x_1 | c) p(x_2 | c) \dots p(x_n | c)\\ &\\propto p(c) \\prod\_{i=1}^n p(x_i | c). \end{aligned} $$
+$$ \begin{aligned} p(c | x_1, x_2, \dots, x_n) &\\propto p(c, x_1, x_2, \dots, x_n)\\ &\\propto p(c) p(x_1 | c) p(x_2 | c) \dots p(x_n | c)\\ &\\propto p(c) \\prod_{i=1}^n p(x_i | c). \end{aligned} $$
 
 The Naive Bayes classifier is then defined as:
 
-$$ \hat{y} = \arg\max\_{c \in 1, \dots, C} p(c) \\prod\_{i=1}^n p(x_i | c) $$
+$$ \hat{y} = \arg\max_{c \in 1, \dots, C} p(c) \\prod_{i=1}^n p(x_i | c) $$
 
-Because the model has learned the prior $p(x\_i \vert c)$ during the training, the contribution of an individual feature value can be easily measured by the posterior, $p(c \vert x\_i) = p(c)p(x\_i \vert c) / p(x\_i)$.
+Because the model has learned the prior $p(x_i \vert c)$ during the training, the contribution of an individual feature value can be easily measured by the posterior, $p(c \vert x_i) = p(c)p(x_i \vert c) / p(x_i)$.
 
 ## Decision Tree/Decision Lists[#](#decision-treedecision-lists)
 
@@ -108,25 +108,25 @@ The interpretation framework should balance between two goals:
 
 [Robnik-Sikonja and Kononenko (2008)](http://lkm.fri.uni-lj.si/rmarko/papers/RobnikSikonjaKononenko08-TKDE.pdf) proposed to explain the model prediction for one instance by measuring the difference between the original prediction and the one made with omitting a set of features.
 
-Let's say we need to generate an explanation for a classification model $f: \mathbf{X} \\rightarrow \mathbf{Y}$. Given a data point $x \in X$ which consists of $a$ individual values of attribute $A\_i$, $i = 1, \dots, a$, and is labeled with class $y \in Y$. The _prediction difference_ is quantified by computing the difference between the model predicted probabilities with or without knowing $A\_i$:
+Let's say we need to generate an explanation for a classification model $f: \mathbf{X} \\rightarrow \mathbf{Y}$. Given a data point $x \in X$ which consists of $a$ individual values of attribute $A_i$, $i = 1, \dots, a$, and is labeled with class $y \in Y$. The _prediction difference_ is quantified by computing the difference between the model predicted probabilities with or without knowing $A_i$:
 
-$$ \text{probDiff}\_i (y | x) = p(y| x) - p(y | x \\backslash A_i) $$
+$$ \text{probDiff}_i (y | x) = p(y| x) - p(y | x \\backslash A_i) $$
 
 (The paper also discussed on using the odds ratio or the entropy-based information metric to quantify the prediction difference.)
 
 **Problem**: If the target model outputs a probability, then great, getting $ p(y \vert x) $ is straightforward. Otherwise, the model prediction has to run through an appropriate post-modeling calibration to translate the prediction score into probabilities. This calibration layer is another piece of complication.
 
-**Another problem**: If we generate $x \\backslash A\_i$ by replacing $A\_i$ with a missing value (like `None`, `NaN`, etc.), we have to rely on the model's internal mechanism for missing value imputation. A model which replaces these missing cases with the median should have output very different from a model which imputes a special placeholder. One solution as presented in the paper is to replace $A\_i$ with all possible values of this feature and then sum up the prediction weighted by how likely each value shows in the data:
+**Another problem**: If we generate $x \\backslash A_i$ by replacing $A_i$ with a missing value (like `None`, `NaN`, etc.), we have to rely on the model's internal mechanism for missing value imputation. A model which replaces these missing cases with the median should have output very different from a model which imputes a special placeholder. One solution as presented in the paper is to replace $A_i$ with all possible values of this feature and then sum up the prediction weighted by how likely each value shows in the data:
 
-$$ \begin{aligned} p(y \vert x \\backslash A_i) &= \sum\_{s=1}^{m_i} p(A_i=a_s \vert x \\backslash A_i) p(y \vert x \\leftarrow A_i=a_s) \\ &\approx \sum\_{s=1}^{m_i} p(A_i=a_s) p(y \vert x \\leftarrow A_i=a_s) \end{aligned} $$
+$$ \begin{aligned} p(y \vert x \\backslash A_i) &= \sum_{s=1}^{m_i} p(A_i=a_s \vert x \\backslash A_i) p(y \vert x \\leftarrow A_i=a_s) \\ &\approx \sum_{s=1}^{m_i} p(A_i=a_s) p(y \vert x \\leftarrow A_i=a_s) \end{aligned} $$
 
-Where $p(y \vert x \\leftarrow A\_i=a\_s)$ is the probability of getting label $y$ if we replace the feature $A\_i$ with value $a\_s$ in the feature vector of $x$. There are $m\_i$ unique values of $A\_i$ in the training set.
+Where $p(y \vert x \\leftarrow A_i=a_s)$ is the probability of getting label $y$ if we replace the feature $A_i$ with value $a_s$ in the feature vector of $x$. There are $m_i$ unique values of $A_i$ in the training set.
 
 With the help of the measures of prediction difference when omitting known features, we can _decompose_ the impact of each individual feature on the prediction.
 
 ![](interpretability_prediction_decomposition.png)
 
-Fig. 1. Explanations for a SVM model predicting the survival of one male adult first-class passenger in the [Titanic dataset](https://www.kaggle.com/c/titanic/data). The information difference is very similar to the probability difference, but it measures the amount of information necessary to find out $y$ is true for the given instance without the knowledge of $A\\\_i$: $\text{infDiff}\\\_i (y|x) = \\log\\\_2 p(y|x) - \\log\\\_2 p(y|x \\backslash A\\\_i)$. Explanations for particular instance are depicted with dark bars. The light shaded half-height bars are average positive and negative explanations for given attributes' values. In this case, being a male adult makes it very less likely to survive; the class level does not impact as much.
+Fig. 1. Explanations for a SVM model predicting the survival of one male adult first-class passenger in the [Titanic dataset](https://www.kaggle.com/c/titanic/data). The information difference is very similar to the probability difference, but it measures the amount of information necessary to find out $y$ is true for the given instance without the knowledge of $A\\_i$: $\text{infDiff}\\_i (y|x) = \\log\\_2 p(y|x) - \\log\\_2 p(y|x \\backslash A\\_i)$. Explanations for particular instance are depicted with dark bars. The light shaded half-height bars are average positive and negative explanations for given attributes' values. In this case, being a male adult makes it very less likely to survive; the class level does not impact as much.
 
 ## Local Gradient Explanation Vector[#](#local-gradient-explanation-vector)
 
@@ -134,27 +134,27 @@ This method ([Baehrens, et al. 2010](http://www.jmlr.org/papers/volume11/baehren
 
 Let's say, we have a [Bayes Classifier](https://en.wikipedia.org/wiki/Bayes_classifier) which is trained on the data set $X$ and outputs probabilities over the class labels $Y$, $p(Y=y \vert X=x)$. And one class label $y$ is drawn from the class label pool, $\{1, 2, \dots, C\}$. This Bayes classifier is constructed as:
 
-$$ f^{\*}(x) = \arg \min\_{c \in \{1, \dots, C\}} p(Y \\neq c \vert X = x) $$
+$$ f^{\*}(x) = \arg \min_{c \in \{1, \dots, C\}} p(Y \\neq c \vert X = x) $$
 
-The _local explanation vector_ is defined as the derivative of the probability prediction function at the test point $x = x\_0$. A large entry in this vector highlights a feature with a big influence on the model decision; A positive sign indicates that increasing the feature would lower the probability of $x\_0$ assigned to $f^{\*}(x\_0)$.
+The _local explanation vector_ is defined as the derivative of the probability prediction function at the test point $x = x_0$. A large entry in this vector highlights a feature with a big influence on the model decision; A positive sign indicates that increasing the feature would lower the probability of $x_0$ assigned to $f^{\*}(x_0)$.
 
 However, this approach requires the model output to be a probability (similar to the [“Prediction Decomposition”](https://lilianweng.github.io/posts/2017-08-01-interpretation/#prediction-decomposition) method above). What if the original model (labelled as $f$) is not calibrated to yield probabilities? As suggested by the paper, we can approximate $f$ by another classifier in a form that resembles the Bayes classifier $f^{\*}$:
 
 (1) Apply [Parzen window](https://en.wikipedia.org/?title=Parzen_window&redirect=no) to the training data to estimate the weighted class densities:
 
-$$ \hat{p}\_{\sigma}(x, y=c) = \frac{1}{n} \sum\_{i \in I_c} k\_{\sigma} (x - x_i) $$
+$$ \hat{p}_{\sigma}(x, y=c) = \frac{1}{n} \sum_{i \in I_c} k_{\sigma} (x - x_i) $$
 
-Where $I\_c$ is the index set containing the indices of data points assigned to class $c$ by the model $f$, $I\_c = \{i \vert f(x\_i) = c\}$. $k\_{\sigma}$ is a kernel function. Gaussian kernel is a popular one among [many candidates](<https://en.wikipedia.org/wiki/Kernel_(statistics)#Kernel_functions_in_common_use>).
+Where $I_c$ is the index set containing the indices of data points assigned to class $c$ by the model $f$, $I_c = \{i \vert f(x_i) = c\}$. $k_{\sigma}$ is a kernel function. Gaussian kernel is a popular one among [many candidates](<https://en.wikipedia.org/wiki/Kernel_(statistics)#Kernel_functions_in_common_use>).
 
 (2) Then, apply the Bayes' rule to approximate the probability $p(Y=c \vert X=x)$ for all classes:
 
-$$ \begin{aligned} \hat{p}\_{\sigma}(y=c | x) &= \frac{\hat{p}\_{\sigma}(x, y=c)}{\hat{p}\_{\sigma}(x, y=c) + \hat{p}\_{\sigma}(x, y \\neq c)} \\ &\approx \frac{\sum\_{i \in I_c} k\_{\sigma} (x - x_i)}{\sum_i k\_{\sigma} (x - x_i)} \end{aligned} $$
+$$ \begin{aligned} \hat{p}_{\sigma}(y=c | x) &= \frac{\hat{p}_{\sigma}(x, y=c)}{\hat{p}_{\sigma}(x, y=c) + \hat{p}_{\sigma}(x, y \\neq c)} \\ &\approx \frac{\sum_{i \in I_c} k_{\sigma} (x - x_i)}{\sum_i k_{\sigma} (x - x_i)} \end{aligned} $$
 
 (3) The final estimated Bayes classifier takes the form:
 
-$$ \hat{f}\_{\sigma} = \arg\min\_{c \in \{1, \dots, C\}} \hat{p}\_{\sigma}(y \\neq c \vert x) $$
+$$ \hat{f}_{\sigma} = \arg\min_{c \in \{1, \dots, C\}} \hat{p}_{\sigma}(y \\neq c \vert x) $$
 
-Noted that we can generate the labeled data with the original model $f$, as much as we want, not restricted by the size of the training data. The hyperparameter $\sigma$ is selected to optimize the chances of $\hat{f}\_{\sigma}(x) = f(x)$ to achieve high fidelity.
+Noted that we can generate the labeled data with the original model $f$, as much as we want, not restricted by the size of the training data. The hyperparameter $\sigma$ is selected to optimize the chances of $\hat{f}_{\sigma}(x) = f(x)$ to achieve high fidelity.
 
 ![](interpretability_local_gradient.png)
 
@@ -168,7 +168,7 @@ Fig. 2. An example of how local gradient explanation vector is applied on simple
 
 Same as above, let us label the black-box model as $f$. LIME presents the following steps:
 
-(1) Convert the dataset into interpretable data representation: $x \\Rightarrow x\_b$.
+(1) Convert the dataset into interpretable data representation: $x \\Rightarrow x_b$.
 
 - Text classifier: a binary vector indicating the presence or absence of a word
 - Image classifier: a binary vector indicating the presence or absence of a contiguous patch of similar pixels (super-pixel).
@@ -177,11 +177,11 @@ Same as above, let us label the black-box model as $f$. LIME presents the follow
 
 Fig. 3. An example of converting an image into interpretable data representation. (Image source: [www.oreilly.com/learning/introduction-to-local-interpretable-model-agnostic-explanations-lime](https://www.oreilly.com/learning/introduction-to-local-interpretable-model-agnostic-explanations-lime))
 
-(2) Given a prediction $f(x)$ with the corresponding interpretable data representation $x\_b$, let us sample instances around $x\_b$ by drawing nonzero elements of $x\_b$ uniformly at random where the number of such draws is also uniformly sampled. This process generates a perturbed sample $z\_b$ which contains a fraction of nonzero elements of $x\_b$.
+(2) Given a prediction $f(x)$ with the corresponding interpretable data representation $x_b$, let us sample instances around $x_b$ by drawing nonzero elements of $x_b$ uniformly at random where the number of such draws is also uniformly sampled. This process generates a perturbed sample $z_b$ which contains a fraction of nonzero elements of $x_b$.
 
-Then we recover $z\_b$ back into the original input $z$ and get a prediction score $f(z)$ by the target model.
+Then we recover $z_b$ back into the original input $z$ and get a prediction score $f(z)$ by the target model.
 
-Use many such sampled data points $z\_b \in \mathcal{Z}\_b$ and their model predictions, we can learn an explanation model (such as in a form as simple as a regression) with local fidelity. The sampled data points are weighted differently based on how close they are to $x\_b$. The paper used a lasso regression with preprocessing to select top $k$ most significant features beforehand, named “K-LASSO”.
+Use many such sampled data points $z_b \in \mathcal{Z}_b$ and their model predictions, we can learn an explanation model (such as in a form as simple as a regression) with local fidelity. The sampled data points are weighted differently based on how close they are to $x_b$. The paper used a lasso regression with preprocessing to select top $k$ most significant features beforehand, named “K-LASSO”.
 
 ![](LIME_illustration.png)
 
@@ -211,7 +211,7 @@ The authors proposed an novel objective function so that the learning process is
 
 ![](BETA.png)
 
-Fig. 6. Measures for desiderata of a good model explanation: fidelity, unambiguity, and interpretability. Given the target model is $\mathcal{B}$, its explanation is a two level decision set $\\Re$ containing a set of rules ${(q\\\_1, s\\\_1, c\\\_1), \dots, (q\\\_M, s\\\_M, c\\\_M)}$, where $q\\\_i$ and $s\\\_i$ are conjunctions of predicates of the form (feature, operator, value) and $c\\\_i$ is a class label. Check [the paper](https://arxiv.org/abs/1707.01154) for more details. (Image source: [arxiv.org/abs/1707.01154](https://arxiv.org/abs/1707.01154))
+Fig. 6. Measures for desiderata of a good model explanation: fidelity, unambiguity, and interpretability. Given the target model is $\mathcal{B}$, its explanation is a two level decision set $\\Re$ containing a set of rules ${(q\\_1, s\\_1, c\\_1), \dots, (q\\_M, s\\_M, c\\_M)}$, where $q\\_i$ and $s\\_i$ are conjunctions of predicates of the form (feature, operator, value) and $c\\_i$ is a class label. Check [the paper](https://arxiv.org/abs/1707.01154) for more details. (Image source: [arxiv.org/abs/1707.01154](https://arxiv.org/abs/1707.01154))
 
 # Explainable Artificial Intelligence[#](#explainable-artificial-intelligence)
 

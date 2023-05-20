@@ -44,15 +44,15 @@ A Markov process is a [“memoryless”](http://mathworld.wolfram.com/Memoryless
 
 KL divergence measures how one probability distribution $p$ diverges from a second expected probability distribution $q$. It is asymmetric.
 
-$$ \begin{aligned} D\_{KL}(p \| q) &= \sum_x p(x) \\log \frac{p(x)}{q(x)} \\ &= - \sum_x p(x)\\log q(x) + \sum_x p(x)\\log p(x) \\ &= H(P, Q) - H(P) \end{aligned} $$
+$$ \begin{aligned} D_{KL}(p \| q) &= \sum_x p(x) \\log \frac{p(x)}{q(x)} \\ &= - \sum_x p(x)\\log q(x) + \sum_x p(x)\\log p(x) \\ &= H(P, Q) - H(P) \end{aligned} $$
 
-$D\_{KL}$ achieves the minimum zero when $p(x)$ == $q(x)$ everywhere.
+$D_{KL}$ achieves the minimum zero when $p(x)$ == $q(x)$ everywhere.
 
 [**Mutual Information**](https://en.wikipedia.org/wiki/Mutual_information)
 
 Mutual information measures the mutual dependence between two variables. It quantifies the “amount of information” obtained about one random variable through the other random variable. Mutual information is symmetric.
 
-$$ \begin{aligned} I(X;Y) &= D\_{KL}\[p(x,y) \| p(x)p(y)\] \\ &= \sum\_{x \in X, y \in Y} p(x, y) \\log(\frac{p(x, y)}{p(x)p(y)}) \\ &= \sum\_{x \in X, y \in Y} p(x, y) \\log(\frac{p(x|y)}{p(x)}) \\ &= H(X) - H(X|Y) \\ \end{aligned} $$
+$$ \begin{aligned} I(X;Y) &= D_{KL}\[p(x,y) \| p(x)p(y)\] \\ &= \sum_{x \in X, y \in Y} p(x, y) \\log(\frac{p(x, y)}{p(x)p(y)}) \\ &= \sum_{x \in X, y \in Y} p(x, y) \\log(\frac{p(x|y)}{p(x)}) \\ &= H(X) - H(X|Y) \\ \end{aligned} $$
 
 [**Data Processing Inequality (DPI)**](https://en.wikipedia.org/wiki/Data_processing_inequality)
 
@@ -72,9 +72,9 @@ The training data contains sampled observations from the joint distribution of $
 
 ![](ib-dnn-structure.png)
 
-Fig. 1. The structure of a deep neural network, which consists of the target label $Y$, input layer $X$, hidden layers $h\\\_1, \dots, h\\\_m$ and the final prediction $\hat{Y}$. (Image source: [Tishby and Zaslavsky, 2015](https://arxiv.org/pdf/1503.02406.pdf))
+Fig. 1. The structure of a deep neural network, which consists of the target label $Y$, input layer $X$, hidden layers $h\\_1, \dots, h\\_m$ and the final prediction $\hat{Y}$. (Image source: [Tishby and Zaslavsky, 2015](https://arxiv.org/pdf/1503.02406.pdf))
 
-If we label the hidden layers of a DNN as $h\_1, h\_2, \dots, h\_m$ as in Fig. 1, we can view each layer as one state of a Markov Chain: $ h_i \to h\_{i+1}$. According to DPI, we would have:
+If we label the hidden layers of a DNN as $h_1, h_2, \dots, h_m$ as in Fig. 1, we can view each layer as one state of a Markov Chain: $ h_i \to h_{i+1}$. According to DPI, we would have:
 
 $$ \begin{aligned} H(X) \\geq I(X; h_1) \\geq I(X; h_2) \\geq \dots \\geq I(X; h_m) \\geq I(X; \hat{Y}) \\ I(X; Y) \\geq I(h_1; Y) \\geq I(h_2; Y) \\geq \dots \\geq I(h_m; Y) \\geq I(\hat{Y}; Y) \end{aligned} $$
 
@@ -82,12 +82,12 @@ A DNN is designed to learn how to describe $X$ to predict $Y$ and eventually, to
 
 ## Information Plane Theorem[#](#information-plane-theorem)
 
-A DNN has successive internal representations of $X$, a set of hidden layers $\{T\_i\}$. The _information plane_ theorem characterizes each layer by its encoder and decoder information. The encoder is a representation of the input data $X$, while the decoder translates the information in the current layer to the target ouput $Y$.
+A DNN has successive internal representations of $X$, a set of hidden layers $\{T_i\}$. The _information plane_ theorem characterizes each layer by its encoder and decoder information. The encoder is a representation of the input data $X$, while the decoder translates the information in the current layer to the target ouput $Y$.
 
 Precisely, in an information plane plot:
 
-- **X-axis**: The sample complexity of $T\_i$ is determined by the encoder mutual information $I(X; T\_i)$. Sample complexity refers to how many samples you need to achieve certain accuracy and generalization.
-- **Y-axis**: The accuracy (generalization error) is determined by the decoder mutual information $I(T\_i; Y)$.
+- **X-axis**: The sample complexity of $T_i$ is determined by the encoder mutual information $I(X; T_i)$. Sample complexity refers to how many samples you need to achieve certain accuracy and generalization.
+- **Y-axis**: The accuracy (generalization error) is determined by the decoder mutual information $I(T_i; Y)$.
 
 ![](ib-information-plane.png)
 
@@ -115,10 +115,10 @@ Among early epochs, the mean values are three magnitudes larger than the standar
 
 The generalization bounds defined by the classic learning theory is:
 
-$$ \\epsilon^2 < \frac{\\log|H\_\\epsilon| + \\log{1/\\delta}}{2m} $$
+$$ \\epsilon^2 < \frac{\\log|H_\\epsilon| + \\log{1/\\delta}}{2m} $$
 
 - $\\epsilon$: The difference between the training error and the generalization error. The generalization error measures how accurate the prediction of an algorithm is for previously unseen data.
-- $H\_\\epsilon$: $\\epsilon$-cover of the hypothesis class. Typically we assume the size $\vert H\_\\epsilon \vert \\sim (1/\\epsilon)^d$.
+- $H_\\epsilon$: $\\epsilon$-cover of the hypothesis class. Typically we assume the size $\vert H_\\epsilon \vert \\sim (1/\\epsilon)^d$.
 - $\\delta$: Confidence.
 - $m$: The number of training samples.
 - $d$: The VC dimension of the hypothesis.
@@ -131,13 +131,13 @@ However, it does not work for deep learning. The larger a network is, the more p
 
 To solve this counterintuitive observation, Tishby et al. proposed a new input compression bound for DNN.
 
-First let us have $T\_\\epsilon$ as an $\\epsilon$-partition of the input variable $X$. This partition compresses the input with respect to the homogeneity to the labels into small cells. The cells in total can cover the whole input space. If the prediction outputs binary values, we can replace the cardinality of the hypothesis, $\vert H\_\\epsilon \vert$, with $2^{\vert T\_\\epsilon \vert}$.
+First let us have $T_\\epsilon$ as an $\\epsilon$-partition of the input variable $X$. This partition compresses the input with respect to the homogeneity to the labels into small cells. The cells in total can cover the whole input space. If the prediction outputs binary values, we can replace the cardinality of the hypothesis, $\vert H_\\epsilon \vert$, with $2^{\vert T_\\epsilon \vert}$.
 
-$$ |H\_\\epsilon| \\sim 2^{|X|} \to 2^{|T\_\\epsilon|} $$
+$$ |H_\\epsilon| \\sim 2^{|X|} \to 2^{|T_\\epsilon|} $$
 
-When $X$ is large, the size of $X$ is approximately $2^{H(X)}$. Each cell in the $\\epsilon$-partition is of size $2^{H(X \vert T\_\\epsilon)}$. Therefore we have $\vert T\_\\epsilon \vert \\sim \frac{2^{H(X)}}{2^{H(X \vert T\_\\epsilon)}} = 2^{I(T\_\\epsilon; X)}$. Then the input compression bound becomes:
+When $X$ is large, the size of $X$ is approximately $2^{H(X)}$. Each cell in the $\\epsilon$-partition is of size $2^{H(X \vert T_\\epsilon)}$. Therefore we have $\vert T_\\epsilon \vert \\sim \frac{2^{H(X)}}{2^{H(X \vert T_\\epsilon)}} = 2^{I(T_\\epsilon; X)}$. Then the input compression bound becomes:
 
-$$ \\epsilon^2 < \frac{2^{I(T\_\\epsilon; X)} + \\log{1/\\delta}}{2m} $$
+$$ \\epsilon^2 < \frac{2^{I(T_\\epsilon; X)} + \\log{1/\\delta}}{2m} $$
 
 ![](ib-bound.png)
 
@@ -153,7 +153,7 @@ Having more layers give us computational benefits and speed up the training proc
 
 Fig. 6. The optimization time is much shorter (fewer epochs) with more hidden layers. (Image source: [Shwartz-Ziv and Tishby, 2017](https://arxiv.org/pdf/1703.00810.pdf))
 
-**Compression through stochastic relaxation**: According to the [diffusion equation](https://en.wikipedia.org/wiki/Fokker%E2%80%93Planck_equation), the relaxation time of layer $k$ is proportional to the exponential of this layer's compression amount $\\Delta S\_k$: $\\Delta t\_k \\sim \exp(\\Delta S\_k)$. We can compute the layer compression as $\\Delta S\_k = I(X; T\_k) - I(X; T\_{k-1})$. Because $\exp(\sum\_k \\Delta S\_k) \\geq \sum\_k \exp(\\Delta S\_k)$, we would expect an exponential decrease in training epochs with more hidden layers (larger $k$).
+**Compression through stochastic relaxation**: According to the [diffusion equation](https://en.wikipedia.org/wiki/Fokker%E2%80%93Planck_equation), the relaxation time of layer $k$ is proportional to the exponential of this layer's compression amount $\\Delta S_k$: $\\Delta t_k \\sim \exp(\\Delta S_k)$. We can compute the layer compression as $\\Delta S_k = I(X; T_k) - I(X; T_{k-1})$. Because $\exp(\sum_k \\Delta S_k) \\geq \sum_k \exp(\\Delta S_k)$, we would expect an exponential decrease in training epochs with more hidden layers (larger $k$).
 
 ## The Benefit of More Training Samples[#](#the-benefit-of-more-training-samples)
 
