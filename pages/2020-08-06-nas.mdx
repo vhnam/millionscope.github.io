@@ -104,7 +104,7 @@ During the experiments, they discovered that a modified version of [_DropPath_](
 
 ## Hierarchical Structure[#](#hierarchical-structure)
 
-To take advantage of already discovered well-designed network [motifs](https://en.wikipedia.org/wiki/Network_motif), the NAS search space can be constrained as a hierarchical structure, as in _Hierarchical NAS_ (**HNAS**; ([Liu et al 2017](https://arxiv.org/abs/1711.00436))). It starts with a small set of primitives, including individual operations like convolution operation, pooling, identity, etc. Then small sub-graphs (or “motifs”) that consist of primitive operations are recursively used to form higher-level computation graphs.
+To take advantage of already discovered well-designed network [motifs](https://en.wikipedia.org/wiki/Network_motif), the NAS search space can be constrained as a hierarchical structure, as in _Hierarchical NAS_ (**HNAS**; ([Liu et al 2017](https://arxiv.org/abs/1711.00436))). It starts with a small set of primitives, including individual operations like convolution operation, pooling, identity, etc. Then small sub-graphs (or "motifs") that consist of primitive operations are recursively used to form higher-level computation graphs.
 
 A computation motif at level $\ell=1, \dots, L$ can be represented by $(G^{(\ell)}, \mathcal{O}^{(\ell)})$, where:
 
@@ -127,7 +127,7 @@ $$x_i = \text{merge} \big\[ \{ o^{(\ell)}_{G^{(\ell)}_{ij}}(x_j) \}_{j < i} \big
 
 where $\text{merge}\[\]$ is implemented as depth-wise concatenation in the [paper](https://arxiv.org/abs/1711.00436).
 
-Same as NASNet, experiments in [Liu et al (2017)](https://arxiv.org/abs/1711.00436) focused on discovering good cell architecture within a predefined “macro” structure with repeated modules. They showed that the power of simple search methods (e.g. random search or evolutionary algorithms) can be substantially enhanced using well-designed search spaces.
+Same as NASNet, experiments in [Liu et al (2017)](https://arxiv.org/abs/1711.00436) focused on discovering good cell architecture within a predefined "macro" structure with repeated modules. They showed that the power of simple search methods (e.g. random search or evolutionary algorithms) can be substantially enhanced using well-designed search spaces.
 
 [Cai et al (2018b)](https://arxiv.org/abs/1806.02639) propose a tree-structure search space using path-level network transformation. Each node in a tree structure defines an _allocation_ scheme for splitting inputs for child nodes and a _merge_ scheme for combining results from child nodes. The path-level network transformation allows replacing a single layer with a multi-branch motif if its corresponding merge scheme is add or concat.
 
@@ -211,15 +211,15 @@ Fig. 12. Two types of mutations in AmoebaNet. (Image source: [Real et al. 2018](
 
 In their experiments, EA and RL work equally well in terms of the final validation accuracy, but EA has better anytime performance and is able to find smaller models. Here using EA in NAS is still expensive in terms of computation, as each experiment took 7 days with 450 GPUs.
 
-**HNAS** ([Liu et al 2017](https://arxiv.org/abs/1711.00436)) also employs the evolutionary algorithms (the original tournament selection) as their search strategy. In the [hierarchical structure](#hierarchical-structure) search space, each edge is an operation. Thus genotype mutation in their experiments is applied by replacing a random edge with a different operation. The replacement set includes an `none` op, so it can alter, remove and add an edge. The initial set of genotypes is created by applying a large number of random mutations on “trivial” motifs (all identity mappings).
+**HNAS** ([Liu et al 2017](https://arxiv.org/abs/1711.00436)) also employs the evolutionary algorithms (the original tournament selection) as their search strategy. In the [hierarchical structure](#hierarchical-structure) search space, each edge is an operation. Thus genotype mutation in their experiments is applied by replacing a random edge with a different operation. The replacement set includes an `none` op, so it can alter, remove and add an edge. The initial set of genotypes is created by applying a large number of random mutations on "trivial" motifs (all identity mappings).
 
 ## Progressive Decision Process[#](#progressive-decision-process)
 
-Constructing a model architecture is a sequential process. Every additional operator or layer brings extra complexity. If we guide the search model to start the investigation from simple models and gradually evolve to more complex architectures, it is like to introduce [“curriculum”](https://lilianweng.github.io/posts/2020-01-29-curriculum-rl/) into the search model's learning process.
+Constructing a model architecture is a sequential process. Every additional operator or layer brings extra complexity. If we guide the search model to start the investigation from simple models and gradually evolve to more complex architectures, it is like to introduce ["curriculum"](https://lilianweng.github.io/posts/2020-01-29-curriculum-rl/) into the search model's learning process.
 
 _Progressive NAS_ (**PNAS**; [Liu, et al 2018](https://arxiv.org/abs/1712.00559)) frames the problem of NAS as a progressive procedure for searching models of increasing complexity. Instead of RL or EA, PNAS adopts a Sequential Model-based Bayesian Optimization (SMBO) as the search strategy. PNAS works similar to A\* search, as it searches for models from simple to hard while simultaneously learning a surrogate function to guide the search.
 
-> [A\* search algorithm](https://en.wikipedia.org/wiki/A*_search_algorithm) (“best-first search”) is a popular algorithm for path finding. The problem is framed as finding a path of smallest cost from a specific starting node to a given target node in a weighted graph. At each iteration, A\* finds a path to extend by minimizing: $f(n)=g(n)+h(n)$, where $n$ is the next node, $g(n)$ is the cost from start to $n$, and $h(n)$ is the heuristic function that estimates the minimum cost of going from node $n$ to the goal.
+> [A\* search algorithm](https://en.wikipedia.org/wiki/A*_search_algorithm) ("best-first search") is a popular algorithm for path finding. The problem is framed as finding a path of smallest cost from a specific starting node to a given target node in a weighted graph. At each iteration, A\* finds a path to extend by minimizing: $f(n)=g(n)+h(n)$, where $n$ is the next node, $g(n)$ is the cost from start to $n$, and $h(n)$ is the heuristic function that estimates the minimum cost of going from node $n$ to the goal.
 
 PNAS uses the [NASNet](#cell-based-representation) search space. Each block is specified as a 5-element tuple and PNAS only considers the element-wise addition as the step 5 combination operator, no concatenation. Differently, instead of setting the number of blocks $B$ at a fixed number, PNAS starts with $B=1$, a model with only one block in a cell, and gradually increases $B$.
 
@@ -231,7 +231,7 @@ Fig. 13. The algorithm of Progressive NAS. (Image source: [Liu, et al 2018](http
 
 ## Gradient descent[#](#gradient-descent)
 
-Using gradient descent to update the architecture search model requires an effort to make the process of choosing discrete operations differentiable. These approaches usually combine the learning of both architecture parameters and network weights together into one model. See more in the [section](#one-shot-approach-search--evaluation) on the _“one-shot”_ approach.
+Using gradient descent to update the architecture search model requires an effort to make the process of choosing discrete operations differentiable. These approaches usually combine the learning of both architecture parameters and network weights together into one model. See more in the [section](#one-shot-approach-search--evaluation) on the _"one-shot"_ approach.
 
 # Evaluation Strategy[#](#evaluation-strategy)
 
@@ -377,7 +377,7 @@ $$\begin{aligned} \frac{\partial \mathcal{L}}{\partial \alpha_i} &= \sum_{j=1}^{
 
 Instead of BinaryConnect, REINFORCE can also be used for parameter updates with the goal for maximizing the reward, while no RNN meta-controller is involved.
 
-Computing $\partial \mathcal{L} / \partial g_i$ needs to calculate and store $o_i(x)$, which requires $\vert \mathcal{O} \vert$ times GPU memory. To resolve this issue, they factorize the task of choosing one path out of $N$ into multiple binary selection tasks (Intuition: “if a path is the best choice, it should be better than any other path”). At every update step, only two paths are sampled while others are masked. These two selected paths are updated according to the above equation and then scaled properly so that other path weights are unchanged. After this process, one of the sampled paths is enhanced (path weight increases) and the other is attenuated (path weight decreases), while all other paths stay unaltered.
+Computing $\partial \mathcal{L} / \partial g_i$ needs to calculate and store $o_i(x)$, which requires $\vert \mathcal{O} \vert$ times GPU memory. To resolve this issue, they factorize the task of choosing one path out of $N$ into multiple binary selection tasks (Intuition: "if a path is the best choice, it should be better than any other path"). At every update step, only two paths are sampled while others are masked. These two selected paths are updated according to the above equation and then scaled properly so that other path weights are unchanged. After this process, one of the sampled paths is enhanced (path weight increases) and the other is attenuated (path weight decreases), while all other paths stay unaltered.
 
 Besides accuracy, ProxylessNAS also considers _latency_ as an important metric to optimize, as different devices might have very different requirements on inference time latency (e.g. GPU, CPU, mobile). To make latency differentiable, they model latency as a continuous function of the network dimensions. The expected latency of a mixed operation can be written as $\mathbb{E}\[\text{latency}\] = \sum_j p_j F(o_j)$, where $F(.)$ is a latency prediction model:
 
@@ -391,13 +391,13 @@ So far we have seen many interesting new ideas on automating the network archite
 
 As also noted in [Elsken, et al (2019)](https://arxiv.org/abs/1808.05377):
 
-> “…, so far it provides little insights into why specific architectures work well and how similar the architectures derived in independent runs would be. Identifying common motifs, providing an understanding why those motifs are important for high performance, and investigating if these motifs generalize over different problems would be desirable.”
+> "…, so far it provides little insights into why specific architectures work well and how similar the architectures derived in independent runs would be. Identifying common motifs, providing an understanding why those motifs are important for high performance, and investigating if these motifs generalize over different problems would be desirable."
 
 In the meantime, purely focusing on improvement over validation accuracy might not be enough ([Cai et al., 2019](https://arxiv.org/abs/1812.00332)). Devices like mobile phones for daily usage in general have limited memory and computation power. While AI applications are on the way to affect our daily life, it is unavoidable to be more _device-specific_.
 
 Another interesting investigation is to consider _unlabelled dataset_ and [self-supervised learning](https://lilianweng.github.io/posts/2019-11-10-self-supervised/) for NAS. The size of labelled dataset is always limited and it is not easy to tell whether such a dataset has biases or big deviation from the real world data distribution.
 
-[Liu et al (2020)](https://arxiv.org/abs/2003.12056) delve into the question _“Can we find high-quality neural architecture without human-annotated labels?"_ and proposed a new setup called _Unsupervised Neural Architecture Search_ (**UnNAS**). The quality of the architecture needs to be estimated in an unsupervised fashion during the search phase. The paper experimented with three unsupervised [pretext tasks](https://lilianweng.github.io/posts/2019-11-10-self-supervised/#images-based): image rotation prediction, colorization, and solving the jigsaw puzzle.
+[Liu et al (2020)](https://arxiv.org/abs/2003.12056) delve into the question _"Can we find high-quality neural architecture without human-annotated labels?"_ and proposed a new setup called _Unsupervised Neural Architecture Search_ (**UnNAS**). The quality of the architecture needs to be estimated in an unsupervised fashion during the search phase. The paper experimented with three unsupervised [pretext tasks](https://lilianweng.github.io/posts/2019-11-10-self-supervised/#images-based): image rotation prediction, colorization, and solving the jigsaw puzzle.
 
 They observed in a set of UnNAS experiments that:
 
@@ -424,7 +424,7 @@ Three types of operations are considered when mutating a parent genotype:
 
 1.  Insert a random instruction or remove an instruction at a random location in a component function;
 2.  Randomize all the instructions in a component function;
-3.  Modify one of the arguments of an instruction by replacing it with a random choice (e.g. “swap the output address” or “change the value of a constant”)
+3.  Modify one of the arguments of an instruction by replacing it with a random choice (e.g. "swap the output address" or "change the value of a constant")
 
 ![](assets/images/2020-08-06-nas/AutoML-zero-progress.png)
 
@@ -567,42 +567,42 @@ Or
 
 # Reference[#](#reference)
 
-\[1\] Thomas Elsken, Jan Hendrik Metzen, Frank Hutter. [“Neural Architecture Search: A Survey”](https://arxiv.org/abs/1808.05377) JMLR 20 (2019) 1-21.
+\[1\] Thomas Elsken, Jan Hendrik Metzen, Frank Hutter. ["Neural Architecture Search: A Survey"](https://arxiv.org/abs/1808.05377) JMLR 20 (2019) 1-21.
 
-\[2\] Kenneth O. Stanley, et al. [“Designing neural networks through neuroevolution”](https://www.nature.com/articles/s42256-018-0006-z) Nature Machine Intelligence volume 1, pages 24–35 (2019).
+\[2\] Kenneth O. Stanley, et al. ["Designing neural networks through neuroevolution"](https://www.nature.com/articles/s42256-018-0006-z) Nature Machine Intelligence volume 1, pages 24–35 (2019).
 
-\[3\] Kenneth O. Stanley & Risto Miikkulainen. [“Evolving Neural Networks through Augmenting Topologies”](http://nn.cs.utexas.edu/downloads/papers/stanley.ec02.pdf) Evolutionary Computation 10(2): 99-127 (2002).
+\[3\] Kenneth O. Stanley & Risto Miikkulainen. ["Evolving Neural Networks through Augmenting Topologies"](http://nn.cs.utexas.edu/downloads/papers/stanley.ec02.pdf) Evolutionary Computation 10(2): 99-127 (2002).
 
-\[4\] Barret Zoph, Quoc V. Le. [“Neural architecture search with reinforcement learning”](https://arxiv.org/abs/1611.01578) ICLR 2017.
+\[4\] Barret Zoph, Quoc V. Le. ["Neural architecture search with reinforcement learning"](https://arxiv.org/abs/1611.01578) ICLR 2017.
 
-\[5\] Bowen Baker, et al. [“Designing Neural Network Architectures using Reinforcement Learning”](https://arxiv.org/abs/1611.02167) ICLR 2017.
+\[5\] Bowen Baker, et al. ["Designing Neural Network Architectures using Reinforcement Learning"](https://arxiv.org/abs/1611.02167) ICLR 2017.
 
-\[6\] Bowen Baker, et al. [“Accelerating neural architecture search using performance prediction”](https://arxiv.org/abs/1705.10823) ICLR Workshop 2018.
+\[6\] Bowen Baker, et al. ["Accelerating neural architecture search using performance prediction"](https://arxiv.org/abs/1705.10823) ICLR Workshop 2018.
 
-\[7\] Barret Zoph, et al. [“Learning transferable architectures for scalable image recognition”](https://arxiv.org/abs/1707.07012) CVPR 2018.
+\[7\] Barret Zoph, et al. ["Learning transferable architectures for scalable image recognition"](https://arxiv.org/abs/1707.07012) CVPR 2018.
 
-\[8\] Hanxiao Liu, et al. [“Hierarchical representations for efficient architecture search."](https://arxiv.org/abs/1711.00436) ICLR 2018.
+\[8\] Hanxiao Liu, et al. ["Hierarchical representations for efficient architecture search."](https://arxiv.org/abs/1711.00436) ICLR 2018.
 
-\[9\] Esteban Real, et al. [“Regularized Evolution for Image Classifier Architecture Search”](https://arxiv.org/abs/1802.01548) arXiv:1802.01548 (2018).
+\[9\] Esteban Real, et al. ["Regularized Evolution for Image Classifier Architecture Search"](https://arxiv.org/abs/1802.01548) arXiv:1802.01548 (2018).
 
-\[10\] Han Cai, et al. \[“Efficient architecture search by network transformation”\] AAAI 2018a.
+\[10\] Han Cai, et al. \["Efficient architecture search by network transformation"\] AAAI 2018a.
 
-\[11\] Han Cai, et al. [“Path-Level Network Transformation for Efficient Architecture Search”](https://arxiv.org/abs/1806.02639) ICML 2018b.
+\[11\] Han Cai, et al. ["Path-Level Network Transformation for Efficient Architecture Search"](https://arxiv.org/abs/1806.02639) ICML 2018b.
 
-\[12\] Han Cai, Ligeng Zhu & Song Han. [“ProxylessNAS: Direct Neural Architecture Search on Target Task and Hardware”](https://arxiv.org/abs/1812.00332) ICLR 2019.
+\[12\] Han Cai, Ligeng Zhu & Song Han. ["ProxylessNAS: Direct Neural Architecture Search on Target Task and Hardware"](https://arxiv.org/abs/1812.00332) ICLR 2019.
 
-\[13\] Chenxi Liu, et al. [“Progressive neural architecture search”](https://arxiv.org/abs/1712.00559) ECCV 2018.
+\[13\] Chenxi Liu, et al. ["Progressive neural architecture search"](https://arxiv.org/abs/1712.00559) ECCV 2018.
 
-\[14\] Hieu Pham, et al. [“Efficient neural architecture search via parameter sharing”](https://arxiv.org/abs/1802.03268) ICML 2018.
+\[14\] Hieu Pham, et al. ["Efficient neural architecture search via parameter sharing"](https://arxiv.org/abs/1802.03268) ICML 2018.
 
-\[15\] Andrew Brock, et al. [“SMASH: One-shot model architecture search through hypernetworks."](https://arxiv.org/abs/1708.05344) ICLR 2018.
+\[15\] Andrew Brock, et al. ["SMASH: One-shot model architecture search through hypernetworks."](https://arxiv.org/abs/1708.05344) ICLR 2018.
 
-\[16\] Gabriel Bender, et al. [“Understanding and simplifying one-shot architecture search."](http://proceedings.mlr.press/v80/bender18a.html) ICML 2018.
+\[16\] Gabriel Bender, et al. ["Understanding and simplifying one-shot architecture search."](http://proceedings.mlr.press/v80/bender18a.html) ICML 2018.
 
-\[17\] Hanxiao Liu, Karen Simonyan, Yiming Yang. [“DARTS: Differentiable Architecture Search”](https://arxiv.org/abs/1806.09055) ICLR 2019.
+\[17\] Hanxiao Liu, Karen Simonyan, Yiming Yang. ["DARTS: Differentiable Architecture Search"](https://arxiv.org/abs/1806.09055) ICLR 2019.
 
-\[18\] Sirui Xie, Hehui Zheng, Chunxiao Liu, Liang Lin. [“SNAS: Stochastic Neural Architecture Search”](https://arxiv.org/abs/1812.09926) ICLR 2019.
+\[18\] Sirui Xie, Hehui Zheng, Chunxiao Liu, Liang Lin. ["SNAS: Stochastic Neural Architecture Search"](https://arxiv.org/abs/1812.09926) ICLR 2019.
 
-\[19\] Chenxi Liu et al. [“Are Labels Necessary for Neural Architecture Search?"](https://arxiv.org/abs/2003.12056) ECCV 2020.
+\[19\] Chenxi Liu et al. ["Are Labels Necessary for Neural Architecture Search?"](https://arxiv.org/abs/2003.12056) ECCV 2020.
 
-\[20\] Esteban Real, et al. [“AutoML-Zero: Evolving Machine Learning Algorithms From Scratch”](https://arxiv.org/abs/2003.03384) ICML 2020.
+\[20\] Esteban Real, et al. ["AutoML-Zero: Evolving Machine Learning Algorithms From Scratch"](https://arxiv.org/abs/2003.03384) ICML 2020.

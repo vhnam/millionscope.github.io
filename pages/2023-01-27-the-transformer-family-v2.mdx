@@ -43,7 +43,7 @@ Table of Contents
 - [Citation](#citation)
 - [References](#references)
 
-Many new Transformer architecture improvements have been proposed since my last post on [“The Transformer Family”](https://lilianweng.github.io/posts/2020-04-07-the-transformer-family/) about three years ago. Here I did a big refactoring and enrichment of that 2020 post — restructure the hierarchy of sections and improve many sections with more recent papers. Version 2.0 is a superset of the old version, about twice the length.
+Many new Transformer architecture improvements have been proposed since my last post on ["The Transformer Family"](https://lilianweng.github.io/posts/2020-04-07-the-transformer-family/) about three years ago. Here I did a big refactoring and enrichment of that 2020 post — restructure the hierarchy of sections and improve many sections with more recent papers. Version 2.0 is a superset of the old version, about twice the length.
 
 # Notations[#](#notations)
 
@@ -122,7 +122,7 @@ position encoding matrix, where the $i$-th row $\mathbf{p}_i$ is the positional 
 
 # Transformer Basics[#](#transformer-basics)
 
-The **Transformer** (which will be referred to as “vanilla Transformer” to distinguish it from other enhanced versions; [Vaswani, et al., 2017](https://arxiv.org/abs/1706.03762)) model has an encoder-decoder architecture, as commonly used in many [NMT](https://lilianweng.github.io/posts/2018-06-24-attention/#born-for-translation) models. Later simplified Transformer was shown to achieve great performance in language modeling tasks, like in encoder-only [BERT](https://lilianweng.github.io/posts/2019-01-31-lm/#bert) or decoder-only [GPT](https://lilianweng.github.io/posts/2019-01-31-lm/#openai-gpt).
+The **Transformer** (which will be referred to as "vanilla Transformer" to distinguish it from other enhanced versions; [Vaswani, et al., 2017](https://arxiv.org/abs/1706.03762)) model has an encoder-decoder architecture, as commonly used in many [NMT](https://lilianweng.github.io/posts/2018-06-24-attention/#born-for-translation) models. Later simplified Transformer was shown to achieve great performance in language modeling tasks, like in encoder-only [BERT](https://lilianweng.github.io/posts/2019-01-31-lm/#bert) or decoder-only [GPT](https://lilianweng.github.io/posts/2019-01-31-lm/#openai-gpt).
 
 ## Attention and Self-Attention[#](#attention-and-self-attention)
 
@@ -242,7 +242,7 @@ The vanilla Transformer has a fixed and limited attention span. The model can on
 - It is hard to predict the first few tokens in each segment given no or thin context.
 - The evaluation is expensive. Whenever the segment is shifted to the right by one, the new segment is re-processed from scratch, although there are a lot of overlapped tokens.
 
-**Transformer-XL** ([Dai et al., 2019](https://arxiv.org/abs/1901.02860); “XL” means “extra long”) modifies the architecture to reuse hidden states between segments with an additional memory. The recurrent connection between segments is introduced into the model by continuously using the hidden states from the previous segments.
+**Transformer-XL** ([Dai et al., 2019](https://arxiv.org/abs/1901.02860); "XL" means "extra long") modifies the architecture to reuse hidden states between segments with an additional memory. The recurrent connection between segments is introduced into the model by continuously using the hidden states from the previous segments.
 
 ![](assets/images/2023-01-27-the-transformer-family-v2/transformer-XL-training.png)
 
@@ -588,7 +588,7 @@ In LSH attention, a query can only attend to positions in the same hashing bucke
 
 - (a) The attention matrix for full attention is often sparse.
 - (b) Using LSH, we can sort the keys and queries to be aligned according to their hash buckets.
-- (c) Set $\mathbf{Q} = \mathbf{K}$ (precisely $\mathbf{k}_j = \mathbf{q}_j / |\mathbf{q}_j|$), so that there are equal numbers of keys and queries in one bucket, easier for batching. Interestingly, this “shared-QK” config does not affect the performance of the Transformer.
+- (c) Set $\mathbf{Q} = \mathbf{K}$ (precisely $\mathbf{k}_j = \mathbf{q}_j / |\mathbf{q}_j|$), so that there are equal numbers of keys and queries in one bucket, easier for batching. Interestingly, this "shared-QK" config does not affect the performance of the Transformer.
 - (d) Apply batching where chunks of $m$ consecutive queries are grouped together.
 
 ![](assets/images/2023-01-27-the-transformer-family-v2/LSH-attention.png)
@@ -726,68 +726,68 @@ Or
 ```
 # References[#](#references)
 
-\[1\] Ashish Vaswani, et al. [“Attention is all you need."](http://papers.nips.cc/paper/7181-attention-is-all-you-need.pdf) NIPS 2017.
+\[1\] Ashish Vaswani, et al. ["Attention is all you need."](http://papers.nips.cc/paper/7181-attention-is-all-you-need.pdf) NIPS 2017.
 
-\[2\] Rami Al-Rfou, et al. [“Character-level language modeling with deeper self-attention."](https://arxiv.org/abs/1808.04444) AAAI 2019.
+\[2\] Rami Al-Rfou, et al. ["Character-level language modeling with deeper self-attention."](https://arxiv.org/abs/1808.04444) AAAI 2019.
 
-\[3\] Olah & Carter, [“Attention and Augmented Recurrent Neural Networks”](http://doi.org/10.23915/disti), Distill, 2016.
+\[3\] Olah & Carter, ["Attention and Augmented Recurrent Neural Networks"](http://doi.org/10.23915/disti), Distill, 2016.
 
-\[4\] Sainbayar Sukhbaatar, et al. [“Adaptive Attention Span in Transformers”](https://arxiv.org/abs/1905.07799). ACL 2019.
+\[4\] Sainbayar Sukhbaatar, et al. ["Adaptive Attention Span in Transformers"](https://arxiv.org/abs/1905.07799). ACL 2019.
 
-\[5\] Rewon Child, et al. [“Generating Long Sequences with Sparse Transformers”](https://arxiv.org/abs/1904.10509) arXiv:1904.10509 (2019).
+\[5\] Rewon Child, et al. ["Generating Long Sequences with Sparse Transformers"](https://arxiv.org/abs/1904.10509) arXiv:1904.10509 (2019).
 
-\[6\] Nikita Kitaev, et al. [“Reformer: The Efficient Transformer”](https://arxiv.org/abs/2001.04451) ICLR 2020.
+\[6\] Nikita Kitaev, et al. ["Reformer: The Efficient Transformer"](https://arxiv.org/abs/2001.04451) ICLR 2020.
 
-\[7\] Alex Graves. (“Adaptive Computation Time for Recurrent Neural Networks”)\[https://arxiv.org/abs/1603.08983\]
+\[7\] Alex Graves. ("Adaptive Computation Time for Recurrent Neural Networks")\[https://arxiv.org/abs/1603.08983\]
 
-\[8\] Niki Parmar, et al. [“Image Transformer”](https://arxiv.org/abs/1802.05751) ICML 2018.
+\[8\] Niki Parmar, et al. ["Image Transformer"](https://arxiv.org/abs/1802.05751) ICML 2018.
 
-\[9\] Zihang Dai, et al. [“Transformer-XL: Attentive Language Models Beyond a Fixed-Length Context."](https://arxiv.org/abs/1901.02860) ACL 2019.
+\[9\] Zihang Dai, et al. ["Transformer-XL: Attentive Language Models Beyond a Fixed-Length Context."](https://arxiv.org/abs/1901.02860) ACL 2019.
 
-\[10\] Aidan N. Gomez, et al. [“The Reversible Residual Network: Backpropagation Without Storing Activations”](https://arxiv.org/abs/1707.04585) NIPS 2017.
+\[10\] Aidan N. Gomez, et al. ["The Reversible Residual Network: Backpropagation Without Storing Activations"](https://arxiv.org/abs/1707.04585) NIPS 2017.
 
-\[11\] Mostafa Dehghani, et al. [“Universal Transformers”](https://arxiv.org/abs/1807.03819) ICLR 2019.
+\[11\] Mostafa Dehghani, et al. ["Universal Transformers"](https://arxiv.org/abs/1807.03819) ICLR 2019.
 
-\[12\] Emilio Parisotto, et al. [“Stabilizing Transformers for Reinforcement Learning”](https://arxiv.org/abs/1910.06764) arXiv:1910.06764 (2019).
+\[12\] Emilio Parisotto, et al. ["Stabilizing Transformers for Reinforcement Learning"](https://arxiv.org/abs/1910.06764) arXiv:1910.06764 (2019).
 
-\[13\] Rae et al. [“Compressive Transformers for Long-Range Sequence Modelling.”](https://arxiv.org/abs/1911.05507) 2019.
+\[13\] Rae et al. ["Compressive Transformers for Long-Range Sequence Modelling."](https://arxiv.org/abs/1911.05507) 2019.
 
-\[14\] Press et al. [“Train Short, Test Long: Attention With Linear Biases Enables Input Length Extrapolation.”](https://arxiv.org/abs/2108.12409) ICLR 2022.
+\[14\] Press et al. ["Train Short, Test Long: Attention With Linear Biases Enables Input Length Extrapolation."](https://arxiv.org/abs/2108.12409) ICLR 2022.
 
-\[15\] Wu, et al. [“DA-Transformer: Distance Aware Transformer”](https://aclanthology.org/2021.naacl-main.166) 2021.
+\[15\] Wu, et al. ["DA-Transformer: Distance Aware Transformer"](https://aclanthology.org/2021.naacl-main.166) 2021.
 
-\[16\] Elabyad et al. [“Depth-Adaptive Transformer.”](https://arxiv.org/abs/1910.10073) ICLR 2020.
+\[16\] Elabyad et al. ["Depth-Adaptive Transformer."](https://arxiv.org/abs/1910.10073) ICLR 2020.
 
-\[17\] Schuster et al. [“Confident Adaptive Language Modeling”](https://arxiv.org/abs/2207.07061) 2022.
+\[17\] Schuster et al. ["Confident Adaptive Language Modeling"](https://arxiv.org/abs/2207.07061) 2022.
 
-\[18\] Qiu et al. [“Blockwise self-attention for long document understanding”](https://arxiv.org/abs/1911.02972) 2019
+\[18\] Qiu et al. ["Blockwise self-attention for long document understanding"](https://arxiv.org/abs/1911.02972) 2019
 
-\[19\] Roy et al. [“Efficient Content-Based Sparse Attention with Routing Transformers.”](https://arxiv.org/abs/2003.05997) 2021.
+\[19\] Roy et al. ["Efficient Content-Based Sparse Attention with Routing Transformers."](https://arxiv.org/abs/2003.05997) 2021.
 
-\[20\] Ainslie et al. [“ETC: Encoding Long and Structured Inputs in Transformers.”](https://aclanthology.org/2020.emnlp-main.19/) EMNLP 2019.
+\[20\] Ainslie et al. ["ETC: Encoding Long and Structured Inputs in Transformers."](https://aclanthology.org/2020.emnlp-main.19/) EMNLP 2019.
 
-\[21\] Beltagy et al. [“Longformer: The long-document transformer.”](https://arxiv.org/abs/2004/05150) 2020.
+\[21\] Beltagy et al. ["Longformer: The long-document transformer."](https://arxiv.org/abs/2004/05150) 2020.
 
-\[22\] Zaheer et al. [“Big Bird: Transformers for Longer Sequences.”](https://arxiv.org/abs/2007.14062) 2020.
+\[22\] Zaheer et al. ["Big Bird: Transformers for Longer Sequences."](https://arxiv.org/abs/2007.14062) 2020.
 
-\[23\] Wang et al. [“Linformer: Self-Attention with Linear Complexity.”](https://arxiv.org/abs/2006.04768) arXiv preprint arXiv:2006.04768 (2020).
+\[23\] Wang et al. ["Linformer: Self-Attention with Linear Complexity."](https://arxiv.org/abs/2006.04768) arXiv preprint arXiv:2006.04768 (2020).
 
-\[24\] Tay et al. 2020 [“Sparse Sinkhorn Attention.”](https://arxiv.org/abs/2002.11296) ICML 2020.
+\[24\] Tay et al. 2020 ["Sparse Sinkhorn Attention."](https://arxiv.org/abs/2002.11296) ICML 2020.
 
-\[25\] Peng et al. [“Random Feature Attention.”](https://arxiv.org/abs/2103.02143) ICLR 2021.
+\[25\] Peng et al. ["Random Feature Attention."](https://arxiv.org/abs/2103.02143) ICLR 2021.
 
-\[26\] Choromanski et al. [“Rethinking Attention with Performers.”](https://arxiv.org/abs/2009.14794) ICLR 2021.
+\[26\] Choromanski et al. ["Rethinking Attention with Performers."](https://arxiv.org/abs/2009.14794) ICLR 2021.
 
-\[27\] Khandelwal et al. [“Generalization through memorization: Nearest neighbor language models.”](https://arxiv.org/abs/1911.00172) ICLR 2020.
+\[27\] Khandelwal et al. ["Generalization through memorization: Nearest neighbor language models."](https://arxiv.org/abs/1911.00172) ICLR 2020.
 
-\[28\] Yogatama et al. [“Adaptive semiparametric language models.”](https://arxiv.org/abs/2102.02557) ACL 2021.
+\[28\] Yogatama et al. ["Adaptive semiparametric language models."](https://arxiv.org/abs/2102.02557) ACL 2021.
 
-\[29\] Wu et al. [“Memorizing Transformers.”](https://arxiv.org/abs/2203.08913) ICLR 2022.
+\[29\] Wu et al. ["Memorizing Transformers."](https://arxiv.org/abs/2203.08913) ICLR 2022.
 
-\[30\] Su et al. [“Roformer: Enhanced transformer with rotary position embedding.”](https://arxiv.org/abs/2104.09864) arXiv preprint arXiv:2104.09864 (2021).
+\[30\] Su et al. ["Roformer: Enhanced transformer with rotary position embedding."](https://arxiv.org/abs/2104.09864) arXiv preprint arXiv:2104.09864 (2021).
 
-\[31\] Shaw et al. [“Self-attention with relative position representations.”](https://arxiv.org/abs/1803.02155) arXiv preprint arXiv:1803.02155 (2018).
+\[31\] Shaw et al. ["Self-attention with relative position representations."](https://arxiv.org/abs/1803.02155) arXiv preprint arXiv:1803.02155 (2018).
 
-\[32\] Tay et al. [“Efficient Transformers: A Survey."](https://arxiv.org/abs/2009.06732) ACM Computing Surveys 55.6 (2022): 1-28.
+\[32\] Tay et al. ["Efficient Transformers: A Survey."](https://arxiv.org/abs/2009.06732) ACM Computing Surveys 55.6 (2022): 1-28.
 
-\[33\] Chen et al., [“Decision Transformer: Reinforcement Learning via Sequence Modeling”](https://arxiv.org/abs/2106.01345) arXiv preprint arXiv:2106.01345 (2021).
+\[33\] Chen et al., ["Decision Transformer: Reinforcement Learning via Sequence Modeling"](https://arxiv.org/abs/2106.01345) arXiv preprint arXiv:2106.01345 (2021).

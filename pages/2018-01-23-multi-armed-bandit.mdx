@@ -50,7 +50,7 @@ In this post, we will only discuss the setting of having an infinite number of t
 
 Fig. 2. An illustration of how a Bernoulli multi-armed bandit works. The reward probabilities are \*\*unknown\*\* to the player.
 
-A naive approach can be that you continue to playing with one machine for many many rounds so as to eventually estimate the “true” reward probability according to the [law of large numbers](https://en.wikipedia.org/wiki/Law_of_large_numbers). However, this is quite wasteful and surely does not guarantee the best long-term reward.
+A naive approach can be that you continue to playing with one machine for many many rounds so as to eventually estimate the "true" reward probability according to the [law of large numbers](https://en.wikipedia.org/wiki/Law_of_large_numbers). However, this is quite wasteful and surely does not guarantee the best long-term reward.
 
 ## Definition[#](#definition)
 
@@ -109,7 +109,7 @@ Now, the question is _how to estimate the upper confidence bound_.
 
 ## Hoeffding's Inequality[#](#hoeffdings-inequality)
 
-If we do not want to assign any prior knowledge on how the distribution looks like, we can get help from [“Hoeffding's Inequality”](http://cs229.stanford.edu/extra-notes/hoeffding.pdf) — a theorem applicable to any bounded distribution.
+If we do not want to assign any prior knowledge on how the distribution looks like, we can get help from ["Hoeffding's Inequality"](http://cs229.stanford.edu/extra-notes/hoeffding.pdf) — a theorem applicable to any bounded distribution.
 
 Let $X_1, \dots, X_t$ be i.i.d. (independent and identically distributed) random variables and they are all bounded by the interval \[0, 1\]. The sample mean is $\overline{X}_t = \frac{1}{t}\sum_{\tau=1}^t X_\tau$. Then for u > 0, we have:
 
@@ -211,6 +211,6 @@ Cited as:
 
 \[2\] RL Course by David Silver - Lecture 9: [Exploration and Exploitation](https://youtu.be/sGuiWX07sKw)
 
-\[3\] Olivier Chapelle and Lihong Li. [“An empirical evaluation of thompson sampling."](http://papers.nips.cc/paper/4321-an-empirical-evaluation-of-thompson-sampling.pdf) NIPS. 2011.
+\[3\] Olivier Chapelle and Lihong Li. ["An empirical evaluation of thompson sampling."](http://papers.nips.cc/paper/4321-an-empirical-evaluation-of-thompson-sampling.pdf) NIPS. 2011.
 
-\[4\] Russo, Daniel, et al. [“A Tutorial on Thompson Sampling."](https://arxiv.org/pdf/1707.02038.pdf) arXiv:1707.02038 (2017).
+\[4\] Russo, Daniel, et al. ["A Tutorial on Thompson Sampling."](https://arxiv.org/pdf/1707.02038.pdf) arXiv:1707.02038 (2017).

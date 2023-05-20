@@ -105,7 +105,7 @@ $$L_\text{AE}(\theta, \phi) = \frac{1}{n}\sum_{i=1}^n (\mathbf{x}^{(i)} - f_\the
 
 # Denoising Autoencoder[#](#denoising-autoencoder)
 
-Since the autoencoder learns the identity function, we are facing the risk of “overfitting” when there are more network parameters than the number of data points.
+Since the autoencoder learns the identity function, we are facing the risk of "overfitting" when there are more network parameters than the number of data points.
 
 To avoid overfitting and improve the robustness, **Denoising Autoencoder** (Vincent et al. 2008) proposed a modification to the basic autoencoder. The input is partially corrupted by adding noises to or masking some values of the input vector in a stochastic manner, $\tilde{\mathbf{x}} \sim \mathcal{M}_\mathcal{D}(\tilde{\mathbf{x}} \vert \mathbf{x})$. Then the model is trained to recover the original input (note: not the corrupt one).
 
@@ -117,7 +117,7 @@ where $\mathcal{M}_\mathcal{D}$ defines the mapping from the true data samples t
 
 Fig. 2. Illustration of denoising autoencoder model architecture.
 
-This design is motivated by the fact that humans can easily recognize an object or a scene even the view is partially occluded or corrupted. To “repair” the partially destroyed input, the denoising autoencoder has to discover and capture relationship between dimensions of input in order to infer missing pieces.
+This design is motivated by the fact that humans can easily recognize an object or a scene even the view is partially occluded or corrupted. To "repair" the partially destroyed input, the denoising autoencoder has to discover and capture relationship between dimensions of input in order to infer missing pieces.
 
 For high dimensional input with high redundancy, like images, the model is likely to depend on evidence gathered from a combination of many input dimensions to recover the denoised version rather than to overfit one dimension. This builds up a good foundation for learning _robust_ latent representation.
 
@@ -127,7 +127,7 @@ In the experiment of the original DAE paper, the noise is applied in this way: a
 
 # Sparse Autoencoder[#](#sparse-autoencoder)
 
-**Sparse Autoencoder** applies a “sparse” constraint on the hidden unit activation to avoid overfitting and improve robustness. It forces the model to only have a small number of hidden units being activated at the same time, or in other words, one hidden neuron should be inactivate most of time.
+**Sparse Autoencoder** applies a "sparse" constraint on the hidden unit activation to avoid overfitting and improve robustness. It forces the model to only have a small number of hidden units being activated at the same time, or in other words, one hidden neuron should be inactivate most of time.
 
 Recall that common [activation functions](http://cs231n.github.io/neural-networks-1/#actfun) include sigmoid, tanh, relu, leaky relu, etc. A neuron is activated when the value is close to 1 and inactivate with a value close to 0.
 
@@ -234,7 +234,7 @@ The negation of the above defines our loss function:
 
 $$\begin{aligned} L_\text{VAE}(\theta, \phi) &= -\log p_\theta(\mathbf{x}) + D_\text{KL}( q_\phi(\mathbf{z}\vert\mathbf{x}) \| p_\theta(\mathbf{z}\vert\mathbf{x}) )\\ &= - \mathbb{E}_{\mathbf{z} \sim q_\phi(\mathbf{z}\vert\mathbf{x})} \log p_\theta(\mathbf{x}\vert\mathbf{z}) + D_\text{KL}( q_\phi(\mathbf{z}\vert\mathbf{x}) \| p_\theta(\mathbf{z}) ) \\ \theta^{\*}, \phi^{\*} &= \arg\min_{\theta, \phi} L_\text{VAE} \end{aligned}$$
 
-In Variational Bayesian methods, this loss function is known as the _variational lower bound_, or _evidence lower bound_. The “lower bound” part in the name comes from the fact that KL divergence is always non-negative and thus $-L_\text{VAE}$ is the lower bound of $\log p_\theta (\mathbf{x})$.
+In Variational Bayesian methods, this loss function is known as the _variational lower bound_, or _evidence lower bound_. The "lower bound" part in the name comes from the fact that KL divergence is always non-negative and thus $-L_\text{VAE}$ is the lower bound of $\log p_\theta (\mathbf{x})$.
 
 $$-L_\text{VAE} = \log p_\theta(\mathbf{x}) - D_\text{KL}( q_\phi(\mathbf{z}\vert\mathbf{x}) \| p_\theta(\mathbf{z}\vert\mathbf{x}) ) \leq \log p_\theta(\mathbf{x})$$
 
@@ -288,11 +288,11 @@ When $\beta=1$, it is same as VAE. When $\beta > 1$, it applies a stronger const
 
 # VQ-VAE and VQ-VAE-2[#](#vq-vae-and-vq-vae-2)
 
-The **VQ-VAE** (“Vector Quantised-Variational AutoEncoder”; [van den Oord, et al. 2017](http://papers.nips.cc/paper/7210-neural-discrete-representation-learning.pdf)) model learns a discrete latent variable by the encoder, since discrete representations may be a more natural fit for problems like language, speech, reasoning, etc.
+The **VQ-VAE** ("Vector Quantised-Variational AutoEncoder"; [van den Oord, et al. 2017](http://papers.nips.cc/paper/7210-neural-discrete-representation-learning.pdf)) model learns a discrete latent variable by the encoder, since discrete representations may be a more natural fit for problems like language, speech, reasoning, etc.
 
-Vector quantisation (VQ) is a method to map $K$-dimensional vectors into a finite set of “code” vectors. The process is very much similar to [KNN](https://en.wikipedia.org/wiki/K-nearest_neighbors_algorithm) algorithm. The optimal centroid code vector that a sample should be mapped to is the one with minimum euclidean distance.
+Vector quantisation (VQ) is a method to map $K$-dimensional vectors into a finite set of "code" vectors. The process is very much similar to [KNN](https://en.wikipedia.org/wiki/K-nearest_neighbors_algorithm) algorithm. The optimal centroid code vector that a sample should be mapped to is the one with minimum euclidean distance.
 
-Let $\mathbf{e} \in \mathbb{R}^{K \times D}, i=1, \dots, K$ be the latent embedding space (also known as “codebook”) in VQ-VAE, where $K$ is the number of latent variable categories and $D$ is the embedding size. An individual embedding vector is $\mathbf{e}_i \in \mathbb{R}^{D}, i=1, \dots, K$.
+Let $\mathbf{e} \in \mathbb{R}^{K \times D}, i=1, \dots, K$ be the latent embedding space (also known as "codebook") in VQ-VAE, where $K$ is the number of latent variable categories and $D$ is the embedding size. An individual embedding vector is $\mathbf{e}_i \in \mathbb{R}^{D}, i=1, \dots, K$.
 
 The encoder output $E(\mathbf{x}) = \mathbf{z}_e$ goes through a nearest-neighbor lookup to match to one of $K$ embedding vectors and then this matched code vector becomes the input for the decoder $D(.)$:
 
@@ -336,7 +336,7 @@ Fig. 12. The VQ-VAE-2 algorithm. (Image source: [Ali Razavi, et al. 2019](https:
 
 # TD-VAE[#](#td-vae)
 
-**TD-VAE** (“Temporal Difference VAE”; [Gregor et al., 2019](https://arxiv.org/abs/1806.03107)) works with sequential data. It relies on three main ideas, described below.
+**TD-VAE** ("Temporal Difference VAE"; [Gregor et al., 2019](https://arxiv.org/abs/1806.03107)) works with sequential data. It relies on three main ideas, described below.
 
 ![](TD-VAE-state-space.png)
 
@@ -414,38 +414,38 @@ Cited as:
 
 # References[#](#references)
 
-\[1\] Geoffrey E. Hinton, and Ruslan R. Salakhutdinov. [“Reducing the dimensionality of data with neural networks."](https://pdfs.semanticscholar.org/c50d/ca78e97e335d362d6b991ae0e1448914e9a3.pdf) Science 313.5786 (2006): 504-507.
+\[1\] Geoffrey E. Hinton, and Ruslan R. Salakhutdinov. ["Reducing the dimensionality of data with neural networks."](https://pdfs.semanticscholar.org/c50d/ca78e97e335d362d6b991ae0e1448914e9a3.pdf) Science 313.5786 (2006): 504-507.
 
-\[2\] Pascal Vincent, et al. [“Extracting and composing robust features with denoising autoencoders."](http://www.cs.toronto.edu/~larocheh/publications/icml-2008-denoising-autoencoders.pdf) ICML, 2008.
+\[2\] Pascal Vincent, et al. ["Extracting and composing robust features with denoising autoencoders."](http://www.cs.toronto.edu/~larocheh/publications/icml-2008-denoising-autoencoders.pdf) ICML, 2008.
 
-\[3\] Pascal Vincent, et al. [“Stacked denoising autoencoders: Learning useful representations in a deep network with a local denoising criterion."](http://www.jmlr.org/papers/volume11/vincent10a/vincent10a.pdf). Journal of machine learning research 11.Dec (2010): 3371-3408.
+\[3\] Pascal Vincent, et al. ["Stacked denoising autoencoders: Learning useful representations in a deep network with a local denoising criterion."](http://www.jmlr.org/papers/volume11/vincent10a/vincent10a.pdf). Journal of machine learning research 11.Dec (2010): 3371-3408.
 
-\[4\] Geoffrey E. Hinton, Nitish Srivastava, Alex Krizhevsky, Ilya Sutskever, and Ruslan R. Salakhutdinov. “Improving neural networks by preventing co-adaptation of feature detectors.” arXiv preprint arXiv:1207.0580 (2012).
+\[4\] Geoffrey E. Hinton, Nitish Srivastava, Alex Krizhevsky, Ilya Sutskever, and Ruslan R. Salakhutdinov. "Improving neural networks by preventing co-adaptation of feature detectors." arXiv preprint arXiv:1207.0580 (2012).
 
 \[5\] [Sparse Autoencoder](https://web.stanford.edu/class/cs294a/sparseAutoencoder.pdf) by Andrew Ng.
 
-\[6\] Alireza Makhzani, Brendan Frey (2013). [“k-sparse autoencoder”](https://arxiv.org/abs/1312.5663). ICLR 2014.
+\[6\] Alireza Makhzani, Brendan Frey (2013). ["k-sparse autoencoder"](https://arxiv.org/abs/1312.5663). ICLR 2014.
 
-\[7\] Salah Rifai, et al. [“Contractive auto-encoders: Explicit invariance during feature extraction."](http://www.icml-2011.org/papers/455_icmlpaper.pdf) ICML, 2011.
+\[7\] Salah Rifai, et al. ["Contractive auto-encoders: Explicit invariance during feature extraction."](http://www.icml-2011.org/papers/455_icmlpaper.pdf) ICML, 2011.
 
-\[8\] Diederik P. Kingma, and Max Welling. [“Auto-encoding variational bayes."](https://arxiv.org/abs/1312.6114) ICLR 2014.
+\[8\] Diederik P. Kingma, and Max Welling. ["Auto-encoding variational bayes."](https://arxiv.org/abs/1312.6114) ICLR 2014.
 
 \[9\] [Tutorial - What is a variational autoencoder?](https://jaan.io/what-is-variational-autoencoder-vae-tutorial/) on jaan.io
 
 \[10\] Youtube tutorial: [Variational Autoencoders](https://www.youtube.com/watch?v=9zKuYvjFFS8) by Arxiv Insights
 
-\[11\] [“A Beginner's Guide to Variational Methods: Mean-Field Approximation”](https://blog.evjang.com/2016/08/variational-bayes.html) by Eric Jang.
+\[11\] ["A Beginner's Guide to Variational Methods: Mean-Field Approximation"](https://blog.evjang.com/2016/08/variational-bayes.html) by Eric Jang.
 
-\[12\] Carl Doersch. [“Tutorial on variational autoencoders."](https://arxiv.org/abs/1606.05908) arXiv:1606.05908, 2016.
+\[12\] Carl Doersch. ["Tutorial on variational autoencoders."](https://arxiv.org/abs/1606.05908) arXiv:1606.05908, 2016.
 
 \[13\] Irina Higgins, et al. ["$\beta$-VAE: Learning basic visual concepts with a constrained variational framework."](https://openreview.net/forum?id=Sy2fzU9gl) ICLR 2017.
 
-\[14\] Christopher P. Burgess, et al. [“Understanding disentangling in beta-VAE."](https://arxiv.org/abs/1804.03599) NIPS 2017.
+\[14\] Christopher P. Burgess, et al. ["Understanding disentangling in beta-VAE."](https://arxiv.org/abs/1804.03599) NIPS 2017.
 
-\[15\] Aaron van den Oord, et al. [“Neural Discrete Representation Learning”](https://arxiv.org/abs/1711.00937) NIPS 2017.
+\[15\] Aaron van den Oord, et al. ["Neural Discrete Representation Learning"](https://arxiv.org/abs/1711.00937) NIPS 2017.
 
-\[16\] Ali Razavi, et al. [“Generating Diverse High-Fidelity Images with VQ-VAE-2”](https://arxiv.org/abs/1906.00446). arXiv preprint arXiv:1906.00446 (2019).
+\[16\] Ali Razavi, et al. ["Generating Diverse High-Fidelity Images with VQ-VAE-2"](https://arxiv.org/abs/1906.00446). arXiv preprint arXiv:1906.00446 (2019).
 
-\[17\] Xi Chen, et al. [“PixelSNAIL: An Improved Autoregressive Generative Model."](https://arxiv.org/abs/1712.09763) arXiv preprint arXiv:1712.09763 (2017).
+\[17\] Xi Chen, et al. ["PixelSNAIL: An Improved Autoregressive Generative Model."](https://arxiv.org/abs/1712.09763) arXiv preprint arXiv:1712.09763 (2017).
 
-\[18\] Karol Gregor, et al. [“Temporal Difference Variational Auto-Encoder."](https://arxiv.org/abs/1806.03107) ICLR 2019.
+\[18\] Karol Gregor, et al. ["Temporal Difference Variational Auto-Encoder."](https://arxiv.org/abs/1806.03107) ICLR 2019.

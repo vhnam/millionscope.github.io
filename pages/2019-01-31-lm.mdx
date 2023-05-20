@@ -68,7 +68,7 @@ We have seen amazing progress in NLP in 2018. Large-scale pre-trained language m
 
 _(\*) He et al. (2018) [found](https://arxiv.org/abs/1811.08883) that pre-training might not be necessary for image segmentation task._
 
-In my previous NLP [post on word embedding](https://lilianweng.github.io/posts/2017-10-15-word-embedding/), the introduced embeddings are not context-specific — they are learned based on word concurrency but not sequential context. So in two sentences, “_I am eating an apple_” and “_I have an Apple phone_”, two “apple” words refer to very different things but they would still share the same word embedding vector.
+In my previous NLP [post on word embedding](https://lilianweng.github.io/posts/2017-10-15-word-embedding/), the introduced embeddings are not context-specific — they are learned based on word concurrency but not sequential context. So in two sentences, "_I am eating an apple_" and "_I have an Apple phone_", two "apple" words refer to very different things but they would still share the same word embedding vector.
 
 Despite this, early adoption of word embeddings in problem-solving is to use them as additional features for an existing task-specific model and in a way the improvement is bounded.
 
@@ -177,7 +177,7 @@ In ELMo the unsupervised pre-training and task-specific learning happen for two 
 The model consists of a two-layer bidirectional LSTM encoder and a primary prediction module. During training, the model is fed with labeled and unlabeled data batches alternatively.
 
 - On _labeled examples_, all the model parameters are updated by standard supervised learning. The loss is the standard cross entropy.
-- On _unlabeled examples_, the primary prediction module still can produce a “soft” target, even though we cannot know exactly how accurate they are. In a couple of auxiliary tasks, the predictor only sees and processes a restricted view of the input, such as only using encoder hidden state representation in one direction. The auxiliary task outputs are expected to match the primary prediction target for a full view of input.  
+- On _unlabeled examples_, the primary prediction module still can produce a "soft" target, even though we cannot know exactly how accurate they are. In a couple of auxiliary tasks, the predictor only sees and processes a restricted view of the input, such as only using encoder hidden state representation in one direction. The auxiliary task outputs are expected to match the primary prediction target for a full view of input.  
   In this way, the encoder is forced to distill the knowledge of the full context into partial representation. At this stage, the biLSTM encoder is backpropagated but the primary prediction module is _fixed_. The loss is to minimize the distance between auxiliary and primary predictions.
 
 ![](CVT.png)
@@ -206,7 +206,7 @@ $$\begin{aligned} p_\theta^\text{fwd}(y_i \mid \mathbf{x}_i) &= \text{NN}^\text{
 
 Fig. 5. The sequential tagging task depends on four auxiliary prediction models, their inputs only involving hidden states in one direction: forward, backward, future and past. (Image source: [original paper](https://arxiv.org/abs/1809.08370))
 
-Note that if the primary prediction module has dropout, the dropout layer works as usual when training with labeled data, but it is not applied when generating “soft” target for auxiliary tasks during training with unlabeled data.
+Note that if the primary prediction module has dropout, the dropout layer works as usual when training with labeled data, but it is not applied when generating "soft" target for auxiliary tasks during training with unlabeled data.
 
 In the machine translation task, the primary prediction module is replaced with a standard unidirectional LSTM decoder with attention. There are two auxiliary tasks: (1) apply dropout on the attention weight vector by randomly zeroing out some values; (2) predict the future word in the target sequence. The primary prediction for auxiliary tasks to match is the best predicted target sequence produced by running the fixed primary decoder on the input sequence with [beam search](https://en.wikipedia.org/wiki/Beam_search).
 
@@ -291,7 +291,7 @@ One limitation of GPT is its uni-directional nature — the model is only traine
 
 Compared to GPT, the largest difference and improvement of BERT is to make training **bi-directional**. The model learns to predict both context on the left and right. The paper according to the ablation study claimed that:
 
-> “bidirectional nature of our model is the single most important new contribution”
+> "bidirectional nature of our model is the single most important new contribution"
 
 ## Pre-training Tasks[#](#pre-training-tasks)
 
@@ -305,9 +305,9 @@ To encourage the bi-directional prediction and sentence-level understanding, BER
 
 \***Task 1: Mask language model (MLM)**
 
-> From [Wikipedia](https://en.wikipedia.org/wiki/Cloze_test): “A cloze test (also cloze deletion test) is an exercise, test, or assessment consisting of a portion of language with certain items, words, or signs removed (cloze text), where the participant is asked to replace the missing language item. … The exercise was first described by W.L. Taylor in 1953.”
+> From [Wikipedia](https://en.wikipedia.org/wiki/Cloze_test): "A cloze test (also cloze deletion test) is an exercise, test, or assessment consisting of a portion of language with certain items, words, or signs removed (cloze text), where the participant is asked to replace the missing language item. … The exercise was first described by W.L. Taylor in 1953."
 
-It is unsurprising to believe that a representation that learns the context around a word rather than just after the word is able to better capture its meaning, both syntactically and semantically. BERT encourages the model to do so by training on the _“mask language model” task_:
+It is unsurprising to believe that a representation that learns the context around a word rather than just after the word is able to better capture its meaning, both syntactically and semantically. BERT encourages the model to do so by training on the _"mask language model" task_:
 
 1.  Randomly mask 15% of tokens in each sequence. Because if we only replace masked tokens with a special placeholder `[MASK]`, the special token would never be encountered during fine-tuning. Hence, BERT employed several heuristic tricks:
     - (a) with 80% probability, replace the chosen words with `[MASK]`;
@@ -394,7 +394,7 @@ The [OpenAI](https://blog.openai.com/better-language-models/) [GPT-2](https://d4
 The pre-training task for GPT-2 is solely language modeling. All the downstream language tasks are framed as predicting conditional probabilities and there is no task-specific fine-tuning.
 
 - Text generation is straightforward using LM.
-- Machine translation task, for example, English to Chinese, is induced by conditioning LM on pairs of “English sentence = Chinese sentence” and “the target English sentence =” at the end.
+- Machine translation task, for example, English to Chinese, is induced by conditioning LM on pairs of "English sentence = Chinese sentence" and "the target English sentence =" at the end.
   - For example, the conditional probability to predict might look like: `P(? | I like green apples. = 我喜欢绿苹果。 A cat meows at him. = 一只猫对他喵。It is raining cats and dogs. =")`
 - QA task is formatted similar to translation with pairs of questions and answers in the context.
 - Summarization task is induced by adding `TL;DR:` after the articles in the context.
@@ -411,7 +411,7 @@ Using the byte sequence representation, GPT-2 is able to assign a probability to
 
 Compared to GPT, other than having many more transformer layers and parameters, GPT-2 incorporates only a few architecture modifications:
 
-- [Layer normalization](https://arxiv.org/abs/1607.06450) was moved to the input of each sub-block, similar to a residual unit of type [“building block”](https://arxiv.org/abs/1603.05027) (differently from the original type [“bottleneck”](https://arxiv.org/abs/1512.03385), it has batch normalization applied before weight layers).
+- [Layer normalization](https://arxiv.org/abs/1607.06450) was moved to the input of each sub-block, similar to a residual unit of type ["building block"](https://arxiv.org/abs/1603.05027) (differently from the original type ["bottleneck"](https://arxiv.org/abs/1512.03385), it has batch normalization applied before weight layers).
 - An additional layer normalization was added after the final self-attention block.
 - A modified initialization was constructed as a function of the model depth.
 - The weights of residual layers were initially scaled by a factor of $1/ \sqrt{N}$ where N is the number of residual layers.
@@ -430,15 +430,15 @@ RoBERTa also added a new dataset [CommonCrawl News](https://commoncrawl.org/2016
 
 # T5[#](#t5)
 
-The language model **T5** is short for **“Text-to-Text Transfer Transformer”** ([Raffel et al., 2020](https://arxiv.org/abs/1910.10683)). The encoder-decoder implementation follows the [original Transformer](https://arxiv.org/abs/1706.03762) architecture: tokens → embedding → encoder → decoder → output. T5 adopts the framework “Natural Language Decathlon” ([McCann et al., 2018](https://arxiv.org/abs/1806.08730)), where many common NLP tasks are translated into question-answering over a context. Instead of an explicit QA format, T5 uses short task prefixes to distinguish task intentions and separately fine-tunes the model on every individual task. The text-to-text framework enables easier transfer learning evaluation with the same model on a diverse set of tasks.
+The language model **T5** is short for **"Text-to-Text Transfer Transformer"** ([Raffel et al., 2020](https://arxiv.org/abs/1910.10683)). The encoder-decoder implementation follows the [original Transformer](https://arxiv.org/abs/1706.03762) architecture: tokens → embedding → encoder → decoder → output. T5 adopts the framework "Natural Language Decathlon" ([McCann et al., 2018](https://arxiv.org/abs/1806.08730)), where many common NLP tasks are translated into question-answering over a context. Instead of an explicit QA format, T5 uses short task prefixes to distinguish task intentions and separately fine-tunes the model on every individual task. The text-to-text framework enables easier transfer learning evaluation with the same model on a diverse set of tasks.
 
 ![](T5.png)
 
 Fig. 13. A diagram of T5 task evaluation. The text-to-text framework casts every task into a generic form: feeding input text to predict some target text. (Image source: [Raffel et al., 2020](https://arxiv.org/abs/1910.10683))
 
-The model is trained on Web corpus extracted from Apr 2019 with various filters applied. The model is fine-tuned for each downstream task separately via “adapter layers” (add an extra layer for training) or “gradual unfreezing” (see [ULMFiT](#ulmfit)). Both fine-tuning approaches only update partial parameters while keeping the majority of the model parameters unchanged. T5-11B achieved SOTA results on many NLP tasks.
+The model is trained on Web corpus extracted from Apr 2019 with various filters applied. The model is fine-tuned for each downstream task separately via "adapter layers" (add an extra layer for training) or "gradual unfreezing" (see [ULMFiT](#ulmfit)). Both fine-tuning approaches only update partial parameters while keeping the majority of the model parameters unchanged. T5-11B achieved SOTA results on many NLP tasks.
 
-As the authors mentioned in the paper “…our goal is not to propose new methods but instead to provide a comprehensive perspective on where the field stands”, the T5 long paper described a lot of training setup and evaluation processes in detail, a good read for people who are interested in training a LM from scratch.
+As the authors mentioned in the paper "…our goal is not to propose new methods but instead to provide a comprehensive perspective on where the field stands", the T5 long paper described a lot of training setup and evaluation processes in detail, a good read for people who are interested in training a LM from scratch.
 
 # GPT-3[#](#gpt-3)
 
@@ -468,8 +468,8 @@ Note that the naive representation of the hidden state of the context, $h_\theta
 
 However, two different requirements on $g_\theta (\mathbf{x}_{\mathbf{z}_{<t}}, z_t)$ lead to a two-stream self-attention design to accommodate:
 
-1.  When predicting $x_{z_t}$, it should only encode the position $z_t$ but not the content $x_{z_t}$; otherwise it is trivial. This is wrapped into the “query representation” $g_{z_t} = g_\theta (\mathbf{x}_{\mathbf{z}_{<t}}, z_t)$ does not encode $x_{z_t}$.
-2.  When predicting $x_j$ where $j > t$, it should encode the content $x_{z_t}$ as well to provide the full context. This is the “content representation” $h_{z_t} = h_\theta(\mathbf{x}_{\leq t})$.
+1.  When predicting $x_{z_t}$, it should only encode the position $z_t$ but not the content $x_{z_t}$; otherwise it is trivial. This is wrapped into the "query representation" $g_{z_t} = g_\theta (\mathbf{x}_{\mathbf{z}_{<t}}, z_t)$ does not encode $x_{z_t}$.
+2.  When predicting $x_j$ where $j > t$, it should encode the content $x_{z_t}$ as well to provide the full context. This is the "content representation" $h_{z_t} = h_\theta(\mathbf{x}_{\leq t})$.
 
 ![](XLNet-two-stream-attention.png)
 
@@ -513,13 +513,13 @@ Learnings from their experiments:
 
 # ELECTRA[#](#electra)
 
-Most current pre-training large language models demand a lot of computation resources, raising concerns about their cost and accessibility. **ELECTRA** (“Efficiently Learning an Encoder that Classifies Token Replacements Accurately”; [Clark et al. 2020](https://arxiv.org/abs/2003.10555)) aims to improve the _pre-training efficiency_, which frames the language modeling as a discrimination task instead of generation task.
+Most current pre-training large language models demand a lot of computation resources, raising concerns about their cost and accessibility. **ELECTRA** ("Efficiently Learning an Encoder that Classifies Token Replacements Accurately"; [Clark et al. 2020](https://arxiv.org/abs/2003.10555)) aims to improve the _pre-training efficiency_, which frames the language modeling as a discrimination task instead of generation task.
 
 ![](ELECTRA-overview.png)
 
 Fig. 20. Illustration of ELECTRA model architecture. (Image source: [Clark et al. 2020](https://arxiv.org/abs/2003.10555))
 
-ELECTRA proposes a new pretraining task, called “Replaced Token Detection” (RTD). Let's randomly sample $k$ positions to be masked. Each selected token in the original text is replaced by a plausible alternative predicted by a small language model, known as the generator $G$. The discriminator $D$ predicts whether each token is original or replaced.
+ELECTRA proposes a new pretraining task, called "Replaced Token Detection" (RTD). Let's randomly sample $k$ positions to be masked. Each selected token in the original text is replaced by a plausible alternative predicted by a small language model, known as the generator $G$. The discriminator $D$ predicts whether each token is original or replaced.
 
 $$\begin{aligned} \boldsymbol{m} &= \[m_1, \dots, m_k\] \text{ where } m_i \sim \text{unif}\{1, n\}\text{ for } i=1, \dots, k \\ \boldsymbol{x}^\text{masked} &= \text{REPLACE}(\boldsymbol{x}, \boldsymbol{m}, \texttt{\[MASK\]}) \\ \boldsymbol{x}^\text{corrupt} &= \text{REPLACE}(\boldsymbol{x}, \boldsymbol{m}, \tilde{\boldsymbol{x}}) \text{ where } \tilde{x}_t \sim p_G(x_i \mid \boldsymbol{x}^\text{masked}) \text{ for } i \in \boldsymbol{m} \\ \end{aligned}$$
 
@@ -676,7 +676,7 @@ A good language model should predict high word probabilities. Therefore, the sma
 - [SST](https://nlp.stanford.edu/sentiment/index.html) (Stanford Sentiment Treebank)
 - [IMDb](http://ai.stanford.edu/~amaas/data/sentiment/): A large dataset of movie reviews with binary sentiment classification labels.
 
-**Semantic Role Labeling (SRL)**: models the predicate-argument structure of a sentence, and is often described as answering “Who did what to whom”.
+**Semantic Role Labeling (SRL)**: models the predicate-argument structure of a sentence, and is often described as answering "Who did what to whom".
 
 - [CoNLL-2004 & CoNLL-2005](http://www.lsi.upc.edu/~srlconll/)
 
@@ -717,7 +717,7 @@ A good language model should predict high word probabilities. Therefore, the sma
 
 **Unsupervised pretraining dataset**
 
-- [Books corpus](https://googlebooks.byu.edu/): The corpus contains “over 7,000 unique unpublished books from a variety of genres including Adventure, Fantasy, and Romance.”
+- [Books corpus](https://googlebooks.byu.edu/): The corpus contains "over 7,000 unique unpublished books from a variety of genres including Adventure, Fantasy, and Romance."
 - [1B Word Language Model Benchmark](http://www.statmt.org/lm-benchmark/)
 - [English Wikipedia](https://en.wikipedia.org/wiki/Wikipedia:Database_download#English-language_Wikipedia): ~2500M words
 
@@ -735,46 +735,46 @@ Cited as:
 
 # Reference[#](#reference)
 
-\[1\] Bryan McCann, et al. [“Learned in translation: Contextualized word vectors."](https://arxiv.org/abs/1708.00107) NIPS. 2017.
+\[1\] Bryan McCann, et al. ["Learned in translation: Contextualized word vectors."](https://arxiv.org/abs/1708.00107) NIPS. 2017.
 
-\[2\] Kevin Clark et al. [“Semi-Supervised Sequence Modeling with Cross-View Training."](https://arxiv.org/abs/1809.08370) EMNLP 2018.
+\[2\] Kevin Clark et al. ["Semi-Supervised Sequence Modeling with Cross-View Training."](https://arxiv.org/abs/1809.08370) EMNLP 2018.
 
-\[3\] Matthew E. Peters, et al. [“Deep contextualized word representations."](https://arxiv.org/abs/1802.05365) NAACL-HLT 2017.
+\[3\] Matthew E. Peters, et al. ["Deep contextualized word representations."](https://arxiv.org/abs/1802.05365) NAACL-HLT 2017.
 
-\[4\] OpenAI Blog [“Improving Language Understanding with Unsupervised Learning”](https://blog.openai.com/language-unsupervised/), June 11, 2018.
+\[4\] OpenAI Blog ["Improving Language Understanding with Unsupervised Learning"](https://blog.openai.com/language-unsupervised/), June 11, 2018.
 
-\[5\] OpenAI Blog [“Better Language Models and Their Implications."](https://blog.openai.com/better-language-models/) Feb 14, 2019.
+\[5\] OpenAI Blog ["Better Language Models and Their Implications."](https://blog.openai.com/better-language-models/) Feb 14, 2019.
 
-\[6\] Jeremy Howard and Sebastian Ruder. [“Universal language model fine-tuning for text classification."](https://arxiv.org/abs/1801.06146) ACL 2018.
+\[6\] Jeremy Howard and Sebastian Ruder. ["Universal language model fine-tuning for text classification."](https://arxiv.org/abs/1801.06146) ACL 2018.
 
-\[7\] Alec Radford et al. [“Improving Language Understanding by Generative Pre-Training”](https://s3-us-west-2.amazonaws.com/openai-assets/research-covers/language-unsupervised/language_understanding_paper.pdf). OpenAI Blog, June 11, 2018.
+\[7\] Alec Radford et al. ["Improving Language Understanding by Generative Pre-Training"](https://s3-us-west-2.amazonaws.com/openai-assets/research-covers/language-unsupervised/language_understanding_paper.pdf). OpenAI Blog, June 11, 2018.
 
-\[8\] Jacob Devlin, et al. [“BERT: Pre-training of deep bidirectional transformers for language understanding."](https://arxiv.org/abs/1810.04805) arXiv:1810.04805 (2018).
+\[8\] Jacob Devlin, et al. ["BERT: Pre-training of deep bidirectional transformers for language understanding."](https://arxiv.org/abs/1810.04805) arXiv:1810.04805 (2018).
 
-\[9\] Mike Schuster, and Kaisuke Nakajima. [“Japanese and Korean voice search."](https://static.googleusercontent.com/media/research.google.com/en//pubs/archive/37842.pdf) ICASSP. 2012.
+\[9\] Mike Schuster, and Kaisuke Nakajima. ["Japanese and Korean voice search."](https://static.googleusercontent.com/media/research.google.com/en//pubs/archive/37842.pdf) ICASSP. 2012.
 
 \[10\] Google's Neural Machine Translation System: Bridging the Gap between Human and Machine Translation
 
-\[11\] Ashish Vaswani, et al. [“Attention is all you need."](https://arxiv.org/abs/1706.03762) NIPS 2017.
+\[11\] Ashish Vaswani, et al. ["Attention is all you need."](https://arxiv.org/abs/1706.03762) NIPS 2017.
 
-\[12\] Peter J. Liu, et al. [“Generating wikipedia by summarizing long sequences."](https://arxiv.org/abs/1801.10198) ICLR 2018.
+\[12\] Peter J. Liu, et al. ["Generating wikipedia by summarizing long sequences."](https://arxiv.org/abs/1801.10198) ICLR 2018.
 
-\[13\] Sebastian Ruder. [“10 Exciting Ideas of 2018 in NLP”](http://ruder.io/10-exciting-ideas-of-2018-in-nlp/) Dec 2018.
+\[13\] Sebastian Ruder. ["10 Exciting Ideas of 2018 in NLP"](http://ruder.io/10-exciting-ideas-of-2018-in-nlp/) Dec 2018.
 
-\[14\] Alec Radford, et al. [“Language Models are Unsupervised Multitask Learners."](https://d4mucfpksywv.cloudfront.net/better-language-models/language_models_are_unsupervised_multitask_learners.pdf). 2019.
+\[14\] Alec Radford, et al. ["Language Models are Unsupervised Multitask Learners."](https://d4mucfpksywv.cloudfront.net/better-language-models/language_models_are_unsupervised_multitask_learners.pdf). 2019.
 
-\[15\] Rico Sennrich, et al. [“Neural machine translation of rare words with subword units."](https://arxiv.org/abs/1508.07909) arXiv preprint arXiv:1508.07909. 2015.
+\[15\] Rico Sennrich, et al. ["Neural machine translation of rare words with subword units."](https://arxiv.org/abs/1508.07909) arXiv preprint arXiv:1508.07909. 2015.
 
-\[16\] Zhenzhong Lan, et al. [“ALBERT: A Lite BERT for Self-supervised Learning of Language Representations."](https://arxiv.org/abs/1909.11942) arXiv Preprint arXiv:1909.11942 (2019).
+\[16\] Zhenzhong Lan, et al. ["ALBERT: A Lite BERT for Self-supervised Learning of Language Representations."](https://arxiv.org/abs/1909.11942) arXiv Preprint arXiv:1909.11942 (2019).
 
-\[17\] Yinhan Liu, et al. [“RoBERTa: A Robustly Optimized BERT Pretraining Approach."](https://arxiv.org/abs/1907.11692) arXiv Preprint arXiv:1907.11692 (2019).
+\[17\] Yinhan Liu, et al. ["RoBERTa: A Robustly Optimized BERT Pretraining Approach."](https://arxiv.org/abs/1907.11692) arXiv Preprint arXiv:1907.11692 (2019).
 
-\[18\] Tom B Brown, et al. [“Language Models are Few-Shot Learners”](https://arxiv.org/abs/2005.14165) NeuriPS 2020.
+\[18\] Tom B Brown, et al. ["Language Models are Few-Shot Learners"](https://arxiv.org/abs/2005.14165) NeuriPS 2020.
 
-\[19\] Zhilin Yang et al. [“XLNet: Generalized Autoregressive Pretraining for Language Understanding.”](https://arxiv.org/abs/1906.08237) NeuriPS 2019.
+\[19\] Zhilin Yang et al. ["XLNet: Generalized Autoregressive Pretraining for Language Understanding."](https://arxiv.org/abs/1906.08237) NeuriPS 2019.
 
-\[20\] Mike Lewis et al. [“BART: Denoising Sequence-to-Sequence Pre-training for Natural Language Generation, Translation, and Comprehension.”](https://arxiv.org/abs/1910.13461) ACL 2020.
+\[20\] Mike Lewis et al. ["BART: Denoising Sequence-to-Sequence Pre-training for Natural Language Generation, Translation, and Comprehension."](https://arxiv.org/abs/1910.13461) ACL 2020.
 
-\[21\] Kevin Clark et al. [“ELECTRA: Pre-training Text Encoders as Discriminators Rather Than Generators.”](https://arxiv.org/abs/2003.10555) ICLR 2020.
+\[21\] Kevin Clark et al. ["ELECTRA: Pre-training Text Encoders as Discriminators Rather Than Generators."](https://arxiv.org/abs/2003.10555) ICLR 2020.
 
-\[22\] Colin Raffel, et al. [“Exploring the Limits of Transfer Learning with a Unified Text-to-Text Transformer”](https://arxiv.org/abs/1910.10683) JMLR 2020.
+\[22\] Colin Raffel, et al. ["Exploring the Limits of Transfer Learning with a Unified Text-to-Text Transformer"](https://arxiv.org/abs/1910.10683) JMLR 2020.

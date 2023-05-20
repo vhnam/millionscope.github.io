@@ -41,7 +41,7 @@ When facing a limited amount of labeled data for supervised learning tasks, four
 3.  **Active learning**: Labeling is expensive, but we still want to collect more given a cost budget. Active learning learns to select most valuable unlabeled samples to be collected next and helps us act smartly with a limited budget.
 4.  **Pre-training + dataset auto-generation**: Given a capable pre-trained model, we can utilize it to auto-generate a lot more labeled samples. This has been especially popular within the language domain driven by the success of few-shot learning.
 
-I plan to write a series of posts on the topic of “Learning with not enough data”. Part 1 is on _Semi-Supervised Learning_.
+I plan to write a series of posts on the topic of "Learning with not enough data". Part 1 is on _Semi-Supervised Learning_.
 
 # What is semi-supervised learning?[#](#what-is-semi-supervised-learning)
 
@@ -226,7 +226,7 @@ $$\mathcal{L}^\text{ICT}_{u} = \mathbb{E}_{\mathbf{u}_i, \mathbf{u}_j \sim \math
 
 where $\theta'$ is a moving average of $\theta$.
 
-Similar to VAT, **Unsupervised Data Augmentation** (**UDA**; [Xie et al. 2020](https://arxiv.org/abs/1904.12848)) learns to predict the same output for an unlabeled example and the augmented one. UDA especially focuses on studying how the _“quality”_ of noise can impact the semi-supervised learning performance with consistency training. It is crucial to use advanced data augmentation methods for producing meaningful and effective noisy samples. Good data augmentation should produce valid (i.e. does not change the label) and diverse noise, and carry targeted inductive biases.
+Similar to VAT, **Unsupervised Data Augmentation** (**UDA**; [Xie et al. 2020](https://arxiv.org/abs/1904.12848)) learns to predict the same output for an unlabeled example and the augmented one. UDA especially focuses on studying how the _"quality"_ of noise can impact the semi-supervised learning performance with consistency training. It is crucial to use advanced data augmentation methods for producing meaningful and effective noisy samples. Good data augmentation should produce valid (i.e. does not change the label) and diverse noise, and carry targeted inductive biases.
 
 For images, UDA adopts RandAugment ([Cubuk et al. 2019](https://arxiv.org/abs/1909.13719)) which uniformly samples augmentation operations available in [PIL](https://pillow.readthedocs.io/en/stable/), no learning or optimization, so it is much cheaper than AutoAugment.
 
@@ -264,7 +264,7 @@ Training with pseudo labeling naturally comes as an iterative process. We refer 
 
 ## Label propagation[#](#label-propagation)
 
-**Label Propagation** ([Iscen et al. 2019](https://arxiv.org/abs/1904.04717)) is an idea to construct a similarity graph among samples based on feature embedding. Then the pseudo labels are “diffused” from known samples to unlabeled ones where the propagation weights are proportional to pairwise similarity scores in the graph. Conceptually it is similar to a k-NN classifier and both suffer from the problem of not scaling up well with a large dataset.
+**Label Propagation** ([Iscen et al. 2019](https://arxiv.org/abs/1904.04717)) is an idea to construct a similarity graph among samples based on feature embedding. Then the pseudo labels are "diffused" from known samples to unlabeled ones where the propagation weights are proportional to pairwise similarity scores in the graph. Conceptually it is similar to a k-NN classifier and both suffer from the problem of not scaling up well with a large dataset.
 
 ![](assets/images/2021-12-05-semi-supervised/label-propagation.png)
 
@@ -355,7 +355,7 @@ Fig. 13. Illustration of two improvements introduced in ReMixMatch over MixMatch
 - _Distribution alignment._ It encourages the marginal distribution $p(y)$ to be close to the marginal distribution of the ground truth labels. Let $p(y)$ be the class distribution in the true labels and $\tilde{p}(\hat{y})$ be a running average of the predicted class distribution among the unlabeled data. The model prediction on an unlabeled sample $p_\theta(y \vert \mathbf{u})$ is normalized to be $\text{Normalize}\big( \frac{p_\theta(y \vert \mathbf{u}) p(y)}{\tilde{p}(\hat{y})} \big)$ to match the true marginal distribution.
   - Note that entropy minimization is not a useful objective if the marginal distribution is not uniform.
   - I do feel the assumption that the class distributions on the labeled and unlabeled data should match is too strong and not necessarily to be true in the real-world setting.
-- _Augmentation anchoring_. Given an unlabeled sample, it first generates an “anchor” version with weak augmentation and then averages $K$ strongly augmented versions using CTAugment (Control Theory Augment). CTAugment only samples augmentations that keep the model predictions within the network tolerance.
+- _Augmentation anchoring_. Given an unlabeled sample, it first generates an "anchor" version with weak augmentation and then averages $K$ strongly augmented versions using CTAugment (Control Theory Augment). CTAugment only samples augmentations that keep the model predictions within the network tolerance.
 
 The ReMixMatch loss is a combination of several terms,
 
@@ -484,42 +484,42 @@ Or
 
 # References[#](#references)
 
-\[1\] Ouali, Hudelot & Tami. [“An Overview of Deep Semi-Supervised Learning”](https://arxiv.org/abs/2006.05278) arXiv preprint arXiv:2006.05278 (2020).
+\[1\] Ouali, Hudelot & Tami. ["An Overview of Deep Semi-Supervised Learning"](https://arxiv.org/abs/2006.05278) arXiv preprint arXiv:2006.05278 (2020).
 
-\[2\] Sajjadi, Javanmardi & Tasdizen [“Regularization With Stochastic Transformations and Perturbations for Deep Semi-Supervised Learning.”](https://arxiv.org/abs/1606.04586) arXiv preprint arXiv:1606.04586 (2016).
+\[2\] Sajjadi, Javanmardi & Tasdizen ["Regularization With Stochastic Transformations and Perturbations for Deep Semi-Supervised Learning."](https://arxiv.org/abs/1606.04586) arXiv preprint arXiv:1606.04586 (2016).
 
-\[3\] Pham et al. [“Meta Pseudo Labels.”](https://arxiv.org/abs/2003.10580) CVPR 2021.
+\[3\] Pham et al. ["Meta Pseudo Labels."](https://arxiv.org/abs/2003.10580) CVPR 2021.
 
-\[4\] Laine & Aila. [“Temporal Ensembling for Semi-Supervised Learning”](https://arxiv.org/abs/1610.02242) ICLR 2017.
+\[4\] Laine & Aila. ["Temporal Ensembling for Semi-Supervised Learning"](https://arxiv.org/abs/1610.02242) ICLR 2017.
 
-\[5\] Tarvaninen & Valpola. [“Mean teachers are better role models: Weight-averaged consistency targets improve semi-supervised deep learning results.”](https://arxiv.org/abs/1703.01780) NeuriPS 2017
+\[5\] Tarvaninen & Valpola. ["Mean teachers are better role models: Weight-averaged consistency targets improve semi-supervised deep learning results."](https://arxiv.org/abs/1703.01780) NeuriPS 2017
 
-\[6\] Xie et al. [“Unsupervised Data Augmentation for Consistency Training.”](https://arxiv.org/abs/1904.12848) NeuriPS 2020.
+\[6\] Xie et al. ["Unsupervised Data Augmentation for Consistency Training."](https://arxiv.org/abs/1904.12848) NeuriPS 2020.
 
-\[7\] Miyato et al. [“Virtual Adversarial Training: A Regularization Method for Supervised and Semi-Supervised Learning.”](https://arxiv.org/abs/1704.03976) IEEE transactions on pattern analysis and machine intelligence 41.8 (2018).
+\[7\] Miyato et al. ["Virtual Adversarial Training: A Regularization Method for Supervised and Semi-Supervised Learning."](https://arxiv.org/abs/1704.03976) IEEE transactions on pattern analysis and machine intelligence 41.8 (2018).
 
-\[8\] Verma et al. [“Interpolation consistency training for semi-supervised learning.”](https://arxiv.org/abs/1903.03825) IJCAI 2019
+\[8\] Verma et al. ["Interpolation consistency training for semi-supervised learning."](https://arxiv.org/abs/1903.03825) IJCAI 2019
 
-\[9\] Lee. [“Pseudo-label: The simple and efficient semi-supervised learning method for deep neural networks.”](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.664.3543&rep=rep1&type=pdf) ICML 2013 Workshop: Challenges in Representation Learning.
+\[9\] Lee. ["Pseudo-label: The simple and efficient semi-supervised learning method for deep neural networks."](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.664.3543&rep=rep1&type=pdf) ICML 2013 Workshop: Challenges in Representation Learning.
 
-\[10\] Iscen et al. [“Label propagation for deep semi-supervised learning.”](https://arxiv.org/abs/1904.04717) CVPR 2019.
+\[10\] Iscen et al. ["Label propagation for deep semi-supervised learning."](https://arxiv.org/abs/1904.04717) CVPR 2019.
 
-\[11\] Xie et al. [“Self-training with Noisy Student improves ImageNet classification”](https://arxiv.org/abs/1911.04252) CVPR 2020.
+\[11\] Xie et al. ["Self-training with Noisy Student improves ImageNet classification"](https://arxiv.org/abs/1911.04252) CVPR 2020.
 
-\[12\] Jingfei Du et al. [“Self-training Improves Pre-training for Natural Language Understanding.”](https://arxiv.org/abs/2010.02194) 2020
+\[12\] Jingfei Du et al. ["Self-training Improves Pre-training for Natural Language Understanding."](https://arxiv.org/abs/2010.02194) 2020
 
-\[13\] Iscen et al. [“Label propagation for deep semi-supervised learning.”](https://arxiv.org/abs/1904.04717) CVPR 2019
+\[13\] Iscen et al. ["Label propagation for deep semi-supervised learning."](https://arxiv.org/abs/1904.04717) CVPR 2019
 
-\[14\] Arazo et al. [“Pseudo-labeling and confirmation bias in deep semi-supervised learning.”](https://arxiv.org/abs/1908.02983) IJCNN 2020.
+\[14\] Arazo et al. ["Pseudo-labeling and confirmation bias in deep semi-supervised learning."](https://arxiv.org/abs/1908.02983) IJCNN 2020.
 
-\[15\] Berthelot et al. [“MixMatch: A holistic approach to semi-supervised learning.”](https://arxiv.org/abs/1905.02249) NeuriPS 2019
+\[15\] Berthelot et al. ["MixMatch: A holistic approach to semi-supervised learning."](https://arxiv.org/abs/1905.02249) NeuriPS 2019
 
-\[16\] Berthelot et al. [“ReMixMatch: Semi-supervised learning with distribution alignment and augmentation anchoring.”](https://arxiv.org/abs/1911.09785) ICLR 2020
+\[16\] Berthelot et al. ["ReMixMatch: Semi-supervised learning with distribution alignment and augmentation anchoring."](https://arxiv.org/abs/1911.09785) ICLR 2020
 
-\[17\] Sohn et al. [“FixMatch: Simplifying semi-supervised learning with consistency and confidence.”](https://arxiv.org/abs/2001.07685) CVPR 2020
+\[17\] Sohn et al. ["FixMatch: Simplifying semi-supervised learning with consistency and confidence."](https://arxiv.org/abs/2001.07685) CVPR 2020
 
-\[18\] Junnan Li et al. [“DivideMix: Learning with Noisy Labels as Semi-supervised Learning.”](https://arxiv.org/abs/2002.07394) 2020 \[[code](https://github.com/LiJunnan1992/DivideMix)\]
+\[18\] Junnan Li et al. ["DivideMix: Learning with Noisy Labels as Semi-supervised Learning."](https://arxiv.org/abs/2002.07394) 2020 \[[code](https://github.com/LiJunnan1992/DivideMix)\]
 
-\[19\] Zoph et al. [“Rethinking pre-training and self-training.”](https://arxiv.org/abs/2006.06882) 2020.
+\[19\] Zoph et al. ["Rethinking pre-training and self-training."](https://arxiv.org/abs/2006.06882) 2020.
 
-\[20\] Chen et al. [“Big Self-Supervised Models are Strong Semi-Supervised Learners”](https://arxiv.org/abs/2006.10029) 2020
+\[20\] Chen et al. ["Big Self-Supervised Models are Strong Semi-Supervised Learners"](https://arxiv.org/abs/2006.10029) 2020

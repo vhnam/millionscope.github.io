@@ -41,7 +41,7 @@ I roughly group such vision language models (VLMs) into four buckets:
 
 # Jointly Training with Image and Text[#](#jointly-training-with-image-and-text)
 
-One straightforward approach to fuse visual information into language models is to treat images as normal text tokens and train the model on a sequence of joint representations of both text and images. Precisely, images are divided into multiple smaller patches and each patch is treated as one “token” in the input sequence.
+One straightforward approach to fuse visual information into language models is to treat images as normal text tokens and train the model on a sequence of joint representations of both text and images. Precisely, images are divided into multiple smaller patches and each patch is treated as one "token" in the input sequence.
 
 **VisualBERT** ([Li et al. 2019](https://arxiv.org/abs/1908.03557)) feeds both text inputs and image regions into [BERT](https://lilianweng.github.io/posts/2019-01-31-lm/#bert) such that it is able to discover the internal alignment between images and text with self-attention mechanism.
 
@@ -160,7 +160,7 @@ Fig. 7. Performance of different versions of Frozen on (left) VQAv2 and (right) 
 
 ClipCap relies on [CLIP](https://lilianweng.github.io/posts/2021-05-31-contrastive/#clip) ([Radford et al. 2021](https://arxiv.org/abs/2103.00020)) for vision encoding, but it needs to be processed by a light mapping network $F$ such that image embedding vectors are translated into the same semantic space as the pre-trained LM. The network $F$ maps CLIP embeddings into a sequence of $k$ embedding vectors, each with the same dimension as a word embedding in GPT2. Increasing the prefix size $k$ helps improve the performance. Both CLIP vision encoder and the LM are _frozen_ during training and only the mapping network $F$ is learned. They found that when LM is frozen, $F$ should be a transformer, with 8 multi-head self-attention layers with 8 heads each, but when LM can be fine-tuned, a MLP is enough.
 
-Even though ClipCap only trains such a minimum set of parameters, it still achieves decent performance on image captioning tasks, comparable with SoTA at the time (e.g. [Oscar](https://arxiv.org/abs/2004.06165), [VLP](https://arxiv.org/abs/1909.11059), [BUTD](https://arxiv.org/abs/1707.07998)). Hence they postulate that “the CLIP space already encapsulates the required information, and adapting it towards specific styles does not contribute to flexibility.”
+Even though ClipCap only trains such a minimum set of parameters, it still achieves decent performance on image captioning tasks, comparable with SoTA at the time (e.g. [Oscar](https://arxiv.org/abs/2004.06165), [VLP](https://arxiv.org/abs/1909.11059), [BUTD](https://arxiv.org/abs/1707.07998)). Hence they postulate that "the CLIP space already encapsulates the required information, and adapting it towards specific styles does not contribute to flexibility."
 
 ![](assets/images/2022-06-09-vlm/ClipCap-arch.png)
 
@@ -197,7 +197,7 @@ Fig. 11. Comparison of different models trained on 0.1% and 1% of the MS COCO an
 Fig. 12. Illustration of VC-GPT training framework.  
 (Image source: [Luo et al. 2022](https://arxiv.org/abs/2201.12723))
 
-The CLIP-ViT takes a sequence of image patches as inputs and outputs representation for each patch. To avoid catastrophic forgetting, instead of injecting the visual information directly into GPT2, VC-GPT introduces extra cross-attention layers on top of the output of visual encoder and language decoder. Then a _self-ensemble_ module linearly combines the single model language decoder logits $h^G$ and cross-model vision-language fused module logits $h^\text{fuse}$. The self-ensemble module (see “VC-GPT w/o SE” in Fig. 13) is important for the performance.
+The CLIP-ViT takes a sequence of image patches as inputs and outputs representation for each patch. To avoid catastrophic forgetting, instead of injecting the visual information directly into GPT2, VC-GPT introduces extra cross-attention layers on top of the output of visual encoder and language decoder. Then a _self-ensemble_ module linearly combines the single model language decoder logits $h^G$ and cross-model vision-language fused module logits $h^\text{fuse}$. The self-ensemble module (see "VC-GPT w/o SE" in Fig. 13) is important for the performance.
 
 $$\text{logits} = W^G h^G + W^\text{fuse}h^\text{fuse}$$
 
@@ -215,7 +215,7 @@ There are 3 learning objectives in MERLOT:
 
 1.  _Masked language modeling_ (MLM) is useful especially because in videos, people tend to ramble, resulting in many repeated keywords or filler words.
 2.  _Contrastive frame-caption matching_ uses the language-only part from the joint vision-language transformer. Matched representations for each frame $\mathbf{I}_t$ and caption $\boldsymbol{w}_t$ are treated as positive examples, while the negative examples come from all other frame-caption pairs in the minibatch.
-3.  _Temporal reordering_ learns temporal reasoning: scramble random $i$ frames and replace the segment-level position embeddings with a random and unique position embedding. The random position embeddings are learned, allowing the model to unshuffle these “‘shuffled'” frames conditioned on correctly-ordered ones. The loss is to predict whether $t_i < t_j$ or $t_j < t_i$ for each frame-frame pair.
+3.  _Temporal reordering_ learns temporal reasoning: scramble random $i$ frames and replace the segment-level position embeddings with a random and unique position embedding. The random position embeddings are learned, allowing the model to unshuffle these "‘shuffled'" frames conditioned on correctly-ordered ones. The loss is to predict whether $t_i < t_j$ or $t_j < t_i$ for each frame-frame pair.
 
 ![](assets/images/2022-06-09-vlm/MERLOT.png)
 
@@ -369,7 +369,7 @@ Fig. 27. The Socratic Model approach for generating captions and question answer
 
 - _MS COCO_ ([Chen et al. 2015](https://arxiv.org/abs/1504.00325)): contains 328K images and each paired with 5 independent captions.
 - _NoCaps_ ([Agrawal et al., 2019](https://arxiv.org/abs/1812.08658)) is designed to measure generalization to unseen classes and concepts, where in-domain contains images portraying only COCO classes, near-domain contains both COCO and novel classes, and out-of-domain consists of only novel classes.
-- _Conceptual Captions_ ([Sharma et al. 2018](https://aclanthology.org/P18-1238/)) contains 3 million pairs of images and captions, mined from the web and post-processed. To focus on the concepts, specific entities in this dataset are replaced with general notions (e.g. a politician's name is replaced with “politician”)
+- _Conceptual Captions_ ([Sharma et al. 2018](https://aclanthology.org/P18-1238/)) contains 3 million pairs of images and captions, mined from the web and post-processed. To focus on the concepts, specific entities in this dataset are replaced with general notions (e.g. a politician's name is replaced with "politician")
 - _Crisscrossed Captions (CxC)_ ([Parekh et al. 2021](https://arxiv.org/abs/2004.15020)) contains 247,315 human-labeled annotations including positive and negative associations between image pairs, caption pairs and image-caption pairs.
 - _Concadia_ ([Kreiss et al. 2021](https://arxiv.org/abs/2104.08376)) is a Wikipedia-based dataset containing 96,918 images with corresponding English-language descriptions, captions, and surrounding context.
 
@@ -409,7 +409,7 @@ Given an image and a question, the task is to correctly answer the question.
   - _TGIF-QA_ contains 165K QA pairs for the animated GIFs from the TGIF dataset.
 - _LSMDC_ (Large Scale Movie Description Challenge; [Rohrbach et al. 2015](https://arxiv.org/abs/1501.02530)) contains 118,081 short video clips extracted from 202 movies. Each video has a caption, either extracted from the movie script or from transcribed DVS (descriptive video services) for the visually impaired.
 - _TVQA_ ([Lei et al. 2018](https://arxiv.org/abs/1809.01696)) / _TVQA+_ ([Lei et al. 2019](https://arxiv.org/abs/1904.11574)) is a large-scale video QA dataset based on 6 popular TV shows (Friends, The Big Bang Theory, How I Met Your Mother, House M.D., Grey's Anatomy, Castle). It consists of 152.5K QA pairs from 21.8K video clips, spanning over 460 hours of video.
-- _DramaQA_ ([Choi et al. 2020](https://arxiv.org/abs/2005.03356)) is a large-scale video QA dataset based on a Korean popular TV show, “Another Miss Oh”. This dataset contains four levels of QA on difficulty and multi-level character-centered story descriptions.
+- _DramaQA_ ([Choi et al. 2020](https://arxiv.org/abs/2005.03356)) is a large-scale video QA dataset based on a Korean popular TV show, "Another Miss Oh". This dataset contains four levels of QA on difficulty and multi-level character-centered story descriptions.
 - _VLEP_ (Video-and-Language Event Prediction; [Lei et al. 2020](https://arxiv.org/abs/2010.07999)) contains 28,726 future event prediction examples (along with their rationales) from 10,234 diverse TV Show and YouTube Lifestyle Vlog video clips.
 
 # Citation[#](#citation)
@@ -433,28 +433,28 @@ Or
 
 # References[#](#references)
 
-\[1\] Li et al. [“VisualBERT: A Simple and Performant Baseline for Vision and Language."](https://arxiv.org/abs/1908.03557) arXiv preprint:1908.03557 (2019).
+\[1\] Li et al. ["VisualBERT: A Simple and Performant Baseline for Vision and Language."](https://arxiv.org/abs/1908.03557) arXiv preprint:1908.03557 (2019).
 
-\[2\] Wang et al. [“SimVLM: Simple Visual Language Model Pretraining with Weak Supervision."](https://arxiv.org/abs/2108.10904) ICLR 2022.
+\[2\] Wang et al. ["SimVLM: Simple Visual Language Model Pretraining with Weak Supervision."](https://arxiv.org/abs/2108.10904) ICLR 2022.
 
-\[3\] Aghajanyan, et al. [“CM3: A Causal Masked Multimodal Model of the Internet."](https://arxiv.org/abs/2201.07520) arXiv preprint arXiv: 2201.07520 (2022).
+\[3\] Aghajanyan, et al. ["CM3: A Causal Masked Multimodal Model of the Internet."](https://arxiv.org/abs/2201.07520) arXiv preprint arXiv: 2201.07520 (2022).
 
-\[4\] Tsimpoukelli et al. [“Multimodal Few-Shot Learning with Frozen Language Models."](https://arxiv.org/abs/2106.13884) NeuriPS 2021.
+\[4\] Tsimpoukelli et al. ["Multimodal Few-Shot Learning with Frozen Language Models."](https://arxiv.org/abs/2106.13884) NeuriPS 2021.
 
-\[5\] Mokady, Hertz & Hertz. [“ClipCap: CLIP Prefix for Image Captioning."](https://arxiv.org/abs/2111.09734) 2021.
+\[5\] Mokady, Hertz & Hertz. ["ClipCap: CLIP Prefix for Image Captioning."](https://arxiv.org/abs/2111.09734) 2021.
 
-\[6\] Chen et al. [“VisualGPT: Data-efficient Adaptation of Pretrained Language Models for Image Captioning."](https://arxiv.org/abs/2102.10407) arXiv preprint arXiv:2111.09734 (2021).
+\[6\] Chen et al. ["VisualGPT: Data-efficient Adaptation of Pretrained Language Models for Image Captioning."](https://arxiv.org/abs/2102.10407) arXiv preprint arXiv:2111.09734 (2021).
 
-\[7\] Luo et al. [“A Frustratingly Simple Approach for End-to-End Image Captioning."](https://arxiv.org/abs/2201.12723) arXiv preprint arXiv:2201.12723 (2022).
+\[7\] Luo et al. ["A Frustratingly Simple Approach for End-to-End Image Captioning."](https://arxiv.org/abs/2201.12723) arXiv preprint arXiv:2201.12723 (2022).
 
-\[8\] Zellers et al. [“MERLOT: Multimodal neural script knowledge models."](https://arxiv.org/abs/2106.02636) NeuriPS 2021.
+\[8\] Zellers et al. ["MERLOT: Multimodal neural script knowledge models."](https://arxiv.org/abs/2106.02636) NeuriPS 2021.
 
-\[9\] Alayrac et al. [“Flamingo: a Visual Language Model for Few-Shot Learning."](https://arxiv.org/abs/2204.14198) arXiv preprint arXiv:2204.14198 (2022).
+\[9\] Alayrac et al. ["Flamingo: a Visual Language Model for Few-Shot Learning."](https://arxiv.org/abs/2204.14198) arXiv preprint arXiv:2204.14198 (2022).
 
-\[10\] Yu & Wang et al. [“CoCa: Contrastive Captioners are Image-Text Foundation Models."](https://arxiv.org/abs/2205.01917) arXiv preprint arXiv:2205.01917 (2022).
+\[10\] Yu & Wang et al. ["CoCa: Contrastive Captioners are Image-Text Foundation Models."](https://arxiv.org/abs/2205.01917) arXiv preprint arXiv:2205.01917 (2022).
 
-\[11\] Yang et al. [“An Empirical Study of GPT-3 for Few-Shot Knowledge-Based VQA."](https://arxiv.org/abs/2109.05014) arXiv preprint arXiv:2109.05014 (2021).
+\[11\] Yang et al. ["An Empirical Study of GPT-3 for Few-Shot Knowledge-Based VQA."](https://arxiv.org/abs/2109.05014) arXiv preprint arXiv:2109.05014 (2021).
 
-\[12\] Su et al. [“Language models can see: Plugging visual controls in text generation."](https://arxiv.org/abs/2205.02655) arXiv preprint arXiv:2205.02655 (2022).
+\[12\] Su et al. ["Language models can see: Plugging visual controls in text generation."](https://arxiv.org/abs/2205.02655) arXiv preprint arXiv:2205.02655 (2022).
 
-\[13\] Zeng et al. [“Socratic Models: Composing Zero-Shot Multimodal Reasoning with Language."](https://arxiv.org/abs/2204.00598) arXiv preprint arXiv:2204.00598 (2022).
+\[13\] Zeng et al. ["Socratic Models: Composing Zero-Shot Multimodal Reasoning with Language."](https://arxiv.org/abs/2204.00598) arXiv preprint arXiv:2204.00598 (2022).

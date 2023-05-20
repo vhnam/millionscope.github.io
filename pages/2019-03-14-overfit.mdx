@@ -38,7 +38,7 @@ Table of Contents
 
 If you are like me, entering into the field of deep learning with experience in traditional machine learning, you may often ponder over this question: Since a typical deep neural network has so many parameters and training error can easily be perfect, it should surely suffer from substantial overfitting. How could it be ever generalized to out-of-sample data points?
 
-The effort in understanding why deep neural networks can generalize somehow reminds me of this interesting paper on System Biology — [“Can a biologist fix a radio?"](<https://www.cell.com/cancer-cell/pdf/S1535-6108(02)00133-2.pdf>) (Lazebnik, 2002). If a biologist intends to fix a radio machine like how she works on a biological system, life could be hard. Because the full mechanism of the radio system is not revealed, poking small local functionalities might give some hints but it can hardly present all the interactions within the system, let alone the entire working flow. No matter whether you think it is relevant to DL, it is a very fun read.
+The effort in understanding why deep neural networks can generalize somehow reminds me of this interesting paper on System Biology — ["Can a biologist fix a radio?"](<https://www.cell.com/cancer-cell/pdf/S1535-6108(02)00133-2.pdf>) (Lazebnik, 2002). If a biologist intends to fix a radio machine like how she works on a biological system, life could be hard. Because the full mechanism of the radio system is not revealed, poking small local functionalities might give some hints but it can hardly present all the interactions within the system, let alone the entire working flow. No matter whether you think it is relevant to DL, it is a very fun read.
 
 I would like to discuss a couple of papers on generalizability and complexity measurement of deep learning models in the post. Hopefully, it could shed light on your thinking path towards the understanding of why DNN can generalize.
 
@@ -52,7 +52,7 @@ There are many classic theorems to guide us when deciding what types of properti
 
 [Occam's Razor](http://pespmc1.vub.ac.be/OCCAMRAZ.html) is an informal principle for problem-solving, proposed by [William of Ockham](https://en.wikipedia.org/wiki/William_of_Ockham) in the 14th century:
 
-> “Simpler solutions are more likely to be correct than complex ones.”
+> "Simpler solutions are more likely to be correct than complex ones."
 
 The statement is extremely powerful when we are facing multiple candidates of underlying theories to explain the world and have to pick one. Too many unnecessary assumptions might seem to be plausible for one problem, but harder to be generalized to other complications or to eventually lead to the basic principles of the universe.
 
@@ -62,7 +62,7 @@ Think of this, it took people hundreds of years to figure out that the sky is bl
 
 The principle of Occam's Razor can be similarly applied to machine learning models. A formalized version of such concept is called the _Minimum Description Length (MDL)_ principle, used for comparing competing models / explanations given data observed.
 
-> “Comprehension is compression.”
+> "Comprehension is compression."
 
 The fundamental idea in MDL is to _view learning as data compression_. By compressing the data, we need to discover regularity or patterns in the data with the high potentiality to generalize to unseen samples. [Information bottleneck](https://lilianweng.github.io/posts/2017-09-28-information-bottleneck/) theory believes that a deep neural network is trained first to represent the data by minimizing the generalization error and then learn to compress this representation by trimming noise.
 
@@ -77,7 +77,7 @@ $$\mathcal{H}^\text{best} = \arg\min_\mathcal{H} \[L(\mathcal{H}) + L(\mathcal{D
 
 In simple words, the _best_ model is the _smallest_ model containing the encoded data and the model itself. Following this criterion, the memorization approach I proposed at the beginning of the section sounds horrible no matter how good accuracy it can achieve on the training data.
 
-People might argue Occam's Razor is wrong, as given the real world can be arbitrarily complicated, why do we have to find simple models? One interesting view by MDL is to consider models as **“languages”** instead of fundamental generative theorems. We would like to find good compression strategies to describe regularity in a small set of samples, and they **do not have to be the “real” generative model** for explaining the phenomenon. Models can be wrong but still useful (i.e., think of any Bayesian prior).
+People might argue Occam's Razor is wrong, as given the real world can be arbitrarily complicated, why do we have to find simple models? One interesting view by MDL is to consider models as **"languages"** instead of fundamental generative theorems. We would like to find good compression strategies to describe regularity in a small set of samples, and they **do not have to be the "real" generative model** for explaining the phenomenon. Models can be wrong but still useful (i.e., think of any Bayesian prior).
 
 ## Kolmogorov Complexity[#](#kolmogorov-complexity)
 
@@ -93,7 +93,7 @@ There are a lot of connections between Kolmogorov Complexity and Shannon Informa
 
 ## Solomonoff's Inference Theory[#](#solomonoffs-inference-theory)
 
-Another mathematical formalization of Occam's Razor is Solomonoff's theory of universal inductive inference ([Solomonoff](https://www.sciencedirect.com/science/article/pii/S0019995864902232), [1964](https://www.sciencedirect.com/science/article/pii/S0019995864901317)). The principle is to favor models that correspond to the “shortest program” to produce the training data, based on its Kolmogorov complexity
+Another mathematical formalization of Occam's Razor is Solomonoff's theory of universal inductive inference ([Solomonoff](https://www.sciencedirect.com/science/article/pii/S0019995864902232), [1964](https://www.sciencedirect.com/science/article/pii/S0019995864901317)). The principle is to favor models that correspond to the "shortest program" to produce the training data, based on its Kolmogorov complexity
 
 # Expressive Power of DL Models[#](#expressive-power-of-dl-models)
 
@@ -155,13 +155,13 @@ Fig. 1. Fit models on CIFAR10 with random labels or random pixels: (a) learning 
 
 # Are Deep Learning Models Dramatically Overfitted?[#](#are-deep-learning-models-dramatically-overfitted)
 
-Deep learning models are heavily over-parameterized and can often get to perfect results on training data. In the traditional view, like bias-variance trade-offs, this could be a disaster that nothing may generalize to the unseen test data. However, as is often the case, such “overfitted” (training error = 0) deep learning models still present a decent performance on out-of-sample test data. Hmm … interesting and why?
+Deep learning models are heavily over-parameterized and can often get to perfect results on training data. In the traditional view, like bias-variance trade-offs, this could be a disaster that nothing may generalize to the unseen test data. However, as is often the case, such "overfitted" (training error = 0) deep learning models still present a decent performance on out-of-sample test data. Hmm … interesting and why?
 
 ## Modern Risk Curve for Deep Learning[#](#modern-risk-curve-for-deep-learning)
 
 The traditional machine learning uses the following U-shape risk curve to measure the bias-variance trade-offs and quantify how generalizable a model is. If I get asked how to tell whether a model is overfitted, this would be the first thing popping into my mind.
 
-As the model turns larger (more parameters added), the training error decreases to close to zero, but the test error (generalization error) starts to increase once the model complexity grows to pass the threshold between “underfitting” and “overfitting”. In a way, this is well aligned with Occam's Razor.
+As the model turns larger (more parameters added), the training error decreases to close to zero, but the test error (generalization error) starts to increase once the model complexity grows to pass the threshold between "underfitting" and "overfitting". In a way, this is well aligned with Occam's Razor.
 
 ![](bias-variance-risk-curve.png)
 
@@ -176,7 +176,7 @@ Fig. 3. A new double-U-shaped bias-variance risk curve for deep neural networks.
 The paper claimed that it is likely due to two reasons:
 
 - The number of parameters is not a good measure of _inductive bias_, defined as the set of assumptions of a learning algorithm used to predict for unknown samples. See more discussion on DL model complexity in [later](#intrinsic-dimension) [sections](#heterogeneous-layer-robustness).
-- Equipped with a larger model, we might be able to discover larger function classes and further find interpolating functions that have smaller norm and are thus “simpler”.
+- Equipped with a larger model, we might be able to discover larger function classes and further find interpolating functions that have smaller norm and are thus "simpler".
 
 The double-U-shaped risk curve was observed empirically, as shown in the paper. However I was struggling quite a bit to reproduce the results. There are some signs of life, but in order to generate a pretty smooth curve similar to the theorem, [many details](#experiments) in the experiment have to be taken care of.
 
@@ -236,7 +236,7 @@ The measurement of intrinsic dimensions suggests that deep learning models are s
 
 ## Heterogeneous Layer Robustness[#](#heterogeneous-layer-robustness)
 
-[Zhang et al. (2019)](https://arxiv.org/abs/1902.01996) investigated the role of parameters in different layers. The fundamental question raised by the paper is: _“are all layers created equal?"_ The short answer is: No. The model is more sensitive to changes in some layers but not others.
+[Zhang et al. (2019)](https://arxiv.org/abs/1902.01996) investigated the role of parameters in different layers. The fundamental question raised by the paper is: _"are all layers created equal?"_ The short answer is: No. The model is more sensitive to changes in some layers but not others.
 
 The paper proposed two types of operations that can be applied to parameters of the $\ell$-th layer, $\ell = 1, \dots, L$, at time $t$, $\theta^{(\ell)}_t$ to test their impacts on model robustness:
 
@@ -262,13 +262,13 @@ Fig. 10. Re-randomization (first row) and re-initialization (the reset rows) rob
 
 Based on the fact that many top layers in deep neural networks are not critical to the model performance after re-initialization, the paper loosely concluded that:
 
-> “Over-capacitated deep networks trained with stochastic gradient have low-complexity due to self-restricting the number of critical layers.”
+> "Over-capacitated deep networks trained with stochastic gradient have low-complexity due to self-restricting the number of critical layers."
 
 We can consider re-initialization as a way to reduce the effective number of parameters, and thus the observation is aligned with what intrinsic dimension has demonstrated.
 
 ## The Lottery Ticket Hypothesis[#](#the-lottery-ticket-hypothesis)
 
-The lottery ticket hypothesis ([Frankle & Carbin, 2019](https://arxiv.org/abs/1803.03635)) is another intriguing and inspiring discovery, supporting that only a subset of network parameters have impact on the model performance and thus the network is not overfitted. The lottery ticket hypothesis states that a randomly initialized, dense, feed-forward network contains a pool of subnetworks and among them only a subset are _“winning tickets”_ which can achieve the optimal performance when _trained in isolation_.
+The lottery ticket hypothesis ([Frankle & Carbin, 2019](https://arxiv.org/abs/1803.03635)) is another intriguing and inspiring discovery, supporting that only a subset of network parameters have impact on the model performance and thus the network is not overfitted. The lottery ticket hypothesis states that a randomly initialized, dense, feed-forward network contains a pool of subnetworks and among them only a subset are _"winning tickets"_ which can achieve the optimal performance when _trained in isolation_.
 
 The idea is motivated by network pruning techniques — removing unnecessary weights (i.e. tiny weights that are almost negligible) without harming the model performance. Although the final network size can be reduced dramatically, it is hard to train such a pruned network architecture successfully from scratch. It feels like in order to successfully train a neural network, we need a large number of parameters, but we don't need that many parameters to keep the accuracy high once the model is trained. Why is that?
 
@@ -277,9 +277,9 @@ The lottery ticket hypothesis did the following experiments:
 1.  Randomly initialize a dense feed-forward network with initialization values $\theta_0$;
 2.  Train the network for multiple iterations to achieve a good performance with parameter config $\theta$;
 3.  Run pruning on $\theta$ and creating a mask $m$.
-4.  The “winning ticket” initialization config is $m \odot \theta_0$.
+4.  The "winning ticket" initialization config is $m \odot \theta_0$.
 
-Only training the small “winning ticket” subset of parameters with the initial values as found in step 1, the model is able to achieve the same level of accuracy as in step 2. It turns out a large parameter space is not needed in the final solution representation, but needed for training as it provides a big pool of initialization configs of many much smaller subnetworks.
+Only training the small "winning ticket" subset of parameters with the initial values as found in step 1, the model is able to achieve the same level of accuracy as in step 2. It turns out a large parameter space is not needed in the final solution representation, but needed for training as it provides a big pool of initialization configs of many much smaller subnetworks.
 
 The lottery ticket hypothesis opens a new perspective about interpreting and dissecting deep neural network results. Many interesting following-up works are on the way.
 
@@ -294,7 +294,7 @@ This is the trickiest one to reproduce. The authors did give me a lot of good ad
 - There are no regularization terms like weight decay, dropout.
 - In Fig 3, the training set contains 4k samples. It is only sampled once and fixed for all the models. The evaluation uses the full MNIST test set.
 - Each network is trained for a long time to achieve near-zero training risk. The learning rate is adjusted differently for models of different sizes.
-- To make the model less sensitive to the initialization in the under-parameterization region, their experiments adopted a _“weight reuse”_ scheme: the parameters obtained from training a smaller neural network are used as initialization for training larger networks.
+- To make the model less sensitive to the initialization in the under-parameterization region, their experiments adopted a _"weight reuse"_ scheme: the parameters obtained from training a smaller neural network are used as initialization for training larger networks.
 
 I did not train or tune each model long enough to get perfect training performance, but evaluation error indeed shows a special twist around the interpolation threshold, different from training error. For example, for MNIST, the threshold is the number of training samples times the number of classes (10), that is 40000.
 
@@ -342,18 +342,18 @@ Cited as:
 
 \[2\] [Occam's Razor](http://pespmc1.vub.ac.be/OCCAMRAZ.html) on Principia Cybernetica Web.
 
-\[3\] Peter Grunwald. [“A Tutorial Introduction to the Minimum Description Length Principle”](https://arxiv.org/abs/math/0406077). 2004.
+\[3\] Peter Grunwald. ["A Tutorial Introduction to the Minimum Description Length Principle"](https://arxiv.org/abs/math/0406077). 2004.
 
 \[4\] Ian Goodfellow, et al. [Deep Learning](https://www.deeplearningbook.org/). 2016. [Sec 6.4.1](https://www.deeplearningbook.org/contents/mlp.html).
 
-\[5\] Zhang, Chiyuan, et al. [“Understanding deep learning requires rethinking generalization."](https://arxiv.org/abs/1611.03530) ICLR 2017.
+\[5\] Zhang, Chiyuan, et al. ["Understanding deep learning requires rethinking generalization."](https://arxiv.org/abs/1611.03530) ICLR 2017.
 
-\[6\] Shibani Santurkar, et al. [“How does batch normalization help optimization?."](https://arxiv.org/abs/1805.11604) NIPS 2018.
+\[6\] Shibani Santurkar, et al. ["How does batch normalization help optimization?."](https://arxiv.org/abs/1805.11604) NIPS 2018.
 
-\[7\] Mikhail Belkin, et al. [“Reconciling modern machine learning and the bias-variance trade-off."](https://arxiv.org/abs/1812.11118) arXiv:1812.11118, 2018.
+\[7\] Mikhail Belkin, et al. ["Reconciling modern machine learning and the bias-variance trade-off."](https://arxiv.org/abs/1812.11118) arXiv:1812.11118, 2018.
 
-\[8\] Chiyuan Zhang, et al. [“Are All Layers Created Equal?"](https://arxiv.org/abs/1902.01996) arXiv:1902.01996, 2019.
+\[8\] Chiyuan Zhang, et al. ["Are All Layers Created Equal?"](https://arxiv.org/abs/1902.01996) arXiv:1902.01996, 2019.
 
-\[9\] Chunyuan Li, et al. [“Measuring the intrinsic dimension of objective landscapes."](https://arxiv.org/abs/1804.08838) ICLR 2018.
+\[9\] Chunyuan Li, et al. ["Measuring the intrinsic dimension of objective landscapes."](https://arxiv.org/abs/1804.08838) ICLR 2018.
 
-\[10\] Jonathan Frankle and Michael Carbin. [“The lottery ticket hypothesis: Finding sparse, trainable neural networks."](https://arxiv.org/abs/1803.03635) ICLR 2019.
+\[10\] Jonathan Frankle and Michael Carbin. ["The lottery ticket hypothesis: Finding sparse, trainable neural networks."](https://arxiv.org/abs/1803.03635) ICLR 2019.

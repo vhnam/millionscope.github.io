@@ -44,7 +44,7 @@ Table of Contents
 
 # What is Policy Gradient[#](#what-is-policy-gradient)
 
-Policy gradient is an approach to solve reinforcement learning problems. If you haven't looked into the field of reinforcement learning, please first read the section [“A (Long) Peek into Reinforcement Learning » Key Concepts”](https://lilianweng.github.io/posts/2018-02-19-rl-overview/#key-concepts) for the problem definition and key concepts.
+Policy gradient is an approach to solve reinforcement learning problems. If you haven't looked into the field of reinforcement learning, please first read the section ["A (Long) Peek into Reinforcement Learning » Key Concepts"](https://lilianweng.github.io/posts/2018-02-19-rl-overview/#key-concepts) for the problem definition and key concepts.
 
 ## Notations[#](#notations)
 
@@ -230,7 +230,7 @@ Two learning rates, $\alpha_\theta$ and $\alpha_w$, are predefined for policy an
 
 Both REINFORCE and the vanilla version of actor-critic method are on-policy: training samples are collected according to the target policy — the very same policy that we try to optimize for. Off policy methods, however, result in several additional advantages:
 
-1.  The off-policy approach does not require full trajectories and can reuse any past episodes ([“experience replay”](https://lilianweng.github.io/posts/2018-02-19-rl-overview/#deep-q-network)) for much better sample efficiency.
+1.  The off-policy approach does not require full trajectories and can reuse any past episodes (["experience replay"](https://lilianweng.github.io/posts/2018-02-19-rl-overview/#deep-q-network)) for much better sample efficiency.
 2.  The sample collection follows a behavior policy different from the target policy, bringing better [exploration](https://lilianweng.github.io/posts/2018-02-19-rl-overview/#exploration-exploitation-dilemma).
 
 Now let's see how off-policy policy gradient is computed. The behavior policy for collecting samples is a known policy (predefined just like a hyperparameter), labelled as $\beta(a \vert s)$. The objective function sums up the reward over the state distribution defined by this behavior policy:
@@ -282,7 +282,7 @@ A3C enables the parallelism in multiple agent training. The gradient accumulatio
 
 \[[paper](https://arxiv.org/abs/1602.01783)|[code](https://github.com/openai/baselines/blob/master/baselines/a2c/a2c.py)\]
 
-**A2C** is a synchronous, deterministic version of A3C; that's why it is named as “A2C” with the first “A” (“asynchronous”) removed. In A3C each agent talks to the global parameters independently, so it is possible sometimes the thread-specific agents would be playing with policies of different versions and therefore the aggregated update would not be optimal. To resolve the inconsistency, a coordinator in A2C waits for all the parallel actors to finish their work before updating the global parameters and then in the next iteration parallel actors starts from the same policy. The synchronized gradient update keeps the training more cohesive and potentially to make convergence faster.
+**A2C** is a synchronous, deterministic version of A3C; that's why it is named as "A2C" with the first "A" ("asynchronous") removed. In A3C each agent talks to the global parameters independently, so it is possible sometimes the thread-specific agents would be playing with policies of different versions and therefore the aggregated update would not be optimal. To resolve the inconsistency, a coordinator in A2C waits for all the parallel actors to finish their work before updating the global parameters and then in the next iteration parallel actors starts from the same policy. The synchronized gradient update keeps the training more cohesive and potentially to make convergence faster.
 
 A2C has been [shown](https://blog.openai.com/baselines-acktr-a2c/) to be able to utilize GPUs more efficiently and work better with large batch sizes while achieving same or better performance than A3C.
 
@@ -336,7 +336,7 @@ In order to do better exploration, an exploration policy $\mu'$ is constructed b
 
 $$\mu'(s) = \mu_\theta(s) + \mathcal{N}$$
 
-In addition, DDPG does soft updates (“conservative policy iteration”) on the parameters of both actor and critic, with $\tau \ll 1$: $\theta' \\leftarrow \tau \theta + (1 - \tau) \theta'$. In this way, the target network values are constrained to change slowly, different from the design in DQN that the target network stays frozen for some period of time.
+In addition, DDPG does soft updates ("conservative policy iteration") on the parameters of both actor and critic, with $\tau \ll 1$: $\theta' \\leftarrow \tau \theta + (1 - \tau) \theta'$. In this way, the target network values are constrained to change slowly, different from the design in DQN that the target network stays frozen for some period of time.
 
 One detail in the paper that is particularly useful in robotics is on how to normalize the different physical units of low dimensional features. For example, a model is designed to learn a policy with the robot's positions and velocities as input; these physical statistics are different by nature and even statistics of the same type may vary a lot across multiple robots. [Batch normalization](http://proceedings.mlr.press/v37/ioffe15.pdf) is applied to fix it by normalizing every dimension across samples in one minibatch.
 
@@ -346,7 +346,7 @@ Fig 3. DDPG Algorithm. (Image source: [Lillicrap, et al., 2015](https://arxiv.or
 
 ## D4PG[#](#d4pg)
 
-\[[paper](https://openreview.net/forum?id=SyZipzbCb)|code (Search “github d4pg” and you will see a few.)\]
+\[[paper](https://openreview.net/forum?id=SyZipzbCb)|code (Search "github d4pg" and you will see a few.)\]
 
 **Distributed Distributional DDPG (D4PG)** applies a set of improvements on DDPG to make it run in the distributional fashion.
 
@@ -517,7 +517,7 @@ Fig. 7. The mean normalized performance of PPG vs PPO on the [Procgen](https://a
 
 Recall how TD learning works for prediction:
 
-1.  Compute TD error: $\delta_t = R_t + \gamma \mathbb{E}_{a \sim \pi} Q(S_{t+1}, a) - Q(S_t, A_t)$; the term $r_t + \gamma \mathbb{E}_{a \sim \pi} Q(s_{t+1}, a) $ is known as “TD target”. The expectation $\mathbb{E}_{a \sim \pi}$ is used because for the future step the best estimation we can make is what the return would be if we follow the current policy $\pi$.
+1.  Compute TD error: $\delta_t = R_t + \gamma \mathbb{E}_{a \sim \pi} Q(S_{t+1}, a) - Q(S_t, A_t)$; the term $r_t + \gamma \mathbb{E}_{a \sim \pi} Q(s_{t+1}, a) $ is known as "TD target". The expectation $\mathbb{E}_{a \sim \pi}$ is used because for the future step the best estimation we can make is what the return would be if we follow the current policy $\pi$.
 2.  Update the value by correcting the error to move toward the goal: $Q(S_t, A_t) \\leftarrow Q(S_t, A_t) + \alpha \delta_t$. In other words, the incremental update on Q is proportional to the TD error: $\Delta Q(S_t, A_t) = \alpha \delta_t$.
 
 When the rollout is off policy, we need to apply importance sampling on the Q update:
@@ -550,7 +550,7 @@ The ACER [paper](https://arxiv.org/pdf/1611.01224.pdf) is pretty dense with many
 
 **ACKTR (actor-critic using Kronecker-factored trust region)** ([Yuhuai Wu, et al., 2017](https://arxiv.org/pdf/1708.05144.pdf)) proposed to use Kronecker-factored approximation curvature ([K-FAC](https://arxiv.org/pdf/1503.05671.pdf)) to do the gradient update for both the critic and actor. K-FAC made an improvement on the computation of _natural gradient_, which is quite different from our _standard gradient_. [Here](http://kvfrans.com/a-intuitive-explanation-of-natural-gradient-descent/) is a nice, intuitive explanation of natural gradient. One sentence summary is probably:
 
-> “we first consider all combinations of parameters that result in a new network a constant KL divergence away from the old network. This constant value can be viewed as the step size or learning rate. Out of all these possible combinations, we choose the one that minimizes our loss function.”
+> "we first consider all combinations of parameters that result in a new network a constant KL divergence away from the old network. This constant value can be viewed as the step size or learning rate. Out of all these possible combinations, we choose the one that minimizes our loss function."
 
 I listed ACTKR here mainly for the completeness of this post, but I would not dive into details, as it involves a lot of theoretical knowledge on natural gradient and optimization methods. If interested, check these papers/posts, before reading the ACKTR paper:
 
@@ -562,9 +562,9 @@ I listed ACTKR here mainly for the completeness of this post, but I would not di
 
 Here is a high level summary from the K-FAC [paper](https://arxiv.org/pdf/1503.05671.pdf):
 
-> “This approximation is built in two stages. In the first, the rows and columns of the Fisher are divided into groups, each of which corresponds to all the weights in a given layer, and this gives rise to a block-partitioning of the matrix. These blocks are then approximated as Kronecker products between much smaller matrices, which we show is equivalent to making certain approximating assumptions regarding the statistics of the network's gradients.
+> "This approximation is built in two stages. In the first, the rows and columns of the Fisher are divided into groups, each of which corresponds to all the weights in a given layer, and this gives rise to a block-partitioning of the matrix. These blocks are then approximated as Kronecker products between much smaller matrices, which we show is equivalent to making certain approximating assumptions regarding the statistics of the network's gradients.
 
-> In the second stage, this matrix is further approximated as having an inverse which is either block-diagonal or block-tridiagonal. We justify this approximation through a careful examination of the relationships between inverse covariances, tree-structured graphical models, and linear regression. Notably, this justification doesn't apply to the Fisher itself, and our experiments confirm that while the inverse Fisher does indeed possess this structure (approximately), the Fisher itself does not.”
+> In the second stage, this matrix is further approximated as having an inverse which is either block-diagonal or block-tridiagonal. We justify this approximation through a careful examination of the relationships between inverse covariances, tree-structured graphical models, and linear regression. Notably, this justification doesn't apply to the Fisher itself, and our experiments confirm that while the inverse Fisher does indeed possess this structure (approximately), the Fisher itself does not."
 
 ## SAC[#](#sac)
 
@@ -608,7 +608,7 @@ The soft Q function is trained to minimize the soft Bellman residual:
 
 $$\begin{aligned} J_Q(w) &= \mathbb{E}_{(s_t, a_t) \sim \mathcal{D}} \[\frac{1}{2}\big( Q_w(s_t, a_t) - (r(s_t, a_t) + \gamma \mathbb{E}_{s_{t+1} \sim \rho_\pi(s)}\[V_{\bar{\\psi}}(s_{t+1})\]) \big)^2\] \\ \text{with gradient: } \nabla_w J_Q(w) &= \nabla_w Q_w(s_t, a_t) \big( Q_w(s_t, a_t) - r(s_t, a_t) - \gamma V_{\bar{\\psi}}(s_{t+1})\big) \end{aligned}$$
 
-where $\bar{\\psi}$ is the target value function which is the exponential moving average (or only gets updated periodically in a “hard” way), just like how the parameter of the target Q network is treated in [DQN](https://lilianweng.github.io/posts/2018-02-19-rl-overview/#deep-q-network) to stabilize the training.
+where $\bar{\\psi}$ is the target value function which is the exponential moving average (or only gets updated periodically in a "hard" way), just like how the parameter of the target Q network is treated in [DQN](https://lilianweng.github.io/posts/2018-02-19-rl-overview/#deep-q-network) to stabilize the training.
 
 SAC updates the policy to minimize the [KL-divergence](https://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence):
 
@@ -652,7 +652,7 @@ And the optimization becomes:
 
 $$\text{maximize } f(\pi_T) \text{ s.t. } h(\pi_T) \\geq 0$$
 
-To solve the maximization optimization with inequality constraint, we can construct a [Lagrangian expression](https://cs.stanford.edu/people/davidknowles/lagrangian_duality.pdf) with a Lagrange multiplier (also known as “dual variable”), $\alpha_T$:
+To solve the maximization optimization with inequality constraint, we can construct a [Lagrangian expression](https://cs.stanford.edu/people/davidknowles/lagrangian_duality.pdf) with a Lagrange multiplier (also known as "dual variable"), $\alpha_T$:
 
 $$L(\pi_T, \alpha_T) = f(\pi_T) + \alpha_T h(\pi_T)$$
 
@@ -798,7 +798,7 @@ Usually the temperature $\alpha$ follows an annealing scheme so that the trainin
 
 \[[paper](https://arxiv.org/abs/1802.01561)|[code](https://github.com/deepmind/scalable_agent)\]
 
-In order to scale up RL training to achieve a very high throughput, **IMPALA** (“Importance Weighted Actor-Learner Architecture”) framework decouples acting from learning on top of basic actor-critic setup and learns from all experience trajectories with **V-trace** off-policy correction.
+In order to scale up RL training to achieve a very high throughput, **IMPALA** ("Importance Weighted Actor-Learner Architecture") framework decouples acting from learning on top of basic actor-critic setup and learns from all experience trajectories with **V-trace** off-policy correction.
 
 Multiple actors generate experience in parallel, while the learner optimizes both policy and value function parameters using all the generated experience. Actors update their parameters with the latest policy from the learner periodically. Because acting and learning are decoupled, we can add many more actor machines to generate a lot more trajectories per time unit. As the training policy and the behavior policy are not totally synchronized, there is a _gap_ between them and thus we need off-policy corrections.
 
@@ -865,52 +865,52 @@ Cited as:
 
 \[2\] Richard S. Sutton and Andrew G. Barto. [Reinforcement Learning: An Introduction; 2nd Edition](http://incompleteideas.net/book/bookdraft2017nov5.pdf). 2017.
 
-\[3\] John Schulman, et al. [“High-dimensional continuous control using generalized advantage estimation."](https://arxiv.org/pdf/1506.02438.pdf) ICLR 2016.
+\[3\] John Schulman, et al. ["High-dimensional continuous control using generalized advantage estimation."](https://arxiv.org/pdf/1506.02438.pdf) ICLR 2016.
 
-\[4\] Thomas Degris, Martha White, and Richard S. Sutton. [“Off-policy actor-critic."](https://arxiv.org/pdf/1205.4839.pdf) ICML 2012.
+\[4\] Thomas Degris, Martha White, and Richard S. Sutton. ["Off-policy actor-critic."](https://arxiv.org/pdf/1205.4839.pdf) ICML 2012.
 
 \[5\] timvieira.github.io [Importance sampling](http://timvieira.github.io/blog/post/2014/12/21/importance-sampling/)
 
-\[6\] Mnih, Volodymyr, et al. [“Asynchronous methods for deep reinforcement learning."](https://arxiv.org/abs/1602.01783) ICML. 2016.
+\[6\] Mnih, Volodymyr, et al. ["Asynchronous methods for deep reinforcement learning."](https://arxiv.org/abs/1602.01783) ICML. 2016.
 
-\[7\] David Silver, et al. [“Deterministic policy gradient algorithms."](https://hal.inria.fr/file/index/docid/938992/filename/dpg-icml2014.pdf) ICML. 2014.
+\[7\] David Silver, et al. ["Deterministic policy gradient algorithms."](https://hal.inria.fr/file/index/docid/938992/filename/dpg-icml2014.pdf) ICML. 2014.
 
-\[8\] Timothy P. Lillicrap, et al. [“Continuous control with deep reinforcement learning."](https://arxiv.org/pdf/1509.02971.pdf) arXiv preprint arXiv:1509.02971 (2015).
+\[8\] Timothy P. Lillicrap, et al. ["Continuous control with deep reinforcement learning."](https://arxiv.org/pdf/1509.02971.pdf) arXiv preprint arXiv:1509.02971 (2015).
 
-\[9\] Ryan Lowe, et al. [“Multi-agent actor-critic for mixed cooperative-competitive environments."](https://arxiv.org/pdf/1706.02275.pdf) NIPS. 2017.
+\[9\] Ryan Lowe, et al. ["Multi-agent actor-critic for mixed cooperative-competitive environments."](https://arxiv.org/pdf/1706.02275.pdf) NIPS. 2017.
 
-\[10\] John Schulman, et al. [“Trust region policy optimization."](https://arxiv.org/pdf/1502.05477.pdf) ICML. 2015.
+\[10\] John Schulman, et al. ["Trust region policy optimization."](https://arxiv.org/pdf/1502.05477.pdf) ICML. 2015.
 
-\[11\] Ziyu Wang, et al. [“Sample efficient actor-critic with experience replay."](https://arxiv.org/pdf/1611.01224.pdf) ICLR 2017.
+\[11\] Ziyu Wang, et al. ["Sample efficient actor-critic with experience replay."](https://arxiv.org/pdf/1611.01224.pdf) ICLR 2017.
 
-\[12\] Rémi Munos, Tom Stepleton, Anna Harutyunyan, and Marc Bellemare. [“Safe and efficient off-policy reinforcement learning”](http://papers.nips.cc/paper/6538-safe-and-efficient-off-policy-reinforcement-learning.pdf) NIPS. 2016.
+\[12\] Rémi Munos, Tom Stepleton, Anna Harutyunyan, and Marc Bellemare. ["Safe and efficient off-policy reinforcement learning"](http://papers.nips.cc/paper/6538-safe-and-efficient-off-policy-reinforcement-learning.pdf) NIPS. 2016.
 
-\[13\] Yuhuai Wu, et al. [“Scalable trust-region method for deep reinforcement learning using Kronecker-factored approximation."](https://arxiv.org/pdf/1708.05144.pdf) NIPS. 2017.
+\[13\] Yuhuai Wu, et al. ["Scalable trust-region method for deep reinforcement learning using Kronecker-factored approximation."](https://arxiv.org/pdf/1708.05144.pdf) NIPS. 2017.
 
 \[14\] kvfrans.com [A intuitive explanation of natural gradient descent](http://kvfrans.com/a-intuitive-explanation-of-natural-gradient-descent/)
 
-\[15\] Sham Kakade. [“A Natural Policy Gradient."](https://papers.nips.cc/paper/2073-a-natural-policy-gradient.pdf). NIPS. 2002.
+\[15\] Sham Kakade. ["A Natural Policy Gradient."](https://papers.nips.cc/paper/2073-a-natural-policy-gradient.pdf). NIPS. 2002.
 
-\[16\] [“Going Deeper Into Reinforcement Learning: Fundamentals of Policy Gradients."](https://danieltakeshi.github.io/2017/03/28/going-deeper-into-reinforcement-learning-fundamentals-of-policy-gradients/) - Seita's Place, Mar 2017.
+\[16\] ["Going Deeper Into Reinforcement Learning: Fundamentals of Policy Gradients."](https://danieltakeshi.github.io/2017/03/28/going-deeper-into-reinforcement-learning-fundamentals-of-policy-gradients/) - Seita's Place, Mar 2017.
 
-\[17\] [“Notes on the Generalized Advantage Estimation Paper."](https://danieltakeshi.github.io/2017/04/02/notes-on-the-generalized-advantage-estimation-paper/) - Seita's Place, Apr, 2017.
+\[17\] ["Notes on the Generalized Advantage Estimation Paper."](https://danieltakeshi.github.io/2017/04/02/notes-on-the-generalized-advantage-estimation-paper/) - Seita's Place, Apr, 2017.
 
-\[18\] Gabriel Barth-Maron, et al. [“Distributed Distributional Deterministic Policy Gradients."](https://arxiv.org/pdf/1804.08617.pdf) ICLR 2018 poster.
+\[18\] Gabriel Barth-Maron, et al. ["Distributed Distributional Deterministic Policy Gradients."](https://arxiv.org/pdf/1804.08617.pdf) ICLR 2018 poster.
 
-\[19\] Tuomas Haarnoja, Aurick Zhou, Pieter Abbeel, and Sergey Levine. [“Soft Actor-Critic: Off-Policy Maximum Entropy Deep Reinforcement Learning with a Stochastic Actor."](https://arxiv.org/pdf/1801.01290.pdf) arXiv preprint arXiv:1801.01290 (2018).
+\[19\] Tuomas Haarnoja, Aurick Zhou, Pieter Abbeel, and Sergey Levine. ["Soft Actor-Critic: Off-Policy Maximum Entropy Deep Reinforcement Learning with a Stochastic Actor."](https://arxiv.org/pdf/1801.01290.pdf) arXiv preprint arXiv:1801.01290 (2018).
 
-\[20\] Scott Fujimoto, Herke van Hoof, and Dave Meger. [“Addressing Function Approximation Error in Actor-Critic Methods."](https://arxiv.org/abs/1802.09477) arXiv preprint arXiv:1802.09477 (2018).
+\[20\] Scott Fujimoto, Herke van Hoof, and Dave Meger. ["Addressing Function Approximation Error in Actor-Critic Methods."](https://arxiv.org/abs/1802.09477) arXiv preprint arXiv:1802.09477 (2018).
 
-\[21\] Tuomas Haarnoja, et al. [“Soft Actor-Critic Algorithms and Applications."](https://arxiv.org/abs/1812.05905) arXiv preprint arXiv:1812.05905 (2018).
+\[21\] Tuomas Haarnoja, et al. ["Soft Actor-Critic Algorithms and Applications."](https://arxiv.org/abs/1812.05905) arXiv preprint arXiv:1812.05905 (2018).
 
-\[22\] David Knowles. [“Lagrangian Duality for Dummies”](https://cs.stanford.edu/people/davidknowles/lagrangian_duality.pdf) Nov 13, 2010.
+\[22\] David Knowles. ["Lagrangian Duality for Dummies"](https://cs.stanford.edu/people/davidknowles/lagrangian_duality.pdf) Nov 13, 2010.
 
-\[23\] Yang Liu, et al. [“Stein variational policy gradient."](https://arxiv.org/abs/1704.02399) arXiv preprint arXiv:1704.02399 (2017).
+\[23\] Yang Liu, et al. ["Stein variational policy gradient."](https://arxiv.org/abs/1704.02399) arXiv preprint arXiv:1704.02399 (2017).
 
-\[24\] Qiang Liu and Dilin Wang. [“Stein variational gradient descent: A general purpose bayesian inference algorithm."](https://papers.nips.cc/paper/6338-stein-variational-gradient-descent-a-general-purpose-bayesian-inference-algorithm.pdf) NIPS. 2016.
+\[24\] Qiang Liu and Dilin Wang. ["Stein variational gradient descent: A general purpose bayesian inference algorithm."](https://papers.nips.cc/paper/6338-stein-variational-gradient-descent-a-general-purpose-bayesian-inference-algorithm.pdf) NIPS. 2016.
 
-\[25\] Lasse Espeholt, et al. [“IMPALA: Scalable Distributed Deep-RL with Importance Weighted Actor-Learner Architectures”](https://arxiv.org/abs/1802.01561) arXiv preprint 1802.01561 (2018).
+\[25\] Lasse Espeholt, et al. ["IMPALA: Scalable Distributed Deep-RL with Importance Weighted Actor-Learner Architectures"](https://arxiv.org/abs/1802.01561) arXiv preprint 1802.01561 (2018).
 
-\[26\] Karl Cobbe, et al. [“Phasic Policy Gradient."](https://arxiv.org/abs/2009.04416) arXiv preprint arXiv:2009.04416 (2020).
+\[26\] Karl Cobbe, et al. ["Phasic Policy Gradient."](https://arxiv.org/abs/2009.04416) arXiv preprint arXiv:2009.04416 (2020).
 
-\[27\] Chloe Ching-Yun Hsu, et al. [“Revisiting Design Choices in Proximal Policy Optimization."](https://arxiv.org/abs/2009.10897) arXiv preprint arXiv:2009.10897 (2020).
+\[27\] Chloe Ching-Yun Hsu, et al. ["Revisiting Design Choices in Proximal Policy Optimization."](https://arxiv.org/abs/2009.10897) arXiv preprint arXiv:2009.10897 (2020).

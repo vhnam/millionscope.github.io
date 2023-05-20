@@ -101,7 +101,7 @@ To simplify the discussion, we assume that the task is a $K$-class classificatio
 
 # Acquisition Function[#](#acquisition-function)
 
-The process of identifying the most valuable examples to label next is referred to as “sampling strategy” or “query strategy”. The scoring function in the sampling process is named “acquisition function”, denoted as $U(\mathbf{x})$. Data points with higher scores are expected to produce higher value for model training if they get labeled.
+The process of identifying the most valuable examples to label next is referred to as "sampling strategy" or "query strategy". The scoring function in the sampling process is named "acquisition function", denoted as $U(\mathbf{x})$. Data points with higher scores are expected to produce higher value for model training if they get labeled.
 
 Here is a list of basic sampling strategies.
 
@@ -146,7 +146,7 @@ There is a long tradition in machine learning of using ensembles to improve mode
 
 To get better uncertainty estimation, it is intuitive to aggregate a collection of independently trained models. However, it is expensive to train a single deep neural network model, let alone many of them. In reinforcement learning, Bootstrapped DQN ([Osband, et al. 2016](https://arxiv.org/abs/1602.04621)) is equipped with multiple value heads and relies on the uncertainty among an ensemble of Q value approximation to guide [exploration](https://lilianweng.github.io/posts/2020-06-07-exploration-drl/#q-value-exploration) in RL.
 
-In active learning, a commoner approach is to use _dropout_ to “simulate” a probabilistic Gaussian process ([Gal & Ghahramani 2016](https://arxiv.org/abs/1506.02142)). We thus ensemble multiple samples collected from the same model but with different dropout masks applied during the forward pass to estimate the model uncertainty (epistemic uncertainty). The process is named **MC dropout** (Monte Carlo dropout), where dropout is applied before every weight layer, is approved to be mathematically equivalent to an approximation to the probabilistic deep Gaussian process ([Gal & Ghahramani 2016](https://arxiv.org/abs/1506.02157)). This simple idea has been shown to be effective for classification with small datasets and widely adopted in scenarios when efficient model uncertainty estimation is needed.
+In active learning, a commoner approach is to use _dropout_ to "simulate" a probabilistic Gaussian process ([Gal & Ghahramani 2016](https://arxiv.org/abs/1506.02142)). We thus ensemble multiple samples collected from the same model but with different dropout masks applied during the forward pass to estimate the model uncertainty (epistemic uncertainty). The process is named **MC dropout** (Monte Carlo dropout), where dropout is applied before every weight layer, is approved to be mathematically equivalent to an approximation to the probabilistic deep Gaussian process ([Gal & Ghahramani 2016](https://arxiv.org/abs/1506.02157)). This simple idea has been shown to be effective for classification with small datasets and widely adopted in scenarios when efficient model uncertainty estimation is needed.
 
 **DBAL** (Deep Bayesian active learning; [Gal et al. 2017](https://arxiv.org/abs/1703.02910)) approximates Bayesian neural networks with MC dropout such that it learns a distribution over model weights. In their experiment, MC dropout performed better than random baseline and mean standard deviation (Mean STD), similarly to variation ratios and entropy measurement.
 
@@ -292,7 +292,7 @@ It is equivalent to [the $k$-Center problem](https://en.wikipedia.org/wiki/Metri
 
 Fig. 9. Active learning results of core-sets algorithm in comparison with several common baselines on CIFAR-10, CIFAR-100, SVHN. (Image source: [Sener & Savarese 2018](https://arxiv.org/abs/1708.00489))
 
-It works well on image classification tasks when there is a small number of classes. When the number of classes grows to be large or the data dimensionality increases (“curse of dimensionality”), the core-set method becomes less effective ([Sinha et al. 2019](https://arxiv.org/abs/1904.00370)).
+It works well on image classification tasks when there is a small number of classes. When the number of classes grows to be large or the data dimensionality increases ("curse of dimensionality"), the core-set method becomes less effective ([Sinha et al. 2019](https://arxiv.org/abs/1904.00370)).
 
 Because the core-set selection is expensive, [Coleman et al. (2020)](https://arxiv.org/abs/1906.11829) experimented with a weaker model (e.g. smaller, weaker architecture, not fully trained) and found that empirically using a weaker model as a proxy can significantly shorten each repeated data selection cycle of training models and selecting samples, without hurting the final error much. Their method is referred to as **SVP** (Selection via Proxy).
 
@@ -321,7 +321,7 @@ $$\text{EGL}(\mathbf{x}_i) = \sum_{y_i \in \mathcal{Y}} p(y=y_i \vert \mathbf{x}
 
 $$\begin{aligned} I\[\boldsymbol{\theta}, y \vert x,\mathcal{D}\] &= H(\boldsymbol{\theta} \vert \mathcal{D}) - \mathbb{E}_{y \sim p(y \vert \boldsymbol{x}, \mathcal{D})} \big\[ H(\boldsymbol{\theta} \vert y, \boldsymbol{x}, \mathcal{D}) \big\] & \text{; Decrease in expected posterior entropy}\\ &= H(y \vert \boldsymbol{x}, \mathcal{D}) - \mathbb{E}_{\boldsymbol{\theta} \sim p(\boldsymbol{\theta} \vert \mathcal{D})} \big\[ H(y \vert \boldsymbol{x}, \mathcal{\theta}) \big\] \end{aligned}$$
 
-The underlying interpretation is to “seek $\mathbf{x}$ for which the model is marginally most uncertain about $y$ (high $H(y \vert \mathbf{x}, \mathcal{D})$), but for which individual settings of the parameters are confident (low $H(y \vert \mathbf{x}, \boldsymbol{\theta})$).” In other words, each individual posterior draw is confident but a collection of draws carry diverse opinions.
+The underlying interpretation is to "seek $\mathbf{x}$ for which the model is marginally most uncertain about $y$ (high $H(y \vert \mathbf{x}, \mathcal{D})$), but for which individual settings of the parameters are confident (low $H(y \vert \mathbf{x}, \boldsymbol{\theta})$)." In other words, each individual posterior draw is confident but a collection of draws carry diverse opinions.
 
 BALD was originally proposed for an individual sample and [Kirsch et al. (2019)](https://arxiv.org/abs/1906.08158) extended it to work in batch mode.
 
@@ -332,7 +332,7 @@ To investigate whether neural networks have a tendency to **forget** previously 
 - _Forgettable_ (redundant) samples: If the class label changes across training epochs.
 - _Unforgettable_ samples: If the class label assignment is consistent across training epochs. Those samples are never forgotten once learned.
 
-They found that there are a large number of unforgettable examples that are never forgotten once learnt. Examples with noisy labels or images with “uncommon” features (visually complicated to classify) are among the most forgotten examples. The experiments empirically validated that unforgettable examples can be safely removed without compromising model performance.
+They found that there are a large number of unforgettable examples that are never forgotten once learnt. Examples with noisy labels or images with "uncommon" features (visually complicated to classify) are among the most forgotten examples. The experiments empirically validated that unforgettable examples can be safely removed without compromising model performance.
 
 In the implementation, the forgetting event is only counted when a sample is included in the current training batch; that is, they compute forgetting across presentations of the same example in subsequent mini-batches. The number of forgetting events per sample is quite stable across different seeds and forgettable examples have a small tendency to be first-time learned later in the training. The forgetting events are also found to be transferable throughout the training period and between architectures.
 
@@ -402,34 +402,34 @@ Or
 
 \[2\] [https://jacobgil.github.io/deeplearning/activelearning](https://jacobgil.github.io/deeplearning/activelearning)
 
-\[3\] Yang et al. [“Cost-effective active learning for deep image classification”](https://arxiv.org/abs/1701.03551) TCSVT 2016.
+\[3\] Yang et al. ["Cost-effective active learning for deep image classification"](https://arxiv.org/abs/1701.03551) TCSVT 2016.
 
-\[4\] Yarin Gal et al. [“Dropout as a Bayesian Approximation: representing model uncertainty in deep learning."](https://arxiv.org/abs/1506.02142) ICML 2016.
+\[4\] Yarin Gal et al. ["Dropout as a Bayesian Approximation: representing model uncertainty in deep learning."](https://arxiv.org/abs/1506.02142) ICML 2016.
 
-\[5\] Blundell et al. [“Weight uncertainty in neural networks (Bayes-by-Backprop)"](https://arxiv.org/abs/1505.05424) ICML 2015.
+\[5\] Blundell et al. ["Weight uncertainty in neural networks (Bayes-by-Backprop)"](https://arxiv.org/abs/1505.05424) ICML 2015.
 
-\[6\] Settles et al. [“Multiple-Instance Active Learning."](https://papers.nips.cc/paper/2007/hash/a1519de5b5d44b31a01de013b9b51a80-Abstract.html) NIPS 2007.
+\[6\] Settles et al. ["Multiple-Instance Active Learning."](https://papers.nips.cc/paper/2007/hash/a1519de5b5d44b31a01de013b9b51a80-Abstract.html) NIPS 2007.
 
 \[7\] Houlsby et al. [Bayesian Active Learning for Classification and Preference Learning."](https://arxiv.org/abs/1112.5745) arXiv preprint arXiv:1112.5745 (2020).
 
-\[8\] Kirsch et al. [“BatchBALD: Efficient and Diverse Batch Acquisition for Deep Bayesian Active Learning."](https://arxiv.org/abs/1906.08158) NeurIPS 2019.
+\[8\] Kirsch et al. ["BatchBALD: Efficient and Diverse Batch Acquisition for Deep Bayesian Active Learning."](https://arxiv.org/abs/1906.08158) NeurIPS 2019.
 
-\[9\] Beluch et al. [“The power of ensembles for active learning in image classification."](https://openaccess.thecvf.com/content_cvpr_2018/papers/Beluch_The_Power_of_CVPR_2018_paper.pdf) CVPR 2018.
+\[9\] Beluch et al. ["The power of ensembles for active learning in image classification."](https://openaccess.thecvf.com/content_cvpr_2018/papers/Beluch_The_Power_of_CVPR_2018_paper.pdf) CVPR 2018.
 
-\[10\] Sener & Savarese. [“Active learning for convolutional neural networks: A core-set approach."](https://arxiv.org/abs/1708.00489) ICLR 2018.
+\[10\] Sener & Savarese. ["Active learning for convolutional neural networks: A core-set approach."](https://arxiv.org/abs/1708.00489) ICLR 2018.
 
-\[11\] Donggeun Yoo & In So Kweon. [“Learning Loss for Active Learning."](https://arxiv.org/abs/1905.03677) CVPR 2019.
+\[11\] Donggeun Yoo & In So Kweon. ["Learning Loss for Active Learning."](https://arxiv.org/abs/1905.03677) CVPR 2019.
 
-\[12\] Margatina et al. [“Active Learning by Acquiring Contrastive Examples."](https://arxiv.org/abs/2109.03764) EMNLP 2021.
+\[12\] Margatina et al. ["Active Learning by Acquiring Contrastive Examples."](https://arxiv.org/abs/2109.03764) EMNLP 2021.
 
-\[13\] Sinha et al. [“Variational Adversarial Active Learning”](https://arxiv.org/abs/1904.00370) ICCV 2019
+\[13\] Sinha et al. ["Variational Adversarial Active Learning"](https://arxiv.org/abs/1904.00370) ICCV 2019
 
-\[14\] Ebrahimiet al. [“Minmax Active Learning”](https://arxiv.org/abs/2012.10467) arXiv preprint arXiv:2012.10467 (2021).
+\[14\] Ebrahimiet al. ["Minmax Active Learning"](https://arxiv.org/abs/2012.10467) arXiv preprint arXiv:2012.10467 (2021).
 
-\[15\] Mariya Toneva et al. [“An empirical study of example forgetting during deep neural network learning."](https://arxiv.org/abs/1812.05159) ICLR 2019.
+\[15\] Mariya Toneva et al. ["An empirical study of example forgetting during deep neural network learning."](https://arxiv.org/abs/1812.05159) ICLR 2019.
 
-\[16\] Javad Zolfaghari Bengar et al. [“When Deep Learners Change Their Mind: Learning Dynamics for Active Learning."](https://arxiv.org/abs/2107.14707) CAIP 2021.
+\[16\] Javad Zolfaghari Bengar et al. ["When Deep Learners Change Their Mind: Learning Dynamics for Active Learning."](https://arxiv.org/abs/2107.14707) CAIP 2021.
 
-\[17\] Yang et al. [“Suggestive annotation: A deep active learning framework for biomedical image segmentation."](https://arxiv.org/abs/1706.04737) MICCAI 2017.
+\[17\] Yang et al. ["Suggestive annotation: A deep active learning framework for biomedical image segmentation."](https://arxiv.org/abs/1706.04737) MICCAI 2017.
 
-\[18\] Fedor Zhdanov. [“Diverse mini-batch Active Learning”](https://arxiv.org/abs/1901.05954) arXiv preprint arXiv:1901.05954 (2019).
+\[18\] Fedor Zhdanov. ["Diverse mini-batch Active Learning"](https://arxiv.org/abs/1901.05954) arXiv preprint arXiv:1901.05954 (2019).

@@ -30,7 +30,7 @@ Table of Contents
 - [References](#references)
 
 \[Updated on 2022-03-13: add [expert choice routing](#ec).\]  
-\[Updated on 2022-06-10\]: [Greg](https://gregbrockman.com/) and I wrote a shorted and upgraded version of this post, published on OpenAI Blog: [“Techniques for Training Large Neural Networks”](https://openai.com/blog/techniques-for-training-large-neural-networks/)
+\[Updated on 2022-06-10\]: [Greg](https://gregbrockman.com/) and I wrote a shorted and upgraded version of this post, published on OpenAI Blog: ["Techniques for Training Large Neural Networks"](https://openai.com/blog/techniques-for-training-large-neural-networks/)
 
 In recent years, we are seeing better results on many NLP benchmark tasks with larger pre-trained [language models](https://lilianweng.github.io/posts/2019-01-31-lm/). How to train large and deep neural networks is challenging, as it demands a large amount of GPU memory and a long horizon of training time.
 
@@ -53,7 +53,7 @@ At the end of each minibatch, workers need to synchronize gradients or weights t
 1.  _Bulk synchronous parallels (BSP)_: Workers sync data at the end of every minibatch. It prevents model weights staleness and good learning efficiency but each machine has to halt and wait for others to send gradients.
 2.  _Asynchronous parallel (ASP)_: Every GPU worker processes the data asynchronously, no waiting or stalling. However, it can easily lead to stale weights being used and thus lower the statistical learning efficiency. Even though it increases the computation time, it may not speed up training time to convergence.
 
-Somewhere in the middle is to synchronize gradients globally once every $x$ iterations ($x > 1$). This feature is called “gradient accumulation” in Distribution Data Parallel ([DDP](https://pytorch.org/tutorials/intermediate/ddp_tutorial.html)) since Pytorch v1.5 ([Li et al. 2021](https://arxiv.org/abs/2006.15704)). Bucketing gradients avoid immediate `AllReduce` operations but instead buckets multiple gradients into one `AllReduce` to improve throughput. Computation and communication scheduling optimization can be made based on the computation graph.
+Somewhere in the middle is to synchronize gradients globally once every $x$ iterations ($x > 1$). This feature is called "gradient accumulation" in Distribution Data Parallel ([DDP](https://pytorch.org/tutorials/intermediate/ddp_tutorial.html)) since Pytorch v1.5 ([Li et al. 2021](https://arxiv.org/abs/2006.15704)). Bucketing gradients avoid immediate `AllReduce` operations but instead buckets multiple gradients into one `AllReduce` to improve throughput. Computation and communication scheduling optimization can be made based on the computation graph.
 
 ![](assets/images/2021-09-25-train-large/pytorch-ddp.png)
 
@@ -67,11 +67,11 @@ Since deep neural networks usually contain a stack of vertical layers, it feels 
 
 ![](assets/images/2021-09-25-train-large/naive-data-parallelism.png)
 
-Fig. 2. A naive model parallelism setup where the model is vertically split into 4 partitions. Data is processed by one worker at a time due to sequential dependency, leading to large “bubbles” of idle time. (Image source: [Huang et al. 2019](https://arxiv.org/abs/1811.06965))
+Fig. 2. A naive model parallelism setup where the model is vertically split into 4 partitions. Data is processed by one worker at a time due to sequential dependency, leading to large "bubbles" of idle time. (Image source: [Huang et al. 2019](https://arxiv.org/abs/1811.06965))
 
 ## Pipeline Parallelism[#](#pipeline-parallelism)
 
-**Pipeline parallelism (PP)** combines model parallelism with data parallelism to reduce inefficient time “bubbles''. The main idea is to split one minibatch into multiple microbatches and enable each stage worker to process one microbatch simultaneously. Note that every microbatch needs two passes, one forward and one backward. Inter-worker communication only transfers activations (forward) and gradients (backward). How these passes are scheduled and how the gradients are aggregated vary in different approaches. The number of partitions (workers) is also known as _pipeline depth_.
+**Pipeline parallelism (PP)** combines model parallelism with data parallelism to reduce inefficient time "bubbles''. The main idea is to split one minibatch into multiple microbatches and enable each stage worker to process one microbatch simultaneously. Note that every microbatch needs two passes, one forward and one backward. Inter-worker communication only transfers activations (forward) and gradients (backward). How these passes are scheduled and how the gradients are aggregated vary in different approaches. The number of partitions (workers) is also known as _pipeline depth_.
 
 In _GPipe_ ([Huang et al. 2019](https://arxiv.org/abs/1811.06965)) gradients from multiple microbatches are aggregated and applied synchronously at the end. The synchronous gradient descent guarantees learning consistency and efficiency irrespective of the number of workers. As shown in Fig. 3, bubbles still exist but are much smaller than what's in Fig. 2. Given $m$ evenly split microbatches and $d$ partitions, assuming both forward and backward per microbatch take one unit of time, the fraction of bubble is:
 
@@ -85,7 +85,7 @@ Fig. 3. Illustration of pipeline parallelism in GPipe with 4 microbatches and 4 
 
 GPipe achieves almost linear speedup in throughput with the number of devices, although it is not always guaranteed if the model parameters are not evenly distributed across workers.
 
-_PipeDream_ ([Narayanan et al. 2019](https://cs.stanford.edu/~matei/papers/2019/sosp_pipedream.pdf)) schedules each worker to alternatively process the forward and backward passes (`1F1B`). PipeDream names each model partition “stage” and each stage worker can have multiple replicas to run data parallelism. In this process, PipeDream uses a deterministic round-robin load balancing strategy to assign work among multiple replicas of stages to ensure that the forward and backward passes for the same minibatch happen on the same replica.
+_PipeDream_ ([Narayanan et al. 2019](https://cs.stanford.edu/~matei/papers/2019/sosp_pipedream.pdf)) schedules each worker to alternatively process the forward and backward passes (`1F1B`). PipeDream names each model partition "stage" and each stage worker can have multiple replicas to run data parallelism. In this process, PipeDream uses a deterministic round-robin load balancing strategy to assign work among multiple replicas of stages to ensure that the forward and backward passes for the same minibatch happen on the same replica.
 
 ![](assets/images/2021-09-25-train-large/pipedream.png)
 
@@ -110,7 +110,7 @@ _PipeDream-flush_ adds a globally synchronized pipeline flush periodically, just
 
 Fig. 6. Illustration of pipeline scheduling in PipeDream-flush. (Image source: ([Narayanan et al. 2021](https://arxiv.org/abs/2006.09503))
 
-_PipeDream-2BW_ maintains only two versions of model weights, where “2BW” is short for “double-buffered weights”. It generates a new model version every $k$ microbatches and $k$ should be larger than the pipeline depth $d$, $k > d$. A newly updated model version cannot fully replace the old version immediately since some leftover backward passes still depend on the old version. In total only two versions need to be saved so the memory cost is much reduced.
+_PipeDream-2BW_ maintains only two versions of model weights, where "2BW" is short for "double-buffered weights". It generates a new model version every $k$ microbatches and $k$ should be larger than the pipeline depth $d$, $k > d$. A newly updated model version cannot fully replace the old version immediately since some leftover backward passes still depend on the old version. In total only two versions need to be saved so the memory cost is much reduced.
 
 ![](assets/images/2021-09-25-train-large/pipedream-2bw.png)
 
@@ -134,7 +134,7 @@ $$\text{Attention}(X, Q, K, V) = \text{softmax}(\frac{(XQ) (XK)^\top}{\sqrt{d_k}
 
 Fig. 8. Illustration of tensor parallelism for key transformer components proposed in Megatron-LM. (Image source: [Shoeybi et al. 2020](https://arxiv.org/abs/1909.08053))
 
-[Narayanan et al. (2021)](https://arxiv.org/abs/2104.04473) combined pipeline, tensor and data parallelism with a new pipeline scheduling strategy and named their approach _PTD-P_. Instead of only positioning a continuous set of layers (“model chunk”) on a device, each worker can be assigned with multiple chunks of smaller continuous subsets of layers (e.g. device 1 has layers 1, 2, 9, 10; device 2 has layers 3, 4, 11, 12; each has two model chunks). The number of microbatches in one batch should be exactly divided by the number of workers ($m % d = 0$). If there are $v$ model chunks per worker, the pipeline bubble time can be reduced by a multiplier of $v$ compared to a GPipe scheduling.
+[Narayanan et al. (2021)](https://arxiv.org/abs/2104.04473) combined pipeline, tensor and data parallelism with a new pipeline scheduling strategy and named their approach _PTD-P_. Instead of only positioning a continuous set of layers ("model chunk") on a device, each worker can be assigned with multiple chunks of smaller continuous subsets of layers (e.g. device 1 has layers 1, 2, 9, 10; device 2 has layers 3, 4, 11, 12; each has two model chunks). The number of microbatches in one batch should be exactly divided by the number of workers ($m % d = 0$). If there are $v$ model chunks per worker, the pipeline bubble time can be reduced by a multiplier of $v$ compared to a GPipe scheduling.
 
 ![](assets/images/2021-09-25-train-large/PTD-P-interleaved.png)
 
@@ -144,7 +144,7 @@ Fig. 9. (Top) Default \`1F1B\` pipeline schedule as in PipeDream-flush. (Bottom)
 
 The **Mixture-of-Experts (MoE)** approach attracts a lot of attention recently as researchers (mainly from Google) try to push the limit of model size. The core of the idea is [ensembling learning](https://en.wikipedia.org/wiki/Ensemble_learning): _Combination of multiple weak learners gives you a strong learner!_
 
-Within one deep neural network, ensembling can be implemented with a gating mechanism connecting multiple experts ([Shazeer et al., 2017](https://arxiv.org/abs/1701.06538)). The gating mechanism controls which subset of the network (e.g. which experts) should be activated to produce outputs. The paper named it “sparsely gated mixture-of-experts” (MoE) layer.
+Within one deep neural network, ensembling can be implemented with a gating mechanism connecting multiple experts ([Shazeer et al., 2017](https://arxiv.org/abs/1701.06538)). The gating mechanism controls which subset of the network (e.g. which experts) should be activated to produce outputs. The paper named it "sparsely gated mixture-of-experts" (MoE) layer.
 
 Precisely one MoE layer contains
 
@@ -169,7 +169,7 @@ $$L_\text{aux} = w_\text{aux} \cdot \text{CV}(\sum_{x \in X} G(x))^2$$
 
 where $ \text{CV}$ is the coefficient of variation and the loss weight $w_\text{aux}$ is a hyperparameter to tune.
 
-Because every expert network only gets a fraction of training samples (“The shrinking batch problem”), we should try to use a batch size as large as possible in MoE. However, it is restricted by GPU memory. Data parallelism and model parallelism can be applied to improve the throughput.
+Because every expert network only gets a fraction of training samples ("The shrinking batch problem"), we should try to use a batch size as large as possible in MoE. However, it is restricted by GPU memory. Data parallelism and model parallelism can be applied to improve the throughput.
 
 ![](assets/images/2021-09-25-train-large/moe-experiments.png)
 
@@ -179,7 +179,7 @@ Fig. 11. Test perplexity on 1-Billion-Word language modeling benchmark. (Left) T
 
 There are several improved designs for the gating function $G$ in GShard:
 
-- _Expert capacity_: The amount of tokens going through one expert should not go above a threshold, named “expert capacity”. If a token is routed to experts that have reached their capacity, the token would be marked “overflowed” and the gating output is changed to a zero vector.
+- _Expert capacity_: The amount of tokens going through one expert should not go above a threshold, named "expert capacity". If a token is routed to experts that have reached their capacity, the token would be marked "overflowed" and the gating output is changed to a zero vector.
 - _Local group dispatching_: Tokens are evenly partitioned into multiple local groups and the expert capacity is enforced on the group level.
 - _Auxiliary loss_: The motivation is similar to the original MoE aux loss. They add an auxiliary loss to minimize the mean square of the fraction of data routed to each expert.
 - _Random routing_: The 2nd-best expert is selected with a probability proportional to its weight; otherwise, GShard follows a random routing, so as to add some randomness.
@@ -232,7 +232,7 @@ When the GPU memory is full, one option is to offload temporarily unused data to
 
 ## Activation Recomputation[#](#activation-recomputation)
 
-**Activation recomputation** (also known as “activation checkpointing” or “gradient checkpointing”; [Chen et al. 2016](https://arvix.org/abs/1604.06174)) is a smart yet simple idea to reduce memory footprint at the cost of computation time. It reduces the memory cost of training a $\ell$ layer deep neural net to $O(\sqrt{\ell})$, which only additionally consumes an extra forward pass computation per batch.
+**Activation recomputation** (also known as "activation checkpointing" or "gradient checkpointing"; [Chen et al. 2016](https://arvix.org/abs/1604.06174)) is a smart yet simple idea to reduce memory footprint at the cost of computation time. It reduces the memory cost of training a $\ell$ layer deep neural net to $O(\sqrt{\ell})$, which only additionally consumes an extra forward pass computation per batch.
 
 Let's say, we evenly divide an $\ell$-layer network into $d$ partitions. Only activations at partition boundaries are saved and communicated between workers. Intermediate activations at intra-partition layers are still needed for computing gradients so they are recomputed during backward passes. With activation recomputation, the memory cost for training $M(\ell)$ is:
 
@@ -270,7 +270,7 @@ In their experiments, loss scaling is not needed for some networks (e.g. image c
 
 Intermediate results often consume a lot of memory, although they are only needed in one forward pass and one backward pass. There is a noticeable temporal gap between these two uses. Thus [Jain et al. (2018)](https://www.microsoft.com/en-us/research/uploads/prod/2018/04/fiddle-gist-isca18.pdf) proposed a data encoding strategy to compress the intermediate results after the first use in the first pass and then decode it back for back-propagation later.
 
-Their system _Gist_ incorporates two encoding schemes: _Layer-specific lossless encoding_; focus on ReLU-Pool (“Binarize”) and ReLU-Conv (“Sparse storage and dense computation”) patterns. _Aggressive lossy encoding_; use delayed precision reduction (DPR). They observed that the first immediate use of feature maps should be kept at high precision but the second use can tolerate lower precision.
+Their system _Gist_ incorporates two encoding schemes: _Layer-specific lossless encoding_; focus on ReLU-Pool ("Binarize") and ReLU-Conv ("Sparse storage and dense computation") patterns. _Aggressive lossy encoding_; use delayed precision reduction (DPR). They observed that the first immediate use of feature maps should be kept at high precision but the second use can tolerate lower precision.
 
 The experiments showed that Gist can reduce the memory cost by 2x across 5 SOTA image classification DNNs, with an average of 1.8x with only 4% performance overhead.
 
@@ -306,36 +306,36 @@ Or
 ```
 # References[#](#references)
 
-\[1\] Li et al. [“PyTorch Distributed: Experiences on Accelerating Data Parallel Training”](https://arxiv.org/abs/2006.15704) VLDB 2020.
+\[1\] Li et al. ["PyTorch Distributed: Experiences on Accelerating Data Parallel Training"](https://arxiv.org/abs/2006.15704) VLDB 2020.
 
-\[2\] Cui et al. [“GeePS: Scalable deep learning on distributed GPUs with a GPU-specialized parameter server”](https://www.pdl.cmu.edu/PDL-FTP/CloudComputing/GeePS-cui-eurosys16.pdf) EuroSys 2016
+\[2\] Cui et al. ["GeePS: Scalable deep learning on distributed GPUs with a GPU-specialized parameter server"](https://www.pdl.cmu.edu/PDL-FTP/CloudComputing/GeePS-cui-eurosys16.pdf) EuroSys 2016
 
-\[3\] Shoeybi et al. [“Megatron-LM: Training Multi-Billion Parameter Language Models Using Model Parallelism.”](https://arxiv.org/abs/1909.08053) arXiv preprint arXiv:1909.08053 (2019).
+\[3\] Shoeybi et al. ["Megatron-LM: Training Multi-Billion Parameter Language Models Using Model Parallelism."](https://arxiv.org/abs/1909.08053) arXiv preprint arXiv:1909.08053 (2019).
 
-\[4\] Narayanan et al. [“Efficient Large-Scale Language Model Training on GPU Clusters Using Megatron-LM.”](https://arxiv.org/abs/2104.04473) arXiv preprint arXiv:2104.04473 (2021).
+\[4\] Narayanan et al. ["Efficient Large-Scale Language Model Training on GPU Clusters Using Megatron-LM."](https://arxiv.org/abs/2104.04473) arXiv preprint arXiv:2104.04473 (2021).
 
-\[5\] Huang et al. [“GPipe: Efficient Training of Giant Neural Networks using Pipeline Parallelism.”](https://arxiv.org/abs/1811.06965) arXiv preprint arXiv:1811.06965 (2018).
+\[5\] Huang et al. ["GPipe: Efficient Training of Giant Neural Networks using Pipeline Parallelism."](https://arxiv.org/abs/1811.06965) arXiv preprint arXiv:1811.06965 (2018).
 
-\[6\] Narayanan et al. [“PipeDream: Generalized Pipeline Parallelism for DNN Training."](https://cs.stanford.edu/~matei/papers/2019/sosp_pipedream.pdf) SOSP 2019.
+\[6\] Narayanan et al. ["PipeDream: Generalized Pipeline Parallelism for DNN Training."](https://cs.stanford.edu/~matei/papers/2019/sosp_pipedream.pdf) SOSP 2019.
 
-\[7\] Narayanan et al. [“Memory-Efficient Pipeline-Parallel DNN Training.”](https://arxiv.org/abs/2006.09503) ICML 2021.
+\[7\] Narayanan et al. ["Memory-Efficient Pipeline-Parallel DNN Training."](https://arxiv.org/abs/2006.09503) ICML 2021.
 
-\[8\] Shazeer et al. [“The Sparsely-Gated Mixture-of-Experts Layer Noam.”](https://arxiv.org/abs/1701.06538) arXiv preprint arXiv:1701.06538 (2017).
+\[8\] Shazeer et al. ["The Sparsely-Gated Mixture-of-Experts Layer Noam."](https://arxiv.org/abs/1701.06538) arXiv preprint arXiv:1701.06538 (2017).
 
-\[9\] Lepikhin et al. [“GShard: Scaling Giant Models with Conditional Computation and Automatic Sharding.”](https://arxiv.org/abs/2006.16668) arXiv preprint arXiv:2006.16668 (2020).
+\[9\] Lepikhin et al. ["GShard: Scaling Giant Models with Conditional Computation and Automatic Sharding."](https://arxiv.org/abs/2006.16668) arXiv preprint arXiv:2006.16668 (2020).
 
-\[10\] Fedus et al. [“Switch Transformers: Scaling to Trillion Parameter Models with Simple and Efficient Sparsity.”](https://arxiv.org/abs/2101.03961) arXiv preprint arXiv:2101.03961 (2021).
+\[10\] Fedus et al. ["Switch Transformers: Scaling to Trillion Parameter Models with Simple and Efficient Sparsity."](https://arxiv.org/abs/2101.03961) arXiv preprint arXiv:2101.03961 (2021).
 
-\[11\] Narang & Micikevicius, et al. [“Mixed precision training.”](https://arxiv.org/abs/1710.03740) ICLR 2018.
+\[11\] Narang & Micikevicius, et al. ["Mixed precision training."](https://arxiv.org/abs/1710.03740) ICLR 2018.
 
-\[12\] Chen et al. 2016 [“Training Deep Nets with Sublinear Memory Cost.”](https://arxiv.org/abs/1604.06174) arXiv preprint arXiv:1604.06174 (2016).
+\[12\] Chen et al. 2016 ["Training Deep Nets with Sublinear Memory Cost."](https://arxiv.org/abs/1604.06174) arXiv preprint arXiv:1604.06174 (2016).
 
-\[13\] Jain et al. [“Gist: Efficient data encoding for deep neural network training.”](https://www.microsoft.com/en-us/research/uploads/prod/2018/04/fiddle-gist-isca18.pdf) ISCA 2018.
+\[13\] Jain et al. ["Gist: Efficient data encoding for deep neural network training."](https://www.microsoft.com/en-us/research/uploads/prod/2018/04/fiddle-gist-isca18.pdf) ISCA 2018.
 
-\[14\] Shazeer & Stern. [“Adafactor: Adaptive learning rates with sublinear memory cost.”](https://arxiv.org/abs/1804.04235) arXiv preprint arXiv:1804.04235 (2018).
+\[14\] Shazeer & Stern. ["Adafactor: Adaptive learning rates with sublinear memory cost."](https://arxiv.org/abs/1804.04235) arXiv preprint arXiv:1804.04235 (2018).
 
-\[15\] Anil et al. [“Memory-Efficient Adaptive Optimization.”](https://arxiv.org/abs/1901.11150) arXiv preprint arXiv:1901.11150 (2019).
+\[15\] Anil et al. ["Memory-Efficient Adaptive Optimization."](https://arxiv.org/abs/1901.11150) arXiv preprint arXiv:1901.11150 (2019).
 
-\[16\] Rajbhandari et al. [“ZeRO: Memory Optimization Towards Training A Trillion Parameter Models Samyam.”](https://arxiv.org/abs/1910.02054) arXiv preprint arXiv:1910.02054 (2019).
+\[16\] Rajbhandari et al. ["ZeRO: Memory Optimization Towards Training A Trillion Parameter Models Samyam."](https://arxiv.org/abs/1910.02054) arXiv preprint arXiv:1910.02054 (2019).
 
-\[17\] Zhou et al. [“Mixture-of-Experts with Expert Choice Routing”](https://arxiv.org/abs/2202.09368) arXiv preprint arXiv:2202.09368 (2022).
+\[17\] Zhou et al. ["Mixture-of-Experts with Expert Choice Routing"](https://arxiv.org/abs/2202.09368) arXiv preprint arXiv:2202.09368 (2022).

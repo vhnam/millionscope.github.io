@@ -58,7 +58,7 @@ Given a function of mapping a $n$-dimensional input vector $\mathbf{x}$ to a $m$
 
 $$\mathbf{J} = \begin{bmatrix} \frac{\partial f_1}{\partial x_1} & \dots & \frac{\partial f_1}{\partial x_n} \\\[6pt\] \vdots & \ddots & \vdots \\\[6pt\] \frac{\partial f_m}{\partial x_1} & \dots & \frac{\partial f_m}{\partial x_n} \\\[6pt\] \end{bmatrix}$$
 
-The determinant is one real number computed as a function of all the elements in a squared matrix. Note that the determinant _only exists for **square** matrices_. The absolute value of the determinant can be thought of as a measure of _“how much multiplication by the matrix expands or contracts space”._
+The determinant is one real number computed as a function of all the elements in a squared matrix. Note that the determinant _only exists for **square** matrices_. The absolute value of the determinant can be thought of as a measure of _"how much multiplication by the matrix expands or contracts space"._
 
 The determinant of a nxn matrix $M$ is:
 
@@ -104,11 +104,11 @@ Then let's convert the equation to be a function of $\mathbf{z}_i$ so that we ca
 
 $$\begin{aligned} p_i(\mathbf{z}_i) &= p_{i-1}(f_i^{-1}(\mathbf{z}_i)) \\left\vert \\det\\dfrac{d f_i^{-1}}{d \mathbf{z}_i} \\right\vert \\ &= p_{i-1}(\mathbf{z}_{i-1}) \\left\vert \\det \color{red}{\Big(\\dfrac{d f_i}{d\mathbf{z}_{i-1}}\Big)^{-1}} \\right\vert & \\scriptstyle{\text{; According to the inverse func theorem.}} \\ &= p_{i-1}(\mathbf{z}_{i-1}) \color{red}{\\left\vert \\det \\dfrac{d f_i}{d\mathbf{z}_{i-1}} \\right\vert^{-1}} & \\scriptstyle{\text{; According to a property of Jacobians of invertible func.}} \\ \log p_i(\mathbf{z}_i) &= \log p_{i-1}(\mathbf{z}_{i-1}) - \log \\left\vert \\det \\dfrac{d f_i}{d\mathbf{z}_{i-1}} \\right\vert \end{aligned}$$
 
-(\*) A note on the _“inverse function theorem”_: If $y=f(x)$ and $x=f^{-1}(y)$, we have:
+(\*) A note on the _"inverse function theorem"_: If $y=f(x)$ and $x=f^{-1}(y)$, we have:
 
 $$\\dfrac{df^{-1}(y)}{dy} = \\dfrac{dx}{dy} = (\\dfrac{dy}{dx})^{-1} = (\\dfrac{df(x)}{dx})^{-1}$$
 
-(\*) A note on _“Jacobians of invertible function”_: The determinant of the inverse of an invertible matrix is the inverse of the determinant: $\\det(M^{-1}) = (\\det(M))^{-1}$, [because](#jacobian-matrix-and-determinant) $\\det(M)\\det(M^{-1}) = \\det(M \cdot M^{-1}) = \\det(I) = 1$.
+(\*) A note on _"Jacobians of invertible function"_: The determinant of the inverse of an invertible matrix is the inverse of the determinant: $\\det(M^{-1}) = (\\det(M))^{-1}$, [because](#jacobian-matrix-and-determinant) $\\det(M)\\det(M^{-1}) = \\det(M \cdot M^{-1}) = \\det(I) = 1$.
 
 Given such a chain of probability density functions, we know the relationship between each pair of consecutive variables. We can expand the equation of the output $\mathbf{x}$ step by step until tracing back to the initial distribution $\mathbf{z}_0$.
 
@@ -130,7 +130,7 @@ $$\mathcal{L}(\mathcal{D}) = - \frac{1}{\vert\mathcal{D}\vert}\sum_{\mathbf{x} \
 The **RealNVP** (Real-valued Non-Volume Preserving; [Dinh et al., 2017](https://arxiv.org/abs/1605.08803)) model implements a normalizing flow by stacking a sequence of invertible bijective transformation functions. In each bijection $f: \mathbf{x} \mapsto \mathbf{y}$, known as _affine coupling layer_, the input dimensions are split into two parts:
 
 - The first $d$ dimensions stay same;
-- The second part, $d+1$ to $D$ dimensions, undergo an affine transformation (“scale-and-shift”) and both the scale and shift parameters are functions of the first $d$ dimensions.
+- The second part, $d+1$ to $D$ dimensions, undergo an affine transformation ("scale-and-shift") and both the scale and shift parameters are functions of the first $d$ dimensions.
 
 $$\begin{aligned} \mathbf{y}_{1:d} &= \mathbf{x}_{1:d} \\ \mathbf{y}_{d+1:D} &= \mathbf{x}_{d+1:D} \odot \exp({s(\mathbf{x}_{1:d})}) + t(\mathbf{x}_{1:d}) \end{aligned}$$
 
@@ -138,13 +138,13 @@ where $s(.)$ and $t(.)$ are _scale_ and _translation_ functions and both map $\m
 
 Now let's check whether this transformation satisfy two basic properties for a flow transformation.
 
-**Condition 1**: “It is easily invertible.”
+**Condition 1**: "It is easily invertible."
 
 Yes and it is fairly straightforward.
 
 $$\begin{cases} \mathbf{y}_{1:d} &= \mathbf{x}_{1:d} \\ \mathbf{y}_{d+1:D} &= \mathbf{x}_{d+1:D} \odot \exp({s(\mathbf{x}_{1:d})}) + t(\mathbf{x}_{1:d}) \end{cases} \\Leftrightarrow \begin{cases} \mathbf{x}_{1:d} &= \mathbf{y}_{1:d} \\ \mathbf{x}_{d+1:D} &= (\mathbf{y}_{d+1:D} - t(\mathbf{y}_{1:d})) \odot \exp(-s(\mathbf{y}_{1:d})) \end{cases}$$
 
-**Condition 2**: “Its Jacobian determinant is easy to compute.”
+**Condition 2**: "Its Jacobian determinant is easy to compute."
 
 Yes. It is not hard to get the Jacobian matrix and determinant of this transformation. The Jacobian is a lower triangular matrix.
 
@@ -160,7 +160,7 @@ Even better, since (i) computing $f^-1$ does not require computing the inverse o
 
 In one affine coupling layer, some dimensions (channels) remain unchanged. To make sure all the inputs have a chance to be altered, the model reverses the ordering in each layer so that different components are left unchanged. Following such an alternating pattern, the set of units which remain identical in one transformation layer are always modified in the next. Batch normalization is found to help training models with a very deep stack of coupling layers.
 
-Furthermore, RealNVP can work in a multi-scale architecture to build a more efficient model for large inputs. The multi-scale architecture applies several “sampling” operations to normal affine layers, including spatial checkerboard pattern masking, squeezing operation, and channel-wise masking. Read the [paper](https://arxiv.org/abs/1605.08803) for more details on the multi-scale architecture.
+Furthermore, RealNVP can work in a multi-scale architecture to build a more efficient model for large inputs. The multi-scale architecture applies several "sampling" operations to normal affine layers, including spatial checkerboard pattern masking, squeezing operation, and channel-wise masking. Read the [paper](https://arxiv.org/abs/1605.08803) for more details on the multi-scale architecture.
 
 ## NICE[#](#nice)
 
@@ -178,7 +178,7 @@ Fig. 3. One step of flow in the Glow model. (Image source: [Kingma and Dhariwal,
 
 There are three substeps in one step of flow in Glow.
 
-Substep 1: **Activation normalization** (short for “actnorm”)
+Substep 1: **Activation normalization** (short for "actnorm")
 
 It performs an affine transformation using a scale and bias parameter per channel, similar to batch normalization, but works for mini-batch size 1. The parameters are trainable but initialized so that the first minibatch of data have mean 0 and standard deviation 1 after actnorm.
 
@@ -228,7 +228,7 @@ $$\begin{aligned} \mathbf{h}^0 &= \mathbf{x} \\ \mathbf{h}^l &= \text{activation
 
 Fig. 5. Demonstration of how MADE works in a three-layer feed-forward neural network. (Image source: [Germain et al., 2015](https://arxiv.org/abs/1502.03509))
 
-To zero out some connections between layers, we can simply element-wise multiply every weight matrix by a binary mask matrix. Each hidden node is assigned with a random “connectivity integer” between $1$ and $D-1$; the assigned value for the $k$-th unit in the $l$-th layer is denoted by $m^l_k$. The binary mask matrix is determined by element-wise comparing values of two nodes in two layers.
+To zero out some connections between layers, we can simply element-wise multiply every weight matrix by a binary mask matrix. Each hidden node is assigned with a random "connectivity integer" between $1$ and $D-1$; the assigned value for the $k$-th unit in the $l$-th layer is denoted by $m^l_k$. The binary mask matrix is determined by element-wise comparing values of two nodes in two layers.
 
 $$\begin{aligned} \mathbf{h}^l &= \text{activation}^l((\mathbf{W}^l \color{red}{\odot \mathbf{M}^{\mathbf{W}^l}}) \mathbf{h}^{l-1} + \mathbf{b}^l) \\ \hat{\mathbf{x}} &= \sigma((\mathbf{V} \color{red}{\odot \mathbf{M}^{\mathbf{V}}}) \mathbf{h}^L + \mathbf{c}) \\ M^{\mathbf{W}^l}_{k', k} &= \mathbf{1}_{m^l_{k'} \\geq m^{l-1}_k} = \begin{cases} 1, & \text{if } m^l_{k'} \\geq m^{l-1}_k\\ 0, & \text{otherwise} \end{cases} \\ M^{\mathbf{V}}_{d, k} &= \mathbf{1}_{d \\geq m^L_k} = \begin{cases} 1, & \text{if } d > m^L_k\\ 0, & \text{otherwise} \end{cases} \end{aligned}$$
 
@@ -395,7 +395,7 @@ Cited as:
 
 # Reference[#](#reference)
 
-\[1\] Danilo Jimenez Rezende, and Shakir Mohamed. [“Variational inference with normalizing flows."](https://arxiv.org/abs/1505.05770) ICML 2015.
+\[1\] Danilo Jimenez Rezende, and Shakir Mohamed. ["Variational inference with normalizing flows."](https://arxiv.org/abs/1505.05770) ICML 2015.
 
 \[2\] [Normalizing Flows Tutorial, Part 1: Distributions and Determinants](https://blog.evjang.com/2018/01/nf1.html) by Eric Jang.
 
@@ -403,20 +403,20 @@ Cited as:
 
 \[4\] [Normalizing Flows](http://akosiorek.github.io/ml/2018/04/03/norm_flows.html) by Adam Kosiorek.
 
-\[5\] Laurent Dinh, Jascha Sohl-Dickstein, and Samy Bengio. [“Density estimation using Real NVP."](https://arxiv.org/abs/1605.08803) ICLR 2017.
+\[5\] Laurent Dinh, Jascha Sohl-Dickstein, and Samy Bengio. ["Density estimation using Real NVP."](https://arxiv.org/abs/1605.08803) ICLR 2017.
 
-\[6\] Laurent Dinh, David Krueger, and Yoshua Bengio. [“NICE: Non-linear independent components estimation."](https://arxiv.org/abs/1410.8516) ICLR 2015 Workshop track.
+\[6\] Laurent Dinh, David Krueger, and Yoshua Bengio. ["NICE: Non-linear independent components estimation."](https://arxiv.org/abs/1410.8516) ICLR 2015 Workshop track.
 
-\[7\] Diederik P. Kingma, and Prafulla Dhariwal. [“Glow: Generative flow with invertible 1x1 convolutions."](https://arxiv.org/abs/1807.03039) arXiv:1807.03039 (2018).
+\[7\] Diederik P. Kingma, and Prafulla Dhariwal. ["Glow: Generative flow with invertible 1x1 convolutions."](https://arxiv.org/abs/1807.03039) arXiv:1807.03039 (2018).
 
-\[8\] Germain, Mathieu, Karol Gregor, Iain Murray, and Hugo Larochelle. [“Made: Masked autoencoder for distribution estimation."](https://arxiv.org/abs/1502.03509) ICML 2015.
+\[8\] Germain, Mathieu, Karol Gregor, Iain Murray, and Hugo Larochelle. ["Made: Masked autoencoder for distribution estimation."](https://arxiv.org/abs/1502.03509) ICML 2015.
 
-\[9\] Aaron van den Oord, Nal Kalchbrenner, and Koray Kavukcuoglu. [“Pixel recurrent neural networks."](https://arxiv.org/abs/1601.06759) ICML 2016.
+\[9\] Aaron van den Oord, Nal Kalchbrenner, and Koray Kavukcuoglu. ["Pixel recurrent neural networks."](https://arxiv.org/abs/1601.06759) ICML 2016.
 
-\[10\] Diederik P. Kingma, et al. [“Improved variational inference with inverse autoregressive flow."](https://arxiv.org/abs/1606.04934) NIPS. 2016.
+\[10\] Diederik P. Kingma, et al. ["Improved variational inference with inverse autoregressive flow."](https://arxiv.org/abs/1606.04934) NIPS. 2016.
 
-\[11\] George Papamakarios, Iain Murray, and Theo Pavlakou. [“Masked autoregressive flow for density estimation."](https://arxiv.org/abs/1705.07057) NIPS 2017.
+\[11\] George Papamakarios, Iain Murray, and Theo Pavlakou. ["Masked autoregressive flow for density estimation."](https://arxiv.org/abs/1705.07057) NIPS 2017.
 
-\[12\] Jianlin Su, and Guang Wu. [“f-VAEs: Improve VAEs with Conditional Flows."](https://arxiv.org/abs/1809.05861) arXiv:1809.05861 (2018).
+\[12\] Jianlin Su, and Guang Wu. ["f-VAEs: Improve VAEs with Conditional Flows."](https://arxiv.org/abs/1809.05861) arXiv:1809.05861 (2018).
 
-\[13\] Van Den Oord, Aaron, et al. [“WaveNet: A generative model for raw audio."](https://arxiv.org/abs/1609.03499) SSW. 2016.
+\[13\] Van Den Oord, Aaron, et al. ["WaveNet: A generative model for raw audio."](https://arxiv.org/abs/1609.03499) SSW. 2016.

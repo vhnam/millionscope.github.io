@@ -64,7 +64,7 @@ For Atari, go to the gym directory and pip install it. This [post](http://alvinw
 
     pip install -e '.[atari]'
 
-3.  Finally clone the “playground” code and install the requirements.
+3.  Finally clone the "playground" code and install the requirements.
 
     git clone git@github.com:lilianweng/deep-reinforcement-learning-gym.git
     cd deep-reinforcement-learning-gym
@@ -101,7 +101,7 @@ We interact with the env through two major api calls:
 
 # Naive Q-Learning[#](#naive-q-learning)
 
-[Q-learning](https://lilianweng.github.io/posts/2018-02-19-rl-overview/#q-learning-off-policy-td-control) (Watkins & Dayan, 1992) learns the action value (“Q-value”) and update it according to the [Bellman equation](https://lilianweng.github.io/posts/2018-02-19-rl-overview/#bellman-equations). The key point is while estimating what is the next action, it does not follow the current policy but rather adopt the best Q value (the part in red) independently.
+[Q-learning](https://lilianweng.github.io/posts/2018-02-19-rl-overview/#q-learning-off-policy-td-control) (Watkins & Dayan, 1992) learns the action value ("Q-value") and update it according to the [Bellman equation](https://lilianweng.github.io/posts/2018-02-19-rl-overview/#bellman-equations). The key point is while estimating what is the next action, it does not follow the current policy but rather adopt the best Q value (the part in red) independently.
 
 $$Q(s, a) \\leftarrow (1 - \alpha) Q(s, a) + \alpha (r + \gamma \color{red}{\max_{a' \in \mathcal{A}} Q(s', a')})$$
 
@@ -191,7 +191,7 @@ Let's plug in the interaction with a gym env and update the Q function every tim
         else:
             ob = ob_next
 
-Often we start with a high `epsilon` and gradually decrease it during the training, known as “epsilon annealing”. The full code of `QLearningPolicy` is available [here](https://github.com/lilianweng/deep-reinforcement-learning-gym/blob/master/playground/policies/qlearning.py).
+Often we start with a high `epsilon` and gradually decrease it during the training, known as "epsilon annealing". The full code of `QLearningPolicy` is available [here](https://github.com/lilianweng/deep-reinforcement-learning-gym/blob/master/playground/policies/qlearning.py).
 
 # Deep Q-Network[#](#deep-q-network)
 
@@ -201,7 +201,7 @@ The main loss function looks like the following,
 
 $$\begin{aligned} & Y(s, a, r, s') = r + \gamma \max_{a'} Q_{\theta^{-}}(s', a') \\ & \mathcal{L}(\theta) = \mathbb{E}_{(s, a, r, s') \sim U(D)} \Big\[ \big( Y(s, a, r, s') - Q_\theta(s, a) \big)^2 \Big\] \end{aligned}$$
 
-The Q network can be a multi-layer dense neural network, a convolutional network, or a recurrent network, depending on the problem. In the [full implementation](https://github.com/lilianweng/deep-reinforcement-learning-gym/blob/master/playground/policies/dqn.py) of the DQN policy, it is determined by the `model_type` parameter, one of (“dense”, “conv”, “lstm”).
+The Q network can be a multi-layer dense neural network, a convolutional network, or a recurrent network, depending on the problem. In the [full implementation](https://github.com/lilianweng/deep-reinforcement-learning-gym/blob/master/playground/policies/dqn.py) of the DQN policy, it is determined by the `model_type` parameter, one of ("dense", "conv", "lstm").
 
 In the following example, I'm using a 2-layer densely connected neural network to learn Q values for the cart pole balancing problem.
 
@@ -246,7 +246,7 @@ We have two networks of the same structure. Both have the same network architect
     q = dense(states, [32, 32, 2], name='Q_primary')
     q_target = dense(states_next, [32, 32, 2], name='Q_target')
 
-The target network “Q_target” takes the `states_next` tensor as the input, because we use its prediction to select the optimal next state in the Bellman equation.
+The target network "Q_target" takes the `states_next` tensor as the input, because we use its prediction to select the optimal next state in the Bellman equation.
 
     # The prediction by the primary Q network for the actual actions.
     action_one_hot = tf.one_hot(actions, act_size, 1.0, 0.0, name='action_one_hot')
@@ -264,7 +264,7 @@ Note that [tf.stop_gradient()](https://www.tensorflow.org/api_docs/python/tf/sto
 
 ![](dqn-tensorboard-graph.png)
 
-The target network is updated by copying the primary Q network parameters over every `C` number of steps (“hard update”) or polyak averaging towards the primary network (“soft update”)
+The target network is updated by copying the primary Q network parameters over every `C` number of steps ("hard update") or polyak averaging towards the primary network ("soft update")
 
     # Get all the variables in the Q primary network.
     q_vars = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope="Q_primary")
@@ -451,10 +451,10 @@ The tensorboard graph is always helpful: ![](actor-critic-tensorboard-graph.png)
 
 \[1\] [Tensorflow API Docs](https://www.tensorflow.org/api_docs/)
 
-\[2\] Christopher JCH Watkins, and Peter Dayan. [“Q-learning."](https://link.springer.com/content/pdf/10.1007/BF00992698.pdf) Machine learning 8.3-4 (1992): 279-292.
+\[2\] Christopher JCH Watkins, and Peter Dayan. ["Q-learning."](https://link.springer.com/content/pdf/10.1007/BF00992698.pdf) Machine learning 8.3-4 (1992): 279-292.
 
-\[3\] Hado Van Hasselt, Arthur Guez, and David Silver. [“Deep Reinforcement Learning with Double Q-Learning."](https://arxiv.org/pdf/1509.06461.pdf) AAAI. Vol. 16. 2016.
+\[3\] Hado Van Hasselt, Arthur Guez, and David Silver. ["Deep Reinforcement Learning with Double Q-Learning."](https://arxiv.org/pdf/1509.06461.pdf) AAAI. Vol. 16. 2016.
 
-\[4\] Hado van Hasselt. [“Double Q-learning."](http://papers.nips.cc/paper/3964-double-q-learning.pdf) NIPS, 23:2613–2621, 2010.
+\[4\] Hado van Hasselt. ["Double Q-learning."](http://papers.nips.cc/paper/3964-double-q-learning.pdf) NIPS, 23:2613–2621, 2010.
 
 \[5\] Ziyu Wang, et al. [Dueling network architectures for deep reinforcement learning.](https://arxiv.org/pdf/1511.06581.pdf) ICML. 2016.

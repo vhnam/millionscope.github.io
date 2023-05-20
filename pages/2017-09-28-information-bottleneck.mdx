@@ -21,8 +21,8 @@ Table of Contents
   - [Information Plane Theorem](#information-plane-theorem)
   - [Two Optimization Phases](#two-optimization-phases)
 - [Learning Theory](#learning-theory)
-  - [“Old” Generalization Bounds](#old-generalization-bounds)
-  - [“New” Input compression bound](#new-input-compression-bound)
+  - ["Old" Generalization Bounds](#old-generalization-bounds)
+  - ["New" Input compression bound](#new-input-compression-bound)
 - [Network Size and Training Data Size](#network-size-and-training-data-size)
   - [The Benefit of More Hidden Layers](#the-benefit-of-more-hidden-layers)
   - [The Benefit of More Training Samples](#the-benefit-of-more-training-samples)
@@ -30,7 +30,7 @@ Table of Contents
 
 Professor Naftali Tishby passed away in 2021. Hope the post can introduce his cool idea of information bottleneck to more people.
 
-Recently I watched the talk [“Information Theory in Deep Learning”](https://youtu.be/bLqJHjXihK8) by Prof Naftali Tishby and found it very interesting. He presented how to apply the information theory to study the growth and transformation of deep neural networks during training. Using the [Information Bottleneck (IB)](https://arxiv.org/pdf/physics/0004057.pdf) method, he proposed a new learning bound for deep neural networks (DNN), as the traditional learning theory fails due to the exponentially large number of parameters. Another keen observation is that DNN training involves two distinct phases: First, the network is trained to fully represent the input data and minimize the generalization error; then, it learns to forget the irrelevant details by compressing the representation of the input.
+Recently I watched the talk ["Information Theory in Deep Learning"](https://youtu.be/bLqJHjXihK8) by Prof Naftali Tishby and found it very interesting. He presented how to apply the information theory to study the growth and transformation of deep neural networks during training. Using the [Information Bottleneck (IB)](https://arxiv.org/pdf/physics/0004057.pdf) method, he proposed a new learning bound for deep neural networks (DNN), as the traditional learning theory fails due to the exponentially large number of parameters. Another keen observation is that DNN training involves two distinct phases: First, the network is trained to fully represent the input data and minimize the generalization error; then, it learns to forget the irrelevant details by compressing the representation of the input.
 
 Most of the materials in this post are from Prof Tishby's talk and [related papers](https://lilianweng.github.io/posts/2017-09-28-information-bottleneck/#references).
 
@@ -38,7 +38,7 @@ Most of the materials in this post are from Prof Tishby's talk and [related pape
 
 [**Markov Chain**](https://en.wikipedia.org/wiki/Markov_chain)
 
-A Markov process is a [“memoryless”](http://mathworld.wolfram.com/Memoryless.html) (also called “Markov Property”) stochastic process. A Markov chain is a type of Markov process containing multiple discrete states. That is being said, the conditional probability of future states of the process is only determined by the current state and does not depend on the past states.
+A Markov process is a ["memoryless"](http://mathworld.wolfram.com/Memoryless.html) (also called "Markov Property") stochastic process. A Markov chain is a type of Markov process containing multiple discrete states. That is being said, the conditional probability of future states of the process is only determined by the current state and does not depend on the past states.
 
 [**Kullback–Leibler (KL) Divergence**](https://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence)
 
@@ -50,7 +50,7 @@ $D_{KL}$ achieves the minimum zero when $p(x)$ == $q(x)$ everywhere.
 
 [**Mutual Information**](https://en.wikipedia.org/wiki/Mutual_information)
 
-Mutual information measures the mutual dependence between two variables. It quantifies the “amount of information” obtained about one random variable through the other random variable. Mutual information is symmetric.
+Mutual information measures the mutual dependence between two variables. It quantifies the "amount of information" obtained about one random variable through the other random variable. Mutual information is symmetric.
 
 $$\begin{aligned} I(X;Y) &= D_{KL}\[p(x,y) \| p(x)p(y)\] \\ &= \sum_{x \in X, y \in Y} p(x, y) \log(\frac{p(x, y)}{p(x)p(y)}) \\ &= \sum_{x \in X, y \in Y} p(x, y) \log(\frac{p(x|y)}{p(x)}) \\ &= H(X) - H(X|Y) \\ \end{aligned}$$
 
@@ -78,7 +78,7 @@ If we label the hidden layers of a DNN as $h_1, h_2, \dots, h_m$ as in Fig. 1, w
 
 $$\begin{aligned} H(X) \\geq I(X; h_1) \\geq I(X; h_2) \\geq \dots \\geq I(X; h_m) \\geq I(X; \hat{Y}) \\ I(X; Y) \\geq I(h_1; Y) \\geq I(h_2; Y) \\geq \dots \\geq I(h_m; Y) \\geq I(\hat{Y}; Y) \end{aligned}$$
 
-A DNN is designed to learn how to describe $X$ to predict $Y$ and eventually, to compress $X$ to only hold the information related to $Y$. Tishby describes this processing as _“successive refinement of relevant information”_.
+A DNN is designed to learn how to describe $X$ to predict $Y$ and eventually, to compress $X$ to only hold the information related to $Y$. Tishby describes this processing as _"successive refinement of relevant information"_.
 
 ## Information Plane Theorem[#](#information-plane-theorem)
 
@@ -93,7 +93,7 @@ Precisely, in an information plane plot:
 
 Fig. 2. The encoder vs decoder mutual information of DNN hidden layers of 50 experiments. Different layers are color-coders, with green being the layer right next to the input and the orange being the furthest. There are three snapshots, at the initial epoch, 400 epochs and 9000 epochs respectively. (Image source: [Shwartz-Ziv and Tishby, 2017](https://arxiv.org/pdf/1703.00810.pdf))
 
-Each dot in Fig. 2. marks the encoder/ decoder mutual information of one hidden layer of one network simulation (no regularization is applied; no weights decay, no dropout, etc.). They move up as expected because the knowledge about the true labels is increasing (accuracy increases). At the early stage, the hidden layers learn a lot about the input $X$, but later they start to compress to forget some information about the input. Tishby believes that _“the most important part of learning is actually forgetting”_. Check out this [nice video](https://youtu.be/P1A1yNsxMjc) that demonstrates how the mutual information measures of layers are changing in epoch time.
+Each dot in Fig. 2. marks the encoder/ decoder mutual information of one hidden layer of one network simulation (no regularization is applied; no weights decay, no dropout, etc.). They move up as expected because the knowledge about the true labels is increasing (accuracy increases). At the early stage, the hidden layers learn a lot about the input $X$, but later they start to compress to forget some information about the input. Tishby believes that _"the most important part of learning is actually forgetting"_. Check out this [nice video](https://youtu.be/P1A1yNsxMjc) that demonstrates how the mutual information measures of layers are changing in epoch time.
 
 ![](ib-information-plane-merged.png)
 
@@ -111,7 +111,7 @@ Among early epochs, the mean values are three magnitudes larger than the standar
 
 # Learning Theory[#](#learning-theory)
 
-## “Old” Generalization Bounds[#](#old-generalization-bounds)
+## "Old" Generalization Bounds[#](#old-generalization-bounds)
 
 The generalization bounds defined by the classic learning theory is:
 
@@ -127,7 +127,7 @@ This definition states that the difference between the training error and the ge
 
 However, it does not work for deep learning. The larger a network is, the more parameters it needs to learn. With this generalization bounds, larger networks (larger $d$) would have worse bounds. This is contrary to the intuition that larger networks are able to achieve better performance with higher expressivity.
 
-## “New” Input compression bound[#](#new-input-compression-bound)
+## "New" Input compression bound[#](#new-input-compression-bound)
 
 To solve this counterintuitive observation, Tishby et al. proposed a new input compression bound for DNN.
 
@@ -185,6 +185,6 @@ Cited as:
 
 \[4\] [New Theory Cracks Open the Black Box of Deep Learning](https://www.quantamagazine.org/new-theory-cracks-open-the-black-box-of-deep-learning-20170921/) by Quanta Magazine.
 
-\[5\] Naftali Tishby and Noga Zaslavsky. [“Deep learning and the information bottleneck principle."](https://arxiv.org/pdf/1503.02406.pdf) IEEE Information Theory Workshop (ITW), 2015.
+\[5\] Naftali Tishby and Noga Zaslavsky. ["Deep learning and the information bottleneck principle."](https://arxiv.org/pdf/1503.02406.pdf) IEEE Information Theory Workshop (ITW), 2015.
 
-\[6\] Ravid Shwartz-Ziv and Naftali Tishby. [“Opening the Black Box of Deep Neural Networks via Information."](https://arxiv.org/pdf/1703.00810.pdf) arXiv preprint arXiv:1703.00810, 2017.
+\[6\] Ravid Shwartz-Ziv and Naftali Tishby. ["Opening the Black Box of Deep Neural Networks via Information."](https://arxiv.org/pdf/1703.00810.pdf) arXiv preprint arXiv:1703.00810, 2017.

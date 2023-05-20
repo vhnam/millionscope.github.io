@@ -53,7 +53,7 @@ During policy training, episodes are collected from source domain with randomiza
 
 $$\theta^\* = \arg\max_\theta \mathbb{E}_{\\xi \sim \\Xi} \[\mathbb{E}_{\pi_\theta, \tau \sim e_\\xi} \[R(\tau)\]\]$$
 
-where $\tau_\\xi$ is a trajectory collected in source domain randomized with $\\xi$. In a way, _“discrepancies between the source and target domains are modeled as variability in the source domain."_ (quote from [Peng et al. 2018](https://arxiv.org/abs/1710.06537)).
+where $\tau_\\xi$ is a trajectory collected in source domain randomized with $\\xi$. In a way, _"discrepancies between the source and target domains are modeled as variability in the source domain."_ (quote from [Peng et al. 2018](https://arxiv.org/abs/1710.06537)).
 
 # Uniform Domain Randomization[#](#uniform-domain-randomization)
 
@@ -117,7 +117,7 @@ Say we train a family of policies with different randomization parameters $\\xi 
 
 Inspired by [NAS](https://ai.google/research/pubs/pub45826), **AutoAugment** ([Cubuk, et al. 2018](https://arxiv.org/abs/1805.09501)) frames the problem of learning best data augmentation operations (i.e. shearing, rotation, invert, etc.) for image classification as an RL problem. Note that AutoAugment is not proposed for sim2real transfer, but falls in the bucket of DR guided by task performance. Individual augmentation configuration is tested on the evaluation set and the performance improvement is used as a reward to train a PPO policy. This policy outputs different augmentation strategies for different datasets; for example, for CIFAR-10 AutoAugment mostly picks color-based transformations, while ImageNet prefers geometric based.
 
-[Ruiz (2019)](https://arxiv.org/abs/1810.02513) considered the _task feedback_ as _reward_ in RL problem and proposed a RL-based method, named “learning to simulate”, for adjusting $\\xi$. A policy is trained to predict $\\xi$ using performance metrics on the validation data of the main task as rewards, which is modeled as a multivariate Gaussian. Overall the idea is similar to AutoAugment, applying NAS on data generation. According to their experiments, even if the main task model is not converged, it still can provide a reasonable signal to the data generation policy.
+[Ruiz (2019)](https://arxiv.org/abs/1810.02513) considered the _task feedback_ as _reward_ in RL problem and proposed a RL-based method, named "learning to simulate", for adjusting $\\xi$. A policy is trained to predict $\\xi$ using performance metrics on the validation data of the main task as rewards, which is modeled as a multivariate Gaussian. Overall the idea is similar to AutoAugment, applying NAS on data generation. According to their experiments, even if the main task model is not converged, it still can provide a reasonable signal to the data generation policy.
 
 ![](learning-to-simulate.png)
 
@@ -141,13 +141,13 @@ The **SimOpt** model ([Chebotar et al, 2019](https://arxiv.org/abs/1810.05687)) 
 
 $$\phi^\* = \arg\min_{\phi}\mathbb{E}_{\\xi \sim P_\phi(\\xi)} \[\mathbb{E}_{\pi_{\theta, P_\phi}} \[D(\tau_\text{sim}, \tau_\text{real})\]\]$$
 
-where $D(.)$ is a trajectory-based discrepancy measure. Like the “Learning to simulate” paper, SimOpt also has to solve the tricky problem of how to propagate gradient through non-differentiable simulator. It used a method called [relative entropy policy search](https://www.aaai.org/ocs/index.php/AAAI/AAAI10/paper/viewFile/1851/2264), see paper for more details.
+where $D(.)$ is a trajectory-based discrepancy measure. Like the "Learning to simulate" paper, SimOpt also has to solve the tricky problem of how to propagate gradient through non-differentiable simulator. It used a method called [relative entropy policy search](https://www.aaai.org/ocs/index.php/AAAI/AAAI10/paper/viewFile/1851/2264), see paper for more details.
 
 ![](simopt.png)
 
 Fig. 4. An overview of the SimOpt framework. (Image source: [Chebotar et al, 2019](https://arxiv.org/abs/1810.05687))
 
-**RCAN** ([James et al., 2019](https://arxiv.org/abs/1812.07252)), short for “Randomized-to-Canonical Adaptation Networks”, is a nice combination of DA and DR for end-to-end RL tasks. An image-conditional GAN ([cGAN](https://arxiv.org/abs/1611.07004)) is trained in sim to translate a domain-randomized image into a non-randomized version (aka “canonical version”). Later the same model is used to translate real images into corresponding simulated version so that the agent would consume consistent observation as what it has encountered in training. Still, the underlying assumption is that the distribution of domain-randomized sim images is broad enough to cover real-world samples.
+**RCAN** ([James et al., 2019](https://arxiv.org/abs/1812.07252)), short for "Randomized-to-Canonical Adaptation Networks", is a nice combination of DA and DR for end-to-end RL tasks. An image-conditional GAN ([cGAN](https://arxiv.org/abs/1611.07004)) is trained in sim to translate a domain-randomized image into a non-randomized version (aka "canonical version"). Later the same model is used to translate real images into corresponding simulated version so that the agent would consume consistent observation as what it has encountered in training. Still, the underlying assumption is that the distribution of domain-randomized sim images is broad enough to cover real-world samples.
 
 ![](RCAN.png)
 
@@ -207,32 +207,32 @@ Overall, after reading this post, I hope you like domain randomization as much a
 
 # References[#](#references)
 
-\[1\] Josh Tobin, et al. [“Domain randomization for transferring deep neural networks from simulation to the real world."](https://arxiv.org/pdf/1703.06907.pdf) IROS, 2017.
+\[1\] Josh Tobin, et al. ["Domain randomization for transferring deep neural networks from simulation to the real world."](https://arxiv.org/pdf/1703.06907.pdf) IROS, 2017.
 
-\[2\] Fereshteh Sadeghi and Sergey Levine. [“CAD2RL: Real single-image flight without a single real image."](https://arxiv.org/abs/1611.04201) arXiv:1611.04201 (2016).
+\[2\] Fereshteh Sadeghi and Sergey Levine. ["CAD2RL: Real single-image flight without a single real image."](https://arxiv.org/abs/1611.04201) arXiv:1611.04201 (2016).
 
-\[3\] Xue Bin Peng, et al. [“Sim-to-real transfer of robotic control with dynamics randomization."](https://arxiv.org/abs/1710.06537) ICRA, 2018.
+\[3\] Xue Bin Peng, et al. ["Sim-to-real transfer of robotic control with dynamics randomization."](https://arxiv.org/abs/1710.06537) ICRA, 2018.
 
-\[4\] Nataniel Ruiz, et al. [“Learning to Simulate."](https://openreview.net/forum?id=HJgkx2Aqt7) ICLR 2019
+\[4\] Nataniel Ruiz, et al. ["Learning to Simulate."](https://openreview.net/forum?id=HJgkx2Aqt7) ICLR 2019
 
-\[5\] OpenAI. [“Learning Dexterous In-Hand Manipulation."](https://arxiv.org/abs/1808.00177) arXiv:1808.00177 (2018).
+\[5\] OpenAI. ["Learning Dexterous In-Hand Manipulation."](https://arxiv.org/abs/1808.00177) arXiv:1808.00177 (2018).
 
-\[6\] OpenAI Blog. [“Learning dexterity”](https://openai.com/blog/learning-dexterity/) July 30, 2018.
+\[6\] OpenAI Blog. ["Learning dexterity"](https://openai.com/blog/learning-dexterity/) July 30, 2018.
 
-\[7\] Quan Vuong, et al. [“How to pick the domain randomization parameters for sim-to-real transfer of reinforcement learning policies?."](https://arxiv.org/abs/1903.11774) arXiv:1903.11774 (2019).
+\[7\] Quan Vuong, et al. ["How to pick the domain randomization parameters for sim-to-real transfer of reinforcement learning policies?."](https://arxiv.org/abs/1903.11774) arXiv:1903.11774 (2019).
 
-\[8\] Ekin D. Cubuk, et al. [“AutoAugment: Learning augmentation policies from data."](https://arxiv.org/abs/1805.09501) arXiv:1805.09501 (2018).
+\[8\] Ekin D. Cubuk, et al. ["AutoAugment: Learning augmentation policies from data."](https://arxiv.org/abs/1805.09501) arXiv:1805.09501 (2018).
 
-\[9\] Wenhao Yu et al. [“Policy Transfer with Strategy Optimization."](https://openreview.net/forum?id=H1g6osRcFQ) ICLR 2019
+\[9\] Wenhao Yu et al. ["Policy Transfer with Strategy Optimization."](https://openreview.net/forum?id=H1g6osRcFQ) ICLR 2019
 
-\[10\] Yevgen Chebotar et al. [“Closing the Sim-to-Real Loop: Adapting Simulation Randomization with Real World Experience."](https://arxiv.org/abs/1810.05687) Arxiv: 1810.05687 (2019).
+\[10\] Yevgen Chebotar et al. ["Closing the Sim-to-Real Loop: Adapting Simulation Randomization with Real World Experience."](https://arxiv.org/abs/1810.05687) Arxiv: 1810.05687 (2019).
 
-\[11\] Stephen James et al. [“Sim-to-real via sim-to-sim: Data-efficient robotic grasping via randomized-to-canonical adaptation networks”](https://arxiv.org/abs/1812.07252) CVPR 2019.
+\[11\] Stephen James et al. ["Sim-to-real via sim-to-sim: Data-efficient robotic grasping via randomized-to-canonical adaptation networks"](https://arxiv.org/abs/1812.07252) CVPR 2019.
 
-\[12\] Bhairav Mehta et al. [“Active Domain Randomization”](https://arxiv.org/abs/1904.04762) arXiv:1904.04762
+\[12\] Bhairav Mehta et al. ["Active Domain Randomization"](https://arxiv.org/abs/1904.04762) arXiv:1904.04762
 
-\[13\] Sergey Zakharov,et al. [“DeceptionNet: Network-Driven Domain Randomization."](https://arxiv.org/abs/1904.02750) arXiv:1904.02750 (2019).
+\[13\] Sergey Zakharov,et al. ["DeceptionNet: Network-Driven Domain Randomization."](https://arxiv.org/abs/1904.02750) arXiv:1904.02750 (2019).
 
-\[14\] Amlan Kar, et al. [“Meta-Sim: Learning to Generate Synthetic Datasets."](https://arxiv.org/abs/1904.11621) arXiv:1904.11621 (2019).
+\[14\] Amlan Kar, et al. ["Meta-Sim: Learning to Generate Synthetic Datasets."](https://arxiv.org/abs/1904.11621) arXiv:1904.11621 (2019).
 
-\[15\] Aayush Prakash, et al. [“Structured Domain Randomization: Bridging the Reality Gap by Context-Aware Synthetic Data."](https://arxiv.org/abs/1810.10093) arXiv:1810.10093 (2018).
+\[15\] Aayush Prakash, et al. ["Structured Domain Randomization: Bridging the Reality Gap by Context-Aware Synthetic Data."](https://arxiv.org/abs/1810.10093) arXiv:1810.10093 (2018).

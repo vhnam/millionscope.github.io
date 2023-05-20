@@ -33,11 +33,11 @@ Table of Contents
   - [Learning with Random Rewards](#learning-with-random-rewards)
 - [References](#references)
 
-In my earlier post on [meta-learning](https://lilianweng.github.io/posts/2018-11-30-meta-learning/), the problem is mainly defined in the context of few-shot classification. Here I would like to explore more into cases when we try to “meta-learn” [Reinforcement Learning (RL)](https://lilianweng.github.io/posts/2018-02-19-rl-overview/) tasks by developing an agent that can solve unseen tasks fast and efficiently.
+In my earlier post on [meta-learning](https://lilianweng.github.io/posts/2018-11-30-meta-learning/), the problem is mainly defined in the context of few-shot classification. Here I would like to explore more into cases when we try to "meta-learn" [Reinforcement Learning (RL)](https://lilianweng.github.io/posts/2018-02-19-rl-overview/) tasks by developing an agent that can solve unseen tasks fast and efficiently.
 
 To recap, a good meta-learning model is expected to generalize to new tasks or new environments that have never been encountered during training. The adaptation process, essentially a _mini learning session_, happens at test with limited exposure to the new configurations. Even without any explicit fine-tuning (no gradient backpropagation on trainable variables), the meta-learning model autonomously adjusts internal hidden states to learn.
 
-Training RL algorithms can be notoriously difficult sometimes. If the meta-learning agent could become so smart that the distribution of solvable unseen tasks grows extremely broad, we are on track towards [general purpose methods](http://incompleteideas.net/IncIdeas/BitterLesson.html) — essentially building a “brain” which would solve all kinds of RL problems without much human interference or manual feature engineering. Sounds amazing, right? 💖
+Training RL algorithms can be notoriously difficult sometimes. If the meta-learning agent could become so smart that the distribution of solvable unseen tasks grows extremely broad, we are on track towards [general purpose methods](http://incompleteideas.net/IncIdeas/BitterLesson.html) — essentially building a "brain" which would solve all kinds of RL problems without much human interference or manual feature engineering. Sounds amazing, right? 💖
 
 # On the Origin of Meta-RL[#](#on-the-origin-of-meta-rl)
 
@@ -134,11 +134,11 @@ There are three key components in Meta-RL:
 > ⭐ **A Distribution of MDPs**  
 > While the agent is exposed to a variety of environments and tasks during training, it has to learn how to adapt to different MDPs.
 
-According to [Botvinick et al.](https://www.cell.com/action/showPdf?pii=S1364-6613%2819%2930061-0) (2019), one source of slowness in RL training is _weak [inductive bias](https://en.wikipedia.org/wiki/Inductive_bias)_ ( = “a set of assumptions that the learner uses to predict outputs given inputs that it has not encountered”). As a general ML rule, a learning algorithm with weak inductive bias will be able to master a wider range of variance, but usually, will be less sample-efficient. Therefore, to narrow down the hypotheses with stronger inductive biases help improve the learning speed.
+According to [Botvinick et al.](https://www.cell.com/action/showPdf?pii=S1364-6613%2819%2930061-0) (2019), one source of slowness in RL training is _weak [inductive bias](https://en.wikipedia.org/wiki/Inductive_bias)_ ( = "a set of assumptions that the learner uses to predict outputs given inputs that it has not encountered"). As a general ML rule, a learning algorithm with weak inductive bias will be able to master a wider range of variance, but usually, will be less sample-efficient. Therefore, to narrow down the hypotheses with stronger inductive biases help improve the learning speed.
 
 In meta-RL, we impose certain types of inductive biases from the _task distribution_ and store them in _memory_. Which inductive bias to adopt at test time depends on the _algorithm_. Together, these three key components depict a compelling view of meta-RL: Adjusting the weights of a recurrent network is slow but it allows the model to work out a new task fast with its own RL algorithm implemented in its internal activity dynamics.
 
-Meta-RL interestingly and not very surprisingly matches the ideas in the [AI-GAs](https://arxiv.org/abs/1905.10985) (“AI-Generating Algorithms”) paper by Jeff Clune (2019). He proposed that one efficient way towards building general AI is to make learning as automatic as possible. The AI-GAs approach involves three pillars: (1) meta-learning architectures, (2) meta-learning algorithms, and (3) automatically generated environments for effective learning.
+Meta-RL interestingly and not very surprisingly matches the ideas in the [AI-GAs](https://arxiv.org/abs/1905.10985) ("AI-Generating Algorithms") paper by Jeff Clune (2019). He proposed that one efficient way towards building general AI is to make learning as automatic as possible. The AI-GAs approach involves three pillars: (1) meta-learning architectures, (2) meta-learning algorithms, and (3) automatically generated environments for effective learning.
 
 ---
 
@@ -290,12 +290,12 @@ The procedure above is quite similar to [PBT](https://arxiv.org/abs/1711.09846),
 
 An MDP without a reward function $R$ is known as a _Controlled Markov process_ (CMP). Given a predefined CMP, $\langle \mathcal{S}, \mathcal{A}, P\rangle$, we can acquire a variety of tasks by generating a collection of reward functions $\mathcal{R}$ that encourage the training of an effective meta-learning policy.
 
-[Gupta et al. (2018)](https://arxiv.org/abs/1806.04640) proposed two unsupervised approaches for growing the task distribution in the context of CMP. Assuming there is an underlying latent variable $z \sim p(z)$ associated with every task, it parameterizes/determines a reward function: $r_z(s) = \log D(z|s)$, where a “discriminator” function $D(.)$ is used to extract the latent variable from the state. The paper described two ways to construct a discriminator function:
+[Gupta et al. (2018)](https://arxiv.org/abs/1806.04640) proposed two unsupervised approaches for growing the task distribution in the context of CMP. Assuming there is an underlying latent variable $z \sim p(z)$ associated with every task, it parameterizes/determines a reward function: $r_z(s) = \log D(z|s)$, where a "discriminator" function $D(.)$ is used to extract the latent variable from the state. The paper described two ways to construct a discriminator function:
 
 - Sample random weights $\phi_\text{rand}$ of the discriminator, $D_{\phi_\text{rand}}(z \mid s)$.
-- Learn a discriminator function to encourage diversity-driven exploration. This method is introduced in more details in another sister paper “DIAYN” ([Eysenbach et al., 2018](https://arxiv.org/abs/1802.06070)).
+- Learn a discriminator function to encourage diversity-driven exploration. This method is introduced in more details in another sister paper "DIAYN" ([Eysenbach et al., 2018](https://arxiv.org/abs/1802.06070)).
 
-DIAYN, short for “Diversity is all you need”, is a framework to encourage a policy to learn useful skills without a reward function. It explicitly models the latent variable $z$ as a _skill_ embedding and makes the policy conditioned on $z$ in addition to state $s$, $\pi_\theta(a \mid s, z)$. (Ok, this part is same as [MAESN](#meta-learning-the-exploration-strategies) unsurprisingly, as the papers are from the same group.) The design of DIAYN is motivated by a few hypotheses:
+DIAYN, short for "Diversity is all you need", is a framework to encourage a policy to learn useful skills without a reward function. It explicitly models the latent variable $z$ as a _skill_ embedding and makes the policy conditioned on $z$ in addition to state $s$, $\pi_\theta(a \mid s, z)$. (Ok, this part is same as [MAESN](#meta-learning-the-exploration-strategies) unsurprisingly, as the papers are from the same group.) The design of DIAYN is motivated by a few hypotheses:
 
 - Skills should be diverse and lead to visitations of different states. → maximize the mutual information between states and skills, $I(S; Z)$
 - Skills should be distinguishable by states, not actions. → minimize the mutual information between actions and skills, conditioned on states $I(A; Z \mid S)$
@@ -326,38 +326,38 @@ Cited as:
 
 # References[#](#references)
 
-\[1\] Richard S. Sutton. [“The Bitter Lesson."](http://incompleteideas.net/IncIdeas/BitterLesson.html) March 13, 2019.
+\[1\] Richard S. Sutton. ["The Bitter Lesson."](http://incompleteideas.net/IncIdeas/BitterLesson.html) March 13, 2019.
 
-\[2\] Sepp Hochreiter, A. Steven Younger, and Peter R. Conwell. [“Learning to learn using gradient descent."](http://snowedin.net/tmp/Hochreiter2001.pdf) Intl. Conf. on Artificial Neural Networks. 2001.
+\[2\] Sepp Hochreiter, A. Steven Younger, and Peter R. Conwell. ["Learning to learn using gradient descent."](http://snowedin.net/tmp/Hochreiter2001.pdf) Intl. Conf. on Artificial Neural Networks. 2001.
 
-\[3\] Jane X Wang, et al. [“Learning to reinforcement learn."](https://arxiv.org/abs/1611.05763) arXiv preprint arXiv:1611.05763 (2016).
+\[3\] Jane X Wang, et al. ["Learning to reinforcement learn."](https://arxiv.org/abs/1611.05763) arXiv preprint arXiv:1611.05763 (2016).
 
-\[4\] Yan Duan, et al. [“RL $^ 2$: Fast Reinforcement Learning via Slow Reinforcement Learning."](https://arxiv.org/abs/1611.02779) ICLR 2017.
+\[4\] Yan Duan, et al. ["RL $^ 2$: Fast Reinforcement Learning via Slow Reinforcement Learning."](https://arxiv.org/abs/1611.02779) ICLR 2017.
 
-\[5\] Matthew Botvinick, et al. [“Reinforcement Learning, Fast and Slow”](<https://www.cell.com/trends/cognitive-sciences/fulltext/S1364-6613(19)30061-0>) Cell Review, Volume 23, Issue 5, P408-422, May 01, 2019.
+\[5\] Matthew Botvinick, et al. ["Reinforcement Learning, Fast and Slow"](<https://www.cell.com/trends/cognitive-sciences/fulltext/S1364-6613(19)30061-0>) Cell Review, Volume 23, Issue 5, P408-422, May 01, 2019.
 
-\[6\] Jeff Clune. [“AI-GAs: AI-generating algorithms, an alternate paradigm for producing general artificial intelligence”](https://arxiv.org/abs/1905.10985) arXiv preprint arXiv:1905.10985 (2019).
+\[6\] Jeff Clune. ["AI-GAs: AI-generating algorithms, an alternate paradigm for producing general artificial intelligence"](https://arxiv.org/abs/1905.10985) arXiv preprint arXiv:1905.10985 (2019).
 
-\[7\] Zhongwen Xu, et al. [“Meta-Gradient Reinforcement Learning”](http://papers.nips.cc/paper/7507-meta-gradient-reinforcement-learning.pdf) NIPS 2018.
+\[7\] Zhongwen Xu, et al. ["Meta-Gradient Reinforcement Learning"](http://papers.nips.cc/paper/7507-meta-gradient-reinforcement-learning.pdf) NIPS 2018.
 
-\[8\] Rein Houthooft, et al. [“Evolved Policy Gradients."](https://papers.nips.cc/paper/7785-evolved-policy-gradients.pdf) NIPS 2018.
+\[8\] Rein Houthooft, et al. ["Evolved Policy Gradients."](https://papers.nips.cc/paper/7785-evolved-policy-gradients.pdf) NIPS 2018.
 
-\[9\] Tim Salimans, et al. [“Evolution strategies as a scalable alternative to reinforcement learning."](https://arxiv.org/abs/1703.03864) arXiv preprint arXiv:1703.03864 (2017).
+\[9\] Tim Salimans, et al. ["Evolution strategies as a scalable alternative to reinforcement learning."](https://arxiv.org/abs/1703.03864) arXiv preprint arXiv:1703.03864 (2017).
 
-\[10\] Abhishek Gupta, et al. [“Meta-Reinforcement Learning of Structured Exploration Strategies."](http://papers.nips.cc/paper/7776-meta-reinforcement-learning-of-structured-exploration-strategies.pdf) NIPS 2018.
+\[10\] Abhishek Gupta, et al. ["Meta-Reinforcement Learning of Structured Exploration Strategies."](http://papers.nips.cc/paper/7776-meta-reinforcement-learning-of-structured-exploration-strategies.pdf) NIPS 2018.
 
-\[11\] Alexander Pritzel, et al. [“Neural episodic control."](https://arxiv.org/abs/1703.01988) Proc. Intl. Conf. on Machine Learning, Volume 70, 2017.
+\[11\] Alexander Pritzel, et al. ["Neural episodic control."](https://arxiv.org/abs/1703.01988) Proc. Intl. Conf. on Machine Learning, Volume 70, 2017.
 
-\[12\] Charles Blundell, et al. [“Model-free episodic control."](https://arxiv.org/abs/1606.04460) arXiv preprint arXiv:1606.04460 (2016).
+\[12\] Charles Blundell, et al. ["Model-free episodic control."](https://arxiv.org/abs/1606.04460) arXiv preprint arXiv:1606.04460 (2016).
 
-\[13\] Samuel Ritter, et al. [“Been there, done that: Meta-learning with episodic recall."](https://arxiv.org/abs/1805.09692) ICML, 2018.
+\[13\] Samuel Ritter, et al. ["Been there, done that: Meta-learning with episodic recall."](https://arxiv.org/abs/1805.09692) ICML, 2018.
 
-\[14\] Rui Wang et al. [“Paired Open-Ended Trailblazer (POET): Endlessly Generating Increasingly Complex and Diverse Learning Environments and Their Solutions”](https://arxiv.org/abs/1901.01753) arXiv preprint arXiv:1901.01753 (2019).
+\[14\] Rui Wang et al. ["Paired Open-Ended Trailblazer (POET): Endlessly Generating Increasingly Complex and Diverse Learning Environments and Their Solutions"](https://arxiv.org/abs/1901.01753) arXiv preprint arXiv:1901.01753 (2019).
 
-\[15\] Uber Engineering Blog: [“POET: Endlessly Generating Increasingly Complex and Diverse Learning Environments and their Solutions through the Paired Open-Ended Trailblazer."](https://eng.uber.com/poet-open-ended-deep-learning/) Jan 8, 2019.
+\[15\] Uber Engineering Blog: ["POET: Endlessly Generating Increasingly Complex and Diverse Learning Environments and their Solutions through the Paired Open-Ended Trailblazer."](https://eng.uber.com/poet-open-ended-deep-learning/) Jan 8, 2019.
 
-\[16\] Abhishek Gupta, et al.[“Unsupervised meta-learning for Reinforcement Learning”](https://arxiv.org/abs/1806.04640) arXiv preprint arXiv:1806.04640 (2018).
+\[16\] Abhishek Gupta, et al.["Unsupervised meta-learning for Reinforcement Learning"](https://arxiv.org/abs/1806.04640) arXiv preprint arXiv:1806.04640 (2018).
 
-\[17\] Eysenbach, Benjamin, et al. [“Diversity is all you need: Learning skills without a reward function."](https://arxiv.org/abs/1802.06070) ICLR 2019.
+\[17\] Eysenbach, Benjamin, et al. ["Diversity is all you need: Learning skills without a reward function."](https://arxiv.org/abs/1802.06070) ICLR 2019.
 
-\[18\] Max Jaderberg, et al. [“Population Based Training of Neural Networks."](https://arxiv.org/abs/1711.09846) arXiv preprint arXiv:1711.09846 (2017).
+\[18\] Max Jaderberg, et al. ["Population Based Training of Neural Networks."](https://arxiv.org/abs/1711.09846) arXiv preprint arXiv:1711.09846 (2017).

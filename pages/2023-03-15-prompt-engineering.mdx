@@ -109,7 +109,7 @@ The purpose of presenting few-shot examples in the prompt is to explain our inte
 
 _Instructed LM_ (e.g. [InstructGPT](https://openai.com/research/instruction-following), [natural instruction](https://github.com/allenai/natural-instructions)) finetunes a pretrained model with high-quality tuples of (task instruction, input, ground truth output) to make LM better understand user intention and follow instruction. [RLHF](https://lilianweng.github.io/posts/2021-01-02-controllable-text-generation/#rl-fine-tuning-with-human-preferences) (Reinforcement Learning from Human Feedback) is a common method to do so. The benefit of instruction following style fine-tuning improves the model to be more aligned with human intention and greatly reduces the cost of communication.
 
-When interacting with instruction models, we should describe the task requirement in details, trying to be _specific_ and _precise_ and avoiding say “not do something” but rather specify what to do.
+When interacting with instruction models, we should describe the task requirement in details, trying to be _specific_ and _precise_ and avoiding say "not do something" but rather specify what to do.
 
     Please label the sentiment towards the movie of the given movie review. The sentiment label should be "positive" or "negative".
     Text: i'll bet the video game is a lot more fun than the film.
@@ -184,7 +184,7 @@ Two main types of CoT prompting:
 
 - [Self-consistency sampling](#self-consistency-sampling) can improve reasoning accuracy by sampling a number of diverse answers and then taking the majority vote. ([Wang et al. 2022a](https://arxiv.org/abs/2203.11171))
 - Another approach for ensemble learning is to alter the example order or use model generated rationales to replace human-written ones to introduce randomness during multiple sample trials. Then aggregate model outputs with a majority vote to get final answer. ([Wang et al. 2022b](https://arxiv.org/abs/2207.00747))
-- If training examples are only associated with true answers (easy to verify!) but no rationales, we can follow the _STaR_ (Self-Taught Reasoner; [Zelikman et al. 2022](https://arxiv.org/abs/2203.14465)) method : (1) Ask LLM to generate reasoning chains and only keep those leading to correct answers; (2) Then fine-tune the model with generated rationales and repeat the process until convergence. Note that higher temperature is more likely to generate incorrect rationales with correct answers. If training examples do not have ground truth answers, maybe consider using majority votes as the “correct” answers.
+- If training examples are only associated with true answers (easy to verify!) but no rationales, we can follow the _STaR_ (Self-Taught Reasoner; [Zelikman et al. 2022](https://arxiv.org/abs/2203.14465)) method : (1) Ask LLM to generate reasoning chains and only keep those leading to correct answers; (2) Then fine-tune the model with generated rationales and repeat the process until convergence. Note that higher temperature is more likely to generate incorrect rationales with correct answers. If training examples do not have ground truth answers, maybe consider using majority votes as the "correct" answers.
 - Prompts with demonstrations of higher reasoning complexity can achieve better performance, where complexity is measured by the number of reasoning steps in the chains. When separating reasoning steps, newline `\n` symbol works better than `step i`, period `.` or semicolon `;`. ([Fu et al. 2023](https://arxiv.org/abs/2210.00720))
 
 - _Complexity-based consistency_ is to explicitly prefer complex chains among all the generations by taking majority vote among only top $k$ complex chains. ([Fu et al. 2023](https://arxiv.org/abs/2210.00720))
@@ -200,7 +200,7 @@ Fig. 1. How Self-Ask works with external search queries.
 
 # Automatic Prompt Design[#](#automatic-prompt-design)
 
-Prompt is a sequence of prefix tokens that increase the probability of getting desired output given input. Therefore we can treat them as trainable parameters and [optimize them directly](https://lilianweng.github.io/posts/2021-01-02-controllable-text-generation/#smart-prompt-design) on the embedding space via gradient descent, such as **AutoPrompt** ([Shin et al., 2020](https://arxiv.org/abs/2010.15980), **Prefix-Tuning** ([Li & Liang (2021)](https://arxiv.org/abs/2101.00190)), **P-tuning** ([Liu et al. 2021](https://arxiv.org/abs/2103.10385)) and **Prompt-Tuning** ([Lester et al. 2021](https://arxiv.org/abs/2104.08691)). [This section in my “Controllable Neural Text Generation” post](https://lilianweng.github.io/posts/2021-01-02-controllable-text-generation/#smart-prompt-design) has a good coverage of them. The trend from AutoPrompt to Prompt-Tuning is that the setup gets gradually simplified.
+Prompt is a sequence of prefix tokens that increase the probability of getting desired output given input. Therefore we can treat them as trainable parameters and [optimize them directly](https://lilianweng.github.io/posts/2021-01-02-controllable-text-generation/#smart-prompt-design) on the embedding space via gradient descent, such as **AutoPrompt** ([Shin et al., 2020](https://arxiv.org/abs/2010.15980), **Prefix-Tuning** ([Li & Liang (2021)](https://arxiv.org/abs/2101.00190)), **P-tuning** ([Liu et al. 2021](https://arxiv.org/abs/2103.10385)) and **Prompt-Tuning** ([Lester et al. 2021](https://arxiv.org/abs/2104.08691)). [This section in my "Controllable Neural Text Generation" post](https://lilianweng.github.io/posts/2021-01-02-controllable-text-generation/#smart-prompt-design) has a good coverage of them. The trend from AutoPrompt to Prompt-Tuning is that the setup gets gradually simplified.
 
 **APE** (Automatic Prompt Engineer; [Zhou et al. 2022](https://arxiv.org/abs/2211.01910)) is a method to search over a pool of model-generated instruction candidates and then filters the candidate set according to a chosen score function to ultimately choose the best candidate with highest score.
 
@@ -248,7 +248,7 @@ According to their experiments on generation and classification tasks, among thr
 
 One observation with [SituatedQA](https://situatedqa.github.io/) dataset for questions grounded in different dates is that despite LM (pretraining cutoff is year 2020) has access to latest information via Google Search, its performance on post-2020 questions are still a lot _worse_ than on pre-2020 questions. This suggests the existence of some discrepencies or conflicting parametric between contextual information and model internal knowledge.
 
-Interestingly it is found to be beneficial even with only “internal retrieval”, that is, to generate knowledge about a topic before answering the question ([Liu et al. 2022](https://arxiv.org/abs/2110.08387)). First we can use the following template to extract knowledge:
+Interestingly it is found to be beneficial even with only "internal retrieval", that is, to generate knowledge about a topic before answering the question ([Liu et al. 2022](https://arxiv.org/abs/2110.08387)). First we can use the following template to extract knowledge:
 
 ```
     Generate some knowledge about the input. Examples:
@@ -325,7 +325,7 @@ Toolformer is trained as follows:
 
 3.  _Fine-tune LM on this annotated dataset._ The new training sequences are constructed as $\mathbf{x}^\* = x_{1:i-1}, e(c_i, r_i), x_{i:n}$ . The training data is a combination of the original dataset (e.g. a subset of CCNet, as in the paper) and its augmented version.
 
-At inference time, decoding runs until the model produces “$\to$ " token, indicating that it is expecting response from an API call next.
+At inference time, decoding runs until the model produces "$\to$ " token, indicating that it is expecting response from an API call next.
 
 Toolformer currently does not support tool use in a chain (i.e. using the output of one tool as an input for another tool) or in an interactive way (i.e. adopt API response after human selection). Both are interesting future directions to expand the model for.
 
@@ -350,52 +350,52 @@ Or
 
 # References[#](#references)
 
-\[1\] Zhao et al. [“Calibrate Before Use: Improving Few-shot Performance of Language Models."](https://arxiv.org/abs/2102.09690) ICML 2021
+\[1\] Zhao et al. ["Calibrate Before Use: Improving Few-shot Performance of Language Models."](https://arxiv.org/abs/2102.09690) ICML 2021
 
-\[2\] Liu et al. [“What Makes Good In-Context Examples for GPT-3?"](https://arxiv.org/abs/2101.06804) arXiv preprint arXiv:2101.06804 (2021).
+\[2\] Liu et al. ["What Makes Good In-Context Examples for GPT-3?"](https://arxiv.org/abs/2101.06804) arXiv preprint arXiv:2101.06804 (2021).
 
-\[3\] Lu et al. [“Fantastically Ordered Prompts and Where to Find Them: Overcoming Few-Shot Prompt Order Sensitivity."](https://arxiv.org/abs/2104.08786) ACL 2022
+\[3\] Lu et al. ["Fantastically Ordered Prompts and Where to Find Them: Overcoming Few-Shot Prompt Order Sensitivity."](https://arxiv.org/abs/2104.08786) ACL 2022
 
-\[4\] Ye et al. [“In-Context Instruction Learning."](https://arxiv.org/abs/2302.14691) arXiv preprint arXiv:2302.14691 (2023).
+\[4\] Ye et al. ["In-Context Instruction Learning."](https://arxiv.org/abs/2302.14691) arXiv preprint arXiv:2302.14691 (2023).
 
-\[5\] Su et al. [“Selective annotation makes language models better few-shot learners."](https://arxiv.org/abs/2209.01975) arXiv preprint arXiv:2209.01975 (2022).
+\[5\] Su et al. ["Selective annotation makes language models better few-shot learners."](https://arxiv.org/abs/2209.01975) arXiv preprint arXiv:2209.01975 (2022).
 
-\[6\] Rubin et al. [“Learning to retrieve prompts for in-context learning."](https://arxiv.org/abs/2112.08633) NAACL-HLT 2022
+\[6\] Rubin et al. ["Learning to retrieve prompts for in-context learning."](https://arxiv.org/abs/2112.08633) NAACL-HLT 2022
 
-\[7\] Wei et al. [“Chain of thought prompting elicits reasoning in large language models."](https://arxiv.org/abs/2201.11903) NeurIPS 2022
+\[7\] Wei et al. ["Chain of thought prompting elicits reasoning in large language models."](https://arxiv.org/abs/2201.11903) NeurIPS 2022
 
-\[8\] Wang et al. [“Self-Consistency Improves Chain of Thought Reasoning in Language Models."](https://arxiv.org/abs/2203.11171) ICLR 2023.
+\[8\] Wang et al. ["Self-Consistency Improves Chain of Thought Reasoning in Language Models."](https://arxiv.org/abs/2203.11171) ICLR 2023.
 
-\[9\] Diao et al. [“Active Prompting with Chain-of-Thought for Large Language Models."](https://arxiv.org/abs/2302.12246) arXiv preprint arXiv:2302.12246 (2023).
+\[9\] Diao et al. ["Active Prompting with Chain-of-Thought for Large Language Models."](https://arxiv.org/abs/2302.12246) arXiv preprint arXiv:2302.12246 (2023).
 
-\[10\] Zelikman et al. [“STaR: Bootstrapping Reasoning With Reasoning."](https://arxiv.org/abs/2203.14465) arXiv preprint arXiv:2203.14465 (2022).
+\[10\] Zelikman et al. ["STaR: Bootstrapping Reasoning With Reasoning."](https://arxiv.org/abs/2203.14465) arXiv preprint arXiv:2203.14465 (2022).
 
-\[11\] Ye & Durrett. [“The unreliability of explanations in few-shot in-context learning."](https://arxiv.org/abs/2205.03401) arXiv preprint arXiv:2205.03401 (2022).
+\[11\] Ye & Durrett. ["The unreliability of explanations in few-shot in-context learning."](https://arxiv.org/abs/2205.03401) arXiv preprint arXiv:2205.03401 (2022).
 
-\[12\] Trivedi et al. [“Interleaving retrieval with chain-of-thought reasoning for knowledge-intensive multi-step questions."](https://arxiv.org/abs/2212.10509) arXiv preprint arXiv:2212.10509 (2022).
+\[12\] Trivedi et al. ["Interleaving retrieval with chain-of-thought reasoning for knowledge-intensive multi-step questions."](https://arxiv.org/abs/2212.10509) arXiv preprint arXiv:2212.10509 (2022).
 
-\[13\] Press et al. [“Measuring and narrowing the compositionality gap in language models."](https://arxiv.org/abs/2210.03350) arXiv preprint arXiv:2210.03350 (2022).
+\[13\] Press et al. ["Measuring and narrowing the compositionality gap in language models."](https://arxiv.org/abs/2210.03350) arXiv preprint arXiv:2210.03350 (2022).
 
-\[14\] Yao et al. [“ReAct: Synergizing reasoning and acting in language models."](https://arxiv.org/abs/2210.03629) ICLR 2023.
+\[14\] Yao et al. ["ReAct: Synergizing reasoning and acting in language models."](https://arxiv.org/abs/2210.03629) ICLR 2023.
 
-\[15\] Fu et al. [“Complexity-based prompting for multi-step reasoning."](https://arxiv.org/abs/2210.00720) arXiv preprint arXiv:2210.00720 (2022).
+\[15\] Fu et al. ["Complexity-based prompting for multi-step reasoning."](https://arxiv.org/abs/2210.00720) arXiv preprint arXiv:2210.00720 (2022).
 
-\[16\] Wang et al. [“Rationale-augmented ensembles in language models."](https://arxiv.org/abs/2207.00747) arXiv preprint arXiv:2207.00747 (2022).
+\[16\] Wang et al. ["Rationale-augmented ensembles in language models."](https://arxiv.org/abs/2207.00747) arXiv preprint arXiv:2207.00747 (2022).
 
-\[17\] Zhang et al. [“Automatic chain of thought prompting in large language models."](https://arxiv.org/abs/2210.03493) arXiv preprint arXiv:2210.03493 (2022).
+\[17\] Zhang et al. ["Automatic chain of thought prompting in large language models."](https://arxiv.org/abs/2210.03493) arXiv preprint arXiv:2210.03493 (2022).
 
-\[18\] Shum et al. [“Automatic Prompt Augmentation and Selection with Chain-of-Thought from Labeled Data."](https://arxiv.org/abs/2302.12822) arXiv preprint arXiv:2302.12822 (2023).
+\[18\] Shum et al. ["Automatic Prompt Augmentation and Selection with Chain-of-Thought from Labeled Data."](https://arxiv.org/abs/2302.12822) arXiv preprint arXiv:2302.12822 (2023).
 
-\[19\] Zhou et al. [“Large Language Models Are Human-Level Prompt Engineers."](https://arxiv.org/abs/2211.01910) ICLR 2023.
+\[19\] Zhou et al. ["Large Language Models Are Human-Level Prompt Engineers."](https://arxiv.org/abs/2211.01910) ICLR 2023.
 
-\[20\] Lazaridou et al. [“Internet augmented language models through few-shot prompting for open-domain question answering."](https://arxiv.org/abs/2203.05115) arXiv preprint arXiv:2203.05115 (2022).
+\[20\] Lazaridou et al. ["Internet augmented language models through few-shot prompting for open-domain question answering."](https://arxiv.org/abs/2203.05115) arXiv preprint arXiv:2203.05115 (2022).
 
-\[21\] Chen et al. [“Program of Thoughts Prompting: Disentangling Computation from Reasoning for Numerical Reasoning Tasks."](https://arxiv.org/abs/2211.12588) arXiv preprint arXiv:2211.12588 (2022).
+\[21\] Chen et al. ["Program of Thoughts Prompting: Disentangling Computation from Reasoning for Numerical Reasoning Tasks."](https://arxiv.org/abs/2211.12588) arXiv preprint arXiv:2211.12588 (2022).
 
-\[22\] Gao et al. [“PAL: Program-aided language models."](https://arxiv.org/abs/2211.10435) arXiv preprint arXiv:2211.10435 (2022).
+\[22\] Gao et al. ["PAL: Program-aided language models."](https://arxiv.org/abs/2211.10435) arXiv preprint arXiv:2211.10435 (2022).
 
-\[23\] Parisi et al. [“TALM: Tool Augmented Language Models”](https://arxiv.org/abs/2205.12255) arXiv preprint arXiv:2205.12255 (2022).
+\[23\] Parisi et al. ["TALM: Tool Augmented Language Models"](https://arxiv.org/abs/2205.12255) arXiv preprint arXiv:2205.12255 (2022).
 
-\[24\] Schick et al. [“Toolformer: Language Models Can Teach Themselves to Use Tools."](https://arxiv.org/abs/2302.04761) arXiv preprint arXiv:2302.04761 (2023).
+\[24\] Schick et al. ["Toolformer: Language Models Can Teach Themselves to Use Tools."](https://arxiv.org/abs/2302.04761) arXiv preprint arXiv:2302.04761 (2023).
 
-\[25\] Mialon et al. [“Augmented Language Models: a Survey”](https://arxiv.org/abs/2302.07842) arXiv preprint arXiv:2302.07842 (2023).
+\[25\] Mialon et al. ["Augmented Language Models: a Survey"](https://arxiv.org/abs/2302.07842) arXiv preprint arXiv:2302.07842 (2023).

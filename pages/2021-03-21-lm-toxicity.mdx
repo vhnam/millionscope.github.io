@@ -59,20 +59,20 @@ One popular categorization of offensive language is proposed by [Zampieri et al.
 
 Fig. 1. The three-level hierarchical taxonomy for categorizing offensive language, proposed by [Zampieri et al. (2019)](https://arxiv.org/abs/1902.09666).
 
-- Level A: “Is it offensive?”
+- Level A: "Is it offensive?"
   - `[OFF]` Offensive: Inappropriate language, insults, or threats.
   - `[NOT]` Not offensive: No offense or profanity.
-- Level B: “Is the offensive text targeted?”
+- Level B: "Is the offensive text targeted?"
   - `[TIN]` Targeted Insult: Targeted insult or threat towards an individual, a group or other.
   - `[UNT]` Untargeted: Non-targeted profanity and swearing.
 - Level C: What is the target?
-  - `[IND]` The offense targets an individual, often defined as “cyberbullying”.
-  - `[GRP]` The offense targets a group of people based on ethnicity, gender, sexual orientation, religion, or other common characteristic, often defined as “hate speech”.
+  - `[IND]` The offense targets an individual, often defined as "cyberbullying".
+  - `[GRP]` The offense targets a group of people based on ethnicity, gender, sexual orientation, religion, or other common characteristic, often defined as "hate speech".
   - `[OTH]` The target can belong to other categories, such as an organization, an event, an issue, etc.
 
 # Data Collection[#](#data-collection)
 
-Preparing a dataset of samples labelled as “safe” vs “unsafe” is the foundation for training a toxic language classifier and further providing signals for model detoxification.
+Preparing a dataset of samples labelled as "safe" vs "unsafe" is the foundation for training a toxic language classifier and further providing signals for model detoxification.
 
 ## Human Annotations[#](#human-annotations)
 
@@ -99,7 +99,7 @@ Crowdsourcing is the most common approach among them ([Davidson et al. 2017](htt
 3.  Train a weak binary classifier to further select more samples from the sorted subreddits,
     - Sensitive: contain blacklisted words or toxic classifier confidence > 0.8;
     - Non-sensitive: not contain blacklisted words and toxic classifier confidence < 0.3
-4.  Given this large expanded dataset, train a new classifier named “Two-stage bootstrap” (**TS bootstrap**).
+4.  Given this large expanded dataset, train a new classifier named "Two-stage bootstrap" (**TS bootstrap**).
 
 Their experiments showed that the TS bootstrap classifier achieved pretty good numbers on F1 score, accuracy and recall and it could also transfer to out-of-domain test data.
 
@@ -120,10 +120,10 @@ Given a supervised dataset, we can train a text classifier from scratch or fine-
 
 ## Adversarial Attacks[#](#adversarial-attacks)
 
-To create a toxicity detection model that is robust to adversarial attacks, [Dinan et al. (2019)](https://arxiv.org/abs/1908.06083) proposed an iterative “**build it, break it, fix it**” strategy to improve the dialogue system safety with humans in the loop.
+To create a toxicity detection model that is robust to adversarial attacks, [Dinan et al. (2019)](https://arxiv.org/abs/1908.06083) proposed an iterative "**build it, break it, fix it**" strategy to improve the dialogue system safety with humans in the loop.
 
 1.  _Build it_: A BERT model is trained to classify toxic comments on the [Jigsaw dataset](#jigsaw).
-2.  _Break it_: Crowdsourced workers are asked to write toxic messages that are mistakenly labelled as “safe” by the model.
+2.  _Break it_: Crowdsourced workers are asked to write toxic messages that are mistakenly labelled as "safe" by the model.
 3.  _Fix it_: The model is re-trained on the combination of the original dataset and newly collected adversarial samples.
 4.  _Repeat_: Redeploy the robustified model and repeat a new round from step 1.
 
@@ -131,7 +131,7 @@ To create a toxicity detection model that is robust to adversarial attacks, [Din
 
 Fig. 3. The illustration of iteratively improving a toxic content detection model via the "build it, break it, fix it" process. (Image source: [Dinan et al. 2019](https://arxiv.org/abs/1908.06083))
 
-One baseline in their experiments is to replace the adversarial collection in the “break it” step with the standard collection where workers are asked to submit “offensive” messages directly . Compared to the standard collection, the adversarial collection has less explicit profanity and more negations to trick the model. The tasks become more challenging in the later rounds.
+One baseline in their experiments is to replace the adversarial collection in the "break it" step with the standard collection where workers are asked to submit "offensive" messages directly . Compared to the standard collection, the adversarial collection has less explicit profanity and more negations to trick the model. The tasks become more challenging in the later rounds.
 
 Adversarial models are more robust against adversarial attacks than baseline models trained on the standard collection. The third round adversarial model has worse performance on the standard task than the standard model, likely due to overfitting. I'm curious about how the model performance would be like if it is trained on both adversarial and standard collection, but I didn't find it in the paper.
 
@@ -161,7 +161,7 @@ The paper proposed two ways to resolve adversarial attacks:
 
 Fig. 5. The overview of Perspective API scores. (Image source: [About Perspective API](https://support.perspectiveapi.com/s/about-the-api))
 
-[Gehman et al. (2020)](https://arxiv.org/abs/2009.11462) measured the Perspective API toxicity scores of unprompted generations sampled from several pretrained language models. “Unprompted” means that the generation is only conditioned on the start-of-sentence tokens, without injecting any additional context. Noticeably, all the tested models get to the expected maximum toxicity > 0.5 after 100 generations. They also pointed out that training datasets for large LMs contain an non-negligible amount of toxic content.
+[Gehman et al. (2020)](https://arxiv.org/abs/2009.11462) measured the Perspective API toxicity scores of unprompted generations sampled from several pretrained language models. "Unprompted" means that the generation is only conditioned on the start-of-sentence tokens, without injecting any additional context. Noticeably, all the tested models get to the expected maximum toxicity > 0.5 after 100 generations. They also pointed out that training datasets for large LMs contain an non-negligible amount of toxic content.
 
 ![](assets/images/2021-03-21-lm-toxicity/unprompted-toxicity.png)
 
@@ -173,11 +173,11 @@ Despite of its popularity, Perspective API contains known biases, as summarized 
 
 > … exhibit biases against minorities and suffer from low agreement in annotations, partially due to annotator identity influencing their perception of hate speech and differences in annotation task setup.
 
-> Notably, recent work has found that systems are overestimating the prevalence of toxicity in text that contains a minority identity mention (e.g., “I'm a gay man”) or text by racial minorities (e.g., text in African American English). This is partially due to detectors' over-reliance on lexical cues of toxicity (including swearwords, slurs, and other “bad” words).
+> Notably, recent work has found that systems are overestimating the prevalence of toxicity in text that contains a minority identity mention (e.g., "I'm a gay man") or text by racial minorities (e.g., text in African American English). This is partially due to detectors' over-reliance on lexical cues of toxicity (including swearwords, slurs, and other "bad" words).
 
 ## Prompt-based Detection[#](#prompt-based-detection)
 
-**Self-diagnosis** ([Schick, et al. 2021](https://arxiv.org/abs/2103.00453)) is a process of exploiting the capacity of a pretrained language model to detect socially undesired attributes in its own outputs. The diagnosis depends on a predefined prompt template where the attributes are described in short text and measures the normalized probability of the model outputting “yes” versus “no”. Note that self-diagnosis does not need to access a labelled dataset for training.
+**Self-diagnosis** ([Schick, et al. 2021](https://arxiv.org/abs/2103.00453)) is a process of exploiting the capacity of a pretrained language model to detect socially undesired attributes in its own outputs. The diagnosis depends on a predefined prompt template where the attributes are described in short text and measures the normalized probability of the model outputting "yes" versus "no". Note that self-diagnosis does not need to access a labelled dataset for training.
 
     # Self-diagnosis template
     "{sample text}"
@@ -294,9 +294,9 @@ $$\mathcal{L}_\text{style} = - p_\phi(\text{class} = 1 \vert f_\theta(\mathbf{x}
 
 Fig. 11. The training process of Style Transformer. (Image source: [Dai et al. 2019](https://arxiv.org/abs/1905.05621))
 
-Driven by the research question “Can we fine-tune a pre-trained language model to suggest civil rephrasings of rude comments using a dataset solely annotated in toxicity?”, [Laugier et al. (2021)](https://arxiv.org/abs/2102.05456) fine-tuned a pretrained text-to-text transformer with a denoising and cyclic auto-encoder loss.
+Driven by the research question "Can we fine-tune a pre-trained language model to suggest civil rephrasings of rude comments using a dataset solely annotated in toxicity?", [Laugier et al. (2021)](https://arxiv.org/abs/2102.05456) fine-tuned a pretrained text-to-text transformer with a denoising and cyclic auto-encoder loss.
 
-Let $s$ be the attribute of $\mathbf{x}$ (e.g. “civil”) and $\bar{s}$ be the other opposite attribute (e.g. “toxic”). These two attributes are mutually exclusive. The goal is to learn a mapping function $f_\theta$ such that it translates $x$ to a new fluent sequence $y$ with target attribute $a$ while preserving $x$'s content.
+Let $s$ be the attribute of $\mathbf{x}$ (e.g. "civil") and $\bar{s}$ be the other opposite attribute (e.g. "toxic"). These two attributes are mutually exclusive. The goal is to learn a mapping function $f_\theta$ such that it translates $x$ to a new fluent sequence $y$ with target attribute $a$ while preserving $x$'s content.
 
 The encoder-decoder model is trained with the loss:
 
@@ -310,7 +310,7 @@ $$\mathcal{L}_\text{DAE} = \mathbb{E}_{\mathbf{x} \sim \mathcal{X}} \[−\log p_
 
 $$\mathcal{L}_\text{cycle} = \mathbb{E}_{\mathbf{x} \sim \mathcal{X}} \[−\log p_\theta(\mathbf{x} \mid f_{\tilde{\theta}}(\mathbf{x}, \bar{s}), s)\]$$
 
-They used the above loss to fine-tune a T5 model, resulting in a model named **CAE-T5**. The conditioning is implemented like CTRL via control code (“civil” or “toxic”) prepended to the start of a sequence.
+They used the above loss to fine-tune a T5 model, resulting in a model named **CAE-T5**. The conditioning is implemented like CTRL via control code ("civil" or "toxic") prepended to the start of a sequence.
 
 Automatic evaluation of the text style transferred results relies on three metrics:
 
@@ -350,13 +350,13 @@ They consider four general strategies in the recipes for making the bot safer:
 
 - _Detect unsafe content_: Adopt a classifier for detecting unsafe language on both the input and output side, as an extra safety layer on top of the language model.
   - The classifier is trained on an enhanced version of the [Jigsaw toxic](#jigsaw) comment dataset (safe vs unsafe binary labels), extended with [adversarial human attacks](#adversarial-attacks) ([Dinan et al. 2019](https://arxiv.org/abs/1908.06083)) and [semi-supervision](#semi-supervised-dataset) ([Khatri et al. 2018](https://arxiv.org/abs/1811.12900)).
-  - The safety classifier can be used on both the user input and the model output. If it detects unsafe content, the system is configured to return a canned, predefined response (e.g “I'm sorry I'm not sure what to say."), or decide to change topics. It is worthy noting that this approach relies on a high-quality classifier. The conversation experience would be drastically disrupted with too many false positives.
+  - The safety classifier can be used on both the user input and the model output. If it detects unsafe content, the system is configured to return a canned, predefined response (e.g "I'm sorry I'm not sure what to say."), or decide to change topics. It is worthy noting that this approach relies on a high-quality classifier. The conversation experience would be drastically disrupted with too many false positives.
   - Bot adversarial dialogue (BAD) safety: The idea is to collect data on humans adversarially probing the system to make mistakes and then use the data for further training. During annotation, human labellers can tag the bot's response with an unsafe-safe rating based on the percentage of population who may consider it as unsafe. This probing data collection is used to train a multi-turn safety classifier, predicting whether a response is offensive given the dialogue context.
 - _Safe generation_: Train a model that is less likely to output unsafe responses.
   - A predefined list of unsafe words/n-grams can be [blocked](#blacklisting) at decoding time.
   - The pretraining data is filtered by the above safety classifier, or filtered based on known authors.
-  - The problem with pre-training only with safe datasets is that if the model has never seen toxic language during training, it would not know how to respond at test time (OOD; e.g. may just copy the offensive content). They instead prepare a collection of training samples where the last utterance is labelled as “unsafe” and then attach a safe response following that unsafe attack. Then the model is fine-tuned on the “baked-in” safety data.
-  - Do [CTRL](https://arxiv.org/abs/1909.05858) style training by assigning “safe” vs “unsafe” label using the safety classifier.
+  - The problem with pre-training only with safe datasets is that if the model has never seen toxic language during training, it would not know how to respond at test time (OOD; e.g. may just copy the offensive content). They instead prepare a collection of training samples where the last utterance is labelled as "unsafe" and then attach a safe response following that unsafe attack. Then the model is fine-tuned on the "baked-in" safety data.
+  - Do [CTRL](https://arxiv.org/abs/1909.05858) style training by assigning "safe" vs "unsafe" label using the safety classifier.
 - _Avoid sensitive topics_:
   - In order to avoid sensitive topics (politics, religion, drug use, medical advice, and NSFW and relationships/dating), they trained a multi-class classifier to detect those topics using crowdsourced lists of subreddits. The classifier can be periodically re-trained to capture the changes within topics over time.
   - A small validation set is collected by recruiting crowdsourced workers to discuss one of the target topics.
@@ -399,32 +399,32 @@ Or
 ```
 # References[#](#references)
 
-\[1\] Vidgen, et al. [“Challenges and frontiers in abusive content detection."](https://www.aclweb.org/anthology/W19-3509/) Workshop on Abusive Language Online 2019.
+\[1\] Vidgen, et al. ["Challenges and frontiers in abusive content detection."](https://www.aclweb.org/anthology/W19-3509/) Workshop on Abusive Language Online 2019.
 
-\[2\] Zampieri et al. [“Predicting the type and target of offensive posts in social media."](https://arxiv.org/abs/1902.09666) NAACL 2019.
+\[2\] Zampieri et al. ["Predicting the type and target of offensive posts in social media."](https://arxiv.org/abs/1902.09666) NAACL 2019.
 
-\[3\] Vidgen & Deczynski. [“Directions in abusive language training data, a systematic review: Garbage in, garbage out."](https://arxiv.org/abs/2004.01670) PLoS ONE 15(12): e0243300 (2020).
+\[3\] Vidgen & Deczynski. ["Directions in abusive language training data, a systematic review: Garbage in, garbage out."](https://arxiv.org/abs/2004.01670) PLoS ONE 15(12): e0243300 (2020).
 
-\[4\] Davidson et al. [“Automated hate speech detection and the problem of offensive language."](https://arxiv.org/abs/1703.04009) ICWSM 2017.
+\[4\] Davidson et al. ["Automated hate speech detection and the problem of offensive language."](https://arxiv.org/abs/1703.04009) ICWSM 2017.
 
-\[5\] Khatri et al. [“Detecting offensive content in open-domain conversations using two stage semi-supervision."](https://arxiv.org/abs/1811.12900) NeuriIPS CONVAI Workshop 2018.
+\[5\] Khatri et al. ["Detecting offensive content in open-domain conversations using two stage semi-supervision."](https://arxiv.org/abs/1811.12900) NeuriIPS CONVAI Workshop 2018.
 
-\[6\] Rosenthal et al. [“A Large-Scale Semi-Supervised Dataset for Offensive Language Identification”](https://arxiv.org/abs/2004.14454) arXiv:2004.14454 (2020).
+\[6\] Rosenthal et al. ["A Large-Scale Semi-Supervised Dataset for Offensive Language Identification"](https://arxiv.org/abs/2004.14454) arXiv:2004.14454 (2020).
 
-\[7\] Pavlopoulos et al. [“Toxicity Detection: Does Context Really Matter?"](https://arxiv.org/abs/2006.00998) arXiv:2006.00998 (2020).
+\[7\] Pavlopoulos et al. ["Toxicity Detection: Does Context Really Matter?"](https://arxiv.org/abs/2006.00998) arXiv:2006.00998 (2020).
 
-\[8\] Dinan et al. [“Build it, break it, fix it for dialogue safety: Robustness from adversarial human attack."](https://arxiv.org/abs/1908.06083) arXiv:1908.06083 (2019).
+\[8\] Dinan et al. ["Build it, break it, fix it for dialogue safety: Robustness from adversarial human attack."](https://arxiv.org/abs/1908.06083) arXiv:1908.06083 (2019).
 
-\[9\] Kurita et al. [“Towards Robust Toxic Content Classification”](https://arxiv.org/abs/1912.06872) arXiv:1912.06872 (2019)
+\[9\] Kurita et al. ["Towards Robust Toxic Content Classification"](https://arxiv.org/abs/1912.06872) arXiv:1912.06872 (2019)
 
-\[10\] Santos et al. [“Fighting offensive language on social media with unsupervised text style transfer."](https://arxiv.org/abs/1805.07685) arXiv:1805.07685 (2018)
+\[10\] Santos et al. ["Fighting offensive language on social media with unsupervised text style transfer."](https://arxiv.org/abs/1805.07685) arXiv:1805.07685 (2018)
 
-\[11\] Dai et al. [“Style Transformer: Unpaired Text Style Transfer without Disentangled Latent Representation”](https://arxiv.org/abs/1905.05621) ACL 2019.
+\[11\] Dai et al. ["Style Transformer: Unpaired Text Style Transfer without Disentangled Latent Representation"](https://arxiv.org/abs/1905.05621) ACL 2019.
 
-\[12\] Laugier et al. [“Civil Rephrases Of Toxic Texts With Self-Supervised Transformers”](https://arxiv.org/abs/2102.05456) arXiv:2102.05456 (2021). [code](https://github.com/LeoLaugier/conditional-auto-encoder-text-to-text-transfer-transformer)
+\[12\] Laugier et al. ["Civil Rephrases Of Toxic Texts With Self-Supervised Transformers"](https://arxiv.org/abs/2102.05456) arXiv:2102.05456 (2021). [code](https://github.com/LeoLaugier/conditional-auto-encoder-text-to-text-transfer-transformer)
 
-\[13\] Schick et al. [“Self-Diagnosis and Self-Debiasing: A Proposal for Reducing Corpus-Based Bias in NLP”](https://arxiv.org/abs/2103.00453) arXiv:2103.00453 (2021).
+\[13\] Schick et al. ["Self-Diagnosis and Self-Debiasing: A Proposal for Reducing Corpus-Based Bias in NLP"](https://arxiv.org/abs/2103.00453) arXiv:2103.00453 (2021).
 
-\[14\] Gehman et al. [“RealToxicityPrompts: Evaluating Neural Toxic Degeneration in Language Models”](https://arxiv.org/abs/2009.11462) EMNLP 2020.
+\[14\] Gehman et al. ["RealToxicityPrompts: Evaluating Neural Toxic Degeneration in Language Models"](https://arxiv.org/abs/2009.11462) EMNLP 2020.
 
-\[15\] Xu et al. [“Recipes for Safety in Open-domain Chatbots”](https://arxiv.org/abs/2010.07079) arXiv:2010.07079 (2020).
+\[15\] Xu et al. ["Recipes for Safety in Open-domain Chatbots"](https://arxiv.org/abs/2010.07079) arXiv:2010.07079 (2020).

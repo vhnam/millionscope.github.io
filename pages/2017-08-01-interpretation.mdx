@@ -45,7 +45,7 @@ At [Affirm](https://www.affirm.com/), we are issuing tens of thousands of instal
 
 # Interpretable Models[#](#interpretable-models)
 
-Lipton (2017) summarized the properties of an interpretable model in a theoretical review paper, [“The mythos of model interpretability”](https://arxiv.org/pdf/1606.03490.pdf): A human can repeat (_“simulatability”_) the computation process with a full understanding of the algorithm (_“algorithmic transparency”_) and every individual part of the model owns an intuitive explanation (_“decomposability”_).
+Lipton (2017) summarized the properties of an interpretable model in a theoretical review paper, ["The mythos of model interpretability"](https://arxiv.org/pdf/1606.03490.pdf): A human can repeat (_"simulatability"_) the computation process with a full understanding of the algorithm (_"algorithmic transparency"_) and every individual part of the model owns an intuitive explanation (_"decomposability"_).
 
 Many classic models have relatively simpler formation and naturally, come with a model-specific interpretation method. Meanwhile, new tools are being developed to help create better interpretable models ([Been, Khanna, & Koyejo, 2016](http://papers.nips.cc/paper/6300-examples-are-not-enough-learn-to-criticize-criticism-for-interpretability.pdf); [Lakkaraju, Bach & Leskovec, 2016](http://www.kdd.org/kdd2016/papers/files/rpp1067-lakkarajuA.pdf)).
 
@@ -59,7 +59,7 @@ The coefficients describe the change of the response triggered by one unit incre
 
 ## Naive Bayes[#](#naive-bayes)
 
-Naive Bayes is named as “Naive” because it works on a very simplified assumption that features are independent of each other and each contributes to the output independently.
+Naive Bayes is named as "Naive" because it works on a very simplified assumption that features are independent of each other and each contributes to the output independently.
 
 Given a feature vector $\mathbf{x} = \[x_1, x_2, \dots, x_n\]$ and a class label $c \in \{1, 2, \dots, C\}$, the probability of this data point belonging to this class is:
 
@@ -85,7 +85,7 @@ A few types of decision lists are briefly described below:
 
 Weirdly enough, many people believe that the [Random Forests](http://www.math.univ-toulouse.fr/~agarivie/Telecom/apprentissage/articles/randomforest2001.pdf) model is a black box, which is not true. Considering that the output of random forests is the majority vote by a large number of independent decision trees and each tree is naturally interpretable.
 
-It is not very hard to gauge the influence of individual features if we look into a single tree at a time. The global feature importance of random forests can be quantified by the total decrease in node impurity averaged over all trees of the ensemble (“mean decrease impurity”).
+It is not very hard to gauge the influence of individual features if we look into a single tree at a time. The global feature importance of random forests can be quantified by the total decrease in node impurity averaged over all trees of the ensemble ("mean decrease impurity").
 
 For one instance, because the decision paths in all the trees are well tracked, we can use the difference between the mean value of data points in a parent node between that of a child node to approximate the contribution of this split. Read more in this series of blog posts: [Interpreting Random Forests](http://blog.datadive.net/interpreting-random-forests/).
 
@@ -138,7 +138,7 @@ $$f^{\*}(x) = \arg \min_{c \in \{1, \dots, C\}} p(Y \\neq c \vert X = x)$$
 
 The _local explanation vector_ is defined as the derivative of the probability prediction function at the test point $x = x_0$. A large entry in this vector highlights a feature with a big influence on the model decision; A positive sign indicates that increasing the feature would lower the probability of $x_0$ assigned to $f^{\*}(x_0)$.
 
-However, this approach requires the model output to be a probability (similar to the [“Prediction Decomposition”](https://lilianweng.github.io/posts/2017-08-01-interpretation/#prediction-decomposition) method above). What if the original model (labelled as $f$) is not calibrated to yield probabilities? As suggested by the paper, we can approximate $f$ by another classifier in a form that resembles the Bayes classifier $f^{\*}$:
+However, this approach requires the model output to be a probability (similar to the ["Prediction Decomposition"](https://lilianweng.github.io/posts/2017-08-01-interpretation/#prediction-decomposition) method above). What if the original model (labelled as $f$) is not calibrated to yield probabilities? As suggested by the paper, we can approximate $f$ by another classifier in a form that resembles the Bayes classifier $f^{\*}$:
 
 (1) Apply [Parzen window](https://en.wikipedia.org/?title=Parzen_window&redirect=no) to the training data to estimate the weighted class densities:
 
@@ -181,13 +181,13 @@ Fig. 3. An example of converting an image into interpretable data representation
 
 Then we recover $z_b$ back into the original input $z$ and get a prediction score $f(z)$ by the target model.
 
-Use many such sampled data points $z_b \in \mathcal{Z}_b$ and their model predictions, we can learn an explanation model (such as in a form as simple as a regression) with local fidelity. The sampled data points are weighted differently based on how close they are to $x_b$. The paper used a lasso regression with preprocessing to select top $k$ most significant features beforehand, named “K-LASSO”.
+Use many such sampled data points $z_b \in \mathcal{Z}_b$ and their model predictions, we can learn an explanation model (such as in a form as simple as a regression) with local fidelity. The sampled data points are weighted differently based on how close they are to $x_b$. The paper used a lasso regression with preprocessing to select top $k$ most significant features beforehand, named "K-LASSO".
 
 ![](LIME_illustration.png)
 
 Fig. 4. The pink and blue areas are two classes predicted by the black-box model $f$. the big red cross is the point to be explained and other smaller crosses (predicted as pink by $f$) and dots (predicted as blue by $f$) are sampled data points. Even though the model can be very complicated, we are still able to learn a local explanation model as simple as the grey dash line. (Image source: [homes.cs.washington.edu/~marcotcr/blog/lime](https://homes.cs.washington.edu/~marcotcr/blog/lime/))
 
-Examining whether the explanation makes sense can directly decide whether the model is trustworthy because sometimes the model can pick up spurious correlation or generalization. One interesting example in the paper is to apply LIME on an SVM text classifier for differentiating “Christianity” from “Atheism”. The model achieved a pretty good accuracy (94% on held-out testing set!), but the LIME explanation demonstrated that decisions were made by very arbitrary reasons, such as counting the words “re”, “posting” and “host” which have no connection with neither “Christianity” nor “Atheism” directly. After such a diagnosis, we learned that even the model gives us a nice accuracy, it cannot be trusted. It also shed lights on ways to improve the model, such as better preprocessing on the text.
+Examining whether the explanation makes sense can directly decide whether the model is trustworthy because sometimes the model can pick up spurious correlation or generalization. One interesting example in the paper is to apply LIME on an SVM text classifier for differentiating "Christianity" from "Atheism". The model achieved a pretty good accuracy (94% on held-out testing set!), but the LIME explanation demonstrated that decisions were made by very arbitrary reasons, such as counting the words "re", "posting" and "host" which have no connection with neither "Christianity" nor "Atheism" directly. After such a diagnosis, we learned that even the model gives us a nice accuracy, it cannot be trusted. It also shed lights on ways to improve the model, such as better preprocessing on the text.
 
 ![](LIME.png)
 
@@ -215,7 +215,7 @@ Fig. 6. Measures for desiderata of a good model explanation: fidelity, unambigui
 
 # Explainable Artificial Intelligence[#](#explainable-artificial-intelligence)
 
-I borrow the name of this section from the DARPA project [“Explainable Artificial Intelligence”](https://www.darpa.mil/program/explainable-artificial-intelligence). This Explainable AI (XAI) program aims to develop more interpretable models and to enable human to understand, appropriately trust, and effectively manage the emerging generation of artificially intelligent techniques.
+I borrow the name of this section from the DARPA project ["Explainable Artificial Intelligence"](https://www.darpa.mil/program/explainable-artificial-intelligence). This Explainable AI (XAI) program aims to develop more interpretable models and to enable human to understand, appropriately trust, and effectively manage the emerging generation of artificially intelligent techniques.
 
 With the progress of the deep learning applications, people start worrying about that [we may never know even if the model goes bad](https://www.technologyreview.com/s/601860/if-a-driverless-car-goes-bad-we-may-never-know-why/). The complicated structure, the large number of learnable parameters, the nonlinear mathematical operations and [some intriguing properties](https://arxiv.org/abs/1312.6199) (Szegedy et al., 2014) lead to the un-interpretability of deep neural networks, creating a true black-box. Although the power of deep learning is originated from this complexity — more flexible to capture rich and intricate patterns in the real-world data.
 
@@ -243,31 +243,31 @@ Cited as:
 
 # References[#](#references)
 
-\[1\] Zachary C. Lipton. [“The mythos of model interpretability."](https://arxiv.org/pdf/1606.03490.pdf) arXiv preprint arXiv:1606.03490 (2016).
+\[1\] Zachary C. Lipton. ["The mythos of model interpretability."](https://arxiv.org/pdf/1606.03490.pdf) arXiv preprint arXiv:1606.03490 (2016).
 
-\[2\] Been Kim, Rajiv Khanna, and Oluwasanmi O. Koyejo. “Examples are not enough, learn to criticize! criticism for interpretability.” Advances in Neural Information Processing Systems. 2016.
+\[2\] Been Kim, Rajiv Khanna, and Oluwasanmi O. Koyejo. "Examples are not enough, learn to criticize! criticism for interpretability." Advances in Neural Information Processing Systems. 2016.
 
-\[3\] Himabindu Lakkaraju, Stephen H. Bach, and Jure Leskovec. [“Interpretable decision sets: A joint framework for description and prediction."](http://www.kdd.org/kdd2016/papers/files/rpp1067-lakkarajuA.pdf) Proc. 22nd ACM SIGKDD Intl. Conf. on Knowledge Discovery and Data Mining. ACM, 2016.
+\[3\] Himabindu Lakkaraju, Stephen H. Bach, and Jure Leskovec. ["Interpretable decision sets: A joint framework for description and prediction."](http://www.kdd.org/kdd2016/papers/files/rpp1067-lakkarajuA.pdf) Proc. 22nd ACM SIGKDD Intl. Conf. on Knowledge Discovery and Data Mining. ACM, 2016.
 
-\[4\] Robnik-Šikonja, Marko, and Igor Kononenko. [“Explaining classifications for individual instances."](http://lkm.fri.uni-lj.si/rmarko/papers/RobnikSikonjaKononenko08-TKDE.pdf) IEEE Transactions on Knowledge and Data Engineering 20.5 (2008): 589-600.
+\[4\] Robnik-Šikonja, Marko, and Igor Kononenko. ["Explaining classifications for individual instances."](http://lkm.fri.uni-lj.si/rmarko/papers/RobnikSikonjaKononenko08-TKDE.pdf) IEEE Transactions on Knowledge and Data Engineering 20.5 (2008): 589-600.
 
-\[5\] Baehrens, David, et al. [“How to explain individual classification decisions."](http://www.jmlr.org/papers/volume11/baehrens10a/baehrens10a.pdf) Journal of Machine Learning Research 11.Jun (2010): 1803-1831.
+\[5\] Baehrens, David, et al. ["How to explain individual classification decisions."](http://www.jmlr.org/papers/volume11/baehrens10a/baehrens10a.pdf) Journal of Machine Learning Research 11.Jun (2010): 1803-1831.
 
-\[6\] Marco Tulio Ribeiro, Sameer Singh, and Carlos Guestrin. [“Why should I trust you?: Explaining the predictions of any classifier."](https://arxiv.org/pdf/1602.04938.pdf) Proc. 22nd ACM SIGKDD Intl. Conf. on Knowledge Discovery and Data Mining. ACM, 2016.
+\[6\] Marco Tulio Ribeiro, Sameer Singh, and Carlos Guestrin. ["Why should I trust you?: Explaining the predictions of any classifier."](https://arxiv.org/pdf/1602.04938.pdf) Proc. 22nd ACM SIGKDD Intl. Conf. on Knowledge Discovery and Data Mining. ACM, 2016.
 
-\[7\] Yiming Yang, and Jan O. Pedersen. [“A comparative study on feature selection in text categorization."](http://www.surdeanu.info/mihai/teaching/ista555-spring15/readings/yang97comparative.pdf) Intl. Conf. on Machine Learning. Vol. 97. 1997.
+\[7\] Yiming Yang, and Jan O. Pedersen. ["A comparative study on feature selection in text categorization."](http://www.surdeanu.info/mihai/teaching/ista555-spring15/readings/yang97comparative.pdf) Intl. Conf. on Machine Learning. Vol. 97. 1997.
 
-\[8\] Isabelle Guyon, and André Elisseeff. [“An introduction to variable and feature selection."](http://www.jmlr.org/papers/volume3/guyon03a/guyon03a.pdf) Journal of Machine Learning Research 3.Mar (2003): 1157-1182.
+\[8\] Isabelle Guyon, and André Elisseeff. ["An introduction to variable and feature selection."](http://www.jmlr.org/papers/volume3/guyon03a/guyon03a.pdf) Journal of Machine Learning Research 3.Mar (2003): 1157-1182.
 
-\[9\] Ian J. Goodfellow, Jonathon Shlens, and Christian Szegedy. [“Explaining and harnessing adversarial examples."](https://arxiv.org/pdf/1412.6572.pdf) ICLR 2015.
+\[9\] Ian J. Goodfellow, Jonathon Shlens, and Christian Szegedy. ["Explaining and harnessing adversarial examples."](https://arxiv.org/pdf/1412.6572.pdf) ICLR 2015.
 
-\[10\] Christian Szegedy, Wojciech Zaremba, Ilya Sutskever, Joan Bruna, Dumitru Erhan, Ian Goodfellow, Rob Fergus. [“Intriguing properties of neural networks."](https://arxiv.org/abs/1312.6199) Intl. Conf. on Learning Representations (2014)
+\[10\] Christian Szegedy, Wojciech Zaremba, Ilya Sutskever, Joan Bruna, Dumitru Erhan, Ian Goodfellow, Rob Fergus. ["Intriguing properties of neural networks."](https://arxiv.org/abs/1312.6199) Intl. Conf. on Learning Representations (2014)
 
-\[11\] Nguyen, Anh, Jason Yosinski, and Jeff Clune. [“Deep neural networks are easily fooled: High confidence predictions for unrecognizable images."](http://www.cv-foundation.org/openaccess/content_cvpr_2015/papers/Nguyen_Deep_Neural_Networks_2015_CVPR_paper.pdf) Proc. IEEE Conference on Computer Vision and Pattern Recognition. 2015.
+\[11\] Nguyen, Anh, Jason Yosinski, and Jeff Clune. ["Deep neural networks are easily fooled: High confidence predictions for unrecognizable images."](http://www.cv-foundation.org/openaccess/content_cvpr_2015/papers/Nguyen_Deep_Neural_Networks_2015_CVPR_paper.pdf) Proc. IEEE Conference on Computer Vision and Pattern Recognition. 2015.
 
-\[12\] Benjamin Letham, Cynthia Rudin, Tyler H. McCormick, and David Madigan. [“Interpretable classifiers using rules and Bayesian analysis: Building a better stroke prediction model."](https://arxiv.org/abs/1511.01644) The Annals of Applied Statistics 9, No. 3 (2015): 1350-1371.
+\[12\] Benjamin Letham, Cynthia Rudin, Tyler H. McCormick, and David Madigan. ["Interpretable classifiers using rules and Bayesian analysis: Building a better stroke prediction model."](https://arxiv.org/abs/1511.01644) The Annals of Applied Statistics 9, No. 3 (2015): 1350-1371.
 
-\[13\] Haohan Wang, Bhiksha Raj, and Eric P. Xing. [“On the Origin of Deep Learning."](https://arxiv.org/pdf/1702.07800.pdf) arXiv preprint arXiv:1702.07800 (2017).
+\[13\] Haohan Wang, Bhiksha Raj, and Eric P. Xing. ["On the Origin of Deep Learning."](https://arxiv.org/pdf/1702.07800.pdf) arXiv preprint arXiv:1702.07800 (2017).
 
 \[14\] [OpenAI Blog: Robust Adversarial Examples](https://blog.openai.com/robust-adversarial-inputs/)
 

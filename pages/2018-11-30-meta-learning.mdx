@@ -59,7 +59,7 @@ The tasks can be any well-defined family of machine learning problems: supervise
 
 # Define the Meta-Learning Problem[#](#define-the-meta-learning-problem)
 
-In this post, we focus on the case when each desired task is a supervised learning problem like image classification. There is a lot of interesting literature on meta-learning with reinforcement learning problems (aka “Meta Reinforcement Learning”), but we would not cover them here.
+In this post, we focus on the case when each desired task is a supervised learning problem like image classification. There is a lot of interesting literature on meta-learning with reinforcement learning problems (aka "Meta Reinforcement Learning"), but we would not cover them here.
 
 ## A Simple View[#](#a-simple-view)
 
@@ -83,7 +83,7 @@ The optimal parameters should maximize the probability of true labels across mul
 
 $$\begin{aligned} \theta^\* &= {\arg\max}_{\theta} \mathbb{E}_{(\mathbf{x}, y)\in \mathcal{D}}\[P_\theta(y \vert \mathbf{x})\] &\\ \theta^\* &= {\arg\max}_{\theta} \mathbb{E}_{B\subset \mathcal{D}}\[\sum_{(\mathbf{x}, y)\in B}P_\theta(y \vert \mathbf{x})\] & \\scriptstyle{\text{; trained with mini-batches.}} \end{aligned}$$
 
-In few-shot classification, the goal is to reduce the prediction error on data samples with unknown labels given a small support set for “fast learning” (think of how “fine-tuning” works). To make the training process mimics what happens during inference, we would like to “fake” datasets with a subset of labels to avoid exposing all the labels to the model and modify the optimization procedure accordingly to encourage fast learning:
+In few-shot classification, the goal is to reduce the prediction error on data samples with unknown labels given a small support set for "fast learning" (think of how "fine-tuning" works). To make the training process mimics what happens during inference, we would like to "fake" datasets with a subset of labels to avoid exposing all the labels to the model and modify the optimization procedure accordingly to encourage fast learning:
 
 1.  Sample a subset of labels, $L\subset\mathcal{L}^\text{label}$.
 2.  Sample a support set $S^L \subset \mathcal{D}$ and a training batch $B^L \subset \mathcal{D}$. Both of them only contain data points with labels belonging to the sampled label set $L$, $y \in L, \forall (x, y) \in S^L, B^L$.
@@ -100,7 +100,7 @@ The idea is to some extent similar to using a pre-trained model in image classif
 
 Another popular view of meta-learning decomposes the model update into two stages:
 
-- A classifier $f_\theta$ is the “learner” model, trained for operating a given task;
+- A classifier $f_\theta$ is the "learner" model, trained for operating a given task;
 - In the meantime, a optimizer $g_\phi$ learns how to update the learner model's parameters via the support set $S$, $\theta' = g_\phi(\theta, S)$.
 
 Then in final optimization step, we need to update both $\theta$ and $\phi$ to maximize:
@@ -206,9 +206,9 @@ The embedding vectors are critical inputs for building a good classifier. Taking
 
  $$\begin{aligned} \hat{\mathbf{h}}_t, \mathbf{c}_t &= \text{LSTM}(f'(\mathbf{x}), \[\mathbf{h}_{t-1}, \mathbf{r}_{t-1}\], \mathbf{c}_{t-1}) \\ \mathbf{h}_t &= \hat{\mathbf{h}}_t + f'(\mathbf{x}) \\ \mathbf{r}_{t-1} &= \sum_{i=1}^k a(\mathbf{h}_{t-1}, g(\mathbf{x}_i)) g(\mathbf{x}_i) \\ a(\mathbf{h}_{t-1}, g(\mathbf{x}_i)) &= \text{softmax}(\mathbf{h}_{t-1}^\top g(\mathbf{x}_i)) = \frac{\exp(\mathbf{h}_{t-1}^\top g(\mathbf{x}_i))}{\sum_{j=1}^k \exp(\mathbf{h}_{t-1}^\top g(\mathbf{x}_j))} \end{aligned}$$
 
-  3.  Eventually $f(\mathbf{x}, S)=\mathbf{h}_K$ if we do K steps of “read”.
+  3.  Eventually $f(\mathbf{x}, S)=\mathbf{h}_K$ if we do K steps of "read".
 
-This embedding method is called “Full Contextual Embeddings (FCE)”. Interestingly it does help improve the performance on a hard task (few-shot classification on mini ImageNet), but makes no difference on a simple task (Omniglot).
+This embedding method is called "Full Contextual Embeddings (FCE)". Interestingly it does help improve the performance on a hard task (few-shot classification on mini ImageNet), but makes no difference on a simple task (Omniglot).
 
 The training process in Matching Networks is designed to match inference at test time, see the details in the earlier [section](#training-in-the-same-way-as-testing). It is worthy of mentioning that the Matching Networks paper refined the idea that training and testing conditions should match.
 
@@ -251,9 +251,9 @@ Model-based meta-learning models make no assumption on the form of $P_\theta(y\v
 
 ## Memory-Augmented Neural Networks[#](#memory-augmented-neural-networks)
 
-A family of model architectures use external memory storage to facilitate the learning process of neural networks, including [Neural Turing Machines](https://lilianweng.github.io/posts/2018-06-24-attention/#neural-turing-machines) and [Memory Networks](https://arxiv.org/abs/1410.3916). With an explicit storage buffer, it is easier for the network to rapidly incorporate new information and not to forget in the future. Such a model is known as **MANN**, short for “**Memory-Augmented Neural Network**”. Note that recurrent neural networks with only _internal memory_ such as vanilla RNN or LSTM are not MANNs.
+A family of model architectures use external memory storage to facilitate the learning process of neural networks, including [Neural Turing Machines](https://lilianweng.github.io/posts/2018-06-24-attention/#neural-turing-machines) and [Memory Networks](https://arxiv.org/abs/1410.3916). With an explicit storage buffer, it is easier for the network to rapidly incorporate new information and not to forget in the future. Such a model is known as **MANN**, short for "**Memory-Augmented Neural Network**". Note that recurrent neural networks with only _internal memory_ such as vanilla RNN or LSTM are not MANNs.
 
-Because MANN is expected to encode new information fast and thus to adapt to new tasks after only a few samples, it fits well for meta-learning. Taking the Neural Turing Machine (NTM) as the base model, [Santoro et al. (2016)](http://proceedings.mlr.press/v48/santoro16.pdf) proposed a set of modifications on the training setup and the memory retrieval mechanisms (or “addressing mechanisms”, deciding how to assign attention weights to memory vectors). Please go through [the NTM section](https://lilianweng.github.io/posts/2018-06-24-attention/#neural-turing-machines) in my other post first if you are not familiar with this matter before reading forward.
+Because MANN is expected to encode new information fast and thus to adapt to new tasks after only a few samples, it fits well for meta-learning. Taking the Neural Turing Machine (NTM) as the base model, [Santoro et al. (2016)](http://proceedings.mlr.press/v48/santoro16.pdf) proposed a set of modifications on the training setup and the memory retrieval mechanisms (or "addressing mechanisms", deciding how to assign attention weights to memory vectors). Please go through [the NTM section](https://lilianweng.github.io/posts/2018-06-24-attention/#neural-turing-machines) in my other post first if you are not familiar with this matter before reading forward.
 
 As a quick recap, NTM couples a controller neural network with external memory storage. The controller learns to read and write memory rows by soft attention, while the memory serves as a knowledge repository. The attention weights are generated by its addressing mechanism: content-based + location based.
 
@@ -299,7 +299,7 @@ There are many cache replacement algorithms and each of them could potentially r
 The preference of LRUA is carried out in a way that everything is differentiable:
 
 1.  The usage weight $\mathbf{w}^u_t$ at time t is a sum of current read and write vectors, in addition to the decayed last usage weight, $\gamma \mathbf{w}^u_{t-1}$, where $\gamma$ is a decay factor.
-2.  The write vector is an interpolation between the previous read weight (prefer “the last used location”) and the previous least-used weight (prefer “rarely used location”). The interpolation parameter is the sigmoid of a hyperparameter $\alpha$.
+2.  The write vector is an interpolation between the previous read weight (prefer "the last used location") and the previous least-used weight (prefer "rarely used location"). The interpolation parameter is the sigmoid of a hyperparameter $\alpha$.
 3.  The least-used weight $\mathbf{w}^{lu}$ is scaled according to usage weights $\mathbf{w}_t^u$, in which any dimension remains at 1 if smaller than the n-th smallest element in the vector and 0 otherwise.
 
 $$\begin{aligned} \mathbf{w}_t^u &= \gamma \mathbf{w}_{t-1}^u + \mathbf{w}_t^r + \mathbf{w}_t^w \\ \mathbf{w}_t^r &= \text{softmax}(\text{cosine}(\mathbf{k}_t, \mathbf{M}_t(i))) \\ \mathbf{w}_t^w &= \sigma(\alpha)\mathbf{w}_{t-1}^r + (1-\sigma(\alpha))\mathbf{w}^{lu}_{t-1}\\ \mathbf{w}_t^{lu} &= \mathbf{1}_{w_t^u(i) \leq m(\mathbf{w}_t^u, n)} \text{, where }m(\mathbf{w}_t^u, n)\text{ is the }n\text{-th smallest element in vector }\mathbf{w}_t^u\text{.} \end{aligned}$$
@@ -314,7 +314,7 @@ $$\mathbf{M}_t(i) = \mathbf{M}_{t-1}(i) + w_t^w(i)\mathbf{k}_t, \forall i$$
 
 ### Fast Weights[#](#fast-weights)
 
-The rapid generalization of MetaNet relies on “fast weights”. There are a handful of papers on this topic, but I haven't read all of them in detail and I failed to find a very concrete definition, only a vague agreement on the concept. Normally weights in the neural networks are updated by stochastic gradient descent in an objective function and this process is known to be slow. One faster way to learn is to utilize one neural network to predict the parameters of another neural network and the generated weights are called _fast weights_. In comparison, the ordinary SGD-based weights are named _slow weights_.
+The rapid generalization of MetaNet relies on "fast weights". There are a handful of papers on this topic, but I haven't read all of them in detail and I failed to find a very concrete definition, only a vague agreement on the concept. Normally weights in the neural networks are updated by stochastic gradient descent in an objective function and this process is known to be slow. One faster way to learn is to utilize one neural network to predict the parameters of another neural network and the generated weights are called _fast weights_. In comparison, the ordinary SGD-based weights are named _slow weights_.
 
 In MetaNet, loss gradients are used as _meta information_ to populate models that learn fast weights. Slow and fast weights are combined to make predictions in neural networks.
 
@@ -358,9 +358,9 @@ Fig.9. The MetaNet architecture.
 
     - a. The base learner outputs a probability distribution: $P(\hat{y}_i \vert \mathbf{x}_i) = g_\phi(\mathbf{x}_i)$ and the loss can be cross-entropy or MSE: $\mathcal{L}^\text{task}_i = y'_i \log g_\phi(\mathbf{x}'_i) + (1- y'_i) \log (1 - g_\phi(\mathbf{x}'_i))$
     - b. Extract meta information (loss gradients) of the task and compute the example-level fast weights: $\phi_i^+ = G_v(\nabla_\phi\mathcal{L}^\text{task}_i)$
-      - Then store $\phi^+_i$ into $i$-th location of the “value” memory $\mathbf{M}$.
+      - Then store $\phi^+_i$ into $i$-th location of the "value" memory $\mathbf{M}$.
     - d. Encode the support sample into a task-specific input representation using both slow and fast weights: $r'_i = f_{\theta, \theta^+}(\mathbf{x}'_i)$
-      - Then store $r'_i$ into $i$-th location of the “key” memory $\mathbf{R}$.
+      - Then store $r'_i$ into $i$-th location of the "key" memory $\mathbf{R}$.
 
 4.  Finally it is the time to construct the training loss using the test set $U=\{\mathbf{x}_i, y_i\}_{i=1}^L$.  
     Starts with $\mathcal{L}_\text{train}=0$:  
@@ -381,7 +381,7 @@ Deep learning models learn through backpropagation of gradients. However, the gr
 
 ## LSTM Meta-Learner[#](#lstm-meta-learner)
 
-The optimization algorithm can be explicitly modeled. [Ravi & Larochelle (2017)](https://openreview.net/pdf?id=rJY0-Kcll) did so and named it “meta-learner”, while the original model for handling the task is called “learner”. The goal of the meta-learner is to efficiently update the learner's parameters using a small support set so that the learner can adapt to the new task quickly.
+The optimization algorithm can be explicitly modeled. [Ravi & Larochelle (2017)](https://openreview.net/pdf?id=rJY0-Kcll) did so and named it "meta-learner", while the original model for handling the task is called "learner". The goal of the meta-learner is to efficiently update the learner's parameters using a small support set so that the learner can adapt to the new task quickly.
 
 Let's denote the learner model as $M_\theta$ parameterized by $\theta$, the meta-learner as $R_\Theta$ with parameters $\Theta$, and the loss function $\mathcal{L}$.
 
@@ -497,7 +497,7 @@ The gradient of the squared euclidean distance is:
 
 $$\begin{aligned} \nabla_\theta\[\frac{1}{2}\text{dist}(\theta, \mathcal{W}_{\tau_i}^\*)^2\] &= \nabla_\theta\[\frac{1}{2}\text{dist}(\theta, W_{\tau_i}^\*(\theta))^2\] & \\ &= \nabla_\theta\[\frac{1}{2}(\theta - W_{\tau_i}^\*(\theta))^2\] & \\ &= \theta - W_{\tau_i}^\*(\theta) & \\scriptstyle{\text{; See notes.}} \end{aligned}$$
 
-Notes: According to the Reptile paper, “_the gradient of the squared euclidean distance between a point Θ and a set S is the vector 2(Θ − p), where p is the closest point in S to Θ_”. Technically the closest point in S is also a function of Θ, but I'm not sure why the gradient does not need to worry about the derivative of p. (Please feel free to leave me a comment or send me an email about this if you have ideas.)
+Notes: According to the Reptile paper, "_the gradient of the squared euclidean distance between a point Θ and a set S is the vector 2(Θ − p), where p is the closest point in S to Θ_". Technically the closest point in S is also a function of Θ, but I'm not sure why the gradient does not need to worry about the derivative of p. (Please feel free to leave me a comment or send me an email about this if you have ideas.)
 
 Thus the update rule for one stochastic gradient step is:
 
@@ -574,30 +574,30 @@ Cited as:
 
 # Reference[#](#reference)
 
-\[1\] Brenden M. Lake, Ruslan Salakhutdinov, and Joshua B. Tenenbaum. [“Human-level concept learning through probabilistic program induction."](https://www.cs.cmu.edu/~rsalakhu/papers/LakeEtAl2015Science.pdf) Science 350.6266 (2015): 1332-1338.
+\[1\] Brenden M. Lake, Ruslan Salakhutdinov, and Joshua B. Tenenbaum. ["Human-level concept learning through probabilistic program induction."](https://www.cs.cmu.edu/~rsalakhu/papers/LakeEtAl2015Science.pdf) Science 350.6266 (2015): 1332-1338.
 
-\[2\] Oriol Vinyals' talk on [“Model vs Optimization Meta Learning”](http://metalearning-symposium.ml/files/vinyals.pdf)
+\[2\] Oriol Vinyals' talk on ["Model vs Optimization Meta Learning"](http://metalearning-symposium.ml/files/vinyals.pdf)
 
-\[3\] Gregory Koch, Richard Zemel, and Ruslan Salakhutdinov. [“Siamese neural networks for one-shot image recognition."](http://www.cs.toronto.edu/~rsalakhu/papers/oneshot1.pdf) ICML Deep Learning Workshop. 2015.
+\[3\] Gregory Koch, Richard Zemel, and Ruslan Salakhutdinov. ["Siamese neural networks for one-shot image recognition."](http://www.cs.toronto.edu/~rsalakhu/papers/oneshot1.pdf) ICML Deep Learning Workshop. 2015.
 
-\[4\] Oriol Vinyals, et al. [“Matching networks for one shot learning."](http://papers.nips.cc/paper/6385-matching-networks-for-one-shot-learning.pdf) NIPS. 2016.
+\[4\] Oriol Vinyals, et al. ["Matching networks for one shot learning."](http://papers.nips.cc/paper/6385-matching-networks-for-one-shot-learning.pdf) NIPS. 2016.
 
-\[5\] Flood Sung, et al. [“Learning to compare: Relation network for few-shot learning."](http://openaccess.thecvf.com/content_cvpr_2018/papers_backup/Sung_Learning_to_Compare_CVPR_2018_paper.pdf) CVPR. 2018.
+\[5\] Flood Sung, et al. ["Learning to compare: Relation network for few-shot learning."](http://openaccess.thecvf.com/content_cvpr_2018/papers_backup/Sung_Learning_to_Compare_CVPR_2018_paper.pdf) CVPR. 2018.
 
-\[6\] Jake Snell, Kevin Swersky, and Richard Zemel. [“Prototypical Networks for Few-shot Learning."](http://papers.nips.cc/paper/6996-prototypical-networks-for-few-shot-learning.pdf) CVPR. 2018.
+\[6\] Jake Snell, Kevin Swersky, and Richard Zemel. ["Prototypical Networks for Few-shot Learning."](http://papers.nips.cc/paper/6996-prototypical-networks-for-few-shot-learning.pdf) CVPR. 2018.
 
-\[7\] Adam Santoro, et al. [“Meta-learning with memory-augmented neural networks."](http://proceedings.mlr.press/v48/santoro16.pdf) ICML. 2016.
+\[7\] Adam Santoro, et al. ["Meta-learning with memory-augmented neural networks."](http://proceedings.mlr.press/v48/santoro16.pdf) ICML. 2016.
 
-\[8\] Alex Graves, Greg Wayne, and Ivo Danihelka. [“Neural turing machines."](https://arxiv.org/abs/1410.5401) arXiv preprint arXiv:1410.5401 (2014).
+\[8\] Alex Graves, Greg Wayne, and Ivo Danihelka. ["Neural turing machines."](https://arxiv.org/abs/1410.5401) arXiv preprint arXiv:1410.5401 (2014).
 
-\[9\] Tsendsuren Munkhdalai and Hong Yu. [“Meta Networks."](https://arxiv.org/abs/1703.00837) ICML. 2017.
+\[9\] Tsendsuren Munkhdalai and Hong Yu. ["Meta Networks."](https://arxiv.org/abs/1703.00837) ICML. 2017.
 
-\[10\] Sachin Ravi and Hugo Larochelle. [“Optimization as a Model for Few-Shot Learning."](https://openreview.net/pdf?id=rJY0-Kcll) ICLR. 2017.
+\[10\] Sachin Ravi and Hugo Larochelle. ["Optimization as a Model for Few-Shot Learning."](https://openreview.net/pdf?id=rJY0-Kcll) ICLR. 2017.
 
-\[11\] Chelsea Finn's BAIR blog on [“Learning to Learn”](https://bair.berkeley.edu/blog/2017/07/18/learning-to-learn/).
+\[11\] Chelsea Finn's BAIR blog on ["Learning to Learn"](https://bair.berkeley.edu/blog/2017/07/18/learning-to-learn/).
 
-\[12\] Chelsea Finn, Pieter Abbeel, and Sergey Levine. [“Model-agnostic meta-learning for fast adaptation of deep networks."](https://arxiv.org/abs/1703.03400) ICML 2017.
+\[12\] Chelsea Finn, Pieter Abbeel, and Sergey Levine. ["Model-agnostic meta-learning for fast adaptation of deep networks."](https://arxiv.org/abs/1703.03400) ICML 2017.
 
-\[13\] Alex Nichol, Joshua Achiam, John Schulman. [“On First-Order Meta-Learning Algorithms."](https://arxiv.org/abs/1803.02999) arXiv preprint arXiv:1803.02999 (2018).
+\[13\] Alex Nichol, Joshua Achiam, John Schulman. ["On First-Order Meta-Learning Algorithms."](https://arxiv.org/abs/1803.02999) arXiv preprint arXiv:1803.02999 (2018).
 
 \[14\] [Slides on Reptile](https://www.slideshare.net/YoonhoLee4/on-firstorder-metalearning-algorithms) by Yoonho Lee.

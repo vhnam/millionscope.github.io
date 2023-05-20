@@ -72,11 +72,11 @@ Check [the previous post on large model training](https://lilianweng.github.io/p
 
 # Distillation[#](#distillation)
 
-**Knowledge Distillation** (**KD**; [Hinton et al. 2015](https://arxiv.org/abs/1503.02531), [Gou et al. 2020](https://arxiv.org/abs/2006.05525)) is a straightforward way to build a smaller, cheaper model (_“student model”_) to speed up inference by transferring skills from a pre-trained expensive model (_“teacher model”_) into the student. There is no much restriction on how the student architecture should be constructed, except for a matched output space with the teacher in order to construct a proper learning objective.
+**Knowledge Distillation** (**KD**; [Hinton et al. 2015](https://arxiv.org/abs/1503.02531), [Gou et al. 2020](https://arxiv.org/abs/2006.05525)) is a straightforward way to build a smaller, cheaper model (_"student model"_) to speed up inference by transferring skills from a pre-trained expensive model (_"teacher model"_) into the student. There is no much restriction on how the student architecture should be constructed, except for a matched output space with the teacher in order to construct a proper learning objective.
 
 ![](assets/images/2023-01-10-inference-optimization/distillation.png)
 
-Fig. 1. The generic framework of teacher-student knowledge distillation training. (Image source: [Gou et al. 2020](”https://arxiv.org/abs/2006.05525”))
+Fig. 1. The generic framework of teacher-student knowledge distillation training. (Image source: [Gou et al. 2020]("https://arxiv.org/abs/2006.05525"))
 
 Given a dataset, a student model is trained to mimic outputs of a teacher via distillation loss. Usually a neural network has a softmax layer; For example, a LLM outputs a probability distribution over tokens. Let's denote the logits layer right before softmax as $\mathbf{z}_t$ and $\mathbf{z}_s$ for teacher and student models, respectively. The _distillation loss_ minimizes the difference between two softmax outputs with a high temperature $T$. When ground truth labels $\mathbf{y}$ are known, we can combine it with a _supervised_ learning objective between ground truth and the student's soft logits using e.g. cross-entropy.
 
@@ -138,7 +138,7 @@ Fig. 4. Two mixed-precision decompositions of \`LLM.int8()\`. (Image source: [De
 
 Fig. 5. Comparison of quantization at different granularity. $d$ is the model size / hidden state dimension and $h$ is the number of heads in one MHSA (multi-head self-attention) component.
 
-Naively quantizing the entire weight matrix in one layer (“per-tensor” or “per-layer” quantization) is easiest to implement but does not lead to good granularity of quantization.
+Naively quantizing the entire weight matrix in one layer ("per-tensor" or "per-layer" quantization) is easiest to implement but does not lead to good granularity of quantization.
 
 **Q-BERT** ([Shen, Dong & Ye, et al. 2020](https://arxiv.org/abs/1909.05840)) applied _group-wise quantization_ to a fine-tuned BERT model, treating an individual matrix $W$ with respect to _each head_ in MHSA (multi-head self-attention) as one group and then applies Hessian based mixed precision quantization.
 
@@ -191,7 +191,7 @@ A routine workflow to construct a pruned network has three steps:
 2.  Prune the network to remove unwanted structure;
 3.  Optionally retrain the network to recover the performance with new weights.
 
-The idea of discovering a sparse structure within a dense model via network pruning while the sparse network can still maintain similar performance is motivated by [**Lottery Ticket Hypothesis**](https://lilianweng.github.io/posts/2019-03-14-overfit/#the-lottery-ticket-hypothesis) (**LTH**): A randomly initialized, dense, feed-forward network contains a pool of subnetworks and among them only a subset (a sparse network) are _“winning tickets”_ which can achieve the optimal performance when trained in isolation.
+The idea of discovering a sparse structure within a dense model via network pruning while the sparse network can still maintain similar performance is motivated by [**Lottery Ticket Hypothesis**](https://lilianweng.github.io/posts/2019-03-14-overfit/#the-lottery-ticket-hypothesis) (**LTH**): A randomly initialized, dense, feed-forward network contains a pool of subnetworks and among them only a subset (a sparse network) are _"winning tickets"_ which can achieve the optimal performance when trained in isolation.
 
 ## How to prune?[#](#how-to-prune)
 
@@ -240,7 +240,7 @@ Fig. 8. Illustration of same permutation on $\mathbf{Q}$ (axis 1) and $\mathbf{K
 
 Fig. 9. Illustration of the same permutation on $\mathbf{W}_1$ (axis 1) and $\mathbf{W}_2$ (axis 0) to keep the FFN layer's output unchanged. For simplicity, the bias terms are skipped but the same permutation should be applied on them too.
 
-To enforce N:M structured sparsity, let's split the columns of one matrix into multiple slides of $M$ columns (named “stripe”) and we can easily observe that both the order of columns within each stripe and the order of stripes have no effect on the N:M sparsity restriction.
+To enforce N:M structured sparsity, let's split the columns of one matrix into multiple slides of $M$ columns (named "stripe") and we can easily observe that both the order of columns within each stripe and the order of stripes have no effect on the N:M sparsity restriction.
 
 [Pool & Yu (2021)](https://proceedings.neurips.cc/paper/2021/hash/6e8404c3b93a9527c8db241a1846599a-Abstract.html) proposed an iterative greedy algorithm to find optimal permutation that maximizes the weight magnitude for N:M sparsity. All pairs of channels are speculatively swapped and only the swap that leads to the greatest increase in magnitude is adopted, generating a new permutation and concluding a single iteration. Greedy algorithm may only find local minima, so they introduced two techniques to escape local minima:
 
@@ -325,7 +325,7 @@ To better work with long sequences, Scaling Transformer is further equipped with
 
 ## Mixture-of-Experts[#](#mixture-of-experts)
 
-Mixture-of-experts (MoE) models depend on a collection of “expert” networks and each example only activates a subset of networks to get predictions. The idea originated back to the 1990s ([Jacobs et al. 1991](https://www.cs.toronto.edu/~hinton/absps/jjnh91.pdf)) and is strongly related to ensemble methods. For details on how to incorporate MoE module into transformer, please check my [previous post on large model training techniques](https://lilianweng.github.io/posts/2021-09-25-train-large/) and a survey paper on MoE by [Fedus et al. 2022](https://arxiv.org/abs/2209.01667).
+Mixture-of-experts (MoE) models depend on a collection of "expert" networks and each example only activates a subset of networks to get predictions. The idea originated back to the 1990s ([Jacobs et al. 1991](https://www.cs.toronto.edu/~hinton/absps/jjnh91.pdf)) and is strongly related to ensemble methods. For details on how to incorporate MoE module into transformer, please check my [previous post on large model training techniques](https://lilianweng.github.io/posts/2021-09-25-train-large/) and a survey paper on MoE by [Fedus et al. 2022](https://arxiv.org/abs/2209.01667).
 
 With MoE architecture, only partial parameters are utilized at decoding time and therefore it saves inference cost. The capacity of each expert can be adjusted with a hyperparameter, capacity factor $C$, and the expert capacity is defined as:
 
@@ -335,7 +335,7 @@ where top-$k$ experts are selected per token. Larger $C$ leads to higher expert 
 
 ### Routing Strategy Improvement[#](#routing-strategy-improvement)
 
-MoE layer has a routing network to assign a subset of experts for each input token. The routing strategy in vanilla MoE models is to route each token toward preferred experts differently as they come up in the natural order. If a token is routed to experts that have reached their capacity, the token would be marked _“overflowed” and skipped_.
+MoE layer has a routing network to assign a subset of experts for each input token. The routing strategy in vanilla MoE models is to route each token toward preferred experts differently as they come up in the natural order. If a token is routed to experts that have reached their capacity, the token would be marked _"overflowed" and skipped_.
 
 **V-MoE** (Vision MoE; [Riquelme et al. 2021](https://arxiv.org/abs/2106.05974)) adds MoE layers into ViT (Vision Transformer). It matches the performance of previous SoTA but only requires _half_ of inference compute. V-MoE can be scaled up to 15B parameters. Their experiments used $k=2$, 32 experts and every-2 expert placement (meaning that MoEs are placed in every other layer).
 
@@ -363,7 +363,7 @@ Fig. 17. Illustration of PR-MoE architecture in comparison with a standard MoE. 
 
 ### Kernel Improvement[#](#kernel-improvement)
 
-Expert networks can be hosted on different devices. However, when the number of GPUs increases, the number of experts per GPU decreases and the communication between experts (“All-to-all”) grows to be more expensive. All-to-all communication between experts across a number of GPUs relies on P2P APIs of NCCL, which cannot saturate the bandwidth of high-speed links (e.g. NVLink, HDR InfiniBand) at a large scale, as individual chunk gets smaller with more nodes used. The existing all-to-all algorithm performs poorly at large scale with a small workload. There are a variety of kernel improvements to enable more efficient MoE computation, such as making all-to-all communication cheaper/faster.
+Expert networks can be hosted on different devices. However, when the number of GPUs increases, the number of experts per GPU decreases and the communication between experts ("All-to-all") grows to be more expensive. All-to-all communication between experts across a number of GPUs relies on P2P APIs of NCCL, which cannot saturate the bandwidth of high-speed links (e.g. NVLink, HDR InfiniBand) at a large scale, as individual chunk gets smaller with more nodes used. The existing all-to-all algorithm performs poorly at large scale with a small workload. There are a variety of kernel improvements to enable more efficient MoE computation, such as making all-to-all communication cheaper/faster.
 
 Both the _DeepSpeed_ library ([Rajbhandari et al. 2022](https://arxiv.org/abs/2201.05596)) and TUTEL ([Hwang et al. 2022](https://arxiv.org/abs/2206.03382)) implemented a tree-based **hierarchical all-to-all** algorithm, which runs an intra-node all-to-all followed by an inter-node all-to-all. It reduces the communication hops from $O(G)$ to $O(G_\text{node} + G / G_\text{node})$, where $G$ is the total number of GPU nodes and $G_\text{node}$ is the number of GPU cores per node. Although the communication volume is doubled in such implementation, it enables better scaling with small batches at large scale as the bottleneck is on latency instead of communication bandwidth when the batch size is small.
 
@@ -371,7 +371,7 @@ _DynaMoE_ ([Kossmann et al. 2022](https://arxiv.org/abs/2205.01848)) uses **dyna
 
 # Architectural Optimization[#](#architectural-optimization)
 
-The survey paper on _Efficient Transformers_ ([Tay et al. 2020](https://arxiv.org/abs/2009.06732)) reviewed a collection of new transformer architectures with improvement for better _computational and memory efficiency_. Strongly recommend a read. You can also check out my post [“The Transformer Family Version 2.0”](https://lilianweng.github.io/posts/2023-01-27-the-transformer-family-v2/) for introduction to a diverse set of transformer archiecture improvements in depth, including changes to make the model cheaper to run.
+The survey paper on _Efficient Transformers_ ([Tay et al. 2020](https://arxiv.org/abs/2009.06732)) reviewed a collection of new transformer architectures with improvement for better _computational and memory efficiency_. Strongly recommend a read. You can also check out my post ["The Transformer Family Version 2.0"](https://lilianweng.github.io/posts/2023-01-27-the-transformer-family-v2/) for introduction to a diverse set of transformer archiecture improvements in depth, including changes to make the model cheaper to run.
 
 ![](assets/images/2023-01-10-inference-optimization/efficient-transformer.png)
 
@@ -413,7 +413,7 @@ Recurrence mechanism connects multiple blocks/segments via recurrence.
 Memory saving designs refer to changes of the architecture to use less memory.
 
 - [Linformer](https://lilianweng.github.io/posts/2023-01-27-the-transformer-family-v2/#low-rank-attention) projects the length dimension of keys and values to a lower-dimensional representation ($N \to k$) and thus the memory complexity is reduced from $N \times N$ to $N \times k$.
-- [Shazeer (2019)](https://arxiv.org/abs/1911.02150) proposed _multi-query attention_ which has the keys and values shared across different attention “heads”, greatly reducing the size of these tensors and the memory cost.
+- [Shazeer (2019)](https://arxiv.org/abs/1911.02150) proposed _multi-query attention_ which has the keys and values shared across different attention "heads", greatly reducing the size of these tensors and the memory cost.
 - [Random feature attention and Performer](https://lilianweng.github.io/posts/2023-01-27-the-transformer-family-v2/#low-rank-attention) use [kernel methods](<(https://lilianweng.github.io/posts/2022-09-08-ntk/#kernel--kernel-methods)>) to achieve a cheaper mathematical format of the self-attention mechanism.
 
 ## Adaptive Attention[#](#adaptive-attention)
@@ -445,68 +445,68 @@ Or
 
 # References[#](#references)
 
-\[1\] Bondarenko et al. [“Understanding and overcoming the challenges of efficient transformer quantization”](https://arxiv.org/abs/2109.12948) ACL 2021.
+\[1\] Bondarenko et al. ["Understanding and overcoming the challenges of efficient transformer quantization"](https://arxiv.org/abs/2109.12948) ACL 2021.
 
-\[2\] Dettmers et al. [“LLM.int8(): 8-bit Matrix Multiplication for Transformers at Scale”](https://arxiv.org/abs/2208.07339) NeuriPS 2022
+\[2\] Dettmers et al. ["LLM.int8(): 8-bit Matrix Multiplication for Transformers at Scale"](https://arxiv.org/abs/2208.07339) NeuriPS 2022
 
-\[3\] Zadeh et al. [“Gobo: Quantizing attention-based NLP models for low latency and energy efficient inference."](https://arxiv.org/abs/2005.03842) MICRO 2020
+\[3\] Zadeh et al. ["Gobo: Quantizing attention-based NLP models for low latency and energy efficient inference."](https://arxiv.org/abs/2005.03842) MICRO 2020
 
-\[4\] Shen, Dong & Ye, et al. [“Q-BERT: Hessian based ultra low precision quantization of BERT”](https://arxiv.org/abs/1909.05840) AAAI 2020.
+\[4\] Shen, Dong & Ye, et al. ["Q-BERT: Hessian based ultra low precision quantization of BERT"](https://arxiv.org/abs/1909.05840) AAAI 2020.
 
-\[5\] Yao et al. [“ZeroQuant: Efficient and affordable post-training quantization for large-scale transformers”](https://arxiv.org/abs/2206.01861) arXiv preprint arXiv:2206.01861 (2022).
+\[5\] Yao et al. ["ZeroQuant: Efficient and affordable post-training quantization for large-scale transformers"](https://arxiv.org/abs/2206.01861) arXiv preprint arXiv:2206.01861 (2022).
 
-\[6\] Frantar et al. [“GPTQ: Accurate Quantization for Generative Pre-trained Transformers”](https://arxiv.org/abs/2210.17323) arXiv preprint arXiv:2210.17323 (2022).
+\[6\] Frantar et al. ["GPTQ: Accurate Quantization for Generative Pre-trained Transformers"](https://arxiv.org/abs/2210.17323) arXiv preprint arXiv:2210.17323 (2022).
 
-\[7\] Xiao & Lin [“SmoothQuant: Accelerated sparse neural training: A provable and efficient method to find N:M transposable masks."](https://arxiv.org/abs/2211.10438) arXiv preprint arXiv:2211.10438 (2022). | [code](https://github.com/mit-han-lab/smoothquant)
+\[7\] Xiao & Lin ["SmoothQuant: Accelerated sparse neural training: A provable and efficient method to find N:M transposable masks."](https://arxiv.org/abs/2211.10438) arXiv preprint arXiv:2211.10438 (2022). | [code](https://github.com/mit-han-lab/smoothquant)
 
-\[8\] Pool & Yu. [“Channel Permutations for N:M Sparsity."](https://proceedings.neurips.cc/paper/2021/hash/6e8404c3b93a9527c8db241a1846599a-Abstract.html) NeuriPS 2021. | [code](https://github.com/NVIDIA/apex/tree/master/apex/contrib/sparsity)
+\[8\] Pool & Yu. ["Channel Permutations for N:M Sparsity."](https://proceedings.neurips.cc/paper/2021/hash/6e8404c3b93a9527c8db241a1846599a-Abstract.html) NeuriPS 2021. | [code](https://github.com/NVIDIA/apex/tree/master/apex/contrib/sparsity)
 
-\[9\] Zhou & Ma, et al. [“Learning N:M fine-grained structured sparse neural networks from scratch."](https://arxiv.org/abs/2102.04010) arXiv preprint arXiv:2102.04010 (2021).
+\[9\] Zhou & Ma, et al. ["Learning N:M fine-grained structured sparse neural networks from scratch."](https://arxiv.org/abs/2102.04010) arXiv preprint arXiv:2102.04010 (2021).
 
-\[10\] Jayakumar et al. [“Top-KAST: Top-K Always Sparse Training."](https://arxiv.org/abs/2106.03517) NeuriPS 2020.
+\[10\] Jayakumar et al. ["Top-KAST: Top-K Always Sparse Training."](https://arxiv.org/abs/2106.03517) NeuriPS 2020.
 
-\[11\] Nvidia. [“Nvidia A100 tensor core GPU architecture."](https://images.nvidia.com/aem-dam/en-zz/Solutions/data-center/nvidia-ampere-architecture-whitepaper.pdf) 2020.
+\[11\] Nvidia. ["Nvidia A100 tensor core GPU architecture."](https://images.nvidia.com/aem-dam/en-zz/Solutions/data-center/nvidia-ampere-architecture-whitepaper.pdf) 2020.
 
-\[12\] Gale, Elsen & Hooker [“The State of Sparsity in Deep Neural Networks."](https://arxiv.org/abs/1902.09574) arXiv preprint arXiv:1902.09574 (2019).
+\[12\] Gale, Elsen & Hooker ["The State of Sparsity in Deep Neural Networks."](https://arxiv.org/abs/1902.09574) arXiv preprint arXiv:1902.09574 (2019).
 
-\[13\] Zhu & Gupta. [“To Prune, or Not to Prune: Exploring the Efficacy of Pruning for Model Compression."](https://arxiv.org/abs/1710.01878) arXiv preprint arXiv:1710.01878 (2017).
+\[13\] Zhu & Gupta. ["To Prune, or Not to Prune: Exploring the Efficacy of Pruning for Model Compression."](https://arxiv.org/abs/1710.01878) arXiv preprint arXiv:1710.01878 (2017).
 
-\[14\] Renda et al. [“Comparing rewinding and fine-tuning in neural network pruning."](https://arxiv.org/abs/2003.02389) arXiv preprint arXiv:2003.02389 (2020).
+\[14\] Renda et al. ["Comparing rewinding and fine-tuning in neural network pruning."](https://arxiv.org/abs/2003.02389) arXiv preprint arXiv:2003.02389 (2020).
 
-\[15\] Zhou & Ma, et al. [“Learning N:M fine-grained structured sparse neural networks from scratch."](https://arxiv.org/abs/2102.04010) arXiv preprint arXiv:2102.04010 (2021).
+\[15\] Zhou & Ma, et al. ["Learning N:M fine-grained structured sparse neural networks from scratch."](https://arxiv.org/abs/2102.04010) arXiv preprint arXiv:2102.04010 (2021).
 
-\[16\] Pool & Yu. [“Channel Permutations for N:M Sparsity."](https://proceedings.neurips.cc/paper/2021/hash/6e8404c3b93a9527c8db241a1846599a-Abstract.html) NeuriPS 2021. | [code](https://github.com/NVIDIA/apex/tree/master/apex/contrib/sparsity)
+\[16\] Pool & Yu. ["Channel Permutations for N:M Sparsity."](https://proceedings.neurips.cc/paper/2021/hash/6e8404c3b93a9527c8db241a1846599a-Abstract.html) NeuriPS 2021. | [code](https://github.com/NVIDIA/apex/tree/master/apex/contrib/sparsity)
 
-\[17\] Jaszczur et al. [“Sparse is Enough in Scaling Transformers."](https://arxiv.org/abs/2111.12763) NeuriPS 2021.
+\[17\] Jaszczur et al. ["Sparse is Enough in Scaling Transformers."](https://arxiv.org/abs/2111.12763) NeuriPS 2021.
 
-\[18\] Mishra et al. [“An Survey of Neural Network Compression."](https://arxiv.org/abs/2010.03954) arXiv preprint arXiv:1710.09282 (2017).
+\[18\] Mishra et al. ["An Survey of Neural Network Compression."](https://arxiv.org/abs/2010.03954) arXiv preprint arXiv:1710.09282 (2017).
 
-\[19\] Fedus et al. [“A Review of Sparse Expert Models in Deep Learning."](https://arxiv.org/abs/2209.01667) arXiv preprint arXiv:2209.01667 (2022)..
+\[19\] Fedus et al. ["A Review of Sparse Expert Models in Deep Learning."](https://arxiv.org/abs/2209.01667) arXiv preprint arXiv:2209.01667 (2022)..
 
-\[20\] Riquelme et al. [“Scaling vision with sparse mixture of experts."](https://arxiv.org/abs/2106.05974) NeuriPS 2021.
+\[20\] Riquelme et al. ["Scaling vision with sparse mixture of experts."](https://arxiv.org/abs/2106.05974) NeuriPS 2021.
 
-\[21\] Kudugunta et al. [“Beyond Distillation: Task-level Mixture-of-Experts for Efficient Inference."](https://arxiv.org/abs/2110.03742) arXiv preprint arXiv:2110.03742 (2021).
+\[21\] Kudugunta et al. ["Beyond Distillation: Task-level Mixture-of-Experts for Efficient Inference."](https://arxiv.org/abs/2110.03742) arXiv preprint arXiv:2110.03742 (2021).
 
-\[22\] Rajbhandari et al. [“DeepSpeed-MoE: Advancing mixture-of-experts inference and training to power next-generation ai scale."](https://arxiv.org/abs/2201.05596) arXiv preprint arXiv:2201.05596 (2022).
+\[22\] Rajbhandari et al. ["DeepSpeed-MoE: Advancing mixture-of-experts inference and training to power next-generation ai scale."](https://arxiv.org/abs/2201.05596) arXiv preprint arXiv:2201.05596 (2022).
 
-\[23\] Kossmann et al. [“Optimizing mixture of experts using dynamic recompilations."](https://arxiv.org/abs/2205.01848) arXiv preprint arXiv:2205.01848 (2022).
+\[23\] Kossmann et al. ["Optimizing mixture of experts using dynamic recompilations."](https://arxiv.org/abs/2205.01848) arXiv preprint arXiv:2205.01848 (2022).
 
-\[24\] Hwang et al. [“Tutel: Adaptive mixture-of-experts at scale."](https://arxiv.org/abs/2206.03382) arXiv preprint arXiv:2206.03382 (2022). | [code](https://github.com/microsoft/tutel)
+\[24\] Hwang et al. ["Tutel: Adaptive mixture-of-experts at scale."](https://arxiv.org/abs/2206.03382) arXiv preprint arXiv:2206.03382 (2022). | [code](https://github.com/microsoft/tutel)
 
-\[25\] Noam Shazeer. [“Fast Transformer Decoding: One Write-Head is All You Need."](https://arxiv.org/abs/1911.02150) arXiv preprint arXiv:1911.02150 (2019).
+\[25\] Noam Shazeer. ["Fast Transformer Decoding: One Write-Head is All You Need."](https://arxiv.org/abs/1911.02150) arXiv preprint arXiv:1911.02150 (2019).
 
-\[26\] Tay et al. [“Efficient Transformers: A Survey."](https://arxiv.org/abs/2009.06732) ACM Computing Surveys 55.6 (2022): 1-28.
+\[26\] Tay et al. ["Efficient Transformers: A Survey."](https://arxiv.org/abs/2009.06732) ACM Computing Surveys 55.6 (2022): 1-28.
 
-\[27\] Pope et al. [“Efficiently Scaling Transformer Inference."](https://arxiv.org/abs/2211.05102) arXiv preprint arXiv:2211.05102 (2022).
+\[27\] Pope et al. ["Efficiently Scaling Transformer Inference."](https://arxiv.org/abs/2211.05102) arXiv preprint arXiv:2211.05102 (2022).
 
-\[28\] Frankle & Carbin. [“The Lottery Ticket Hypothesis: Finding Sparse, Trainable Neural Networks”](https://arxiv.org/abs/1803.03635) ICLR 2019.
+\[28\] Frankle & Carbin. ["The Lottery Ticket Hypothesis: Finding Sparse, Trainable Neural Networks"](https://arxiv.org/abs/1803.03635) ICLR 2019.
 
-\[29\] Elabyad et al. [“Depth-Adaptive Transformer”](https://arxiv.org/abs/1910.10073) ICLR 2020.
+\[29\] Elabyad et al. ["Depth-Adaptive Transformer"](https://arxiv.org/abs/1910.10073) ICLR 2020.
 
-\[30\] Schuster et al. [“Confident Adaptive Language Modeling”](https://arxiv.org/abs/2207.07061) arXiv preprint arXiv:2207.07061 (2022).
+\[30\] Schuster et al. ["Confident Adaptive Language Modeling"](https://arxiv.org/abs/2207.07061) arXiv preprint arXiv:2207.07061 (2022).
 
-\[31\] Gou et al. [“https://arxiv.org/abs/2006.05525”](https://arxiv.org/abs/2006.05525) arXiv preprint arXiv:2006.05525 (2020).
+\[31\] Gou et al. ["https://arxiv.org/abs/2006.05525"](https://arxiv.org/abs/2006.05525) arXiv preprint arXiv:2006.05525 (2020).
 
-\[32\] Hinton et al. [“Distilling the Knowledge in a Neural Network”](https://arxiv.org/abs/1503.02531) NIPS 2014.
+\[32\] Hinton et al. ["Distilling the Knowledge in a Neural Network"](https://arxiv.org/abs/1503.02531) NIPS 2014.
 
-\[33\] Sanh et al. [“DistilBERT, a distilled version of BERT: smaller, faster, cheaper and lighter”](https://arxiv.org/abs/1910.01108) Workshop on Energy Efficient Machine Learning and Cognitive Computing @ NeuriPS 2019.
+\[33\] Sanh et al. ["DistilBERT, a distilled version of BERT: smaller, faster, cheaper and lighter"](https://arxiv.org/abs/1910.01108) Workshop on Energy Efficient Machine Learning and Cognitive Computing @ NeuriPS 2019.

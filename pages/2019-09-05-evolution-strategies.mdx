@@ -56,7 +56,7 @@ Let's say we want to optimize a function $f(x)$ and we are not able to compute g
 Starting with an initial value of $\theta$, we can continuously update $\theta$ by looping three steps as follows:
 
 1.  Generate a population of samples $D = \{(x_i, f(x_i)\}$ where $x_i \sim p_\theta(x)$.
-2.  Evaluate the “fitness” of samples in $D$.
+2.  Evaluate the "fitness" of samples in $D$.
 3.  Select the best subset of individuals and use them to update $\theta$, generally based on fitness or rank.
 
 In **Genetic Algorithms (GA)**, another popular subcategory of EA, $x$ is a sequence of binary codes, $x \in \{0, 1\}^n$. While in ES, $x$ is just a vector of real numbers, $x \in \mathbb{R}^n$.
@@ -87,7 +87,7 @@ $$\begin{aligned} \mu^{(t+1)} &= \text{avg}(D^{(t+1)}_\text{elite}) = \frac{1}{\
 
 The standard deviation $\sigma$ accounts for the level of exploration: the larger $\sigma$ the bigger search space we can sample our offspring population. In [vanilla ES](#simple-gaussian-evolution-strategies), $\sigma^{(t+1)}$ is highly correlated with $\sigma^{(t)}$, so the algorithm is not able to rapidly adjust the exploration space when needed (i.e. when the confidence level changes).
 
-[**CMA-ES**](https://en.wikipedia.org/wiki/CMA-ES), short for _“Covariance Matrix Adaptation Evolution Strategy”_, fixes the problem by tracking pairwise dependencies between the samples in the distribution with a covariance matrix $C$. The new distribution parameter becomes:
+[**CMA-ES**](https://en.wikipedia.org/wiki/CMA-ES), short for _"Covariance Matrix Adaptation Evolution Strategy"_, fixes the problem by tracking pairwise dependencies between the samples in the distribution with a covariance matrix $C$. The new distribution parameter becomes:
 
 $$\theta = (\mu, \sigma, C),\\; p_\theta(x) \sim \mathcal{N}(\mu, \sigma^2 C) \sim \mu + \sigma \mathcal{N}(0, C)$$
 
@@ -262,7 +262,7 @@ Given an objective function $\mathcal{J}(\theta)$ parameterized by $\theta$, let
 
 $$d^{\*} = \\operatorname\*{argmax}_{\|d\| = \\epsilon} \mathcal{J}(\theta + d)\text{, where }\\epsilon \to 0$$
 
-Differently, _natural gradient_ works with a probability [distribution](https://arxiv.org/abs/1301.3584v7) [space](https://wiseodd.github.io/techblog/2018/03/14/natural-gradient/) parameterized by $\theta$, $p_\theta(x)$ (referred to as “search distribution” in NES [paper](https://arxiv.org/abs/1106.4487)). It looks for the steepest direction within a small step in the distribution space where the distance is measured by KL divergence. With this constraint we ensure that each update is moving along the distributional manifold with constant speed, without being slowed down by its curvature.
+Differently, _natural gradient_ works with a probability [distribution](https://arxiv.org/abs/1301.3584v7) [space](https://wiseodd.github.io/techblog/2018/03/14/natural-gradient/) parameterized by $\theta$, $p_\theta(x)$ (referred to as "search distribution" in NES [paper](https://arxiv.org/abs/1106.4487)). It looks for the steepest direction within a small step in the distribution space where the distance is measured by KL divergence. With this constraint we ensure that each update is moving along the distributional manifold with constant speed, without being slowed down by its curvature.
 
 $$d^{\*}_\text{N} = \\operatorname\*{argmax}_{\text{KL}\[p_\theta \| p_{\theta+d}\] = \\epsilon} \mathcal{J}(\theta + d)$$
 
@@ -310,7 +310,7 @@ $$\begin{aligned} \nabla_\theta\mathcal{J}(\theta) &= \nabla_\theta \int_x f(x) 
 
 Besides natural gradients, NES adopts a couple of important heuristics to make the algorithm performance more robust.
 
-- NES applies **rank-based fitness shaping**, that is to use the _rank_ under monotonically increasing fitness values instead of using $f(x)$ directly. Or it can be a function of the rank (“utility function”), which is considered as a free parameter of NES.
+- NES applies **rank-based fitness shaping**, that is to use the _rank_ under monotonically increasing fitness values instead of using $f(x)$ directly. Or it can be a function of the rank ("utility function"), which is considered as a free parameter of NES.
 - NES adopts **adaptation sampling** to adjust hyperparameters at run time. When changing $\theta \to \theta'$, samples drawn from $p_\theta$ are compared with samples from $p_{\theta'}$ using \[Mann-Whitney U-test(https://en.wikipedia.org/wiki/Mann%E2%80%93Whitney_U_test)\]; if there shows a positive or negative sign, the target hyperparameter decreases or increases by a multiplication constant. Note the score of a sample $x'_i \sim p_{\theta'}(x)$ has importance sampling weights applied $w_i' = p_\theta(x) / p_{\theta'}(x)$.
 
 # Applications: ES in Deep Reinforcement Learning[#](#applications-es-in-deep-reinforcement-learning)
@@ -352,7 +352,7 @@ The ES optimization step relies on the novelty score instead of fitness:
 
 $$\nabla_\theta \mathbb{E}_{\theta\sim\mathcal{N}(\hat{\theta}, \sigma^2 I)} N(\theta, \mathcal{A}) = \frac{1}{\sigma}\mathbb{E}_{\\epsilon\sim\mathcal{N}(0, I)} \[ \\epsilon N(\hat{\theta} + \sigma\\epsilon, \mathcal{A}) \]$$
 
-NS-ES maintains a group of $M$ independently trained agents (“meta-population”), $\mathcal{M} = \{\theta_1, \dots, \theta_M \}$ and picks one to advance proportional to the novelty score. Eventually we select the best policy. This process is equivalent to ensembling; also see the same idea in [SVPG](https://lilianweng.github.io/posts/2018-04-08-policy-gradient/#svpg).
+NS-ES maintains a group of $M$ independently trained agents ("meta-population"), $\mathcal{M} = \{\theta_1, \dots, \theta_M \}$ and picks one to advance proportional to the novelty score. Eventually we select the best policy. This process is equivalent to ensembling; also see the same idea in [SVPG](https://lilianweng.github.io/posts/2018-04-08-policy-gradient/#svpg).
 
 $$\begin{aligned} m &\\leftarrow \text{pick } i=1,\dots,M\text{ according to probability}\frac{N(\theta_i, \mathcal{A})}{\sum_{j=1}^M N(\theta_j, \mathcal{A})} \\ \theta_m^{(t+1)} &\\leftarrow \theta_m^{(t)} + \alpha \frac{1}{\sigma}\sum_{i=1}^N \\epsilon_i N(\theta^{(t)}_m + \\epsilon_i, \mathcal{A}) \text{ where }\\epsilon_i \sim \mathcal{N}(0, I) \end{aligned}$$
 
@@ -420,7 +420,7 @@ Fig. 9. The algorithm of population-based training. (Image source: [PBT](https:/
 
 ## Network Topology Optimization: WANN[#](#network-topology-optimization-wann)
 
-_Weight Agnostic Neural_ Networks (short for **WANN**; [Gaier & Ha 2019](https://arxiv.org/abs/1906.04358)) experiments with searching for the smallest network topologies that can achieve the optimal performance without training the network weights. By not considering the best configuration of network weights, WANN puts much more emphasis on the architecture itself, making the focus different from [NAS](http://openaccess.thecvf.com/content_cvpr_2018/papers/Zoph_Learning_Transferable_Architectures_CVPR_2018_paper.pdf). WANN is heavily inspired by a classic genetic algorithm to evolve network topologies, called _NEAT_ (“Neuroevolution of Augmenting Topologies”; [Stanley & Miikkulainen 2002](http://nn.cs.utexas.edu/downloads/papers/stanley.gecco02_1.pdf)).
+_Weight Agnostic Neural_ Networks (short for **WANN**; [Gaier & Ha 2019](https://arxiv.org/abs/1906.04358)) experiments with searching for the smallest network topologies that can achieve the optimal performance without training the network weights. By not considering the best configuration of network weights, WANN puts much more emphasis on the architecture itself, making the focus different from [NAS](http://openaccess.thecvf.com/content_cvpr_2018/papers/Zoph_Learning_Transferable_Architectures_CVPR_2018_paper.pdf). WANN is heavily inspired by a classic genetic algorithm to evolve network topologies, called _NEAT_ ("Neuroevolution of Augmenting Topologies"; [Stanley & Miikkulainen 2002](http://nn.cs.utexas.edu/downloads/papers/stanley.gecco02_1.pdf)).
 
 The workflow of WANN looks pretty much the same as standard GA:
 
@@ -433,7 +433,7 @@ The workflow of WANN looks pretty much the same as standard GA:
 
 Fig. 10. mutation operations for searching for new network topologies in WANN (Image source: [WANN](https://arxiv.org/abs/1906.04358) paper)
 
-At the “evaluation” stage, all the network weights are set to be the same. In this way, WANN is actually searching for network that can be described with a minimal description length. In the “selection” stage, both the network connection and the model performance are considered.
+At the "evaluation" stage, all the network weights are set to be the same. In this way, WANN is actually searching for network that can be described with a minimal description length. In the "selection" stage, both the network connection and the model performance are considered.
 
 ![](WANN-results.png)
 
@@ -455,26 +455,26 @@ Cited as:
 
 # References[#](#references)
 
-\[1\] Nikolaus Hansen. [“The CMA Evolution Strategy: A Tutorial”](https://arxiv.org/abs/1604.00772) arXiv preprint arXiv:1604.00772 (2016).
+\[1\] Nikolaus Hansen. ["The CMA Evolution Strategy: A Tutorial"](https://arxiv.org/abs/1604.00772) arXiv preprint arXiv:1604.00772 (2016).
 
-\[2\] Marc Toussaint. [Slides: “Introduction to Optimization”](https://ipvs.informatik.uni-stuttgart.de/mlr/marc/teaching/13-Optimization/06-blackBoxOpt.pdf)
+\[2\] Marc Toussaint. [Slides: "Introduction to Optimization"](https://ipvs.informatik.uni-stuttgart.de/mlr/marc/teaching/13-Optimization/06-blackBoxOpt.pdf)
 
-\[3\] David Ha. [“A Visual Guide to Evolution Strategies”](http://blog.otoro.net/2017/10/29/visual-evolution-strategies/) blog.otoro.net. Oct 2017.
+\[3\] David Ha. ["A Visual Guide to Evolution Strategies"](http://blog.otoro.net/2017/10/29/visual-evolution-strategies/) blog.otoro.net. Oct 2017.
 
-\[4\] Daan Wierstra, et al. [“Natural evolution strategies."](https://arxiv.org/abs/1106.4487) IEEE World Congress on Computational Intelligence, 2008.
+\[4\] Daan Wierstra, et al. ["Natural evolution strategies."](https://arxiv.org/abs/1106.4487) IEEE World Congress on Computational Intelligence, 2008.
 
-\[5\] Agustinus Kristiadi. [“Natural Gradient Descent”](https://wiseodd.github.io/techblog/2018/03/14/natural-gradient/) Mar 2018.
+\[5\] Agustinus Kristiadi. ["Natural Gradient Descent"](https://wiseodd.github.io/techblog/2018/03/14/natural-gradient/) Mar 2018.
 
-\[6\] Razvan Pascanu & Yoshua Bengio. [“Revisiting Natural Gradient for Deep Networks."](https://arxiv.org/abs/1301.3584v7) arXiv preprint arXiv:1301.3584 (2013).
+\[6\] Razvan Pascanu & Yoshua Bengio. ["Revisiting Natural Gradient for Deep Networks."](https://arxiv.org/abs/1301.3584v7) arXiv preprint arXiv:1301.3584 (2013).
 
-\[7\] Tim Salimans, et al. [“Evolution strategies as a scalable alternative to reinforcement learning."](https://arxiv.org/abs/1703.03864) arXiv preprint arXiv:1703.03864 (2017).
+\[7\] Tim Salimans, et al. ["Evolution strategies as a scalable alternative to reinforcement learning."](https://arxiv.org/abs/1703.03864) arXiv preprint arXiv:1703.03864 (2017).
 
-\[8\] Edoardo Conti, et al. [“Improving exploration in evolution strategies for deep reinforcement learning via a population of novelty-seeking agents."](https://arxiv.org/abs/1712.06560) NIPS. 2018.
+\[8\] Edoardo Conti, et al. ["Improving exploration in evolution strategies for deep reinforcement learning via a population of novelty-seeking agents."](https://arxiv.org/abs/1712.06560) NIPS. 2018.
 
-\[9\] Aloïs Pourchot & Olivier Sigaud. [“CEM-RL: Combining evolutionary and gradient-based methods for policy search."](https://arxiv.org/abs/1810.01222) ICLR 2019.
+\[9\] Aloïs Pourchot & Olivier Sigaud. ["CEM-RL: Combining evolutionary and gradient-based methods for policy search."](https://arxiv.org/abs/1810.01222) ICLR 2019.
 
-\[10\] Shauharda Khadka & Kagan Tumer. [“Evolution-guided policy gradient in reinforcement learning."](https://papers.nips.cc/paper/7395-evolution-guided-policy-gradient-in-reinforcement-learning.pdf) NIPS 2018.
+\[10\] Shauharda Khadka & Kagan Tumer. ["Evolution-guided policy gradient in reinforcement learning."](https://papers.nips.cc/paper/7395-evolution-guided-policy-gradient-in-reinforcement-learning.pdf) NIPS 2018.
 
-\[11\] Max Jaderberg, et al. [“Population based training of neural networks."](https://arxiv.org/abs/1711.09846) arXiv preprint arXiv:1711.09846 (2017).
+\[11\] Max Jaderberg, et al. ["Population based training of neural networks."](https://arxiv.org/abs/1711.09846) arXiv preprint arXiv:1711.09846 (2017).
 
-\[12\] Adam Gaier & David Ha. [“Weight Agnostic Neural Networks."](https://arxiv.org/abs/1906.04358) arXiv preprint arXiv:1906.04358 (2019).
+\[12\] Adam Gaier & David Ha. ["Weight Agnostic Neural Networks."](https://arxiv.org/abs/1906.04358) arXiv preprint arXiv:1906.04358 (2019).

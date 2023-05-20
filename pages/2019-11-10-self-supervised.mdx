@@ -33,10 +33,10 @@ Table of Contents
 - [References](#references)
 
 \[Updated on 2020-01-09: add a new section on [Contrastive Predictive Coding](#contrastive-predictive-coding)\].  
-\[Updated on 2020-04-13: add a “Momentum Contrast” section on MoCo, SimCLR and CURL.\]  
-\[Updated on 2020-07-08: add a [“Bisimulation”](#bisimulation) section on DeepMDP and DBC.\]  
-\[Updated on 2020-09-12: add [MoCo V2](https://lilianweng.github.io/posts/2021-05-31-contrastive/#moco--moco-v2) and [BYOL](https://lilianweng.github.io/posts/2021-05-31-contrastive/#byol) in the “Momentum Contrast” section.\]  
-\[Updated on 2021-05-31: remove section on “Momentum Contrast” and add a pointer to a full post on [“Contrastive Representation Learning”](https://lilianweng.github.io/posts/2021-05-31-contrastive/)\]
+\[Updated on 2020-04-13: add a "Momentum Contrast" section on MoCo, SimCLR and CURL.\]  
+\[Updated on 2020-07-08: add a ["Bisimulation"](#bisimulation) section on DeepMDP and DBC.\]  
+\[Updated on 2020-09-12: add [MoCo V2](https://lilianweng.github.io/posts/2021-05-31-contrastive/#moco--moco-v2) and [BYOL](https://lilianweng.github.io/posts/2021-05-31-contrastive/#byol) in the "Momentum Contrast" section.\]  
+\[Updated on 2021-05-31: remove section on "Momentum Contrast" and add a pointer to a full post on ["Contrastive Representation Learning"](https://lilianweng.github.io/posts/2021-05-31-contrastive/)\]
 
 Given a task and enough labels, supervised learning can solve it really well. Good performance usually requires a decent amount of labels, but collecting manual labels is expensive (i.e. ImageNet) and hard to be scaled up. Considering the amount of unlabelled data (e.g. free text, all the images on the Internet) is substantially more than a limited number of human curated labelled datasets, it is kinda wasteful not to use them. However, unsupervised learning is not easy and usually works much less efficiently than supervised learning.
 
@@ -74,7 +74,7 @@ We expect small distortion on an image does not modify its original semantic mea
 
 **Exemplar-CNN** ([Dosovitskiy et al., 2015](https://arxiv.org/abs/1406.6909)) create surrogate training datasets with unlabeled image patches:
 
-1.  Sample $N$ patches of size 32 × 32 pixels from different images at varying positions and scales, only from regions containing considerable gradients as those areas cover edges and tend to contain objects or parts of objects. They are _“exemplary”_ patches.
+1.  Sample $N$ patches of size 32 × 32 pixels from different images at varying positions and scales, only from regions containing considerable gradients as those areas cover edges and tend to contain objects or parts of objects. They are _"exemplary"_ patches.
 2.  Each patch is distorted by applying a variety of random transformations (i.e., translation, rotation, scaling, etc.). All the resulting distorted patches are considered to belong to the _same surrogate class_.
 3.  The pretext task is to discriminate between a set of surrogate classes. We can arbitrarily create as many surrogate classes as we want.
 
@@ -104,14 +104,14 @@ The training patches are sampled in the following way:
     - Add gaps between patches
     - Small jitters
     - Randomly downsample some patches to as little as 100 total pixels, and then upsampling it, to build robustness to pixelation.
-    - Shift green and magenta toward gray or randomly drop 2 of 3 color channels (See [“chromatic aberration”](#chromatic-aberration) below)
+    - Shift green and magenta toward gray or randomly drop 2 of 3 color channels (See ["chromatic aberration"](#chromatic-aberration) below)
 4.  The model is trained to predict which one of 8 neighboring locations the second patch is selected from, a classification problem over 8 classes.
 
 ![](self-sup-by-relative-position.png)
 
 Fig. 4. Illustration of self-supervised learning by predicting the relative position of two random patches. (Image source: [Doersch et al., 2015](https://arxiv.org/abs/1505.05192))
 
-[](#chromatic-aberration)Other than trivial signals like boundary patterns or textures continuing, another interesting and a bit surprising trivial solution was found, called [_“chromatic aberration”_](https://en.wikipedia.org/wiki/Chromatic_aberration). It is triggered by different focal lengths of lights at different wavelengths passing through the lens. In the process, there might exist small offsets between color channels. Hence, the model can learn to tell the relative position by simply comparing how green and magenta are separated differently in two patches. This is a trivial solution and has nothing to do with the image content. Pre-processing images by shifting green and magenta toward gray or randomly dropping 2 of 3 color channels can avoid this trivial solution.
+[](#chromatic-aberration)Other than trivial signals like boundary patterns or textures continuing, another interesting and a bit surprising trivial solution was found, called [_"chromatic aberration"_](https://en.wikipedia.org/wiki/Chromatic_aberration). It is triggered by different focal lengths of lights at different wavelengths passing through the lens. In the process, there might exist small offsets between color channels. Hence, the model can learn to tell the relative position by simply comparing how green and magenta are separated differently in two patches. This is a trivial solution and has nothing to do with the image content. Pre-processing images by shifting green and magenta toward gray or randomly dropping 2 of 3 color channels can avoid this trivial solution.
 
 ![](chromatic-aberration.png)
 
@@ -127,7 +127,7 @@ Because how the input patches are shuffled does not alter the correct order to p
 
 Fig. 6. Illustration of self-supervised learning by solving jigsaw puzzle. (Image source: [Noroozi & Favaro, 2016](https://arxiv.org/abs/1603.09246))
 
-Another idea is to consider “feature” or “visual primitives” as a scalar-value attribute that can be summed up over multiple patches and compared across different patches. Then the relationship between patches can be defined by **counting features** and simple arithmetic ([Noroozi, et al, 2017](https://arxiv.org/abs/1708.06734)).
+Another idea is to consider "feature" or "visual primitives" as a scalar-value attribute that can be summed up over multiple patches and compared across different patches. Then the relationship between patches can be defined by **counting features** and simple arithmetic ([Noroozi, et al, 2017](https://arxiv.org/abs/1708.06734)).
 
 The paper considers two transformations:
 
@@ -203,7 +203,7 @@ Fig. 10. Illustration of how Bidirectional GAN works. (Image source: [Donahue, e
 
 ## Contrastive Learning[#](#contrastive-learning)
 
-The **Contrastive Predictive Coding (CPC)** ([van den Oord, et al. 2018](https://arxiv.org/abs/1807.03748)) is an approach for unsupervised learning from high-dimensional data by translating a generative modeling problem to a classification problem. The _contrastive loss_ or _InfoNCE loss_ in CPC, inspired by [Noise Contrastive Estimation (NCE)](https://lilianweng.github.io/posts/2017-10-15-word-embedding/#noise-contrastive-estimation-nce), uses cross-entropy loss to measure how well the model can classify the “future” representation amongst a set of unrelated “negative” samples. Such design is partially motivated by the fact that the unimodal loss like MSE has no enough capacity but learning a full generative model could be too expensive.
+The **Contrastive Predictive Coding (CPC)** ([van den Oord, et al. 2018](https://arxiv.org/abs/1807.03748)) is an approach for unsupervised learning from high-dimensional data by translating a generative modeling problem to a classification problem. The _contrastive loss_ or _InfoNCE loss_ in CPC, inspired by [Noise Contrastive Estimation (NCE)](https://lilianweng.github.io/posts/2017-10-15-word-embedding/#noise-contrastive-estimation-nce), uses cross-entropy loss to measure how well the model can classify the "future" representation amongst a set of unrelated "negative" samples. Such design is partially motivated by the fact that the unimodal loss like MSE has no enough capacity but learning a full generative model could be too expensive.
 
 ![](CPC-audio.png)
 
@@ -239,7 +239,7 @@ A contrastive loss quantifies this prediction with a goal to correctly identify 
 
 $$\mathcal{L}_\text{CPC} = -\sum_{i,j,k} \log p(z_{i+k, j} \vert \hat{z}_{i+k, j}, \{z_l\}) = -\sum_{i,j,k} \log \frac{\exp(\hat{z}_{i+k, j}^\top z_{i+k, j})}{\exp(\hat{z}_{i+k, j}^\top z_{i+k, j}) + \sum_l \exp(\hat{z}_{i+k, j}^\top z_l)}$$
 
-For more content on contrastive learning, check out the post on [“Contrastive Representation Learning”](https://lilianweng.github.io/posts/2021-05-31-contrastive/).
+For more content on contrastive learning, check out the post on ["Contrastive Representation Learning"](https://lilianweng.github.io/posts/2021-05-31-contrastive/).
 
 # Video-Based[#](#video-based)
 
@@ -282,7 +282,7 @@ During training, given a pair of correlated patches $\mathbf{x}$ and $\mathbf{x}
 
 Video frames are naturally positioned in chronological order. Researchers have proposed several self-supervised tasks, motivated by the expectation that good representation should learn the _correct sequence_ of frames.
 
-One idea is to **validate frame order** ([Misra, et al 2016](https://arxiv.org/abs/1603.08561)). The pretext task is to determine whether a sequence of frames from a video is placed in the correct temporal order (“temporal valid”). The model needs to track and reason about small motion of an object across frames to complete such a task.
+One idea is to **validate frame order** ([Misra, et al 2016](https://arxiv.org/abs/1603.08561)). The pretext task is to determine whether a sequence of frames from a video is placed in the correct temporal order ("temporal valid"). The model needs to track and reason about small motion of an object across frames to complete such a task.
 
 The training frames are sampled from high-motion windows. Every time 5 frames are sampled $(f_a, f_b, f_c, f_d, f_e)$ and the timestamps are in order $a < b < c < d < e$. Out of 5 frames, one positive tuple $(f_b, f_c, f_d)$ and two negative tuples, $(f_b, f_a, f_d)$ and $(f_b, f_e, f_d)$ are created. The parameter $\tau_\max = \vert b-d \vert$ controls the difficulty of positive training instances (i.e. higher → harder) and the parameter $\tau_\min = \min(\vert a-b \vert, \vert d-e \vert)$ controls the difficulty of negatives (i.e. lower → harder).
 
@@ -361,7 +361,7 @@ The grasping system can tell whether it moves an object but cannot tell which ob
 - $s_\text{pre}$ is an image of the scene _before_ grasping, with the object $o$ in the tray;
 - $s_\text{post}$ is an image of the same scene _after_ grasping, without the object $o$ in the tray.
 
-To learn object-centric representation, we expect the difference between embeddings of $s_\text{pre}$ and $s_\text{post}$ to capture the removed object $o$. The idea is quite interesting and similar to relationships that have been observed in [word embedding](https://lilianweng.github.io/posts/2017-10-15-word-embedding/), [e.g.](https://developers.google.com/machine-learning/crash-course/embeddings/translating-to-a-lower-dimensional-space) distance(“king”, “queen”) ≈ distance(“man”, “woman”).
+To learn object-centric representation, we expect the difference between embeddings of $s_\text{pre}$ and $s_\text{post}$ to capture the removed object $o$. The idea is quite interesting and similar to relationships that have been observed in [word embedding](https://lilianweng.github.io/posts/2017-10-15-word-embedding/), [e.g.](https://developers.google.com/machine-learning/crash-course/embeddings/translating-to-a-lower-dimensional-space) distance("king", "queen") ≈ distance("man", "woman").
 
 Let $\phi_s$ and $\phi_o$ be the embedding functions for the scene and the object respectively. The model learns the representation by minimizing the distance between $\phi_s(s_\text{pre}) - \phi_s(s_\text{post})$ and $\phi_o(o)$ using _n-pair loss_:
 
@@ -408,7 +408,7 @@ mfTCN embedding can capture the position and velocity of objects in the scene (e
 
 ## Autonomous Goal Generation[#](#autonomous-goal-generation)
 
-**RIG** (**Reinforcement learning with Imagined Goals**; [Nair et al., 2018](https://arxiv.org/abs/1807.04742)) described a way to train a goal-conditioned policy with unsupervised representation learning. A policy learns from self-supervised practice by first imagining “fake” goals and then trying to achieve them.
+**RIG** (**Reinforcement learning with Imagined Goals**; [Nair et al., 2018](https://arxiv.org/abs/1807.04742)) described a way to train a goal-conditioned policy with unsupervised representation learning. A policy learns from self-supervised practice by first imagining "fake" goals and then trying to achieve them.
 
 ![](RIG.png)
 
@@ -475,7 +475,7 @@ $$\begin{aligned} \mathcal{L}_{\bar{\mathcal{R}}}(s, a) = \vert \mathcal{R}(s, a
 
 where $\phi(s)$ is the embedding of state $s$; symbols with bar are functions (reward function $R$ and transition function $P$) in the same MDP but running in the latent low-dimensional observation space. Here the embedding representation $\phi$ can be connected to bisimulation metrics, as the bisimulation distance is proved to be upper-bounded by the L2 distance in the latent space.
 
-The function $D$ quantifies the distance between two probability distributions and should be chosen carefully. DeepMDP focuses on _Wasserstein-1_ metric (also known as [“earth-mover distance”](https://lilianweng.github.io/posts/2017-08-20-gan/#what-is-wasserstein-distance)). The Wasserstein-1 distance between distributions $P$ and $Q$ on a metric space $(M, d)$ (i.e., $d: M \times M \to \mathbb{R}$) is:
+The function $D$ quantifies the distance between two probability distributions and should be chosen carefully. DeepMDP focuses on _Wasserstein-1_ metric (also known as ["earth-mover distance"](https://lilianweng.github.io/posts/2017-08-20-gan/#what-is-wasserstein-distance)). The Wasserstein-1 distance between distributions $P$ and $Q$ on a metric space $(M, d)$ (i.e., $d: M \times M \to \mathbb{R}$) is:
 
 $$W_d (P, Q) = \inf_{\lambda \in \\Pi(P, Q)} \int_{M \times M} d(x, y) \lambda(x, y) \\; \\mathrm{d}x \\mathrm{d}y$$
 
@@ -531,66 +531,66 @@ Cited as:
 
 # References[#](#references)
 
-\[1\] Alexey Dosovitskiy, et al. [“Discriminative unsupervised feature learning with exemplar convolutional neural networks."](https://arxiv.org/abs/1406.6909) IEEE transactions on pattern analysis and machine intelligence 38.9 (2015): 1734-1747.
+\[1\] Alexey Dosovitskiy, et al. ["Discriminative unsupervised feature learning with exemplar convolutional neural networks."](https://arxiv.org/abs/1406.6909) IEEE transactions on pattern analysis and machine intelligence 38.9 (2015): 1734-1747.
 
-\[2\] Spyros Gidaris, Praveer Singh & Nikos Komodakis. [“Unsupervised Representation Learning by Predicting Image Rotations”](https://arxiv.org/abs/1803.07728) ICLR 2018.
+\[2\] Spyros Gidaris, Praveer Singh & Nikos Komodakis. ["Unsupervised Representation Learning by Predicting Image Rotations"](https://arxiv.org/abs/1803.07728) ICLR 2018.
 
-\[3\] Carl Doersch, Abhinav Gupta, and Alexei A. Efros. [“Unsupervised visual representation learning by context prediction."](https://arxiv.org/abs/1505.05192) ICCV. 2015.
+\[3\] Carl Doersch, Abhinav Gupta, and Alexei A. Efros. ["Unsupervised visual representation learning by context prediction."](https://arxiv.org/abs/1505.05192) ICCV. 2015.
 
-\[4\] Mehdi Noroozi & Paolo Favaro. [“Unsupervised learning of visual representations by solving jigsaw puzzles."](https://arxiv.org/abs/1603.09246) ECCV, 2016.
+\[4\] Mehdi Noroozi & Paolo Favaro. ["Unsupervised learning of visual representations by solving jigsaw puzzles."](https://arxiv.org/abs/1603.09246) ECCV, 2016.
 
-\[5\] Mehdi Noroozi, Hamed Pirsiavash, and Paolo Favaro. [“Representation learning by learning to count."](https://arxiv.org/abs/1708.06734) ICCV. 2017.
+\[5\] Mehdi Noroozi, Hamed Pirsiavash, and Paolo Favaro. ["Representation learning by learning to count."](https://arxiv.org/abs/1708.06734) ICCV. 2017.
 
-\[6\] Richard Zhang, Phillip Isola & Alexei A. Efros. [“Colorful image colorization."](https://arxiv.org/abs/1603.08511) ECCV, 2016.
+\[6\] Richard Zhang, Phillip Isola & Alexei A. Efros. ["Colorful image colorization."](https://arxiv.org/abs/1603.08511) ECCV, 2016.
 
-\[7\] Pascal Vincent, et al. [“Extracting and composing robust features with denoising autoencoders."](https://www.cs.toronto.edu/~larocheh/publications/icml-2008-denoising-autoencoders.pdf) ICML, 2008.
+\[7\] Pascal Vincent, et al. ["Extracting and composing robust features with denoising autoencoders."](https://www.cs.toronto.edu/~larocheh/publications/icml-2008-denoising-autoencoders.pdf) ICML, 2008.
 
-\[8\] Jeff Donahue, Philipp Krähenbühl, and Trevor Darrell. [“Adversarial feature learning."](https://arxiv.org/abs/1605.09782) ICLR 2017.
+\[8\] Jeff Donahue, Philipp Krähenbühl, and Trevor Darrell. ["Adversarial feature learning."](https://arxiv.org/abs/1605.09782) ICLR 2017.
 
-\[9\] Deepak Pathak, et al. [“Context encoders: Feature learning by inpainting."](https://arxiv.org/abs/1604.07379) CVPR. 2016.
+\[9\] Deepak Pathak, et al. ["Context encoders: Feature learning by inpainting."](https://arxiv.org/abs/1604.07379) CVPR. 2016.
 
-\[10\] Richard Zhang, Phillip Isola, and Alexei A. Efros. [“Split-brain autoencoders: Unsupervised learning by cross-channel prediction."](https://arxiv.org/abs/1611.09842) CVPR. 2017.
+\[10\] Richard Zhang, Phillip Isola, and Alexei A. Efros. ["Split-brain autoencoders: Unsupervised learning by cross-channel prediction."](https://arxiv.org/abs/1611.09842) CVPR. 2017.
 
-\[11\] Xiaolong Wang & Abhinav Gupta. [“Unsupervised Learning of Visual Representations using Videos."](https://arxiv.org/abs/1505.00687) ICCV. 2015.
+\[11\] Xiaolong Wang & Abhinav Gupta. ["Unsupervised Learning of Visual Representations using Videos."](https://arxiv.org/abs/1505.00687) ICCV. 2015.
 
-\[12\] Carl Vondrick, et al. [“Tracking Emerges by Colorizing Videos”](https://arxiv.org/pdf/1806.09594.pdf) ECCV. 2018.
+\[12\] Carl Vondrick, et al. ["Tracking Emerges by Colorizing Videos"](https://arxiv.org/pdf/1806.09594.pdf) ECCV. 2018.
 
-\[13\] Ishan Misra, C. Lawrence Zitnick, and Martial Hebert. [“Shuffle and learn: unsupervised learning using temporal order verification."](https://arxiv.org/abs/1603.08561) ECCV. 2016.
+\[13\] Ishan Misra, C. Lawrence Zitnick, and Martial Hebert. ["Shuffle and learn: unsupervised learning using temporal order verification."](https://arxiv.org/abs/1603.08561) ECCV. 2016.
 
-\[14\] Basura Fernando, et al. [“Self-Supervised Video Representation Learning With Odd-One-Out Networks”](https://arxiv.org/abs/1611.06646) CVPR. 2017.
+\[14\] Basura Fernando, et al. ["Self-Supervised Video Representation Learning With Odd-One-Out Networks"](https://arxiv.org/abs/1611.06646) CVPR. 2017.
 
-\[15\] Donglai Wei, et al. [“Learning and Using the Arrow of Time”](https://www.robots.ox.ac.uk/~vgg/publications/2018/Wei18/wei18.pdf) CVPR. 2018.
+\[15\] Donglai Wei, et al. ["Learning and Using the Arrow of Time"](https://www.robots.ox.ac.uk/~vgg/publications/2018/Wei18/wei18.pdf) CVPR. 2018.
 
-\[16\] Florian Schroff, Dmitry Kalenichenko and James Philbin. [“FaceNet: A Unified Embedding for Face Recognition and Clustering”](https://arxiv.org/abs/1503.03832) CVPR. 2015.
+\[16\] Florian Schroff, Dmitry Kalenichenko and James Philbin. ["FaceNet: A Unified Embedding for Face Recognition and Clustering"](https://arxiv.org/abs/1503.03832) CVPR. 2015.
 
-\[17\] Pierre Sermanet, et al. [“Time-Contrastive Networks: Self-Supervised Learning from Video”](https://arxiv.org/abs/1704.06888) CVPR. 2018.
+\[17\] Pierre Sermanet, et al. ["Time-Contrastive Networks: Self-Supervised Learning from Video"](https://arxiv.org/abs/1704.06888) CVPR. 2018.
 
-\[18\] Debidatta Dwibedi, et al. [“Learning actionable representations from visual observations."](https://arxiv.org/abs/1808.00928) IROS. 2018.
+\[18\] Debidatta Dwibedi, et al. ["Learning actionable representations from visual observations."](https://arxiv.org/abs/1808.00928) IROS. 2018.
 
-\[19\] Eric Jang & Coline Devin, et al. [“Grasp2Vec: Learning Object Representations from Self-Supervised Grasping”](https://arxiv.org/abs/1811.06964) CoRL. 2018.
+\[19\] Eric Jang & Coline Devin, et al. ["Grasp2Vec: Learning Object Representations from Self-Supervised Grasping"](https://arxiv.org/abs/1811.06964) CoRL. 2018.
 
-\[20\] Ashvin Nair, et al. [“Visual reinforcement learning with imagined goals”](https://arxiv.org/abs/1807.04742) NeuriPS. 2018.
+\[20\] Ashvin Nair, et al. ["Visual reinforcement learning with imagined goals"](https://arxiv.org/abs/1807.04742) NeuriPS. 2018.
 
-\[21\] Ashvin Nair, et al. [“Contextual imagined goals for self-supervised robotic learning”](https://arxiv.org/abs/1910.11670) CoRL. 2019.
+\[21\] Ashvin Nair, et al. ["Contextual imagined goals for self-supervised robotic learning"](https://arxiv.org/abs/1910.11670) CoRL. 2019.
 
-\[22\] Aaron van den Oord, Yazhe Li & Oriol Vinyals. [“Representation Learning with Contrastive Predictive Coding”](https://arxiv.org/abs/1807.03748) arXiv preprint arXiv:1807.03748, 2018.
+\[22\] Aaron van den Oord, Yazhe Li & Oriol Vinyals. ["Representation Learning with Contrastive Predictive Coding"](https://arxiv.org/abs/1807.03748) arXiv preprint arXiv:1807.03748, 2018.
 
-\[23\] Olivier J. Henaff, et al. [“Data-Efficient Image Recognition with Contrastive Predictive Coding”](https://arxiv.org/abs/1905.09272) arXiv preprint arXiv:1905.09272, 2019.
+\[23\] Olivier J. Henaff, et al. ["Data-Efficient Image Recognition with Contrastive Predictive Coding"](https://arxiv.org/abs/1905.09272) arXiv preprint arXiv:1905.09272, 2019.
 
-\[24\] Kaiming He, et al. [“Momentum Contrast for Unsupervised Visual Representation Learning."](https://arxiv.org/abs/1911.05722) CVPR 2020.
+\[24\] Kaiming He, et al. ["Momentum Contrast for Unsupervised Visual Representation Learning."](https://arxiv.org/abs/1911.05722) CVPR 2020.
 
-\[25\] Zhirong Wu, et al. [“Unsupervised Feature Learning via Non-Parametric Instance-level Discrimination."](https://arxiv.org/abs/1805.01978v1) CVPR 2018.
+\[25\] Zhirong Wu, et al. ["Unsupervised Feature Learning via Non-Parametric Instance-level Discrimination."](https://arxiv.org/abs/1805.01978v1) CVPR 2018.
 
-\[26\] Ting Chen, et al. [“A Simple Framework for Contrastive Learning of Visual Representations."](https://arxiv.org/abs/2002.05709) arXiv preprint arXiv:2002.05709, 2020.
+\[26\] Ting Chen, et al. ["A Simple Framework for Contrastive Learning of Visual Representations."](https://arxiv.org/abs/2002.05709) arXiv preprint arXiv:2002.05709, 2020.
 
-\[27\] Aravind Srinivas, Michael Laskin & Pieter Abbeel [“CURL: Contrastive Unsupervised Representations for Reinforcement Learning."](https://arxiv.org/abs/2004.04136) arXiv preprint arXiv:2004.04136, 2020.
+\[27\] Aravind Srinivas, Michael Laskin & Pieter Abbeel ["CURL: Contrastive Unsupervised Representations for Reinforcement Learning."](https://arxiv.org/abs/2004.04136) arXiv preprint arXiv:2004.04136, 2020.
 
-\[28\] Carles Gelada, et al. [“DeepMDP: Learning Continuous Latent Space Models for Representation Learning”](https://arxiv.org/abs/1906.02736) ICML 2019.
+\[28\] Carles Gelada, et al. ["DeepMDP: Learning Continuous Latent Space Models for Representation Learning"](https://arxiv.org/abs/1906.02736) ICML 2019.
 
-\[29\] Amy Zhang, et al. [“Learning Invariant Representations for Reinforcement Learning without Reconstruction”](https://arxiv.org/abs/2006.10742) arXiv preprint arXiv:2006.10742, 2020.
+\[29\] Amy Zhang, et al. ["Learning Invariant Representations for Reinforcement Learning without Reconstruction"](https://arxiv.org/abs/2006.10742) arXiv preprint arXiv:2006.10742, 2020.
 
-\[30\] Xinlei Chen, et al. [“Improved Baselines with Momentum Contrastive Learning”](https://arxiv.org/abs/2003.04297) arXiv preprint arXiv:2003.04297, 2020.
+\[30\] Xinlei Chen, et al. ["Improved Baselines with Momentum Contrastive Learning"](https://arxiv.org/abs/2003.04297) arXiv preprint arXiv:2003.04297, 2020.
 
-\[31\] Jean-Bastien Grill, et al. [“Bootstrap Your Own Latent: A New Approach to Self-Supervised Learning”](https://arxiv.org/abs/2006.07733) arXiv preprint arXiv:2006.07733, 2020.
+\[31\] Jean-Bastien Grill, et al. ["Bootstrap Your Own Latent: A New Approach to Self-Supervised Learning"](https://arxiv.org/abs/2006.07733) arXiv preprint arXiv:2006.07733, 2020.
 
-\[32\] Abe Fetterman & Josh Albrecht. [“Understanding self-supervised and contrastive learning with Bootstrap Your Own Latent (BYOL)”](https://untitled-ai.github.io/understanding-self-supervised-contrastive-learning.html) Untitled blog. Aug 24, 2020.
+\[32\] Abe Fetterman & Josh Albrecht. ["Understanding self-supervised and contrastive learning with Bootstrap Your Own Latent (BYOL)"](https://untitled-ai.github.io/understanding-self-supervised-contrastive-learning.html) Untitled blog. Aug 24, 2020.

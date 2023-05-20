@@ -191,7 +191,7 @@ Fig. 6. Comparison of negative log-likelihood of improved DDPM with other likeli
 
 # Speed up Diffusion Model Sampling[#](#speed-up-diffusion-model-sampling)
 
-It is very slow to generate a sample from DDPM by following the Markov chain of the reverse diffusion process, as $T$ can be up to one or a few thousand steps. One data point from [Song et al. 2020](https://arxiv.org/abs/2010.02502): “For example, it takes around 20 hours to sample 50k images of size 32 × 32 from a DDPM, but less than a minute to do so from a GAN on an Nvidia 2080 Ti GPU.”
+It is very slow to generate a sample from DDPM by following the Markov chain of the reverse diffusion process, as $T$ can be up to one or a few thousand steps. One data point from [Song et al. 2020](https://arxiv.org/abs/2010.02502): "For example, it takes around 20 hours to sample 50k images of size 32 × 32 from a DDPM, but less than a minute to do so from a GAN on an Nvidia 2080 Ti GPU."
 
 One simple way is to run a strided sampling schedule ([Nichol & Dhariwal, 2021](https://arxiv.org/abs/2102.09672)) by taking the sampling update every $\\lceil T/S \\rceil$ steps to reduce the process from $T$ to $S$ steps. The new sampling schedule for generation is $\{\tau_1, \dots, \tau_S\}$ where $\tau_1 < \tau_2 < \dots <\tau_S \in \[1, T\]$ and $S < T$.
 
@@ -218,7 +218,7 @@ Fig. 7. FID scores on CIFAR10 and CelebA datasets by diffusion models of differe
 Compared to DDPM, DDIM is able to:
 
 1.  Generate higher-quality samples using a much fewer number of steps.
-2.  Have “consistency” property since the generative process is deterministic, meaning that multiple samples conditioned on the same latent variable should have similar high-level features.
+2.  Have "consistency" property since the generative process is deterministic, meaning that multiple samples conditioned on the same latent variable should have similar high-level features.
 3.  Because of the consistency, DDIM can do semantically meaningful interpolation in the latent variable.
 
 _Latent diffusion model_ (**LDM**; [Rombach & Blattmann, et al. 2022](https://arxiv.org/abs/2112.10752)) runs the diffusion process in the latent space instead of pixel space, making training cost lower and inference speed faster. It is motivated by the observation that most bits of an image contribute to perceptual details and the semantic and conceptual composition still remains after aggressive compression. LDM loosely decomposes the perceptual compression and semantic compression with generative modeling learning by first trimming off pixel-level redundancy with autoencoder and then manipulate/generate semantic concepts with diffusion process on learned latent.
@@ -350,32 +350,32 @@ Or
 
 # References[#](#references)
 
-\[1\] Jascha Sohl-Dickstein et al. [“Deep Unsupervised Learning using Nonequilibrium Thermodynamics.”](https://arxiv.org/abs/1503.03585) ICML 2015.
+\[1\] Jascha Sohl-Dickstein et al. ["Deep Unsupervised Learning using Nonequilibrium Thermodynamics."](https://arxiv.org/abs/1503.03585) ICML 2015.
 
-\[2\] Max Welling & Yee Whye Teh. [“Bayesian learning via stochastic gradient langevin dynamics.”](https://www.stats.ox.ac.uk/~teh/research/compstats/WelTeh2011a.pdf) ICML 2011.
+\[2\] Max Welling & Yee Whye Teh. ["Bayesian learning via stochastic gradient langevin dynamics."](https://www.stats.ox.ac.uk/~teh/research/compstats/WelTeh2011a.pdf) ICML 2011.
 
-\[3\] Yang Song & Stefano Ermon. [“Generative modeling by estimating gradients of the data distribution.”](https://arxiv.org/abs/1907.05600) NeurIPS 2019.
+\[3\] Yang Song & Stefano Ermon. ["Generative modeling by estimating gradients of the data distribution."](https://arxiv.org/abs/1907.05600) NeurIPS 2019.
 
-\[4\] Yang Song & Stefano Ermon. [“Improved techniques for training score-based generative models.”](https://arxiv.org/abs/2006.09011) NeuriPS 2020.
+\[4\] Yang Song & Stefano Ermon. ["Improved techniques for training score-based generative models."](https://arxiv.org/abs/2006.09011) NeuriPS 2020.
 
-\[5\] Jonathan Ho et al. [“Denoising diffusion probabilistic models.”](https://arxiv.org/abs/2006.11239) arxiv Preprint arxiv:2006.11239 (2020). \[[code](https://github.com/hojonathanho/diffusion)\]
+\[5\] Jonathan Ho et al. ["Denoising diffusion probabilistic models."](https://arxiv.org/abs/2006.11239) arxiv Preprint arxiv:2006.11239 (2020). \[[code](https://github.com/hojonathanho/diffusion)\]
 
-\[6\] Jiaming Song et al. [“Denoising diffusion implicit models.”](https://arxiv.org/abs/2010.02502) arxiv Preprint arxiv:2010.02502 (2020). \[[code](https://github.com/ermongroup/ddim)\]
+\[6\] Jiaming Song et al. ["Denoising diffusion implicit models."](https://arxiv.org/abs/2010.02502) arxiv Preprint arxiv:2010.02502 (2020). \[[code](https://github.com/ermongroup/ddim)\]
 
-\[7\] Alex Nichol & Prafulla Dhariwal. [“Improved denoising diffusion probabilistic models”](https://arxiv.org/abs/2102.09672) arxiv Preprint arxiv:2102.09672 (2021). \[[code](https://github.com/openai/improved-diffusion)\]
+\[7\] Alex Nichol & Prafulla Dhariwal. ["Improved denoising diffusion probabilistic models"](https://arxiv.org/abs/2102.09672) arxiv Preprint arxiv:2102.09672 (2021). \[[code](https://github.com/openai/improved-diffusion)\]
 
-\[8\] Prafula Dhariwal & Alex Nichol. [“Diffusion Models Beat GANs on Image Synthesis."](https://arxiv.org/abs/2105.05233) arxiv Preprint arxiv:2105.05233 (2021). \[[code](https://github.com/openai/guided-diffusion)\]
+\[8\] Prafula Dhariwal & Alex Nichol. ["Diffusion Models Beat GANs on Image Synthesis."](https://arxiv.org/abs/2105.05233) arxiv Preprint arxiv:2105.05233 (2021). \[[code](https://github.com/openai/guided-diffusion)\]
 
-\[9\] Jonathan Ho & Tim Salimans. [“Classifier-Free Diffusion Guidance."](https://arxiv.org/abs/2207.12598) NeurIPS 2021 Workshop on Deep Generative Models and Downstream Applications.
+\[9\] Jonathan Ho & Tim Salimans. ["Classifier-Free Diffusion Guidance."](https://arxiv.org/abs/2207.12598) NeurIPS 2021 Workshop on Deep Generative Models and Downstream Applications.
 
-\[10\] Yang Song, et al. [“Score-Based Generative Modeling through Stochastic Differential Equations."](https://openreview.net/forum?id=PxTIG12RRHS) ICLR 2021.
+\[10\] Yang Song, et al. ["Score-Based Generative Modeling through Stochastic Differential Equations."](https://openreview.net/forum?id=PxTIG12RRHS) ICLR 2021.
 
-\[11\] Alex Nichol, Prafulla Dhariwal & Aditya Ramesh, et al. [“GLIDE: Towards Photorealistic Image Generation and Editing with Text-Guided Diffusion Models."](https://arxiv.org/abs/2112.10741) ICML 2022.
+\[11\] Alex Nichol, Prafulla Dhariwal & Aditya Ramesh, et al. ["GLIDE: Towards Photorealistic Image Generation and Editing with Text-Guided Diffusion Models."](https://arxiv.org/abs/2112.10741) ICML 2022.
 
-\[12\] Jonathan Ho, et al. [“Cascaded diffusion models for high fidelity image generation."](https://arxiv.org/abs/2106.15282) J. Mach. Learn. Res. 23 (2022): 47-1.
+\[12\] Jonathan Ho, et al. ["Cascaded diffusion models for high fidelity image generation."](https://arxiv.org/abs/2106.15282) J. Mach. Learn. Res. 23 (2022): 47-1.
 
-\[13\] Aditya Ramesh et al. [“Hierarchical Text-Conditional Image Generation with CLIP Latents."](https://arxiv.org/abs/2204.06125) arxiv Preprint arxiv:2204.06125 (2022).
+\[13\] Aditya Ramesh et al. ["Hierarchical Text-Conditional Image Generation with CLIP Latents."](https://arxiv.org/abs/2204.06125) arxiv Preprint arxiv:2204.06125 (2022).
 
-\[14\] Chitwan Saharia & William Chan, et al. [“Photorealistic Text-to-Image Diffusion Models with Deep Language Understanding."](https://arxiv.org/abs/2205.11487) arxiv Preprint arxiv:2205.11487 (2022).
+\[14\] Chitwan Saharia & William Chan, et al. ["Photorealistic Text-to-Image Diffusion Models with Deep Language Understanding."](https://arxiv.org/abs/2205.11487) arxiv Preprint arxiv:2205.11487 (2022).
 
-\[15\] Rombach & Blattmann, et al. [“High-Resolution Image Synthesis with Latent Diffusion Models."](https://arxiv.org/abs/2112.10752) CVPR 2022.[code](https://github.com/CompVis/latent-diffusion)
+\[15\] Rombach & Blattmann, et al. ["High-Resolution Image Synthesis with Latent Diffusion Models."](https://arxiv.org/abs/2112.10752) CVPR 2022.[code](https://github.com/CompVis/latent-diffusion)
