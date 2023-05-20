@@ -32,10 +32,13 @@ In the previous two posts, I have introduced the algorithms of many deep reinfor
 
 0.  Make sure you have [Homebrew](https://docs.brew.sh/Installation) installed:
 
+```bash
     /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+```
 
 1.  I would suggest starting a virtualenv for your development. It makes life so much easier when you have multiple projects with conflicting requirements; i.e. one works in Python 2.7 while the other is only compatible with Python 3.5+.
 
+```bash
     # Install python virtualenv
 
     brew install pyenv-virtualenv
@@ -47,12 +50,13 @@ In the previous two posts, I have introduced the algorithms of many deep reinfor
     # Activate the virtualenv named "workspace"
 
     pyenv activate workspace
+```
 
 _\[\*\] For every new installation below, please make sure you are in the virtualenv._
 
 2.  Install OpenAI gym according to the [instruction](https://github.com/openai/gym#installation). For a minimal installation, run:
 
-```
+```bash
     git clone https://github.com/openai/gym.git
     cd gym
     pip install -e .
@@ -60,24 +64,30 @@ _\[\*\] For every new installation below, please make sure you are in the virtua
 
 If you are interested in playing with Atari games or other advanced packages, please continue to get a couple of system packages installed.
 
+```bash
     brew install cmake boost boost-python sdl2 swig wget
+```
 
 For Atari, go to the gym directory and pip install it. This [post](http://alvinwan.com/installing-arcade-learning-environment-with-python3-on-macosx/) is pretty helpful if you have troubles with ALE (arcade learning environment) installation.
 
+```bash
     pip install -e '.[atari]'
+```
 
 3.  Finally clone the "playground" code and install the requirements.
 
+```bash
     git clone git@github.com:lilianweng/deep-reinforcement-learning-gym.git
     cd deep-reinforcement-learning-gym
     pip install -e . # install the "playground" project.
     pip install -r requirements.txt # install required packages.
+```
 
 # Gym Environment[#](#gym-environment)
 
 The [OpenAI Gym](https://gym.openai.com/) toolkit provides a set of physical simulation environments, games, and robot simulators that we can play with and design reinforcement learning agents for. An environment object can be initialized by `gym.make("{environment name}"`:
 
-```
+```python
     import gym
     env = gym.make("MsPacman-v0")
 ```
@@ -111,6 +121,7 @@ $$Q(s, a) \\leftarrow (1 - \alpha) Q(s, a) + \alpha (r + \gamma \color{red}{\max
 
 In a naive implementation, the Q value for all (s, a) pairs can be simply tracked in a dict. No complicated machine learning model is involved yet.
 
+```python
     from collections import defaultdict
     Q = defaultdict(float)
     gamma = 0.99  # Discounting factor
@@ -123,6 +134,7 @@ In a naive implementation, the Q value for all (s, a) pairs can be simply tracke
         max_q_next = max([Q[s_next, a] for a in actions])
         # Do not include the next state's value if currently at the terminal state.
         Q[s, a] += alpha * (r + gamma * max_q_next * (1.0 - done) - Q[s, a])
+```
 
 Most gym environments have a multi-dimensional continuous observation space (`gym.spaces.Box`). To make sure our Q dictionary will not explode by trying to memorize an infinite number of keys, we apply a wrapper to discretize the observation. The concept of [wrappers](https://github.com/openai/gym/tree/master/gym/wrappers) is very powerful, with which we are capable to customize observation, action, step function, etc. of an env. No matter how many wrappers are applied, `env.unwrapped` always gives back the internal original environment object.
 
