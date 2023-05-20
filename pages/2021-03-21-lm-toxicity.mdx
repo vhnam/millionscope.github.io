@@ -55,7 +55,7 @@ How to categorize toxic content is not a straightforward task. Which content sho
 
 One popular categorization of offensive language is proposed by [Zampieri et al. (2019)](https://arxiv.org/abs/1902.09666), a three-level hierarchical taxonomy considering both the type and the target of offense. The Offensive Language Identification Dataset ([OLID](#OLID)) dataset is collected based on this taxonomy.
 
-![](offensive-taxonomy.png)
+![](assets/images/2021-03-21-lm-toxicity/offensive-taxonomy.png)
 
 Fig. 1. The three-level hierarchical taxonomy for categorizing offensive language, proposed by [Zampieri et al. (2019)](https://arxiv.org/abs/1902.09666).
 
@@ -103,7 +103,7 @@ Crowdsourcing is the most common approach among them ([Davidson et al. 2017](htt
 
 Their experiments showed that the TS bootstrap classifier achieved pretty good numbers on F1 score, accuracy and recall and it could also transfer to out-of-domain test data.
 
-![](TS-bootstrap.png)
+![](assets/images/2021-03-21-lm-toxicity/TS-bootstrap.png)
 
 Fig. 2. The two-stage bootstrap classifier is trained on a dataset bootstrapped by a weak toxic binary classifier on Reddit data. (Image source: [Khatri et al. 2018](https://arxiv.org/abs/1811.12900))
 
@@ -127,7 +127,7 @@ To create a toxicity detection model that is robust to adversarial attacks, [Din
 3.  _Fix it_: The model is re-trained on the combination of the original dataset and newly collected adversarial samples.
 4.  _Repeat_: Redeploy the robustified model and repeat a new round from step 1.
 
-![](build-break-fix.png)
+![](assets/images/2021-03-21-lm-toxicity/build-break-fix.png)
 
 Fig. 3. The illustration of iteratively improving a toxic content detection model via the "build it, break it, fix it" process. (Image source: [Dinan et al. 2019](https://arxiv.org/abs/1908.06083))
 
@@ -135,7 +135,7 @@ One baseline in their experiments is to replace the adversarial collection in th
 
 Adversarial models are more robust against adversarial attacks than baseline models trained on the standard collection. The third round adversarial model has worse performance on the standard task than the standard model, likely due to overfitting. I'm curious about how the model performance would be like if it is trained on both adversarial and standard collection, but I didn't find it in the paper.
 
-![](build-break-fix-it-results.png)
+![](assets/images/2021-03-21-lm-toxicity/build-break-fix-it-results.png)
 
 Fig. 4. The comparison of performance on standard and adversarial tasks of models trained on standard ($S\\_i$) and adversarial data collection ($A\\_i$). The subscript $i$ indicates the number of training rounds. (Image source: [Dinan et al. 2019](https://arxiv.org/abs/1908.06083))
 
@@ -157,13 +157,13 @@ The paper proposed two ways to resolve adversarial attacks:
 
 **perspective API** ([www.perspectiveapi.com](https://www.perspectiveapi.com/)) is the most widely used commercial API for toxic content detection. Perspective trains machine learning models to provide scores for several different [attributes](https://support.perspectiveapi.com/s/about-the-api-attributes-and-languages): toxicity, severe toxicity, insult, profanity, identity attack, threat, and sexually explicit. Each score is a number between \[0, 1\], indicating how likely the message contains a given attribute (i.e. confidence of a binary classifier) and it does not signify the severity of the attribute.
 
-![](about-perspective-api.png)
+![](assets/images/2021-03-21-lm-toxicity/about-perspective-api.png)
 
 Fig. 5. The overview of Perspective API scores. (Image source: [About Perspective API](https://support.perspectiveapi.com/s/about-the-api))
 
 [Gehman et al. (2020)](https://arxiv.org/abs/2009.11462) measured the Perspective API toxicity scores of unprompted generations sampled from several pretrained language models. “Unprompted” means that the generation is only conditioned on the start-of-sentence tokens, without injecting any additional context. Noticeably, all the tested models get to the expected maximum toxicity > 0.5 after 100 generations. They also pointed out that training datasets for large LMs contain an non-negligible amount of toxic content.
 
-![](unprompted-toxicity.png)
+![](assets/images/2021-03-21-lm-toxicity/unprompted-toxicity.png)
 
 Fig. 6. Perspective API toxicity scores of unprompted generations. Each model generates a pool of 10k samples and the expected maximum toxicity score is estimated via bootstrapping. (Image source: [Gehman et al. 2020](https://arxiv.org/abs/2009.11462))
 
@@ -186,7 +186,7 @@ Despite of its popularity, Perspective API contains known biases, as summarized 
 
 They use RealToxicityPrompts dataset and Perspective API for evaluation in the experiments. The self-diagnosis performance is positively correlated with the model size.
 
-![](self-diagnosis-toxicity-score.png)
+![](assets/images/2021-03-21-lm-toxicity/self-diagnosis-toxicity-score.png)
 
 Fig. 7. Self-diagnosis abilities for identifying undesired attributes. The ground truth is provided by Perspective API. (Image source: [Schick, et al. 2021](https://arxiv.org/abs/2103.00453))
 
@@ -220,7 +220,7 @@ In the paper, they used a soft variant where the probabilities of the words with
 
 $$\alpha(x)=\begin{cases} 1 & \text{ if } x\\geq 0 \\ e^{\lambda\cdot x} & \text{ otherwise} \end{cases}$$
 
-![](self-debiasing-decoding.png)
+![](assets/images/2021-03-21-lm-toxicity/self-debiasing-decoding.png)
 
 Fig. 8. Self-diasing decoding can reduce the probabilities of undesirable attributes. The scores are provided by Perspective API. (Image source: [Schick et al. 2021](https://arxiv.org/abs/2103.00453))
 
@@ -234,7 +234,7 @@ There are a couple of major limitations in self-debiasing detoxification:
 
 **Unsupervised style transfer** can be used to translate offensive sentences into innocuous ones ([Santos et al. 2018](https://arxiv.org/abs/1805.07685)). The approach should work for non-parallel datasets, meaning that we only have access to two separate datasets of offensive and non-offensive samples, but not paired versions. To preserve the content when transferring the text into another style, a cycle consistency loss ([Zhu et al. 2017](https://arxiv.org/abs/1703.10593)) is adopted.
 
-![](offensive-text-style-transfer.png)
+![](assets/images/2021-03-21-lm-toxicity/offensive-text-style-transfer.png)
 
 Fig. 9. The training process of a neural text style transfer algorithm using non-parallel data. (Image source: [Santos et al. 2018](https://arxiv.org/abs/1805.07685))
 
@@ -271,7 +271,7 @@ $$\mathcal{L}(\theta_E, \theta_G, \theta_C) = \min_{E, G, C} \mathcal{L}_\text{s
 
 **Style Transformer** ([Dai et al. 2019](https://arxiv.org/abs/1905.05621)) also aims to learn unsupervised text style transfer. Different from the encoder-decoder model in [Santos et al. 2018](https://arxiv.org/abs/1805.07685), it learns a Transformer-based style transfer function $f_\theta(\mathbf{x}, s)$ for a given input sample $\mathbf{x}$ and a desired style control variable $s$.
 
-![](style-transformer.png)
+![](assets/images/2021-03-21-lm-toxicity/style-transformer.png)
 
 Fig. 10. The comparison of style transformer and previous models that depend on disentangled latent representation. (Image source: [Dai et al. 2019](https://arxiv.org/abs/1905.05621))
 
@@ -290,7 +290,7 @@ $$\mathcal{L}_\text{style} = - p_\phi(\text{class} = 1 \vert f_\theta(\mathbf{x}
 - $\{(\mathbf{x}, s), (f_\theta(\mathbf{x}, s), s), (f_\theta(\mathbf{x}, \hat{s}), \hat{s})\}$ as positive class 1
 - $\{(\mathbf{x}, \hat{s}), (f_\theta(\mathbf{x}, s), \hat{s}), (f_\theta(\mathbf{x}, \hat{s}), s)\}$ as negative class 0.
 
-![](style-transformer-training.png)
+![](assets/images/2021-03-21-lm-toxicity/style-transformer-training.png)
 
 Fig. 11. The training process of Style Transformer. (Image source: [Dai et al. 2019](https://arxiv.org/abs/1905.05621))
 
@@ -334,7 +334,7 @@ Read more in my [last post](https://lilianweng.github.io/posts/2021-01-02-contro
 
 [Gehman et al. (2020)](https://arxiv.org/abs/2009.11462) experimented with both data-based (supervised fine-tuning, CTRL training) and decoding-based (vocabulary shifting, blocked word filtering, PPLM) methods for language model detoxification. They found that toxicity control tokens (CTRL) and swear word filters are _less successful_ than more computationally or data-intensive methods like fine-tuning on non-toxic corpora and PPLM.
 
-![](RealToxicityPrompts-experiments.png)
+![](assets/images/2021-03-21-lm-toxicity/RealToxicityPrompts-experiments.png)
 
 Fig. 12. Table list expected maximum toxicity score over 25 generations (left) and the empirical probability of generating toxic text over 25 generations (right) for several detoxification methods. Scores are provided by Perspective API. (Image source: [Gehman et al., 2020](https://arxiv.org/abs/2009.11462))
 
@@ -342,7 +342,7 @@ Fig. 12. Table list expected maximum toxicity score over 25 generations (left) a
 
 [Xu et al. (2020)](https://arxiv.org/abs/2010.07079) presented a thorough system-level design for building safe chatbots.
 
-![](safe-chatbot-system.png)
+![](assets/images/2021-03-21-lm-toxicity/safe-chatbot-system.png)
 
 Fig. 13. Illustration of a safe chat bot system. (Image source: [Xu et al. 2020](https://arxiv.org/abs/2010.07079))
 
@@ -387,7 +387,7 @@ Cited as:
 > Weng, Lilian. (Mar 2021). Reducing toxicity in language models. Lil'Log. https://lilianweng.github.io/posts/2021-03-21-lm-toxicity/.
 
 Or
-
+```
     @article{weng2021toxic,
       title   = "Reducing Toxicity in Language Models.",
       author  = "Weng, Lilian",
@@ -396,7 +396,7 @@ Or
       month   = "Mar",
       url     = "https://lilianweng.github.io/posts/2021-03-21-lm-toxicity/"
     }
-
+```
 # References[#](#references)
 
 \[1\] Vidgen, et al. [“Challenges and frontiers in abusive content detection."](https://www.aclweb.org/anthology/W19-3509/) Workshop on Abusive Language Online 2019.
