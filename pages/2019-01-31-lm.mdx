@@ -149,9 +149,9 @@ $$ R_i = \{ \mathbf{h}_{i,\ell} \mid \ell = 0, \dots, L \} $$
 
 where $\mathbf{h}_{0, \ell}$ is the embedding layer output and $\mathbf{h}_{i, \ell} = \[\\overrightarrow{\mathbf{h}}_{i,\ell}; \\overleftarrow{\mathbf{h}}_{i,\ell}\]$.
 
-The weights, $\mathbf{s}^\text{task}$, in the linear combination are learned for each end task and normalized by softmax. The scaling factor $\\gamma^\text{task}$ is used to correct the misalignment between the distribution of biLM hidden states and the distribution of task specific representations.
+The weights, $\mathbf{s}^\text{task}$, in the linear combination are learned for each end task and normalized by softmax. The scaling factor $\gamma^\text{task}$ is used to correct the misalignment between the distribution of biLM hidden states and the distribution of task specific representations.
 
-$$ v_i = f(R_i; \Theta^\text{task}) = \\gamma^\text{task} \sum_{\ell=0}^L s^\text{task}_i \mathbf{h}_{i,\ell} $$
+$$ v_i = f(R_i; \Theta^\text{task}) = \gamma^\text{task} \sum_{\ell=0}^L s^\text{task}_i \mathbf{h}_{i,\ell} $$
 
 To evaluate what kind of information is captured by hidden states across different layers, ELMo is applied on semantic-intensive and syntax-intensive tasks respectively using representations in different layers of biLM:
 

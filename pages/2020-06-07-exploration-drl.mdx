@@ -314,7 +314,7 @@ The design of NGU enables it to have two nice properties:
 
 Later, built on top of NGU, DeepMind proposed “Agent57” ([Badia, et al. 2020b](https://arxiv.org/abs/2003.13350)), the first deep RL agent that outperforms the standard human benchmark on _all_ 57 Atari games. Two major improvements in Agent57 over NGU are:
 
-1.  A _population_ of policies are trained in Agent57, each equipped with a different exploration parameter pair $\{(\beta_j, \\gamma_j)\}_{j=1}^N$. Recall that given $\beta_j$, the reward is constructed as $r_{j,t} = r_t^e + \beta_j r^i_t$ and $\\gamma_j$ is the reward discounting factor. It is natural to expect policies with higher $\beta_j$ and lower $\\gamma_j$ to make more progress early in training, while the opposite would be expected as training progresses. A meta-controller ([sliding-window UCB bandit algorithm](https://arxiv.org/pdf/0805.3415.pdf)) is trained to select which policies should be prioritized.
+1.  A _population_ of policies are trained in Agent57, each equipped with a different exploration parameter pair $\{(\beta_j, \gamma_j)\}_{j=1}^N$. Recall that given $\beta_j$, the reward is constructed as $r_{j,t} = r_t^e + \beta_j r^i_t$ and $\gamma_j$ is the reward discounting factor. It is natural to expect policies with higher $\beta_j$ and lower $\gamma_j$ to make more progress early in training, while the opposite would be expected as training progresses. A meta-controller ([sliding-window UCB bandit algorithm](https://arxiv.org/pdf/0805.3415.pdf)) is trained to select which policies should be prioritized.
 2.  The second improvement is a new parameterization of Q-value function that decomposes the contributions of the intrinsic and extrinsic rewards in a similar form as the bundled reward: $Q(s, a; \theta_j) = Q(s, a; \theta_j^e) + \beta_j Q(s, a; \theta_j^i)$. During training, $Q(s, a; \theta_j^e)$ and $Q(s, a; \theta_j^i)$ are optimized separately with rewards $r_j^e$ and $r_j^i$, respectively.
 
 ![](agent57.png)
@@ -395,7 +395,7 @@ However, this kind of exploration is still restricted, because uncertainty intro
 
 Let $\theta$ be the Q function parameter and $\theta^-$ for the target Q, the loss function using a randomized prior function $p$ is:
 
-$$ \mathcal{L}(\theta, \theta^{-}, p, \mathcal{D}; \\gamma) = \sum_{t\in\mathcal{D}}\Big( r_t + \\gamma \max_{a'\in\mathcal{A}} (\underbrace{Q_{\theta^-} + p)}_\text{target Q}(s'_t, a') - \underbrace{(Q_\theta + p)}_\text{Q to optimize}(s_t, a_t) \Big)^2 $$
+$$ \mathcal{L}(\theta, \theta^{-}, p, \mathcal{D}; \gamma) = \sum_{t\in\mathcal{D}}\Big( r_t + \gamma \max_{a'\in\mathcal{A}} (\underbrace{Q_{\theta^-} + p)}_\text{target Q}(s'_t, a') - \underbrace{(Q_\theta + p)}_\text{Q to optimize}(s_t, a_t) \Big)^2 $$
 
 # Varitional Options[#](#varitional-options)
 

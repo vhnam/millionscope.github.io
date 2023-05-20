@@ -292,9 +292,9 @@ The location-based addressing sums up the values at different positions in the a
 
 Fig. 11. Two ways to represent the shift weighting distribution $\mathbf{s}\\_t$.
 
-Finally the attention distribution is enhanced by a sharpening scalar $\\gamma_t \\geq 1$.
+Finally the attention distribution is enhanced by a sharpening scalar $\gamma_t \\geq 1$.
 
-$$ \begin{aligned} \tilde{w}_t(i) &= \sum_{j=1}^N w_t^g(j) s_t(i-j) & \\scriptstyle{\text{; circular convolution}}\\ w_t(i) &= \frac{\tilde{w}_t(i)^{\\gamma_t}}{\sum_{j=1}^N \tilde{w}_t(j)^{\\gamma_t}} & \\scriptstyle{\text{; sharpen}} \end{aligned} $$
+$$ \begin{aligned} \tilde{w}_t(i) &= \sum_{j=1}^N w_t^g(j) s_t(i-j) & \\scriptstyle{\text{; circular convolution}}\\ w_t(i) &= \frac{\tilde{w}_t(i)^{\gamma_t}}{\sum_{j=1}^N \tilde{w}_t(j)^{\gamma_t}} & \\scriptstyle{\text{; sharpen}} \end{aligned} $$
 
 The complete process of generating the attention vector $\mathbf{w}_t$ at time step t is illustrated in Fig. 12. All the parameters produced by the controller are unique for each head. If there are multiple read and write heads in parallel, the controller would output multiple sets.
 
@@ -423,9 +423,9 @@ Note that $\alpha_{i,j}$ is one entry in the attention map, indicating how much 
 
 Furthermore, the output of the attention layer is multiplied by a scale parameter and added back to the original input feature map:
 
-$$ \mathbf{y} = \mathbf{x}_i + \\gamma \mathbf{o}_i $$
+$$ \mathbf{y} = \mathbf{x}_i + \gamma \mathbf{o}_i $$
 
-While the scaling parameter $\\gamma$ is increased gradually from 0 during the training, the network is configured to first rely on the cues in the local regions and then gradually learn to assign more weight to the regions that are further away.
+While the scaling parameter $\gamma$ is increased gradually from 0 during the training, the network is configured to first rely on the cues in the local regions and then gradually learn to assign more weight to the regions that are further away.
 
 ![](SAGAN-examples.png)
 

@@ -234,11 +234,11 @@ Fig. 6. The overview of R^3 (reinforced ranker-reader) architecture. Both compon
 
 The retriever runs a max-pooling operation per passage and then aggregates to output a probability of each passage entailing the answer.
 
-$$ \begin{aligned} \mathbf{u}_i &= \text{max-pooling}(\mathbf{H}^\text{rank}_i) \in \mathbb{R}^l \\ \mathbf{C} &= \text{tanh}(\mathbf{W}^c\[\mathbf{u}_1;\dots;\mathbf{u}_N\] + \mathbf{b}^c \otimes \mathbf{e}_N) \in \mathbb{R}^{l \times n} \\ \\gamma &= \text{softmax}(\mathbf{w}^c \mathbf{C}) \in \mathbb{R}^n \end{aligned} $$
+$$ \begin{aligned} \mathbf{u}_i &= \text{max-pooling}(\mathbf{H}^\text{rank}_i) \in \mathbb{R}^l \\ \mathbf{C} &= \text{tanh}(\mathbf{W}^c\[\mathbf{u}_1;\dots;\mathbf{u}_N\] + \mathbf{b}^c \otimes \mathbf{e}_N) \in \mathbb{R}^{l \times n} \\ \gamma &= \text{softmax}(\mathbf{w}^c \mathbf{C}) \in \mathbb{R}^n \end{aligned} $$
 
-Finally, the retriever is viewed as a _policy_ to output action to sample a passage according to predicted $\\gamma$,
+Finally, the retriever is viewed as a _policy_ to output action to sample a passage according to predicted $\gamma$,
 
-$$ \pi(z \vert x; \theta^\\gamma) = \\gamma_z $$
+$$ \pi(z \vert x; \theta^\gamma) = \gamma_z $$
 
 The reader predicts the start position $\beta^s$ and the end position $\beta^e$ of the answer span. Two positions are computed in the same way, with independent parameters to learn. There are $V$ words in all the passages involved.
 

@@ -70,13 +70,13 @@ $S_t, A_t, R_t$
 
 State, action, and reward at time step $t$ of one trajectory. I may occasionally use $s_t, a_t, r_t$ as well.
 
-$\\gamma$
+$\gamma$
 
-Discount factor; penalty to uncertainty of future rewards; $0<\\gamma \leq 1$.
+Discount factor; penalty to uncertainty of future rewards; $0<\gamma \leq 1$.
 
 $G_t$
 
-Return; or discounted future reward; $G_t = \sum_{k=0}^{\infty} \\gamma^k R_{t+k+1}$.
+Return; or discounted future reward; $G_t = \sum_{k=0}^{\infty} \gamma^k R_{t+k+1}$.
 
 $P(s', r \vert s, a)$
 
@@ -198,7 +198,7 @@ The process is pretty straightforward:
 2.  Generate one trajectory on policy $\pi_\theta$: $S_1, A_1, R_2, S_2, A_2, \dots, S_T$.
 3.  For t=1, 2, … , T:
     1.  Estimate the the return $G_t$;
-    2.  Update policy parameters: $\theta \\leftarrow \theta + \alpha \\gamma^t G_t \\nabla_\theta \\ln \pi_\theta(A_t \vert S_t)$
+    2.  Update policy parameters: $\theta \\leftarrow \theta + \alpha \gamma^t G_t \\nabla_\theta \\ln \pi_\theta(A_t \vert S_t)$
 
 A widely used variation of REINFORCE is to subtract a baseline value from the return $G_t$ to _reduce the variance of gradient estimation while keeping the bias unchanged_ (Remember we always want to do this when possible). For example, a common baseline is to subtract state-value from action-value, and if applied, we would use advantage $A(s, a) = Q(s, a) - V(s)$ in the gradient ascent update. This [post](https://danieltakeshi.github.io/2017/03/28/going-deeper-into-reinforcement-learning-fundamentals-of-policy-gradients/) nicely explained why a baseline works for reducing the variance, in addition to a set of fundamentals of policy gradient.
 
@@ -219,7 +219,7 @@ Let's see how it works in a simple action-value actor-critic algorithm.
     2.  Then sample the next action $a' \sim \pi_\theta(a' \vert s')$;
     3.  Update the policy parameters: $\theta \\leftarrow \theta + \alpha_\theta Q_w(s, a) \\nabla_\theta \\ln \pi_\theta(a \vert s)$;
     4.  Compute the correction (TD error) for action-value at time t:  
-        $\delta_t = r_t + \\gamma Q_w(s', a') - Q_w(s, a)$  
+        $\delta_t = r_t + \gamma Q_w(s', a') - Q_w(s, a)$  
         and use it to update the parameters of action-value function:  
         $w \\leftarrow w + \alpha_w \delta_t \\nabla_w Q_w(s, a)$
     5.  Update $a \\leftarrow a'$ and $s \\leftarrow s'$.
@@ -273,7 +273,7 @@ Here is the algorithm outline:
 
     $$ R = \begin{cases} 0 & \text{if } s_t \text{ is TERMINAL} \\ V_{w'}(s_t) & \text{otherwise} \end{cases} $$
 
-    6\. For $i = t-1, \dots, t\\_\text{start}$: 1. $R \\leftarrow \\gamma R + R\\_i$; here R is a MC measure of $G\\_i$. 2. Accumulate gradients w.r.t. $\theta'$: $d\theta \\leftarrow d\theta + \\nabla\\_{\theta'} \log \pi\\_{\theta'}(a\\_i \vert s\\_i)(R - V\\_{w'}(s\\_i))$;  
+    6\. For $i = t-1, \dots, t\\_\text{start}$: 1. $R \\leftarrow \gamma R + R\\_i$; here R is a MC measure of $G\\_i$. 2. Accumulate gradients w.r.t. $\theta'$: $d\theta \\leftarrow d\theta + \\nabla\\_{\theta'} \log \pi\\_{\theta'}(a\\_i \vert s\\_i)(R - V\\_{w'}(s\\_i))$;  
     Accumulate gradients w.r.t. w': $dw \\leftarrow dw + 2 (R - V\\_{w'}(s\\_i)) \\nabla\\_{w'} (R - V\\_{w'}(s\\_i))$. 7. Update asynchronously $\theta$ using $\\mathrm{d}\theta$, and $w$ using $\\mathrm{d}w$.
 
 A3C enables the parallelism in multiple agent training. The gradient accumulation step (6.2) can be considered as a parallelized reformation of minibatch-based stochastic gradient update: the values of $w$ or $\theta$ get corrected by a little bit in the direction of each training thread independently.
@@ -300,7 +300,7 @@ Refresh on a few notations to facilitate the discussion:
 
 - $\rho_0(s)$: The initial distribution over states
 - $\rho^\mu(s \to s', k)$: Starting from state s, the visitation probability density at state s' after moving k steps by policy $\mu$.
-- $\rho^\mu(s')$: Discounted state distribution, defined as $\rho^\mu(s') = \int_\mathcal{S} \sum_{k=1}^\infty \\gamma^{k-1} \rho_0(s) \rho^\mu(s \to s', k) ds$.
+- $\rho^\mu(s')$: Discounted state distribution, defined as $\rho^\mu(s') = \int_\mathcal{S} \sum_{k=1}^\infty \gamma^{k-1} \rho_0(s) \rho^\mu(s \to s', k) ds$.
 
 The objective function to optimize for is listed as follows:
 
@@ -316,7 +316,7 @@ The deterministic policy gradient theorem can be plugged into common policy grad
 
 Let's consider an example of on-policy actor-critic algorithm to showcase the procedure. In each iteration of on-policy actor-critic, two actions are taken deterministically $a = \mu_\theta(s)$ and the [SARSA](https://lilianweng.github.io/posts/2018-02-19-rl-overview/#sarsa-on-policy-td-control) update on policy parameters relies on the new gradient that we just computed above:
 
-$$ \begin{aligned} \delta_t &= R_t + \\gamma Q_w(s_{t+1}, a_{t+1}) - Q_w(s_t, a_t) & \\small{\text{; TD error in SARSA}}\\ w_{t+1} &= w_t + \alpha_w \delta_t \\nabla_w Q_w(s_t, a_t) & \\ \theta_{t+1} &= \theta_t + \alpha_\theta \color{red}{\\nabla_a Q_w(s_t, a_t) \\nabla_\theta \mu_\theta(s) \\rvert_{a=\mu_\theta(s)}} & \\small{\text{; Deterministic policy gradient theorem}} \end{aligned} $$
+$$ \begin{aligned} \delta_t &= R_t + \gamma Q_w(s_{t+1}, a_{t+1}) - Q_w(s_t, a_t) & \\small{\text{; TD error in SARSA}}\\ w_{t+1} &= w_t + \alpha_w \delta_t \\nabla_w Q_w(s_t, a_t) & \\ \theta_{t+1} &= \theta_t + \alpha_\theta \color{red}{\\nabla_a Q_w(s_t, a_t) \\nabla_\theta \mu_\theta(s) \\rvert_{a=\mu_\theta(s)}} & \\small{\text{; Deterministic policy gradient theorem}} \end{aligned} $$
 
 However, unless there is sufficient noise in the environment, it is very hard to guarantee enough [exploration](https://lilianweng.github.io/posts/2018-02-19-rl-overview/#exploration-exploitation-dilemma) due to the determinacy of the policy. We can either add noise into the policy (ironically this makes it nondeterministic!) or learn it off-policy-ly by following a different stochastic behavior policy to collect samples.
 
@@ -358,7 +358,7 @@ $$ \begin{aligned} \\nabla_\theta J(\theta) &\approx \mathbb{E}_{\rho^\mu} \[\\n
 
 (2) **$N$-step returns**: When calculating the TD error, D4PG computes $N$-step TD target rather than one-step to incorporate rewards in more future steps. Thus the new TD target is:
 
-$$ r(s_0, a_0) + \mathbb{E}\[\sum_{n=1}^{N-1} r(s_n, a_n) + \\gamma^N Q(s_N, \mu_\theta(s_N)) \vert s_0, a_0 \] $$
+$$ r(s_0, a_0) + \mathbb{E}\[\sum_{n=1}^{N-1} r(s_n, a_n) + \gamma^N Q(s_N, \mu_\theta(s_N)) \vert s_0, a_0 \] $$
 
 (3) **Multiple Distributed Parallel Actors**: D4PG utilizes $K$ independent actors, gathering experience in parallel and feeding data into the same replay buffer.
 
@@ -388,7 +388,7 @@ Where $\mathcal{D}$ is the memory buffer for experience replay, containing multi
 
 **Critic update**:
 
-$$ \begin{aligned} \mathcal{L}(\theta_i) &= \mathbb{E}_{\\vec{o}, a_1, \dots, a_N, r_1, \dots, r_N, \\vec{o}'}\[ (Q^{\\vec{\mu}}_i(\\vec{o}, a_1, \dots, a_N) - y)^2 \] & \\ \text{where } y &= r_i + \\gamma Q^{\\vec{\mu}'}_i (\\vec{o}', a'_1, \dots, a'_N) \\rvert_{a'_j = \mu'_{\theta_j}} & \\scriptstyle{\text{; TD target!}} \end{aligned} $$
+$$ \begin{aligned} \mathcal{L}(\theta_i) &= \mathbb{E}_{\\vec{o}, a_1, \dots, a_N, r_1, \dots, r_N, \\vec{o}'}\[ (Q^{\\vec{\mu}}_i(\\vec{o}, a_1, \dots, a_N) - y)^2 \] & \\ \text{where } y &= r_i + \gamma Q^{\\vec{\mu}'}_i (\\vec{o}', a'_1, \dots, a'_N) \\rvert_{a'_j = \mu'_{\theta_j}} & \\scriptstyle{\text{; TD target!}} \end{aligned} $$
 
 where $\\vec{\mu}'$ are the target policies with delayed softly-updated parameters.
 
@@ -517,16 +517,16 @@ Fig. 7. The mean normalized performance of PPG vs PPO on the [Procgen](https://a
 
 Recall how TD learning works for prediction:
 
-1.  Compute TD error: $\delta_t = R_t + \\gamma \mathbb{E}_{a \sim \pi} Q(S_{t+1}, a) - Q(S_t, A_t)$; the term $r_t + \\gamma \mathbb{E}_{a \sim \pi} Q(s_{t+1}, a) $ is known as “TD target”. The expectation $\mathbb{E}_{a \sim \pi}$ is used because for the future step the best estimation we can make is what the return would be if we follow the current policy $\pi$.
+1.  Compute TD error: $\delta_t = R_t + \gamma \mathbb{E}_{a \sim \pi} Q(S_{t+1}, a) - Q(S_t, A_t)$; the term $r_t + \gamma \mathbb{E}_{a \sim \pi} Q(s_{t+1}, a) $ is known as “TD target”. The expectation $\mathbb{E}_{a \sim \pi}$ is used because for the future step the best estimation we can make is what the return would be if we follow the current policy $\pi$.
 2.  Update the value by correcting the error to move toward the goal: $Q(S_t, A_t) \\leftarrow Q(S_t, A_t) + \alpha \delta_t$. In other words, the incremental update on Q is proportional to the TD error: $\\Delta Q(S_t, A_t) = \alpha \delta_t$.
 
 When the rollout is off policy, we need to apply importance sampling on the Q update:
 
-$$ \\Delta Q^\text{imp}(S_t, A_t) = \\gamma^t \prod_{1 \leq \tau \leq t} \frac{\pi(A_\tau \vert S_\tau)}{\beta(A_\tau \vert S_\tau)} \delta_t $$
+$$ \\Delta Q^\text{imp}(S_t, A_t) = \gamma^t \prod_{1 \leq \tau \leq t} \frac{\pi(A_\tau \vert S_\tau)}{\beta(A_\tau \vert S_\tau)} \delta_t $$
 
 The product of importance weights looks pretty scary when we start imagining how it can cause super high variance and even explode. Retrace Q-value estimation method modifies $\\Delta Q$ to have importance weights truncated by no more than a constant $c$:
 
-$$ \\Delta Q^\text{ret}(S_t, A_t) = \\gamma^t \prod_{1 \leq \tau \leq t} \min(c, \frac{\pi(A_\tau \vert S_\tau)}{\beta(A_\tau \vert S_\tau)}) \delta_t $$
+$$ \\Delta Q^\text{ret}(S_t, A_t) = \gamma^t \prod_{1 \leq \tau \leq t} \min(c, \frac{\pi(A_\tau \vert S_\tau)}{\beta(A_\tau \vert S_\tau)}) \delta_t $$
 
 ACER uses $Q^\text{ret}$ as the target to train the critic by minimizing the L2 error term: $(Q^\text{ret}(s, a) - Q(s, a))^2$.
 
@@ -592,9 +592,9 @@ Precisely, SAC aims to learn three functions:
 
 Soft Q-value and soft state value are defined as:
 
-$$ \begin{aligned} Q(s_t, a_t) &= r(s_t, a_t) + \\gamma \mathbb{E}_{s_{t+1} \sim \rho_{\pi}(s)} \[V(s_{t+1})\] & \text{; according to Bellman equation.}\\ \text{where }V(s_t) &= \mathbb{E}_{a_t \sim \pi} \[Q(s_t, a_t) - \alpha \log \pi(a_t \vert s_t)\] & \text{; soft state value function.} \end{aligned} $$
+$$ \begin{aligned} Q(s_t, a_t) &= r(s_t, a_t) + \gamma \mathbb{E}_{s_{t+1} \sim \rho_{\pi}(s)} \[V(s_{t+1})\] & \text{; according to Bellman equation.}\\ \text{where }V(s_t) &= \mathbb{E}_{a_t \sim \pi} \[Q(s_t, a_t) - \alpha \log \pi(a_t \vert s_t)\] & \text{; soft state value function.} \end{aligned} $$
 
-$$ \text{Thus, } Q(s_t, a_t) = r(s_t, a_t) + \\gamma \mathbb{E}_{(s_{t+1}, a_{t+1}) \sim \rho_{\pi}} \[Q(s_{t+1}, a_{t+1}) - \alpha \log \pi(a_{t+1} \vert s_{t+1})\] $$
+$$ \text{Thus, } Q(s_t, a_t) = r(s_t, a_t) + \gamma \mathbb{E}_{(s_{t+1}, a_{t+1}) \sim \rho_{\pi}} \[Q(s_{t+1}, a_{t+1}) - \alpha \log \pi(a_{t+1} \vert s_{t+1})\] $$
 
 $\rho_\pi(s)$ and $\rho_\pi(s, a)$ denote the state and the state-action marginals of the state distribution induced by the policy $\pi(a \vert s)$; see the similar definitions in [DPG](#dpg) section.
 
@@ -606,7 +606,7 @@ where $\mathcal{D}$ is the replay buffer.
 
 The soft Q function is trained to minimize the soft Bellman residual:
 
-$$ \begin{aligned} J_Q(w) &= \mathbb{E}_{(s_t, a_t) \sim \mathcal{D}} \[\frac{1}{2}\big( Q_w(s_t, a_t) - (r(s_t, a_t) + \\gamma \mathbb{E}_{s_{t+1} \sim \rho_\pi(s)}\[V_{\bar{\\psi}}(s_{t+1})\]) \big)^2\] \\ \text{with gradient: } \\nabla_w J_Q(w) &= \\nabla_w Q_w(s_t, a_t) \big( Q_w(s_t, a_t) - r(s_t, a_t) - \\gamma V_{\bar{\\psi}}(s_{t+1})\big) \end{aligned} $$
+$$ \begin{aligned} J_Q(w) &= \mathbb{E}_{(s_t, a_t) \sim \mathcal{D}} \[\frac{1}{2}\big( Q_w(s_t, a_t) - (r(s_t, a_t) + \gamma \mathbb{E}_{s_{t+1} \sim \rho_\pi(s)}\[V_{\bar{\\psi}}(s_{t+1})\]) \big)^2\] \\ \text{with gradient: } \\nabla_w J_Q(w) &= \\nabla_w Q_w(s_t, a_t) \big( Q_w(s_t, a_t) - r(s_t, a_t) - \gamma V_{\bar{\\psi}}(s_{t+1})\big) \end{aligned} $$
 
 where $\bar{\\psi}$ is the target value function which is the exponential moving average (or only gets updated periodically in a “hard” way), just like how the parameter of the target Q network is treated in [DQN](https://lilianweng.github.io/posts/2018-02-19-rl-overview/#deep-q-network) to stabilize the training.
 
@@ -638,7 +638,7 @@ The expected return $\mathbb{E} \Big\[ \sum_{t=0}^T r(s_t, a_t)\Big\]$ can be de
 
 $$ \underbrace{\max_{\pi_0} \Big( \mathbb{E}\[r(s_0, a_0)\]+ \underbrace{\max_{\pi_1} \Big(\mathbb{E}\[...\] + \underbrace{\max_{\pi_T} \mathbb{E}\[r(s_T, a_T)\]}_\text{1st maximization} \Big)}_\text{second but last maximization} \Big)}_\text{last maximization} $$
 
-where we consider $\\gamma=1$.
+where we consider $\gamma=1$.
 
 So we start the optimization from the last timestep $T$:
 
@@ -711,11 +711,11 @@ The Q-learning algorithm is commonly known to suffer from the overestimation of 
 
 (1) **Clipped Double Q-learning**: In Double Q-Learning, the action selection and Q-value estimation are made by two networks separately. In the DDPG setting, given two deterministic actors $(\mu_{\theta_1}, \mu_{\theta_2})$ with two corresponding critics $(Q_{w_1}, Q_{w_2})$, the Double Q-learning Bellman targets look like:
 
-$$ \begin{aligned} y_1 &= r + \\gamma Q_{w_2}(s', \mu_{\theta_1}(s'))\\ y_2 &= r + \\gamma Q_{w_1}(s', \mu_{\theta_2}(s')) \end{aligned} $$
+$$ \begin{aligned} y_1 &= r + \gamma Q_{w_2}(s', \mu_{\theta_1}(s'))\\ y_2 &= r + \gamma Q_{w_1}(s', \mu_{\theta_2}(s')) \end{aligned} $$
 
 However, due to the slow changing policy, these two networks could be too similar to make independent decisions. The _Clipped Double Q-learning_ instead uses the minimum estimation among two so as to favor underestimation bias which is hard to propagate through training:
 
-$$ \begin{aligned} y_1 &= r + \\gamma \min_{i=1,2}Q_{w_i}(s', \mu_{\theta_1}(s'))\\ y_2 &= r + \\gamma \min_{i=1,2} Q_{w_i}(s', \mu_{\theta_2}(s')) \end{aligned} $$
+$$ \begin{aligned} y_1 &= r + \gamma \min_{i=1,2}Q_{w_i}(s', \mu_{\theta_1}(s'))\\ y_2 &= r + \gamma \min_{i=1,2} Q_{w_i}(s', \mu_{\theta_2}(s')) \end{aligned} $$
 
 (2) **Delayed update of Target and Policy Networks**: In the [actor-critic](https://lilianweng.github.io/posts/2018-02-19-rl-overview/#actor-critic) model, policy and value updates are deeply coupled: Value estimates diverge through overestimation when the policy is poor, and the policy will become poor if the value estimate itself is inaccurate.
 
@@ -723,7 +723,7 @@ To reduce the variance, TD3 updates the policy at a lower frequency than the Q-f
 
 (3) **Target Policy Smoothing**: Given a concern with deterministic policies that they can overfit to narrow peaks in the value function, TD3 introduced a smoothing regularization strategy on the value function: adding a small amount of clipped random noises to the selected action and averaging over mini-batches.
 
-$$ \begin{aligned} y &= r + \\gamma Q_w (s', \mu_{\theta}(s') + \\epsilon) & \\ \\epsilon &\sim \text{clip}(\mathcal{N}(0, \sigma), -c, +c) & \\scriptstyle{\text{ ; clipped random noises.}} \end{aligned} $$
+$$ \begin{aligned} y &= r + \gamma Q_w (s', \mu_{\theta}(s') + \\epsilon) & \\ \\epsilon &\sim \text{clip}(\mathcal{N}(0, \sigma), -c, +c) & \\scriptstyle{\text{ ; clipped random noises.}} \end{aligned} $$
 
 This approach mimics the idea of [SARSA](https://lilianweng.github.io/posts/2018-02-19-rl-overview/#sarsa-on-policy-td-control) update and enforces that similar actions should have similar values.
 
@@ -808,7 +808,7 @@ Let the value function $V_\theta$ parameterized by $\theta$ and the policy $\pi_
 
 At the training time $t$, given $(s_t, a_t, s_{t+1}, r_t)$, the value function parameter $\theta$ is learned through an L2 loss between the current value and a V-trace value target. The $n$-step V-trace target is defined as:
 
-$$ \begin{aligned} v_t &= V_\theta(s_t) + \sum_{i=t}^{t+n-1} \\gamma^{i-t} \big(\prod_{j=t}^{i-1} c_j\big) \color{red}{\delta_i V} \\ &= V_\theta(s_t) + \sum_{i=t}^{t+n-1} \\gamma^{i-t} \big(\prod_{j=t}^{i-1} c_j\big) \color{red}{\rho_i (r_i + \\gamma V_\theta(s_{i+1}) - V_\theta(s_i))} \end{aligned} $$
+$$ \begin{aligned} v_t &= V_\theta(s_t) + \sum_{i=t}^{t+n-1} \gamma^{i-t} \big(\prod_{j=t}^{i-1} c_j\big) \color{red}{\delta_i V} \\ &= V_\theta(s_t) + \sum_{i=t}^{t+n-1} \gamma^{i-t} \big(\prod_{j=t}^{i-1} c_j\big) \color{red}{\rho_i (r_i + \gamma V_\theta(s_{i+1}) - V_\theta(s_i))} \end{aligned} $$
 
 where the red part $\delta_i V$ is a temporal difference for $V$. $\rho_i = \min\big(\bar{\rho}, \frac{\pi(a_i \vert s_i)}{\mu(a_i \vert s_i)}\big)$ and $c_j = \min\big(\bar{c}, \frac{\pi(a_j \vert s_j)}{\mu(a_j \vert s_j)}\big)$ are _truncated [importance sampling (IS)](#off-policy-policy-gradient) weights_. The product of $c_t, \dots, c_{i-1}$ measures how much a temporal difference $\delta_i V$ observed at time $i$ impacts the update of the value function at a previous time $t$. In the on-policy case, we have $\rho_i=1$ and $c_j=1$ (assuming $\bar{c} \\geq 1$) and therefore the V-trace target becomes on-policy $n$-step Bellman target.
 
@@ -820,9 +820,9 @@ $$ \\Delta\theta = (v_t - V_\theta(s_t))\\nabla_\theta V_\theta(s_t) $$
 
 The policy parameter $\phi$ is updated through policy gradient,
 
-$$ \begin{aligned} \\Delta \phi &= \rho_t \\nabla_\phi \log \pi_\phi(a_t \vert s_t) \big(r_t + \\gamma v_{t+1} - V_\theta(s_t)\big) + \\nabla_\phi H(\pi_\phi)\\ &= \rho_t \\nabla_\phi \log \pi_\phi(a_t \vert s_t) \big(r_t + \\gamma v_{t+1} - V_\theta(s_t)\big) - \\nabla_\phi \sum_a \pi_\phi(a\vert s_t)\log \pi_\phi(a\vert s_t) \end{aligned} $$
+$$ \begin{aligned} \\Delta \phi &= \rho_t \\nabla_\phi \log \pi_\phi(a_t \vert s_t) \big(r_t + \gamma v_{t+1} - V_\theta(s_t)\big) + \\nabla_\phi H(\pi_\phi)\\ &= \rho_t \\nabla_\phi \log \pi_\phi(a_t \vert s_t) \big(r_t + \gamma v_{t+1} - V_\theta(s_t)\big) - \\nabla_\phi \sum_a \pi_\phi(a\vert s_t)\log \pi_\phi(a\vert s_t) \end{aligned} $$
 
-where $r_t + \\gamma v_{t+1}$ is the estimated Q value, from which a state-dependent baseline $V_\theta(s_t)$ is subtracted. $H(\pi_\phi)$ is an entropy bonus to encourage exploration.
+where $r_t + \gamma v_{t+1}$ is the estimated Q value, from which a state-dependent baseline $V_\theta(s_t)$ is subtracted. $H(\pi_\phi)$ is an entropy bonus to encourage exploration.
 
 In the experiments, IMPALA is used to train one agent over multiple tasks. Two different model architectures are involved, a shallow model (left) and a deep residual model (right).
 

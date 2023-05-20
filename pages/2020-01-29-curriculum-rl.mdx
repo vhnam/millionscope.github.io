@@ -134,7 +134,7 @@ Let us consider Alice and Bob as two separate copies for one RL agent trained in
 
 Note that since B has to repeat the actions between the same pair of $(s_0, s_t)$ of A, this framework only works in reversible or resettable environments.
 
-Alice should learn to push Bob out of his comfort zone, but not give him impossible tasks. Bob's reward is set as $R_B = -\\gamma t_B$ and Alice's reward is $R_A = \\gamma \max(0, t_B - t_A)$, where $t_B$ is the total time for B to complete the task, $t_A$ is the time until Alice performs the STOP action and $\\gamma$ is a scalar constant to rescale the reward to be comparable with the external task reward. If B fails a task, $t_B = t_\max - t_A$. Both policies are goal-conditioned. The losses imply:
+Alice should learn to push Bob out of his comfort zone, but not give him impossible tasks. Bob's reward is set as $R_B = -\gamma t_B$ and Alice's reward is $R_A = \gamma \max(0, t_B - t_A)$, where $t_B$ is the total time for B to complete the task, $t_A$ is the time until Alice performs the STOP action and $\gamma$ is a scalar constant to rescale the reward to be comparable with the external task reward. If B fails a task, $t_B = t_\max - t_A$. Both policies are goal-conditioned. The losses imply:
 
 1.  B wants to finish a task asap.
 2.  A prefers tasks that take more time of B.
