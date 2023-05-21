@@ -33,12 +33,12 @@ Fig. 1. Conceptual illustrations of three approaches for sim2real transfer.
 
 ## What is Domain Randomization?[#](#what-is-domain-randomization)
 
-To make the definition more general, let us call the environment that we have full access to (i.e. simulator) **source domain** and the environment that we would like to transfer the model to **target domain** (i.e. physical world). Training happens in the source domain. We can control a set of $N$ randomization parameters in the source domain $e_\xi$ with a configuration $\xi$, sampled from a randomization space, $\xi \in \\Xi \subset \mathbb{R}^N$.
+To make the definition more general, let us call the environment that we have full access to (i.e. simulator) **source domain** and the environment that we would like to transfer the model to **target domain** (i.e. physical world). Training happens in the source domain. We can control a set of $N$ randomization parameters in the source domain $e_\xi$ with a configuration $\xi$, sampled from a randomization space, $\xi \in \Xi \subset \mathbb{R}^N$.
 
 During policy training, episodes are collected from source domain with randomization applied. Thus the policy is exposed to a variety of environments and learns to generalize. The policy parameter $\theta$ is trained to maximize the expected reward $R(.)$ average across a distribution of configurations:
 
 $$
-\theta^* = \arg\max_\theta \mathbb{E}_{\xi \sim \\Xi} [\mathbb{E}_{\pi_\theta, \tau \sim e_\xi} [R(\tau)]]
+\theta^* = \arg\max_\theta \mathbb{E}_{\xi \sim \Xi} [\mathbb{E}_{\pi_\theta, \tau \sim e_\xi} [R(\tau)]]
 $$
 
 where $\tau_\xi$ is a trajectory collected in source domain randomized with $\xi$. In a way, _"discrepancies between the source and target domains are modeled as variability in the source domain."_ (quote from [Peng et al. 2018](https://arxiv.org/abs/1710.06537)).

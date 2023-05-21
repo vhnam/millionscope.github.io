@@ -275,7 +275,7 @@ Essentially in training, given a passage $z$ sampled by the retriever, the reade
 
 $$
 R(y, \hat{y} \vert z) = \begin{cases} 2 & \text{if } y = \hat{y}\\
-f1(y, \hat{y}) & \text{if } y \\cap \hat{y} = \\varnothing \\
+f1(y, \hat{y}) & \text{if } y \cap \hat{y} = \varnothing \\
 -1 & \text{otherwise} \end{cases}
 $$
 
@@ -292,8 +292,8 @@ Fig. 8. An illustration of the retriever component in ORQA. (Image source: replo
 All the evidence blocks are ranked by a retrieval score, defined as the inner product of BERT embedding vectors of the `[CLS]` token of the question $x$ and the evidence block $z$. Note that the encoders for questions and context are independent.
 
 $$
-\begin{aligned} h_x &= \mathbf{W}_x \text{BERT}_x(x)^{\\mathtt{[CLS]}} \\
-h_z &= \mathbf{W}_z \text{BERT}_z(z)^{\\mathtt{[CLS]}} \\
+\begin{aligned} h_x &= \mathbf{W}_x \text{BERT}_x(x)^{\mathtt{[CLS]}} \\
+h_z &= \mathbf{W}_z \text{BERT}_z(z)^{\mathtt{[CLS]}} \\
 S_\text{retr}(z, x) &= h_x^\top h_z \end{aligned}
 $$
 

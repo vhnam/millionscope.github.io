@@ -233,7 +233,7 @@ There are several approaches for using a proxy task performance as the performan
 - Train on a smaller dataset.
 - Train for fewer epochs.
 - Train and evaluate a down-scaled model in the search stage. For example, once a cell structure is learned, we can play with the number of cell repeats or scale up the number of filters ([Zoph et al. 2018](https://arxiv.org/abs/1707.07012)).
-- Predict the learning curve. [Baker et al (2018)](https://arxiv.org/abs/1705.10823) model the prediction of validation accuracies as a time-series regression problem. The features for the regression model ($\\nu$-support vector machine regressions; $\\nu$-SVR) include the early sequences of accuracy per epoch, architecture parameters, and hyperparameters.
+- Predict the learning curve. [Baker et al (2018)](https://arxiv.org/abs/1705.10823) model the prediction of validation accuracies as a time-series regression problem. The features for the regression model ($nu$-support vector machine regressions; $nu$-SVR) include the early sequences of accuracy per epoch, architecture parameters, and hyperparameters.
 
 ### Parameter Sharing[#](#parameter-sharing)
 

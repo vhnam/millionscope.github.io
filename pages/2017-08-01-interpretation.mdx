@@ -49,7 +49,9 @@ Naive Bayes is named as "Naive" because it works on a very simplified assumption
 Given a feature vector $\mathbf{x} = [x_1, x_2, \dots, x_n]$ and a class label $c \in \{1, 2, \dots, C\}$, the probability of this data point belonging to this class is:
 
 $$
-\begin{aligned} p(c | x_1, x_2, \dots, x_n) &\propto p(c, x_1, x_2, \dots, x_n)\\ &\propto p(c) p(x_1 | c) p(x_2 | c) \dots p(x_n | c)\\ &\propto p(c) \prod_{i=1}^n p(x_i | c). \end{aligned}
+\begin{aligned} p(c | x_1, x_2, \dots, x_n) &\propto p(c, x_1, x_2, \dots, x_n)\\
+&\propto p(c) p(x_1 | c) p(x_2 | c) \dots p(x_n | c)\\
+&\propto p(c) \prod_{i=1}^n p(x_i | c). \end{aligned}
 $$
 
 The Naive Bayes classifier is then defined as:
@@ -110,7 +112,8 @@ $$
 **Another problem**: If we generate $x \backslash A_i$ by replacing $A_i$ with a missing value (like `None`, `NaN`, etc.), we have to rely on the model's internal mechanism for missing value imputation. A model which replaces these missing cases with the median should have output very different from a model which imputes a special placeholder. One solution as presented in the paper is to replace $A_i$ with all possible values of this feature and then sum up the prediction weighted by how likely each value shows in the data:
 
 $$
-\begin{aligned} p(y \vert x \backslash A_i) &= \sum_{s=1}^{m_i} p(A_i=a_s \vert x \backslash A_i) p(y \vert x \leftarrow A_i=a_s) \\ &\approx \sum_{s=1}^{m_i} p(A_i=a_s) p(y \vert x \leftarrow A_i=a_s) \end{aligned}
+\begin{aligned} p(y \vert x \backslash A_i) &= \sum_{s=1}^{m_i} p(A_i=a_s \vert x \backslash A_i) p(y \vert x \leftarrow A_i=a_s) \\
+&\approx \sum_{s=1}^{m_i} p(A_i=a_s) p(y \vert x \leftarrow A_i=a_s) \end{aligned}
 $$
 
 Where $p(y \vert x \leftarrow A_i=a_s)$ is the probability of getting label $y$ if we replace the feature $A_i$ with value $a_s$ in the feature vector of $x$. There are $m_i$ unique values of $A_i$ in the training set.
@@ -119,7 +122,7 @@ With the help of the measures of prediction difference when omitting known featu
 
 ![](assets/images/2017-08-01-interpretation/interpretability_prediction_decomposition.png)
 
-Fig. 1. Explanations for a SVM model predicting the survival of one male adult first-class passenger in the [Titanic dataset](https://www.kaggle.com/c/titanic/data). The information difference is very similar to the probability difference, but it measures the amount of information necessary to find out $y$ is true for the given instance without the knowledge of $A\\_i$: $\text{infDiff}\\_i (y|x) = \log\\_2 p(y|x) - \log\\_2 p(y|x \backslash A\\_i)$. Explanations for particular instance are depicted with dark bars. The light shaded half-height bars are average positive and negative explanations for given attributes' values. In this case, being a male adult makes it very less likely to survive; the class level does not impact as much.
+Fig. 1. Explanations for a SVM model predicting the survival of one male adult first-class passenger in the [Titanic dataset](https://www.kaggle.com/c/titanic/data). The information difference is very similar to the probability difference, but it measures the amount of information necessary to find out $y$ is true for the given instance without the knowledge of $A_i$: $\text{infDiff}_i (y|x) = \log_2 p(y|x) - \log_2 p(y|x \backslash A_i)$. Explanations for particular instance are depicted with dark bars. The light shaded half-height bars are average positive and negative explanations for given attributes' values. In this case, being a male adult makes it very less likely to survive; the class level does not impact as much.
 
 ### Local Gradient Explanation Vector[#](#local-gradient-explanation-vector)
 
@@ -144,7 +147,8 @@ Where $I_c$ is the index set containing the indices of data points assigned to c
 (2) Then, apply the Bayes' rule to approximate the probability $p(Y=c \vert X=x)$ for all classes:
 
 $$
-\begin{aligned} \hat{p}_{\sigma}(y=c | x) &= \frac{\hat{p}_{\sigma}(x, y=c)}{\hat{p}_{\sigma}(x, y=c) + \hat{p}_{\sigma}(x, y \neq c)} \\ &\approx \frac{\sum_{i \in I_c} k_{\sigma} (x - x_i)}{\sum_i k_{\sigma} (x - x_i)} \end{aligned}
+\begin{aligned} \hat{p}_{\sigma}(y=c | x) &= \frac{\hat{p}_{\sigma}(x, y=c)}{\hat{p}_{\sigma}(x, y=c) + \hat{p}_{\sigma}(x, y \neq c)} \\
+&\approx \frac{\sum_{i \in I_c} k_{\sigma} (x - x_i)}{\sum_i k_{\sigma} (x - x_i)} \end{aligned}
 $$
 
 (3) The final estimated Bayes classifier takes the form:
@@ -210,7 +214,7 @@ The authors proposed an novel objective function so that the learning process is
 
 ![](assets/images/2017-08-01-interpretation/BETA.png)
 
-Fig. 6. Measures for desiderata of a good model explanation: fidelity, unambiguity, and interpretability. Given the target model is $\mathcal{B}$, its explanation is a two level decision set $\Re$ containing a set of rules ${(q\\_1, s\\_1, c\\_1), \dots, (q\\_M, s\\_M, c\\_M)}$, where $q\\_i$ and $s\\_i$ are conjunctions of predicates of the form (feature, operator, value) and $c\\_i$ is a class label. Check [the paper](https://arxiv.org/abs/1707.01154) for more details. (Image source: [arxiv.org/abs/1707.01154](https://arxiv.org/abs/1707.01154))
+Fig. 6. Measures for desiderata of a good model explanation: fidelity, unambiguity, and interpretability. Given the target model is $\mathcal{B}$, its explanation is a two level decision set $\Re$ containing a set of rules ${(q_1, s_1, c_1), \dots, (q_M, s_M, c_M)}$, where $q_i$ and $s_i$ are conjunctions of predicates of the form (feature, operator, value) and $c_i$ is a class label. Check [the paper](https://arxiv.org/abs/1707.01154) for more details. (Image source: [arxiv.org/abs/1707.01154](https://arxiv.org/abs/1707.01154))
 
 ## Explainable Artificial Intelligence[#](#explainable-artificial-intelligence)
 

@@ -376,7 +376,7 @@ The embedding function $\phi_o$ works great for presenting a goal $g$ with an im
 
 ![](assets/images/2019-11-10-self-supervised/grasp2vec-attention-map.png)
 
-Fig. 19. Localization results of grasp2vec embedding. The heatmap of localizing a goal object in a pre-grasping scene is defined as $\phi\\_o(o)^\top \phi\\_{s, \text{spatial}} (s\\_\text{pre})$, where $\phi\\_{s, \text{spatial}}$ is the output of the last resnet block after ReLU. The fourth column is a failure case and the last three columns take real images as goals. (Image source: [Jang & Devin et al., 2018](https://arxiv.org/abs/1811.06964))
+Fig. 19. Localization results of grasp2vec embedding. The heatmap of localizing a goal object in a pre-grasping scene is defined as $\phi\_o(o)^\top \phi\_{s, \text{spatial}} (s\_\text{pre})$, where $\phi\_{s, \text{spatial}}$ is the output of the last resnet block after ReLU. The fourth column is a failure case and the last three columns take real images as goals. (Image source: [Jang & Devin et al., 2018](https://arxiv.org/abs/1811.06964))
 
 Other than the embedding-similarity-based reward function, there are a few other tricks for training the RL policy in the grasp2vec framework:
 
@@ -445,7 +445,7 @@ $$
 
 To create plausible goals, CC-VAE conditions on a starting state $s_0$ so that the generated goal presents a consistent type of object as in $s_0$. This goal consistency is necessary; e.g. if the current scene contains a red puck but the goal has a blue block, it would confuse the policy.
 
-Other than the state encoder $e(s) \\triangleq \mu_\phi(s)$, CC-VAE trains a second convolutional encoder $e_0(.)$ to translate the starting state $s_0$ into a compact context representation $c = e_0(s_0)$. Two encoders, $e(.)$ and $e_0(.)$, are intentionally different without shared weights, as they are expected to encode different factors of image variation. In addition to the loss function of CVAE, CC-VAE adds an extra term to learn to reconstruct $c$ back to $s_0$, $\hat{s}_0 = d_0(c)$.
+Other than the state encoder $e(s) \triangleq \mu_\phi(s)$, CC-VAE trains a second convolutional encoder $e_0(.)$ to translate the starting state $s_0$ into a compact context representation $c = e_0(s_0)$. Two encoders, $e(.)$ and $e_0(.)$, are intentionally different without shared weights, as they are expected to encode different factors of image variation. In addition to the loss function of CVAE, CC-VAE adds an extra term to learn to reconstruct $c$ back to $s_0$, $\hat{s}_0 = d_0(c)$.
 
 $$
 \mathcal{L}_\text{CC-VAE} = \mathcal{L}_\text{CVAE} + \log p(s_0\vert c)
@@ -522,7 +522,7 @@ Similar to DeepMDP, DBC models the dynamics by learning a reward model and a tra
 > \mathcal{F}(d; \pi)(s_i, s_j) = (1-c) \vert \mathcal{R}_{s_i}^\pi - \mathcal{R}_{s_j}^\pi \vert + c W_d (\mathcal{P}_{s_i}^\pi, \mathcal{P}_{s_j}^\pi)
 > $$
 
-> Then, $\mathcal{F}$ has a unique fixed point $\tilde{d}$ which is a $\pi^*$-bisimulation metric and $\tilde{d}(s_i, s_j) = 0 \\iff s_i \sim s_j$.
+> Then, $\mathcal{F}$ has a unique fixed point $\tilde{d}$ which is a $\pi^*$-bisimulation metric and $\tilde{d}(s_i, s_j) = 0 \iff s_i \sim s_j$.
 
 [The proof is not trivial. I may or may not add it in the future _(:3」∠)_ …]
 

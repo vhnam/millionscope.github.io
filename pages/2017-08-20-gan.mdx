@@ -83,7 +83,8 @@ On the other hand, the generator is trained to increase the chances of $D$ produ
 When combining both aspects together, $D$ and $G$ are playing a **minimax game** in which we should optimize the following loss function:
 
 $$
-\begin{aligned} \min_G \max_D L(D, G) & = \mathbb{E}_{x \sim p_{r}(x)} [\log D(x)] + \mathbb{E}_{z \sim p_z(z)} [\log(1 - D(G(z)))] \\ & = \mathbb{E}_{x \sim p_{r}(x)} [\log D(x)] + \mathbb{E}_{x \sim p_g(x)} [\log(1 - D(x)] \end{aligned}
+\begin{aligned} \min_G \max_D L(D, G) & = \mathbb{E}_{x \sim p_{r}(x)} [\log D(x)] + \mathbb{E}_{z \sim p_z(z)} [\log(1 - D(G(z)))] \\
+& = \mathbb{E}_{x \sim p_{r}(x)} [\log D(x)] + \mathbb{E}_{x \sim p_g(x)} [\log(1 - D(x)] \end{aligned}
 $$
 
 ($\mathbb{E}_{x \sim p_{r}(x)} [\log D(x)]$ has no impact on $G$ during gradient descent updates.)
@@ -105,7 +106,11 @@ $$
 And then what is inside the integral (we can safely ignore the integral because $x$ is sampled over all the possible values) is:
 
 $$
-\begin{aligned} f(\tilde{x}) & = A log\tilde{x} + B log(1-\tilde{x}) \\ \frac{d f(\tilde{x})}{d \tilde{x}} & = A \frac{1}{ln10} \frac{1}{\tilde{x}} - B \frac{1}{ln10} \frac{1}{1 - \tilde{x}} \\ & = \frac{1}{ln10} (\frac{A}{\tilde{x}} - \frac{B}{1-\tilde{x}}) \\ & = \frac{1}{ln10} \frac{A - (A + B)\tilde{x}}{\tilde{x} (1 - \tilde{x})} \\ \end{aligned}
+\begin{aligned} f(\tilde{x}) & = A log\tilde{x} + B log(1-\tilde{x}) \\
+\frac{d f(\tilde{x})}{d \tilde{x}} & = A \frac{1}{ln10} \frac{1}{\tilde{x}} - B \frac{1}{ln10} \frac{1}{1 - \tilde{x}} \\
+& = \frac{1}{ln10} (\frac{A}{\tilde{x}} - \frac{B}{1-\tilde{x}}) \\
+& = \frac{1}{ln10} \frac{A - (A + B)\tilde{x}}{\tilde{x} (1 - \tilde{x})} \\
+\end{aligned}
 $$
 
 Thus, set $\frac{d f(\tilde{x})}{d \tilde{x}} = 0$, we get the best value of the discriminator: $D^*(x) = \tilde{x}^* = \frac{A}{A + B} = \frac{p_{r}(x)}{p_{r}(x) + p_g(x)} \in [0, 1]$.
@@ -117,7 +122,9 @@ Once the generator is trained to its optimal, $p_g$ gets very close to $p_{r}$. 
 When both $G$ and $D$ are at their optimal values, we have $p_g = p_{r}$ and $D^*(x) = 1/2$ and the loss function becomes:
 
 $$
-\begin{aligned} L(G, D^*) &= \int_x \bigg( p_{r}(x) \log(D^*(x)) + p_g (x) \log(1 - D^*(x)) \bigg) dx \\ &= \log \frac{1}{2} \int_x p_{r}(x) dx + \log \frac{1}{2} \int_x p_g(x) dx \\ &= -2\log2 \end{aligned}
+\begin{aligned} L(G, D^*) &= \int_x \bigg( p_{r}(x) \log(D^*(x)) + p_g (x) \log(1 - D^*(x)) \bigg) dx \\
+&= \log \frac{1}{2} \int_x p_{r}(x) dx + \log \frac{1}{2} \int_x p_g(x) dx \\
+&= -2\log2 \end{aligned}
 $$
 
 ### What does the loss function represent?[#](#what-does-the-loss-function-represent)
@@ -125,7 +132,9 @@ $$
 According to the formula listed in the [previous section](https://lilianweng.github.io/posts/2017-08-20-gan/#kullbackleibler-and-jensenshannon-divergence), JS divergence between $p_{r}$ and $p_g$ can be computed as:
 
 $$
-\begin{aligned} D_{JS}(p_{r} \| p_g) =& \frac{1}{2} D_{KL}(p_{r} || \frac{p_{r} + p_g}{2}) + \frac{1}{2} D_{KL}(p_{g} || \frac{p_{r} + p_g}{2}) \\ =& \frac{1}{2} \bigg( \log2 + \int_x p_{r}(x) \log \frac{p_{r}(x)}{p_{r} + p_g(x)} dx \bigg) + \\& \frac{1}{2} \bigg( \log2 + \int_x p_g(x) \log \frac{p_g(x)}{p_{r} + p_g(x)} dx \bigg) \\ =& \frac{1}{2} \bigg( \log4 + L(G, D^*) \bigg) \end{aligned}
+\begin{aligned} D_{JS}(p_{r} \| p_g) =& \frac{1}{2} D_{KL}(p_{r} || \frac{p_{r} + p_g}{2}) + \frac{1}{2} D_{KL}(p_{g} || \frac{p_{r} + p_g}{2}) \\
+=& \frac{1}{2} \bigg( \log2 + \int_x p_{r}(x) \log \frac{p_{r}(x)}{p_{r} + p_g(x)} dx \bigg) + \\& \frac{1}{2} \bigg( \log2 + \int_x p_g(x) \log \frac{p_g(x)}{p_{r} + p_g(x)} dx \bigg) \\
+=& \frac{1}{2} \bigg( \log4 + L(G, D^*) \bigg) \end{aligned}
 $$
 
 Thus,
@@ -258,7 +267,8 @@ The loss function of the vanilla GAN measures the JS divergence between the dist
 Let us first look at a simple case where the probability domain is _discrete_. For example, suppose we have two distributions $P$ and $Q$, each has four piles of dirt and both have ten shovelfuls of dirt in total. The numbers of shovelfuls in each dirt pile are assigned as follows:
 
 $$
-P_1 = 3, P_2 = 2, P_3 = 1, P_4 = 4\\ Q_1 = 1, Q_2 = 2, Q_3 = 4, Q_4 = 3
+P_1 = 3, P_2 = 2, P_3 = 1, P_4 = 4\\
+Q_1 = 1, Q_2 = 2, Q_3 = 4, Q_4 = 3
 $$
 
 In order to change $P$ to look like $Q$, as illustrated in Fig. 7, we:
@@ -270,7 +280,11 @@ In order to change $P$ to look like $Q$, as illustrated in Fig. 7, we:
 If we label the cost to pay to make $P_i$ and $Q_i$ match as $\delta_i$, we would have $\delta_{i+1} = \delta_i + P_i - Q_i$ and in the example:
 
 $$
-\begin{aligned} \delta_0 &= 0\\ \delta_1 &= 0 + 3 - 1 = 2\\ \delta_2 &= 2 + 2 - 2 = 2\\ \delta_3 &= 2 + 1 - 4 = -1\\ \delta_4 &= -1 + 4 - 3 = 0 \end{aligned}
+\begin{aligned} \delta_0 &= 0\\
+\delta_1 &= 0 + 3 - 1 = 2\\
+\delta_2 &= 2 + 2 - 2 = 2\\
+\delta_3 &= 2 + 1 - 4 = -1\\
+\delta_4 &= -1 + 4 - 3 = 0 \end{aligned}
 $$
 
 Finally the Earth Mover's distance is $W = \sum \vert \delta_i \vert = 5$.
@@ -304,7 +318,8 @@ The WGAN paper exemplified the idea with a simple example.
 Suppose we have two probability distributions, $P$ and $Q$:
 
 $$
-\forall (x, y) \in P, x = 0 \text{ and } y \sim U(0, 1)\\ \forall (x, y) \in Q, x = \theta, 0 \leq \theta \leq 1 \text{ and } y \sim U(0, 1)\\
+\forall (x, y) \in P, x = 0 \text{ and } y \sim U(0, 1)\\
+\forall (x, y) \in Q, x = \theta, 0 \leq \theta \leq 1 \text{ and } y \sim U(0, 1)\\
 $$
 
 ![](assets/images/2017-08-20-gan/wasserstein_simple_example.png)
@@ -314,13 +329,17 @@ Fig. 8. There is no overlap between $P$ and $Q$ when $\theta \neq 0$.
 When $\theta \neq 0$:
 
 $$
-\begin{aligned} D_{KL}(P \| Q) &= \sum_{x=0, y \sim U(0, 1)} 1 \cdot \log\frac{1}{0} = +\infty \\ D_{KL}(Q \| P) &= \sum_{x=\theta, y \sim U(0, 1)} 1 \cdot \log\frac{1}{0} = +\infty \\ D_{JS}(P, Q) &= \frac{1}{2}(\sum_{x=0, y \sim U(0, 1)} 1 \cdot \log\frac{1}{1/2} + \sum_{x=0, y \sim U(0, 1)} 1 \cdot \log\frac{1}{1/2}) = \log 2\\ W(P, Q) &= |\theta| \end{aligned}
+\begin{aligned} D_{KL}(P \| Q) &= \sum_{x=0, y \sim U(0, 1)} 1 \cdot \log\frac{1}{0} = +\infty \\
+D_{KL}(Q \| P) &= \sum_{x=\theta, y \sim U(0, 1)} 1 \cdot \log\frac{1}{0} = +\infty \\
+D_{JS}(P, Q) &= \frac{1}{2}(\sum_{x=0, y \sim U(0, 1)} 1 \cdot \log\frac{1}{1/2} + \sum_{x=0, y \sim U(0, 1)} 1 \cdot \log\frac{1}{1/2}) = \log 2\\
+W(P, Q) &= |\theta| \end{aligned}
 $$
 
 But when $\theta = 0$, two distributions are fully overlapped:
 
 $$
-\begin{aligned} D_{KL}(P \| Q) &= D_{KL}(Q \| P) = D_{JS}(P, Q) = 0\\ W(P, Q) &= 0 = \lvert \theta \rvert \end{aligned}
+\begin{aligned} D_{KL}(P \| Q) &= D_{KL}(Q \| P) = D_{JS}(P, Q) = 0\\
+W(P, Q) &= 0 = \lvert \theta \rvert \end{aligned}
 $$
 
 $D_{KL}$ gives us inifity when two distributions are disjoint. The value of $D_{JS}$ has sudden jump, not differentiable at $\theta = 0$. Only Wasserstein metric provides a smooth measure, which is super helpful for a stable learning process using gradient descents.

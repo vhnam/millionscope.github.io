@@ -41,7 +41,11 @@ A Markov process is a ["memoryless"](http://mathworld.wolfram.com/Memoryless.htm
 
 KL divergence measures how one probability distribution $p$ diverges from a second expected probability distribution $q$. It is asymmetric.
 
-$$\begin{aligned} D_{KL}(p \| q) &= \sum_x p(x) \log \frac{p(x)}{q(x)} \\ &= - \sum_x p(x)\log q(x) + \sum_x p(x)\log p(x) \\ &= H(P, Q) - H(P) \end{aligned}$$
+$$
+\begin{aligned} D_{KL}(p \| q) &= \sum_x p(x) \log \frac{p(x)}{q(x)} \\
+&= - \sum_x p(x)\log q(x) + \sum_x p(x)\log p(x) \\
+&= H(P, Q) - H(P) \end{aligned}
+$$
 
 $D_{KL}$ achieves the minimum zero when $p(x)$ == $q(x)$ everywhere.
 
@@ -49,7 +53,13 @@ $D_{KL}$ achieves the minimum zero when $p(x)$ == $q(x)$ everywhere.
 
 Mutual information measures the mutual dependence between two variables. It quantifies the "amount of information" obtained about one random variable through the other random variable. Mutual information is symmetric.
 
-$$\begin{aligned} I(X;Y) &= D_{KL}[p(x,y) \| p(x)p(y)] \\ &= \sum_{x \in X, y \in Y} p(x, y) \log(\frac{p(x, y)}{p(x)p(y)}) \\ &= \sum_{x \in X, y \in Y} p(x, y) \log(\frac{p(x|y)}{p(x)}) \\ &= H(X) - H(X|Y) \\ \end{aligned}$$
+$$
+\begin{aligned} I(X;Y) &= D_{KL}[p(x,y) \| p(x)p(y)] \\
+&= \sum_{x \in X, y \in Y} p(x, y) \log(\frac{p(x, y)}{p(x)p(y)}) \\
+&= \sum_{x \in X, y \in Y} p(x, y) \log(\frac{p(x|y)}{p(x)}) \\
+&= H(X) - H(X|Y) \\
+\end{aligned}
+$$
 
 [**Data Processing Inequality (DPI)**](https://en.wikipedia.org/wiki/Data_processing_inequality)
 
@@ -73,7 +83,10 @@ Fig. 1. The structure of a deep neural network, which consists of the target lab
 
 If we label the hidden layers of a DNN as $h_1, h_2, \dots, h_m$ as in Fig. 1, we can view each layer as one state of a Markov Chain: $ h*i \to h*{i+1}$. According to DPI, we would have:
 
-$$\begin{aligned} H(X) \geq I(X; h_1) \geq I(X; h_2) \geq \dots \geq I(X; h_m) \geq I(X; \hat{Y}) \\ I(X; Y) \geq I(h_1; Y) \geq I(h_2; Y) \geq \dots \geq I(h_m; Y) \geq I(\hat{Y}; Y) \end{aligned}$$
+$$
+\begin{aligned} H(X) \geq I(X; h_1) \geq I(X; h_2) \geq \dots \geq I(X; h_m) \geq I(X; \hat{Y}) \\
+I(X; Y) \geq I(h_1; Y) \geq I(h_2; Y) \geq \dots \geq I(h_m; Y) \geq I(\hat{Y}; Y) \end{aligned}
+$$
 
 A DNN is designed to learn how to describe $X$ to predict $Y$ and eventually, to compress $X$ to only hold the information related to $Y$. Tishby describes this processing as _"successive refinement of relevant information"_.
 

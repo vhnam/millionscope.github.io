@@ -151,13 +151,16 @@ Morin and Bengio ([2005](https://www.iro.umontreal.ca/~lisa/pointeurs/hierarchic
 
 ![](assets/images/2017-10-15-word-embedding/word2vec-hierarchical-softmax.png)
 
-Fig. 3. An illustration of the hierarchical softmax binary tree. The leaf nodes in white are words in the vocabulary. The gray inner nodes carry information on the probabilities of reaching its child nodes. One path starting from the root to the leaf $w\\_i$. $n(w\\_i, j)$ denotes the j-th node on this path. (Image source: [word2vec Parameter Learning Explained](https://arxiv.org/pdf/1411.2738.pdf))
+Fig. 3. An illustration of the hierarchical softmax binary tree. The leaf nodes in white are words in the vocabulary. The gray inner nodes carry information on the probabilities of reaching its child nodes. One path starting from the root to the leaf $w_i$. $n(w_i, j)$ denotes the j-th node on this path. (Image source: [word2vec Parameter Learning Explained](https://arxiv.org/pdf/1411.2738.pdf))
 
 Each word $w_i$ has a unique path from the root down to its corresponding leaf. The probability of picking this word is equivalent to the probability of taking this path from the root down through the tree branches. Since we know the embedding vector $v_n$ of the internal node $n$, the probability of getting the word can be computed by the product of taking left or right turn at every internal node stop.
 
 According to Fig. 3, the probability of one node is ($\sigma$ is the sigmoid function):
 
-$$\begin{align} p(\text{turn right} \to \dots w_I \vert n) &= \sigma({v'_n}^{\top} v_{w_I})\\ p(\text{turn left } \to \dots w_I \vert n) &= 1 - p(\text{turn right} \vert n) = \sigma(-{v'_n}^{\top} v_{w_I}) \end{align}$$
+$$
+\begin{align} p(\text{turn right} \to \dots w_I \vert n) &= \sigma({v'_n}^{\top} v_{w_I})\\
+p(\text{turn left } \to \dots w_I \vert n) &= 1 - p(\text{turn right} \vert n) = \sigma(-{v'_n}^{\top} v_{w_I}) \end{align}
+$$
 
 The final probability of getting a context word $w_O$ given an input word $w_I$ is:
 
@@ -185,7 +188,14 @@ $$\mathcal{L}_{\theta} = - \log \frac{\exp({v'_{w_O}}^{\top}{v_{w_I}})}{\sum_{i=
 
 To start training the model using back-propagation with SGD, we need to compute the gradient of the loss function. For simplicity, let's label $z_{IO} = {v'_{w_O}}^{\top}{v_{w_I}}$.
 
-$$\begin{align} \nabla_\theta \mathcal{L}_{\theta} &= \nabla_\theta\big( - z_{IO} + \log \sum_{i=1}^V e^{z_{Ii}} \big) \\ &= - \nabla_\theta z_{IO} + \nabla_\theta \big( \log \sum_{i=1}^V e^{z_{Ii}} \big) \\ &= - \nabla_\theta z_{IO} + \frac{1}{\sum_{i=1}^V e^{z_{Ii}}} \sum_{i=1}^V e^{z_{Ii}} \nabla_\theta z_{Ii} \\ &= - \nabla_\theta z_{IO} + \sum_{i=1}^V \frac{e^{z_{Ii}}}{\sum_{i=1}^V e^{z_{Ii}}} \nabla_\theta z_{Ii} \\ &= - \nabla_\theta z_{IO} + \sum_{i=1}^V p(w_i \vert w_I) \nabla_\theta z_{Ii} \\ &= - \nabla_\theta z_{IO} + \mathbb{E}_{w_i \sim Q(\tilde{w})} \nabla_\theta z_{Ii} \end{align}$$
+$$
+\begin{align} \nabla_\theta \mathcal{L}_{\theta} &= \nabla_\theta\big( - z_{IO} + \log \sum_{i=1}^V e^{z_{Ii}} \big) \\
+&= - \nabla_\theta z_{IO} + \nabla_\theta \big( \log \sum_{i=1}^V e^{z_{Ii}} \big) \\
+&= - \nabla_\theta z_{IO} + \frac{1}{\sum_{i=1}^V e^{z_{Ii}}} \sum_{i=1}^V e^{z_{Ii}} \nabla_\theta z_{Ii} \\
+&= - \nabla_\theta z_{IO} + \sum_{i=1}^V \frac{e^{z_{Ii}}}{\sum_{i=1}^V e^{z_{Ii}}} \nabla_\theta z_{Ii} \\
+&= - \nabla_\theta z_{IO} + \sum_{i=1}^V p(w_i \vert w_I) \nabla_\theta z_{Ii} \\
+&= - \nabla_\theta z_{IO} + \mathbb{E}_{w_i \sim Q(\tilde{w})} \nabla_\theta z_{Ii} \end{align}
+$$
 
 where $Q(\tilde{w})$ is the distribution of noise samples.
 
@@ -207,7 +217,10 @@ $$\mathcal{L}_\theta = - [ \log p(d=1 \vert w, w_I) + N\mathbb{E}_{\tilde{w}_i \
 
 To compute the probability $p(d=1 \vert w, w_I)$, we can start with the joint probability $p(d, w \vert w_I)$. Among $w, \tilde{w}_1, \tilde{w}_2, \dots, \tilde{w}_N$, we have 1 out of (N+1) chance to pick the true word $w$, which is sampled from the conditional probability $p(w \vert w_I)$; meanwhile, we have N out of (N+1) chances to pick a noise word, each sampled from $q(\tilde{w}) \sim Q$. Thus,
 
-$$p(d, w | w_I) = \begin{cases} \frac{1}{N+1} p(w \vert w_I) & \text{if } d=1 \\ \frac{N}{N+1} q(\tilde{w}) & \text{if } d=0 \end{cases}$$
+$$
+p(d, w | w_I) = \begin{cases} \frac{1}{N+1} p(w \vert w_I) & \text{if } d=1 \\
+\frac{N}{N+1} q(\tilde{w}) & \text{if } d=0 \end{cases}
+$$
 
 Then we can figure out $p(d=1 \vert w, w_I)$ and $p(d=0 \vert w, w_I)$:
 
@@ -217,11 +230,19 @@ $$\begin{align} p(d=0 \vert w, w_I) &= \frac{p(d=0, w \vert w_I)}{p(d=1, w \vert
 
 Finally the loss function of NCE's binary classifier becomes:
 
-$$\begin{align} \mathcal{L}_\theta & = - [ \log p(d=1 \vert w, w_I) + \sum_{\substack{i=1 \\ \tilde{w}_i \sim Q}}^N \log p(d=0|\tilde{w}_i, w_I)] \\ & = - [ \log \frac{p(w \vert w_I)}{p(w \vert w_I) + Nq(\tilde{w})} + \sum_{\substack{i=1 \\ \tilde{w}_i \sim Q}}^N \log \frac{Nq(\tilde{w}_i)}{p(w \vert w_I) + Nq(\tilde{w}_i)}] \end{align}$$
+$$
+\begin{align} \mathcal{L}_\theta & = - [ \log p(d=1 \vert w, w_I) + \sum_{\substack{i=1 \\
+\tilde{w}_i \sim Q}}^N \log p(d=0|\tilde{w}_i, w_I)] \\
+& = - [ \log \frac{p(w \vert w_I)}{p(w \vert w_I) + Nq(\tilde{w})} + \sum_{\substack{i=1 \\
+\tilde{w}_i \sim Q}}^N \log \frac{Nq(\tilde{w}_i)}{p(w \vert w_I) + Nq(\tilde{w}_i)}] \end{align}
+$$
 
 However, $p(w \vert w_I)$ still involves summing up the entire vocabulary in the denominator. Let's label the denominator as a partition function of the input word, $Z(w_I)$. A common assumption is $Z(w) \approx 1$ given that we expect the softmax output layer to be normalized ([Minh and Teh, 2012](https://www.cs.toronto.edu/~amnih/papers/ncelm.pdf)). Then the loss function is simplified to:
 
-$$\mathcal{L}_\theta = - [ \log \frac{\exp({v'_w}^{\top}{v_{w_I}})}{\exp({v'_w}^{\top}{v_{w_I}}) + Nq(\tilde{w})} + \sum_{\substack{i=1 \\ \tilde{w}_i \sim Q}}^N \log \frac{Nq(\tilde{w}_i)}{\exp({v'_w}^{\top}{v_{w_I}}) + Nq(\tilde{w}_i)}]$$
+$$
+\mathcal{L}_\theta = - [ \log \frac{\exp({v'_w}^{\top}{v_{w_I}})}{\exp({v'_w}^{\top}{v_{w_I}}) + Nq(\tilde{w})} + \sum_{\substack{i=1 \\
+\tilde{w}_i \sim Q}}^N \log \frac{Nq(\tilde{w}_i)}{\exp({v'_w}^{\top}{v_{w_I}}) + Nq(\tilde{w}_i)}]
+$$
 
 The noise distribution $Q$ is a tunable parameter and we would like to design it in a way so that:
 
@@ -236,11 +257,17 @@ The Negative Sampling (NEG) proposed by Mikolov et al. ([2013](https://papers.ni
 
 NEG approximates the binary classifier's output with sigmoid functions as follows:
 
-$$\begin{align} p(d=1 \vert w_, w_I) &= \sigma({v'_{w}}^\top v_{w_I}) \\ p(d=0 \vert w, w_I) &= 1 - \sigma({v'_{w}}^\top v_{w_I}) = \sigma(-{v'_{w}}^\top v_{w_I}) \end{align}$$
+$$
+\begin{align} p(d=1 \vert w_, w_I) &= \sigma({v'_{w}}^\top v_{w_I}) \\
+p(d=0 \vert w, w_I) &= 1 - \sigma({v'_{w}}^\top v_{w_I}) = \sigma(-{v'_{w}}^\top v_{w_I}) \end{align}
+$$
 
 The final NCE loss function looks like:
 
-$$\mathcal{L}_\theta = - [ \log \sigma({v'_{w}}^\top v_{w_I}) + \sum_{\substack{i=1 \\ \tilde{w}_i \sim Q}}^N \log \sigma(-{v'_{\tilde{w}_i}}^\top v_{w_I})]$$
+$$
+\mathcal{L}_\theta = - [ \log \sigma({v'_{w}}^\top v_{w_I}) + \sum_{\substack{i=1 \\
+\tilde{w}_i \sim Q}}^N \log \sigma(-{v'_{\tilde{w}_i}}^\top v_{w_I})]
+$$
 
 # Other Tips for Learning Word Embedding[#](#other-tips-for-learning-word-embedding)
 
@@ -272,7 +299,10 @@ $$F((w_i - w_j)^\top \tilde{w}_k) = \frac{p_{\text{co}}(\tilde{w}_k \vert w_i)}{
 
 With the consideration of $F$ being symmetric between target words and context words, the final solution is to model $F$ as an **exponential** function. Please read the original paper ([Pennington et al., 2014](http://www.aclweb.org/anthology/D14-1162)) for more details of the equations.
 
-$$\begin{align} F({w_i}^\top \tilde{w}_k) &= \exp({w_i}^\top \tilde{w}_k) = p_{\text{co}}(\tilde{w}_k \vert w_i) \\ F((w_i - w_j)^\top \tilde{w}_k) &= \exp((w_i - w_j)^\top \tilde{w}_k) = \frac{\exp(w_i^\top \tilde{w}_k)}{\exp(w_j^\top \tilde{w}_k)} = \frac{p_{\text{co}}(\tilde{w}_k \vert w_i)}{p_{\text{co}}(\tilde{w}_k \vert w_j)} \end{align}$$
+$$
+\begin{align} F({w_i}^\top \tilde{w}_k) &= \exp({w_i}^\top \tilde{w}_k) = p_{\text{co}}(\tilde{w}_k \vert w_i) \\
+F((w_i - w_j)^\top \tilde{w}_k) &= \exp((w_i - w_j)^\top \tilde{w}_k) = \frac{\exp(w_i^\top \tilde{w}_k)}{\exp(w_j^\top \tilde{w}_k)} = \frac{p_{\text{co}}(\tilde{w}_k \vert w_i)}{p_{\text{co}}(\tilde{w}_k \vert w_j)} \end{align}
+$$
 
 Finally,
 
@@ -288,7 +318,10 @@ $$\mathcal{L}_\theta = \sum_{i=1, j=1}^V f(C(w_i,w_j)) ({w_i}^\top \tilde{w}_j +
 
 The weighting schema $f(c)$ is a function of the co-occurrence of $w_i$ and $w_j$ and it is an adjustable model configuration. It should be close to zero as $c \to 0$; should be non-decreasing as higher co-occurrence should have more impact; should saturate when $c$ become extremely large. The paper proposed the following weighting function.
 
-$$f(c) = \begin{cases} (\frac{c}{c_{\max}})^\alpha & \text{if } c < c_{\max} \text{, } c_{\max} \text{ is adjustable.} \\ 1 & \text{if } \text{otherwise} \end{cases}$$
+$$
+f(c) = \begin{cases} (\frac{c}{c_{\max}})^\alpha & \text{if } c < c_{\max} \text{, } c_{\max} \text{ is adjustable.} \\
+1 & \text{if } \text{otherwise} \end{cases}
+$$
 
 # Examples: word2vec on "Game of Thrones"[#](#examples-word2vec-on-game-of-thrones)
 

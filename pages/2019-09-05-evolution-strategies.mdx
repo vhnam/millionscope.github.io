@@ -56,7 +56,7 @@ The process of Simple-Gaussian-ES, given $x \in \mathcal{R}^n$:
 3.  Select a top subset of $\lambda$ samples with optimal $f(x_i)$ and this subset is called **elite** set. Without loss of generality, we may consider the first $k$ samples in $D^{(t+1)}$ to belong to the elite group — Let's label them as
 
 $$
-D^{(t+1)}\\_\text{elite} = \\\{x^{(t+1)}\\_i \mid x^{(t+1)}\\_i \in D^{(t+1)}, i=1,\dots, \lambda, \lambda\leq \Lambda\\\}
+D^{(t+1)}_\text{elite} = \{x^{(t+1)}_i \mid x^{(t+1)}_i \in D^{(t+1)}, i=1,\dots, \lambda, \lambda\leq \Lambda\}
 $$
 
 4.  Then we estimate the new mean and std for the next generation using the elite set:
@@ -220,11 +220,11 @@ $$
 The expected length of $p_\sigma$ under random selection is $\mathbb{E}|\mathcal{N}(0,I)|$, that is the expectation of the L2-norm of a $\mathcal{N}(0,I)$ random variable. Following the idea in Fig. 2, we adjust the step size according to the ratio of $|p_\sigma^{(t+1)}| / \mathbb{E}|\mathcal{N}(0,I)|$:
 
 $$
-\begin{aligned} \\ln\sigma^{(t+1)} &= \\ln\sigma^{(t)} + \frac{\alpha_\sigma}{d_\sigma} \Big(\frac{\|p_\sigma^{(t+1)}\|}{\mathbb{E}\|\mathcal{N}(0,I)\|} - 1\Big) \\
+\begin{aligned} \ln\sigma^{(t+1)} &= \ln\sigma^{(t)} + \frac{\alpha_\sigma}{d_\sigma} \Big(\frac{\|p_\sigma^{(t+1)}\|}{\mathbb{E}\|\mathcal{N}(0,I)\|} - 1\Big) \\
 \sigma^{(t+1)} &= \sigma^{(t)} \exp\Big(\frac{\alpha_\sigma}{d_\sigma} \Big(\frac{\|p_\sigma^{(t+1)}\|}{\mathbb{E}\|\mathcal{N}(0,I)\|} - 1\Big)\Big) \end{aligned}
 $$
 
-where $d_\sigma \approx 1$ is a damping parameter, scaling how fast $\\ln\sigma$ should be changed.
+where $d_\sigma \approx 1$ is a damping parameter, scaling how fast $\ln\sigma$ should be changed.
 
 ### Adapting the Covariance Matrix[#](#adapting-the-covariance-matrix)
 
@@ -287,13 +287,13 @@ Natural Evolution Strategies (**NES**; [Wierstra, et al, 2008](https://arxiv.org
 Given an objective function $\mathcal{J}(\theta)$ parameterized by $\theta$, let's say our goal is to find the optimal $\theta$ to maximize the objective function value. A _plain gradient_ finds the steepest direction within a small Euclidean distance from the current $\theta$; the distance restriction is applied on the parameter space. In other words, we compute the plain gradient with respect to a small change of the absolute value of $\theta$. The optimal step is:
 
 $$
-d^{*} = \\operatorname*{argmax}_{\|d\| = \epsilon} \mathcal{J}(\theta + d)\text{, where }\epsilon \to 0
+d^{*} = \operatorname*{argmax}_{\|d\| = \epsilon} \mathcal{J}(\theta + d)\text{, where }\epsilon \to 0
 $$
 
 Differently, _natural gradient_ works with a probability [distribution](https://arxiv.org/abs/1301.3584v7) [space](https://wiseodd.github.io/techblog/2018/03/14/natural-gradient/) parameterized by $\theta$, $p_\theta(x)$ (referred to as "search distribution” in NES [paper](https://arxiv.org/abs/1106.4487)). It looks for the steepest direction within a small step in the distribution space where the distance is measured by KL divergence. With this constraint we ensure that each update is moving along the distributional manifold with constant speed, without being slowed down by its curvature.
 
 $$
-d^{*}_\text{N} = \\operatorname*{argmax}_{\text{KL}[p_\theta \| p_{\theta+d}] = \epsilon} \mathcal{J}(\theta + d)
+d^{*}_\text{N} = \operatorname*{argmax}_{\text{KL}[p_\theta \| p_{\theta+d}] = \epsilon} \mathcal{J}(\theta + d)
 $$
 
 ### Estimation using Fisher Information Matrix[#](#estimation-using-fisher-information-matrix)
