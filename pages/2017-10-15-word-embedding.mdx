@@ -208,9 +208,17 @@ $$
 
 Then we can figure out $p(d=1 \vert w, w_I)$ and $p(d=0 \vert w, w_I)$:
 
-$$\begin{align} p(d=1 \vert w, w_I) &= \frac{p(d=1, w \vert w_I)}{p(d=1, w \vert w_I) + p(d=0, w \vert w_I)} &= \frac{p(w \vert w_I)}{p(w \vert w_I) + Nq(\tilde{w})} \end{align}$$
+$$
+\begin{align}
+p(d=1 \vert w, w_I) &= \frac{p(d=1, w \vert w_I)}{p(d=1, w \vert w_I) + p(d=0, w \vert w_I)} &= \frac{p(w \vert w_I)}{p(w \vert w_I) + Nq(\tilde{w})}
+\end{align}
+$$
 
-$$\begin{align} p(d=0 \vert w, w_I) &= \frac{p(d=0, w \vert w_I)}{p(d=1, w \vert w_I) + p(d=0, w \vert w_I)} &= \frac{Nq(\tilde{w})}{p(w \vert w_I) + Nq(\tilde{w})} \end{align}$$
+$$
+\begin{align}
+p(d=0 \vert w, w_I) &= \frac{p(d=0, w \vert w_I)}{p(d=1, w \vert w_I) + p(d=0, w \vert w_I)} &= \frac{Nq(\tilde{w})}{p(w \vert w_I) + Nq(\tilde{w})}
+\end{align}
+$$
 
 Finally the loss function of NCE's binary classifier becomes:
 
@@ -267,7 +275,9 @@ The Global Vector (GloVe) model proposed by Pennington et al. ([2014](http://www
 
 We all know the counts and co-occurrences can reveal the meanings of words. To distinguish from $p(w_O \vert w_I)$ in the context of a word embedding word, we would like to define the co-ocurrence probability as:
 
-$$p_{\text{co}}(w_k \vert w_i) = \frac{C(w_i, w_k)}{C(w_i)}$$
+$$
+p_{\text{co}}(w_k \vert w_i) = \frac{C(w_i, w_k)}{C(w_i)}
+$$
 
 $C(w_i, w_k)$ counts the co-occurrence between words $w_i$ and $w_k$.
 
@@ -275,11 +285,15 @@ Say, we have two words, $w_i$="ice" and $w_j$="steam". The third word $\tilde{w}
 
 The intuition here is that the word meanings are captured by the ratios of co-occurrence probabilities rather than the probabilities themselves. The global vector models the relationship between two words regarding to the third context word as:
 
-$$F(w_i, w_j, \tilde{w}_k) = \frac{p_{\text{co}}(\tilde{w}_k \vert w_i)}{p_{\text{co}}(\tilde{w}_k \vert w_j)}$$
+$$
+F(w_i, w_j, \tilde{w}_k) = \frac{p_{\text{co}}(\tilde{w}_k \vert w_i)}{p_{\text{co}}(\tilde{w}_k \vert w_j)}
+$$
 
 Further, since the goal is to learn meaningful word vectors, $F$ is designed to be a function of the linear difference between two words $w_i - w_j$:
 
-$$F((w_i - w_j)^\top \tilde{w}_k) = \frac{p_{\text{co}}(\tilde{w}_k \vert w_i)}{p_{\text{co}}(\tilde{w}_k \vert w_j)}$$
+$$
+F((w_i - w_j)^\top \tilde{w}_k) = \frac{p_{\text{co}}(\tilde{w}_k \vert w_i)}{p_{\text{co}}(\tilde{w}_k \vert w_j)}
+$$
 
 With the consideration of $F$ being symmetric between target words and context words, the final solution is to model $F$ as an **exponential** function. Please read the original paper ([Pennington et al., 2014](http://www.aclweb.org/anthology/D14-1162)) for more details of the equations.
 
@@ -290,11 +304,15 @@ $$
 
 Finally,
 
-$${w_i}^\top \tilde{w}_k = \log p_{\text{co}}(\tilde{w}_k \vert w_i) = \log \frac{C(w_i, \tilde{w}_k)}{C(w_i)} = \log C(w_i, \tilde{w}_k) - \log C(w_i)$$
+$$
+{w_i}^\top \tilde{w}_k = \log p_{\text{co}}(\tilde{w}_k \vert w_i) = \log \frac{C(w_i, \tilde{w}_k)}{C(w_i)} = \log C(w_i, \tilde{w}_k) - \log C(w_i)
+$$
 
 Since the second term $-\log C(w_i)$ is independent of $k$, we can add bias term $b_i$ for $w_i$ to capture $-\log C(w_i)$. To keep the symmetric form, we also add in a bias $\tilde{b}_k$ for $\tilde{w}_k$.
 
-$$\log C(w_i, \tilde{w}_k) = {w_i}^\top \tilde{w}_k + b_i + \tilde{b}_k$$
+$$
+\log C(w_i, \tilde{w}_k) = {w_i}^\top \tilde{w}_k + b_i + \tilde{b}_k
+$$
 
 The loss function for the GloVe model is designed to preserve the above formula by minimizing the sum of the squared errors:
 
