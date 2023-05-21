@@ -293,7 +293,7 @@ Fig. 7. Attention weights with one standard deviation as error bars versus memor
 
 At inference time, the next token probability is a weighted sum of two predictions:
 
-$$\begin{aligned} p(y \vert \mathbf{x}) &= \lambda \\; p_\text{kNN}(y \vert \mathbf{x}) + (1- \lambda) \\; p_\text{LM}(y \vert \mathbf{x}) \\ p_\text{kNN}(y \vert \mathbf{x}) &\propto \sum_{(k_i, w_i) \in \mathcal{N}} \mathbb{1}[y = w_i] \exp(-d(k_i, f(\mathbf{x}))) \end{aligned}$$
+$$\begin{aligned} p(y \vert \mathbf{x}) &= \lambda \; p_\text{kNN}(y \vert \mathbf{x}) + (1- \lambda) \; p_\text{LM}(y \vert \mathbf{x}) \\ p_\text{kNN}(y \vert \mathbf{x}) &\propto \sum_{(k_i, w_i) \in \mathcal{N}} \mathbb{1}[y = w_i] \exp(-d(k_i, f(\mathbf{x}))) \end{aligned}$$
 
 where $\mathcal{N}$ contains a set of nearest neighbor data points retrieved by $k$NN; $d(., .)$ is a distance function such as L2 distance.
 
@@ -445,7 +445,7 @@ Fig. 16. Illustration of three types of adaptive depth classifiers.
 
 3.  _Token-specific depth classifier (geometric-like)_: A binary exit prediction distribution is made per layer per token, $\mathcal{X}^n_t$. The RBF kernel $\kappa(t, t') = \exp(\frac{\vert t - t' \vert^2}{\sigma})$ is used to smooth the predictions to incorporate the impact of current decision on future time steps.
 
-   $$\begin{aligned} \mathcal{X}^n_t &= \text{sigmoid}(\mathbf{w}_n^\top \mathbf{h}^n_t + b_n)\quad \forall n \in [1, \dots, N-1] \\ q_t(n \vert \mathbf{x}, \mathbf{y}_{< t}) &= \begin{cases} \mathcal{X}^n_t \prod_{n' < n} (1 - \mathcal{X}^{n'}_t) & \text{if } n < N\\ \prod_{n' < N} (1 - \mathcal{X}^{n'}_t) & \text{otherwise} \end{cases} \\ q_\text{lik}^\*(\mathbf{x}, \mathbf{y}) &= \delta(\arg\max_n \widetilde{\text{LL}}^n_t - \lambda n) \text{ where } \widetilde{\text{LL}}^n_t = \sum_{t'=1}^{\vert\mathbf{y}\vert}\kappa(t, t') LL^n_{t'} \\ \text{or }q_\text{cor}^\*(\mathbf{x}, \mathbf{y}) &= \delta(\arg\max_n \tilde{C}_t^n - \lambda n) \text{ where }C_t^n = \mathbb{1}[y_t = \arg\max_y p(y \vert \mathbf{h}^n_{t-1})],\\; \tilde{C}^n_t = \sum_{t'=1}^{\vert\mathbf{y}\vert}\kappa(t, t') C^n_{t'} \\ \end{aligned}$$
+   $$\begin{aligned} \mathcal{X}^n_t &= \text{sigmoid}(\mathbf{w}_n^\top \mathbf{h}^n_t + b_n)\quad \forall n \in [1, \dots, N-1] \\ q_t(n \vert \mathbf{x}, \mathbf{y}_{< t}) &= \begin{cases} \mathcal{X}^n_t \prod_{n' < n} (1 - \mathcal{X}^{n'}_t) & \text{if } n < N\\ \prod_{n' < N} (1 - \mathcal{X}^{n'}_t) & \text{otherwise} \end{cases} \\ q_\text{lik}^\*(\mathbf{x}, \mathbf{y}) &= \delta(\arg\max_n \widetilde{\text{LL}}^n_t - \lambda n) \text{ where } \widetilde{\text{LL}}^n_t = \sum_{t'=1}^{\vert\mathbf{y}\vert}\kappa(t, t') LL^n_{t'} \\ \text{or }q_\text{cor}^\*(\mathbf{x}, \mathbf{y}) &= \delta(\arg\max_n \tilde{C}_t^n - \lambda n) \text{ where }C_t^n = \mathbb{1}[y_t = \arg\max_y p(y \vert \mathbf{h}^n_{t-1})],\; \tilde{C}^n_t = \sum_{t'=1}^{\vert\mathbf{y}\vert}\kappa(t, t') C^n_{t'} \\ \end{aligned}$$
 
 At inference time, the confidence threshold for making an exit decision needs to be calibrated. Depth-adaptive transformer finds such a threshold on a validation set via grid search. _CALM_ ([Schuster et al. 2022](https://arxiv.org/abs/2207.07061)) applied the Learn then Test (LTT) framework ([Angelopoulos et al. 2021](https://arxiv.org/abs/2110.01052)) to identify a subset of valid thresholds and chose the minimum value as the threshold for inference. Except for training per-layer exit classifier, CALM also explored other methods for adaptive depth prediction, including the softmax responses (i.e. difference between top two softmax outputs) and hidden state saturation (i.e. $\cos(\mathbf{h}^n_t, \mathbf{h}^{n+1}_t)$) as confidence scores for exit decisions. They found softmax responses result in best inference speedup.
 
@@ -601,15 +601,15 @@ Another improvement by Reformer is to use _reversible residual layers_ ([Gomez e
 
 Given a layer $x \mapsto y$, the normal residual layer does $y = x + F(x)$, but the reversible layer splits both input and output into pairs $(x_1, x_2) \mapsto (y_1, y_2)$ and then executes the following:
 
-$$y_1 = x_1 + F(x_2),\\; y_2 = x_2 + G(y_1)$$
+$$y_1 = x_1 + F(x_2),\; y_2 = x_2 + G(y_1)$$
 
 and reversing is easy:
 
-$$x_2 = y_2 - G(y_1), \\; x_1 = y_1 - F(x_2)$$
+$$x_2 = y_2 - G(y_1), \; x_1 = y_1 - F(x_2)$$
 
 Reformer applies the same idea to Transformer by combination attention ($F$) and feed-forward layers ($G$) within a reversible net block:
 
-$$Y_1 = X_1 + \text{Attention}(X_2), \\; Y_2 = X_2 + \text{FeedForward}(Y_1)$$
+$$Y_1 = X_1 + \text{Attention}(X_2), \; Y_2 = X_2 + \text{FeedForward}(Y_1)$$
 
 The memory can be further reduced by chunking the feed-forward computation:
 
@@ -651,7 +651,7 @@ The main theorem behind RFA is from [Rahimi & Recht, 2007](https://people.eecs.b
 
 An unbiased estimation of $\exp(\mathbf{x} \cdot \mathbf{y})$ is:
 
-$$\begin{aligned} \exp(\mathbf{x} \cdot \mathbf{y} / \sigma^2) &= \exp(\frac{1}{2\sigma^2}(\|\mathbf{x}\|^2 + \|\mathbf{y}\|^2 - \|\mathbf{x} - \mathbf{y}\|^2) \\ &= \exp(\frac{\|\mathbf{x}\|^2}{2\sigma^2}) \exp(\frac{\|\mathbf{y}\|^2}{2\sigma^2}) ( - \frac{\|\mathbf{x} - \mathbf{y}\|^2}{2\sigma^2}) \\ &\approx \exp(\frac{\|\mathbf{x}\|^2}{2\sigma^2}) \exp(\frac{\|\mathbf{y}\|^2}{2\sigma^2})\\;\phi(\mathbf{x})\cdot\phi(\mathbf{y}) \\ &= \exp(\frac{1}{\sigma^2})\\;\phi(\mathbf{x})\cdot\phi(\mathbf{y}) & \text{; unit vectors} \end{aligned}$$
+$$\begin{aligned} \exp(\mathbf{x} \cdot \mathbf{y} / \sigma^2) &= \exp(\frac{1}{2\sigma^2}(\|\mathbf{x}\|^2 + \|\mathbf{y}\|^2 - \|\mathbf{x} - \mathbf{y}\|^2) \\ &= \exp(\frac{\|\mathbf{x}\|^2}{2\sigma^2}) \exp(\frac{\|\mathbf{y}\|^2}{2\sigma^2}) ( - \frac{\|\mathbf{x} - \mathbf{y}\|^2}{2\sigma^2}) \\ &\approx \exp(\frac{\|\mathbf{x}\|^2}{2\sigma^2}) \exp(\frac{\|\mathbf{y}\|^2}{2\sigma^2})\;\phi(\mathbf{x})\cdot\phi(\mathbf{y}) \\ &= \exp(\frac{1}{\sigma^2})\;\phi(\mathbf{x})\cdot\phi(\mathbf{y}) & \text{; unit vectors} \end{aligned}$$
 
 Then we can write the attention function as follows, where $\otimes$ is outer product operation and $\sigma^2$ is the temperature:
 

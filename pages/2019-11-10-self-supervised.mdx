@@ -449,7 +449,7 @@ Representation learning for control based on bisimulation does not depend on rec
 
 Given a [MDP](https://lilianweng.github.io/posts/2018-02-19-rl-overview/#markov-decision-processes) $\mathcal{M} = \langle \mathcal{S}, \mathcal{A}, \mathcal{P}, \mathcal{R}, \gamma \rangle$ and a bisimulation relation $B$, two states that are equal under relation $B$ (i.e. $s_i B s_j$) should have the same immediate reward for all actions and the same transition probabilities over the next bisimilar states:
 
-$$\begin{aligned} \mathcal{R}(s_i, a) &= \mathcal{R}(s_j, a) \\; \forall a \in \mathcal{A} \\ \mathcal{P}(G \vert s_i, a) &= \mathcal{P}(G \vert s_j, a) \\; \forall a \in \mathcal{A} \\; \forall G \in \mathcal{S}_B \end{aligned}$$
+$$\begin{aligned} \mathcal{R}(s_i, a) &= \mathcal{R}(s_j, a) \; \forall a \in \mathcal{A} \\ \mathcal{P}(G \vert s_i, a) &= \mathcal{P}(G \vert s_j, a) \; \forall a \in \mathcal{A} \; \forall G \in \mathcal{S}_B \end{aligned}$$
 
 where $\mathcal{S}_B$ is a partition of the state space under the relation $B$.
 
@@ -470,7 +470,7 @@ where $\phi(s)$ is the embedding of state $s$; symbols with bar are functions (r
 
 The function $D$ quantifies the distance between two probability distributions and should be chosen carefully. DeepMDP focuses on _Wasserstein-1_ metric (also known as ["earth-mover distance"](https://lilianweng.github.io/posts/2017-08-20-gan/#what-is-wasserstein-distance)). The Wasserstein-1 distance between distributions $P$ and $Q$ on a metric space $(M, d)$ (i.e., $d: M \times M \to \mathbb{R}$) is:
 
-$$W_d (P, Q) = \inf_{\lambda \in \Pi(P, Q)} \int_{M \times M} d(x, y) \lambda(x, y) \\; \mathrm{d}x \mathrm{d}y$$
+$$W_d (P, Q) = \inf_{\lambda \in \Pi(P, Q)} \int_{M \times M} d(x, y) \lambda(x, y) \; \mathrm{d}x \mathrm{d}y$$
 
 where $\Pi(P, Q)$ is the set of all [couplings](<https://en.wikipedia.org/wiki/Coupling_(probability)>) of $P$ and $Q$. $d(x, y)$ defines the cost of moving a particle from point $x$ to point $y$.
 

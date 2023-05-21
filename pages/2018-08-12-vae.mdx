@@ -312,7 +312,7 @@ where $\text{sq}[.]$ is the `stop_gradient` operator.
 
 The embedding vectors in the codebook is updated through EMA (exponential moving average). Given a code vector $\mathbf{e}_i$, say we have $n_i$ encoder output vectors, $\{\mathbf{z}_{i,j}\}_{j=1}^{n_i}$, that are quantized to $\mathbf{e}_i$:
 
-$$N_i^{(t)} = \gamma N_i^{(t-1)} + (1-\gamma)n_i^{(t)}\\;\\;\\; \mathbf{m}_i^{(t)} = \gamma \mathbf{m}_i^{(t-1)} + (1-\gamma)\sum_{j=1}^{n_i^{(t)}}\mathbf{z}_{i,j}^{(t)}\\;\\;\\; \mathbf{e}_i^{(t)} = \mathbf{m}_i^{(t)} / N_i^{(t)}$$
+$$N_i^{(t)} = \gamma N_i^{(t-1)} + (1-\gamma)n_i^{(t)}\;\;\; \mathbf{m}_i^{(t)} = \gamma \mathbf{m}_i^{(t-1)} + (1-\gamma)\sum_{j=1}^{n_i^{(t)}}\mathbf{z}_{i,j}^{(t)}\;\;\; \mathbf{e}_i^{(t)} = \mathbf{m}_i^{(t)} / N_i^{(t)}$$
 
 where $(t)$ refers to batch sequence in time. $N_i$ and $\mathbf{m}_i$ are accumulated vector count and volume, respectively.
 

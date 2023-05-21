@@ -65,7 +65,7 @@ In **Genetic Algorithms (GA)**, another popular subcategory of EA, $x$ is a sequ
 
 [This](http://blog.otoro.net/2017/10/29/visual-evolution-strategies/) is the most basic and canonical version of evolution strategies. It models $p_\theta(x)$ as a $n$-dimensional isotropic Gaussian distribution, in which $\theta$ only tracks the mean $\mu$ and standard deviation $\sigma$.
 
-$$\theta = (\mu, \sigma),\\;p_\theta(x) \sim \mathcal{N}(\mathbf{\mu}, \sigma^2 I) = \mu + \sigma \mathcal{N}(0, I)$$
+$$\theta = (\mu, \sigma),\;p_\theta(x) \sim \mathcal{N}(\mathbf{\mu}, \sigma^2 I) = \mu + \sigma \mathcal{N}(0, I)$$
 
 The process of Simple-Gaussian-ES, given $x \in \mathcal{R}^n$:
 
@@ -89,7 +89,7 @@ The standard deviation $\sigma$ accounts for the level of exploration: the large
 
 [**CMA-ES**](https://en.wikipedia.org/wiki/CMA-ES), short for _"Covariance Matrix Adaptation Evolution Strategy”_, fixes the problem by tracking pairwise dependencies between the samples in the distribution with a covariance matrix $C$. The new distribution parameter becomes:
 
-$$\theta = (\mu, \sigma, C),\\; p_\theta(x) \sim \mathcal{N}(\mu, \sigma^2 C) \sim \mu + \sigma \mathcal{N}(0, C)$$
+$$\theta = (\mu, \sigma, C),\; p_\theta(x) \sim \mathcal{N}(\mu, \sigma^2 C) \sim \mu + \sigma \mathcal{N}(0, C)$$
 
 where $\sigma$ controls for the overall scale of the distribution, often known as _step size_.
 
@@ -193,7 +193,7 @@ Fig. 2. Three scenarios of how single steps are correlated in different ways and
 
 Each time the evolution path is updated with the average of moving step $y_i$ in the same generation.
 
-$$\begin{aligned} &\frac{1}{\lambda}\sum_{i=1}^\lambda y_i^{(t+1)} = \frac{1}{\lambda} \frac{\sum_{i=1}^\lambda x_i^{(t+1)} - \lambda \mu^{(t)}}{\sigma^{(t)}} = \frac{\mu^{(t+1)} - \mu^{(t)}}{\sigma^{(t)}} \\ &\frac{1}{\lambda}\sum_{i=1}^\lambda y_i^{(t+1)} \sim \frac{1}{\lambda}\mathcal{N}(0, \lambda C^{(t)}) \sim \frac{1}{\sqrt{\lambda}}{C^{(t)}}^{\frac{1}{2}}\mathcal{N}(0, I) \\ &\text{Thus } \sqrt{\lambda}\\;{C^{(t)}}^{-\frac{1}{2}} \frac{\mu^{(t+1)} - \mu^{(t)}}{\sigma^{(t)}} \sim \mathcal{N}(0, I) \end{aligned}$$
+$$\begin{aligned} &\frac{1}{\lambda}\sum_{i=1}^\lambda y_i^{(t+1)} = \frac{1}{\lambda} \frac{\sum_{i=1}^\lambda x_i^{(t+1)} - \lambda \mu^{(t)}}{\sigma^{(t)}} = \frac{\mu^{(t+1)} - \mu^{(t)}}{\sigma^{(t)}} \\ &\frac{1}{\lambda}\sum_{i=1}^\lambda y_i^{(t+1)} \sim \frac{1}{\lambda}\mathcal{N}(0, \lambda C^{(t)}) \sim \frac{1}{\sqrt{\lambda}}{C^{(t)}}^{\frac{1}{2}}\mathcal{N}(0, I) \\ &\text{Thus } \sqrt{\lambda}\;{C^{(t)}}^{-\frac{1}{2}} \frac{\mu^{(t+1)} - \mu^{(t)}}{\sigma^{(t)}} \sim \mathcal{N}(0, I) \end{aligned}$$
 
 > By multiplying with $C^{-\frac{1}{2}}$, the evolution path is transformed to be independent of its direction. The term ${C^{(t)}}^{-\frac{1}{2}} = {B^{(t)}}^\top {D^{(t)}}^{-\frac{1}{2}} {B^{(t)}}$ transformation works as follows:
 
@@ -203,7 +203,7 @@ $$\begin{aligned} &\frac{1}{\lambda}\sum_{i=1}^\lambda y_i^{(t+1)} = \frac{1}{\l
 
 In order to assign higher weights to recent generations, we use polyak averaging to update the evolution path with learning rate $\alpha_\sigma$. Meanwhile, the weights are balanced so that $p_\sigma$ is [conjugate](https://en.wikipedia.org/wiki/Conjugate_prior), $\sim \mathcal{N}(0, I)$ both before and after one update.
 
-$$\begin{aligned} p_\sigma^{(t+1)} & = (1 - \alpha_\sigma) p_\sigma^{(t)} + \sqrt{1 - (1 - \alpha_\sigma)^2}\\;\sqrt{\lambda}\\; {C^{(t)}}^{-\frac{1}{2}} \frac{\mu^{(t+1)} - \mu^{(t)}}{\sigma^{(t)}} \\ & = (1 - \alpha_\sigma) p_\sigma^{(t)} + \sqrt{c_\sigma (2 - \alpha_\sigma)\lambda}\\;{C^{(t)}}^{-\frac{1}{2}} \frac{\mu^{(t+1)} - \mu^{(t)}}{\sigma^{(t)}} \end{aligned}$$
+$$\begin{aligned} p_\sigma^{(t+1)} & = (1 - \alpha_\sigma) p_\sigma^{(t)} + \sqrt{1 - (1 - \alpha_\sigma)^2}\;\sqrt{\lambda}\; {C^{(t)}}^{-\frac{1}{2}} \frac{\mu^{(t+1)} - \mu^{(t)}}{\sigma^{(t)}} \\ & = (1 - \alpha_\sigma) p_\sigma^{(t)} + \sqrt{c_\sigma (2 - \alpha_\sigma)\lambda}\;{C^{(t)}}^{-\frac{1}{2}} \frac{\mu^{(t+1)} - \mu^{(t)}}{\sigma^{(t)}} \end{aligned}$$
 
 The expected length of $p_\sigma$ under random selection is $\mathbb{E}|\mathcal{N}(0,I)|$, that is the expectation of the L2-norm of a $\mathcal{N}(0,I)$ random variable. Following the idea in Fig. 2, we adjust the step size according to the ratio of $|p_\sigma^{(t+1)}| / \mathbb{E}|\mathcal{N}(0,I)|$:
 
@@ -232,17 +232,17 @@ The second route tries to solve the issue that $y_i{y_i}^\top = (-y_i)(-y_i)^\to
 
 We may consider $p_c$ as another way to compute $\text{avg}_i(y_i)$ (notice that both $\sim \mathcal{N}(0, C)$) while the entire history is used and the sign information is maintained. Note that we've known $\sqrt{k}\frac{\mu^{(t+1)} - \mu^{(t)}}{\sigma^{(t)}} \sim \mathcal{N}(0, C)$ in the [last section](#controlling-the-step-size),
 
-$$\begin{aligned} p_c^{(t+1)} &= (1-\alpha_{cp}) p_c^{(t)} + \sqrt{1 - (1-\alpha_{cp})^2}\\;\sqrt{\lambda}\\;\frac{\mu^{(t+1)} - \mu^{(t)}}{\sigma^{(t)}} \\ &= (1-\alpha_{cp}) p_c^{(t)} + \sqrt{\alpha_{cp}(2 - \alpha_{cp})\lambda}\\;\frac{\mu^{(t+1)} - \mu^{(t)}}{\sigma^{(t)}} \end{aligned}$$
+$$\begin{aligned} p_c^{(t+1)} &= (1-\alpha_{cp}) p_c^{(t)} + \sqrt{1 - (1-\alpha_{cp})^2}\;\sqrt{\lambda}\;\frac{\mu^{(t+1)} - \mu^{(t)}}{\sigma^{(t)}} \\ &= (1-\alpha_{cp}) p_c^{(t)} + \sqrt{\alpha_{cp}(2 - \alpha_{cp})\lambda}\;\frac{\mu^{(t+1)} - \mu^{(t)}}{\sigma^{(t)}} \end{aligned}$$
 
 Then the covariance matrix is updated according to $p_c$:
 
-$$C^{(t+1)} = (1-\alpha_{c1}) C^{(t)} + \alpha_{c1}\\;p_c^{(t+1)} {p_c^{(t+1)}}^\top$$
+$$C^{(t+1)} = (1-\alpha_{c1}) C^{(t)} + \alpha_{c1}\;p_c^{(t+1)} {p_c^{(t+1)}}^\top$$
 
 The _rank-one update_ approach is claimed to generate a significant improvement over the _rank-min(λ, n)-update_ when $k$ is small, because the signs of moving steps and correlations between consecutive steps are all utilized and passed down through generations.
 
 Eventually we combine two approaches together,
 
-$$C^{(t+1)} = (1 - \alpha_{c\lambda} - \alpha_{c1}) C^{(t)} + \alpha_{c1}\\;\underbrace{p_c^{(t+1)} {p_c^{(t+1)}}^\top}_\textrm{rank-one update} + \alpha_{c\lambda} \underbrace{\frac{1}{\lambda} \sum_{i=1}^\lambda y^{(t+1)}_i {y^{(t+1)}_i}^\top}_\textrm{rank-min(lambda, n) update}$$
+$$C^{(t+1)} = (1 - \alpha_{c\lambda} - \alpha_{c1}) C^{(t)} + \alpha_{c1}\;\underbrace{p_c^{(t+1)} {p_c^{(t+1)}}^\top}_\textrm{rank-one update} + \alpha_{c\lambda} \underbrace{\frac{1}{\lambda} \sum_{i=1}^\lambda y^{(t+1)}_i {y^{(t+1)}_i}^\top}_\textrm{rank-min(lambda, n) update}$$
 
 ![](assets/images/2019-11-10-self-supervised/CMA-ES-algorithm.png)
 
@@ -284,7 +284,7 @@ where $\mathbf{F}_\theta$ is called the **[Fisher Information Matrix](http://mat
 
 The solution to the following optimization problem:
 
-$$\max \mathcal{J}(\theta + d) \approx \max \big( \mathcal{J}(\theta) + {\nabla_\theta\mathcal{J}(\theta)}^\top d \big)\\;\text{ s.t. }\text{KL}[p_\theta \| p_{\theta+d}] - \epsilon = 0$$
+$$\max \mathcal{J}(\theta + d) \approx \max \big( \mathcal{J}(\theta) + {\nabla_\theta\mathcal{J}(\theta)}^\top d \big)\;\text{ s.t. }\text{KL}[p_\theta \| p_{\theta+d}] - \epsilon = 0$$
 
 can be found using a Lagrangian multiplier,
 
@@ -327,7 +327,7 @@ $$\theta \sim \mathcal{N}(\hat{\theta}, \sigma^2 I) \text{ equivalent to } \thet
 
 The gradient for $\theta$ update is:
 
-$$\begin{aligned} & \nabla_\theta \mathbb{E}_{\theta\sim\mathcal{N}(\hat{\theta}, \sigma^2 I)} F(\theta) \\ &= \nabla_\theta \mathbb{E}_{\epsilon\sim\mathcal{N}(0, I)} F(\hat{\theta} + \sigma\epsilon) \\ &= \nabla_\theta \int_{\epsilon} p(\epsilon) F(\hat{\theta} + \sigma\epsilon) d\epsilon & \scriptstyle{\text{; Gaussian }p(\epsilon)=(2\pi)^{-\frac{n}{2}} \exp(-\frac{1}{2}\epsilon^\top\epsilon)} \\ &= \int_{\epsilon} p(\epsilon) \nabla_\epsilon \log p(\epsilon) \nabla_\theta \epsilon\\;F(\hat{\theta} + \sigma\epsilon) d\epsilon & \scriptstyle{\text{; log-likelihood trick}}\\ &= \mathbb{E}_{\epsilon\sim\mathcal{N}(0, I)} [ \nabla_\epsilon \big(-\frac{1}{2}\epsilon^\top\epsilon\big) \nabla_\theta \big(\frac{\theta - \hat{\theta}}{\sigma}\big) F(\hat{\theta} + \sigma\epsilon) ] & \\ &= \mathbb{E}_{\epsilon\sim\mathcal{N}(0, I)} [ (-\epsilon) (\frac{1}{\sigma}) F(\hat{\theta} + \sigma\epsilon) ] & \\ &= \frac{1}{\sigma}\mathbb{E}_{\epsilon\sim\mathcal{N}(0, I)} [ \epsilon F(\hat{\theta} + \sigma\epsilon) ] & \scriptstyle{\text{; negative sign can be absorbed.}} \end{aligned}$$
+$$\begin{aligned} & \nabla_\theta \mathbb{E}_{\theta\sim\mathcal{N}(\hat{\theta}, \sigma^2 I)} F(\theta) \\ &= \nabla_\theta \mathbb{E}_{\epsilon\sim\mathcal{N}(0, I)} F(\hat{\theta} + \sigma\epsilon) \\ &= \nabla_\theta \int_{\epsilon} p(\epsilon) F(\hat{\theta} + \sigma\epsilon) d\epsilon & \scriptstyle{\text{; Gaussian }p(\epsilon)=(2\pi)^{-\frac{n}{2}} \exp(-\frac{1}{2}\epsilon^\top\epsilon)} \\ &= \int_{\epsilon} p(\epsilon) \nabla_\epsilon \log p(\epsilon) \nabla_\theta \epsilon\;F(\hat{\theta} + \sigma\epsilon) d\epsilon & \scriptstyle{\text{; log-likelihood trick}}\\ &= \mathbb{E}_{\epsilon\sim\mathcal{N}(0, I)} [ \nabla_\epsilon \big(-\frac{1}{2}\epsilon^\top\epsilon\big) \nabla_\theta \big(\frac{\theta - \hat{\theta}}{\sigma}\big) F(\hat{\theta} + \sigma\epsilon) ] & \\ &= \mathbb{E}_{\epsilon\sim\mathcal{N}(0, I)} [ (-\epsilon) (\frac{1}{\sigma}) F(\hat{\theta} + \sigma\epsilon) ] & \\ &= \frac{1}{\sigma}\mathbb{E}_{\epsilon\sim\mathcal{N}(0, I)} [ \epsilon F(\hat{\theta} + \sigma\epsilon) ] & \scriptstyle{\text{; negative sign can be absorbed.}} \end{aligned}$$
 
 In one generation, we can sample many $epsilon_i, i=1,\dots,n$ and evaluate the fitness _in parallel_. One beautiful design is that no large model parameter needs to be shared. By only communicating the random seeds between workers, it is enough for the master node to do parameter update. This approach is later extended to adaptively learn a loss function; see my previous post on [Evolved Policy Gradient](https://lilianweng.github.io/posts/2019-06-23-meta-rl/#meta-learning-the-loss-function).
 
