@@ -276,7 +276,7 @@ Video frames are naturally positioned in chronological order. Researchers have p
 
 One idea is to **validate frame order** ([Misra, et al 2016](https://arxiv.org/abs/1603.08561)). The pretext task is to determine whether a sequence of frames from a video is placed in the correct temporal order ("temporal valid"). The model needs to track and reason about small motion of an object across frames to complete such a task.
 
-The training frames are sampled from high-motion windows. Every time 5 frames are sampled $(f_a, f_b, f_c, f_d, f_e)$ and the timestamps are in order $a < b < c < d < e$. Out of 5 frames, one positive tuple $(f_b, f_c, f_d)$ and two negative tuples, $(f_b, f_a, f_d)$ and $(f_b, f_e, f_d)$ are created. The parameter $\tau_\max = \vert b-d \vert$ controls the difficulty of positive training instances (i.e. higher → harder) and the parameter $\tau_\min = \min(\vert a-b \vert, \vert d-e \vert)$ controls the difficulty of negatives (i.e. lower → harder).
+The training frames are sampled from high-motion windows. Every time 5 frames are sampled $(f_a, f_b, f_c, f_d, f_e)$ and the timestamps are in order $a < b < c < d < e$. Out of 5 frames, one positive tuple $(f_b, f_c, f_d)$ and two negative tuples, $(f_b, f_a, f_d)$ and $(f_b, f_e, f_d)$ are created. The parameter $\tau_{max} = \vert b-d \vert$ controls the difficulty of positive training instances (i.e. higher → harder) and the parameter $\tau_{min} = \min(\vert a-b \vert, \vert d-e \vert)$ controls the difficulty of negatives (i.e. lower → harder).
 
 The pretext task of video frame order validation is shown to improve the performance on the downstream task of action recognition when used as a pretraining step.
 

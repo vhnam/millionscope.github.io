@@ -43,7 +43,7 @@ Evolution strategies (ES) belong to the big family of evolutionary algorithms. T
 
 Evolutionary algorithms refer to a division of population-based optimization algorithms inspired by _natural selection_. Natural selection believes that individuals with traits beneficial to their survival can live through generations and pass down the good characteristics to the next generation. Evolution happens by the selection process gradually and the population grows better adapted to the environment.
 
-![](assets/images/2019-11-10-self-supervised/EA-illustration.png)
+![](assets/images/2019-09-05-evolution-strategies/EA-illustration.png)
 
 Fig. 1. How natural selection works. (Image source: Khan Academy: [Darwin, evolution, & natural selection](https://www.khanacademy.org/science/biology/her/evolution-and-natural-selection/a/darwin-evolution-natural-selection))
 
@@ -187,7 +187,7 @@ $$x^{(t+1)}_i = \mu^{(t)} + \sigma^{(t)} y^{(t+1)}_i \text{, where } y^{(t+1)}_i
 
 The parameter $\sigma$ controls the overall scale of the distribution. It is separated from the covariance matrix so that we can change steps faster than the full covariance. A larger step size leads to faster parameter update. In order to evaluate whether the current step size is proper, CMA-ES constructs an _evolution path_ $p_\sigma$ by summing up a consecutive sequence of moving steps, $\frac{1}{\lambda}\sum_{i}^\lambda y_i^{(j)}, j=1, \dots, t$. By comparing this path length with its expected length under random selection (meaning single steps are uncorrelated), we are able to adjust $\sigma$ accordingly (See Fig. 2).
 
-![](assets/images/2019-11-10-self-supervised/CMA-ES-step-size-path.png)
+![](assets/images/2019-09-05-evolution-strategies/CMA-ES-step-size-path.png)
 
 Fig. 2. Three scenarios of how single steps are correlated in different ways and their impacts on step size update. (Image source: additional annotations on Fig 5 in [CMA-ES tutorial](https://arxiv.org/abs/1604.00772) paper)
 
@@ -244,11 +244,11 @@ Eventually we combine two approaches together,
 
 $$C^{(t+1)} = (1 - \alpha_{c\lambda} - \alpha_{c1}) C^{(t)} + \alpha_{c1}\;\underbrace{p_c^{(t+1)} {p_c^{(t+1)}}^\top}_\textrm{rank-one update} + \alpha_{c\lambda} \underbrace{\frac{1}{\lambda} \sum_{i=1}^\lambda y^{(t+1)}_i {y^{(t+1)}_i}^\top}_\textrm{rank-min(lambda, n) update}$$
 
-![](assets/images/2019-11-10-self-supervised/CMA-ES-algorithm.png)
+![](assets/images/2019-09-05-evolution-strategies/CMA-ES-algorithm.png)
 
 In all my examples above, each elite sample is considered to contribute an equal amount of weights, $1/\lambda$. The process can be easily extended to the case where selected samples are assigned with different weights, $w_1, \dots, w_\lambda$, according to their performances. See more detail in [tutorial](https://arxiv.org/abs/1604.00772).
 
-![](assets/images/2019-11-10-self-supervised/CMA-ES-illustration.png)
+![](assets/images/2019-09-05-evolution-strategies/CMA-ES-illustration.png)
 
 Fig. 3. Illustration of how CMA-ES works on a 2D optimization problem (the lighter color the better). Black dots are samples in one generation. The samples are more spread out initially but when the model has higher confidence in finding a good solution in the late stage, the samples become very concentrated over the global optimum. (Image source: [Wikipedia CMA-ES](https://en.wikipedia.org/wiki/CMA-ES))
 
@@ -292,7 +292,7 @@ $$\begin{aligned} \mathcal{L}(\theta, d, \beta) &= \mathcal{J}(\theta) + \nabla_
 
 where $d_\text{N}^*$ only extracts the direction of the optimal moving step on $\theta$, ignoring the scalar $\beta^{-1}$.
 
-![](assets/images/2019-11-10-self-supervised/CMA-ES-coordinates.png)
+![](assets/images/2019-09-05-evolution-strategies/CMA-ES-coordinates.png)
 
 Fig. 4. The natural gradient samples (black solid arrows) in the right are the plain gradient samples (black solid arrows) in the left multiplied by the inverse of their covariance. In this way, a gradient direction with high uncertainty (indicated by high covariance with other samples) are penalized with a small weight. The aggregated natural gradient (red dash arrow) is therefore more trustworthy than the natural gradient (green solid arrow). (Image source: additional annotations on Fig 2 in [NES](https://arxiv.org/abs/1106.4487) paper)
 
@@ -306,7 +306,7 @@ Using the same log-likelihood [trick](http://blog.shakirm.com/2015/11/machine-le
 
 $$\begin{aligned} \nabla_\theta\mathcal{J}(\theta) &= \nabla_\theta \int_x f(x) p_\theta(x) dx \\ &= \int_x f(x) \frac{p_\theta(x)}{p_\theta(x)}\nabla_\theta p_\theta(x) dx \\ & = \int_x f(x) p_\theta(x) \nabla_\theta \log p_\theta(x) dx \\ & = \mathbb{E}_{x \sim p_\theta} [f(x) \nabla_\theta \log p_\theta(x)] \end{aligned}$$
 
-![](assets/images/2019-11-10-self-supervised/NES-algorithm.png)
+![](assets/images/2019-09-05-evolution-strategies/NES-algorithm.png)
 
 Besides natural gradients, NES adopts a couple of important heuristics to make the algorithm performance more robust.
 
@@ -331,7 +331,7 @@ $$\begin{aligned} & \nabla_\theta \mathbb{E}_{\theta\sim\mathcal{N}(\hat{\theta}
 
 In one generation, we can sample many $epsilon_i, i=1,\dots,n$ and evaluate the fitness _in parallel_. One beautiful design is that no large model parameter needs to be shared. By only communicating the random seeds between workers, it is enough for the master node to do parameter update. This approach is later extended to adaptively learn a loss function; see my previous post on [Evolved Policy Gradient](https://lilianweng.github.io/posts/2019-06-23-meta-rl/#meta-learning-the-loss-function).
 
-![](assets/images/2019-11-10-self-supervised/OpenAI-ES-algorithm.png)
+![](assets/images/2019-09-05-evolution-strategies/OpenAI-ES-algorithm.png)
 
 Fig. 5. The algorithm for training a RL policy using evolution strategies. (Image source: [ES-for-RL](https://arxiv.org/abs/1703.03864) paper)
 
@@ -368,13 +368,13 @@ $$\theta_m^{(t+1)} \leftarrow \theta_m^{(t)} + \alpha \frac{1}{\sigma}\sum_{i=1}
 
 $$\theta_m^{(t+1)} \leftarrow \theta_m^{(t)} + \alpha \frac{1}{\sigma}\sum_{i=1}^N \epsilon_i \big((1-w) N(\theta^{(t)}_m + \epsilon_i, \mathcal{A}) + w F(\theta^{(t)}_m + \epsilon_i)\big)$$
 
-![](assets/images/2019-11-10-self-supervised/NS-ES-experiments.png)
+![](assets/images/2019-09-05-evolution-strategies/NS-ES-experiments.png)
 
 Fig. 6. (Left) The environment is Humanoid locomotion with a three-sided wall which plays a role as a deceptive trap to create local optimum. (Right) Experiments compare ES baseline and other variations that encourage exploration. (Image source: [NS-ES](https://arxiv.org/abs/1712.06560) paper)
 
 ## CEM-RL[#](#cem-rl)
 
-![](assets/images/2019-11-10-self-supervised/CEM-RL.png)
+![](assets/images/2019-09-05-evolution-strategies/CEM-RL.png)
 
 Fig. 7. Architectures of the (a) CEM-RL and (b) [ERL](https://papers.nips.cc/paper/7395-evolution-guided-policy-gradient-in-reinforcement-learning.pdf) algorithms (Image source: [CEM-RL](https://arxiv.org/abs/1810.01222) paper)
 
@@ -401,7 +401,7 @@ Below I would like to introduce two applications in more detail, _Population-Bas
 
 ## Hyperparameter Tuning: PBT[#](#hyperparameter-tuning-pbt)
 
-![](assets/images/2019-11-10-self-supervised/PBT.png)
+![](assets/images/2019-09-05-evolution-strategies/PBT.png)
 
 Fig. 8. Paradigms of comparing different ways of hyperparameter tuning. (Image source: [PBT](https://arxiv.org/abs/1711.09846) paper)
 
@@ -414,7 +414,7 @@ PBT starts with a set of random candidates, each containing a pair of model weig
 
 In this process, only promising model and hyperparameter pairs can survive and keep on evolving, achieving better utilization of computational resources.
 
-![](assets/images/2019-11-10-self-supervised/PBT-algorithm.png)
+![](assets/images/2019-09-05-evolution-strategies/PBT-algorithm.png)
 
 Fig. 9. The algorithm of population-based training. (Image source: [PBT](https://arxiv.org/abs/1711.09846) paper)
 
@@ -429,13 +429,13 @@ The workflow of WANN looks pretty much the same as standard GA:
 3.  Rank and Selection: Rank by performance and complexity.
 4.  Mutation: Create new population by varying best networks.
 
-![](assets/images/2019-11-10-self-supervised/WANN-mutations.png)
+![](assets/images/2019-09-05-evolution-strategies/WANN-mutations.png)
 
 Fig. 10. mutation operations for searching for new network topologies in WANN (Image source: [WANN](https://arxiv.org/abs/1906.04358) paper)
 
 At the "evaluation” stage, all the network weights are set to be the same. In this way, WANN is actually searching for network that can be described with a minimal description length. In the "selection” stage, both the network connection and the model performance are considered.
 
-![](assets/images/2019-11-10-self-supervised/WANN-results.png)
+![](assets/images/2019-09-05-evolution-strategies/WANN-results.png)
 
 Fig. 11. Performance of WANN found network topologies on different RL tasks are compared with baseline FF networks commonly used in the literature. "Tuned Shared Weight" only requires adjusting one weight value. (Image source: [WANN](https://arxiv.org/abs/1906.04358) paper)
 
@@ -446,13 +446,13 @@ As shown in Fig. 11, WANN results are evaluated with both random weights and sha
 Cited as:
 
 ```bibtex
-    @article{weng2019ES,
-      title   = "Evolution Strategies",
-      author  = "Weng, Lilian",
-      journal = "lilianweng.github.io",
-      year    = "2019",
-      url     = "https://lilianweng.github.io/posts/2019-09-05-evolution-strategies/"
-    }
+@article{weng2019ES,
+  title   = "Evolution Strategies",
+  author  = "Weng, Lilian",
+  journal = "lilianweng.github.io",
+  year    = "2019",
+  url     = "https://lilianweng.github.io/posts/2019-09-05-evolution-strategies/"
+}
 ```
 
 # References[#](#references)
