@@ -11,46 +11,9 @@ Source : https://lilianweng.github.io/posts/2018-02-19-rl-overview
 
 # A (Long) Peek into Reinforcement Learning
 
-Table of Contents
-
-- [What is Reinforcement Learning?](#what-is-reinforcement-learning)
-  - [Key Concepts](#key-concepts)
-    - [Model: Transition and Reward](#model-transition-and-reward)
-    - [Policy](#policy)
-    - [Value Function](#value-function)
-    - [Optimal Value and Policy](#optimal-value-and-policy)
-  - [Markov Decision Processes](#markov-decision-processes)
-  - [Bellman Equations](#bellman-equations)
-    - [Bellman Expectation Equations](#bellman-expectation-equations)
-    - [Bellman Optimality Equations](#bellman-optimality-equations)
-- [Common Approaches](#common-approaches)
-  - [Dynamic Programming](#dynamic-programming)
-    - [Policy Evaluation](#policy-evaluation)
-    - [Policy Improvement](#policy-improvement)
-    - [Policy Iteration](#policy-iteration)
-  - [Monte-Carlo Methods](#monte-carlo-methods)
-  - [Temporal-Difference Learning](#temporal-difference-learning)
-    - [Bootstrapping](#bootstrapping)
-    - [Value Estimation](#value-estimation)
-    - [SARSA: On-Policy TD control](#sarsa-on-policy-td-control)
-    - [Q-Learning: Off-policy TD control](#q-learning-off-policy-td-control)
-    - [Deep Q-Network](#deep-q-network)
-  - [Combining TD and MC Learning](#combining-td-and-mc-learning)
-  - [Policy Gradient](#policy-gradient)
-    - [Policy Gradient Theorem](#policy-gradient-theorem)
-    - [REINFORCE](#reinforce)
-    - [Actor-Critic](#actor-critic)
-    - [A3C](#a3c)
-  - [Evolution Strategies](#evolution-strategies)
-- [Known Problems](#known-problems)
-  - [Exploration-Exploitation Dilemma](#exploration-exploitation-dilemma)
-  - [Deadly Triad Issue](#deadly-triad-issue)
-- [Case Study: AlphaGo Zero](#case-study-alphago-zero)
-- [References](#references)
-
 A couple of exciting news in Artificial Intelligence (AI) has just happened in recent years. AlphaGo defeated the best professional human player in the game of Go. Very soon the extended algorithm AlphaGo Zero beat AlphaGo by 100-0 without supervised learning on human knowledge. Top professional game players lost to the bot developed by OpenAI on DOTA2 1v1 competition. After knowing these, it is pretty hard not to be curious about the magic behind these algorithms — Reinforcement Learning (RL). I'm writing this post to briefly go over the field. We will first introduce several fundamental concepts and then dive into classic approaches to solving RL problems. Hopefully, this post could be a good starting point for newbies, bridging the future study on the cutting-edge research.
 
-# What is Reinforcement Learning?[#](#what-is-reinforcement-learning)
+## What is Reinforcement Learning?[#](#what-is-reinforcement-learning)
 
 Say, we have an agent in an unknown environment and this agent can obtain some rewards by interacting with the environment. The agent ought to take actions so as to maximize cumulative rewards. In reality, the scenario could be a bot playing a game to achieve high scores, or a robot trying to complete physical tasks with physical items; and not just limited to these.
 
@@ -60,7 +23,7 @@ Fig. 1. An agent interacts with the environment, trying to take smart actions to
 
 The goal of Reinforcement Learning (RL) is to learn a good strategy for the agent from experimental trials and relative simple feedback received. With the optimal strategy, the agent is capable to actively adapt to the environment to maximize future rewards.
 
-## Key Concepts[#](#key-concepts)
+### Key Concepts[#](#key-concepts)
 
 Now Let's formally define a set of key concepts in RL.
 
@@ -90,7 +53,7 @@ Terms you will encounter a lot when diving into different categories of RL algor
 - **On-policy**: Use the deterministic outcomes or samples from the target policy to train the algorithm.
 - **Off-policy**: Training on a distribution of transitions or episodes produced by a different behavior policy rather than that produced by the target policy.
 
-### Model: Transition and Reward[#](#model-transition-and-reward)
+#### Model: Transition and Reward[#](#model-transition-and-reward)
 
 The model is a descriptor of the environment. With the model, we can learn or infer how the environment would interact with and provide feedback to the agent. The model has two major parts, transition probability function $P$ and reward function $R$.
 
@@ -114,14 +77,14 @@ $$
 R(s, a) = \mathbb{E} [R_{t+1} \vert S_t = s, A_t = a] = \sum_{r\in\mathcal{R}} r \sum_{s' \in \mathcal{S}} P(s', r \vert s, a)
 $$
 
-### Policy[#](#policy)
+#### Policy[#](#policy)
 
 Policy, as the agent's behavior function $\pi$, tells us which action to take in state s. It is a mapping from state s to action a and can be either deterministic or stochastic:
 
 - Deterministic: $\pi(s) = a$.
 - Stochastic: $\pi(a \vert s) = \mathbb{P}_\pi [A=a \vert S=s]$.
 
-### Value Function[#](#value-function)
+#### Value Function[#](#value-function)
 
 Value function measures the goodness of a state or how rewarding a state or an action is by a prediction of future reward. The future reward, also known as **return**, is a total sum of discounted rewards going forward. Let's compute the return $G_t$ starting from time t:
 
@@ -160,7 +123,7 @@ $$
 A_{\pi}(s, a) = Q_{\pi}(s, a) - V_{\pi}(s)
 $$
 
-### Optimal Value and Policy[#](#optimal-value-and-policy)
+#### Optimal Value and Policy[#](#optimal-value-and-policy)
 
 The optimal value function produces the maximum return:
 
@@ -176,7 +139,7 @@ $$
 
 And of course, we have $V_{\pi_{*}}(s)=V_{*}(s)$ and $Q_{\pi_{*}}(s, a) = Q_{*}(s, a)$.
 
-## Markov Decision Processes[#](#markov-decision-processes)
+### Markov Decision Processes[#](#markov-decision-processes)
 
 In more formal terms, almost all the RL problems can be framed as **Markov Decision Processes** (MDPs). All states in MDP has "Markov" property, referring to the fact that the future only depends on the current state, not the history:
 
@@ -202,7 +165,7 @@ A Markov deicison process consists of five elements $\mathcal{M} = \langle \math
 
 Fig. 4. A fun example of Markov decision process: a typical work day. (Image source: [randomant.net/reinforcement-learning-concepts](https://randomant.net/reinforcement-learning-concepts/))
 
-## Bellman Equations[#](#bellman-equations)
+### Bellman Equations[#](#bellman-equations)
 
 Bellman equations refer to a set of equations that decompose the value function into the immediate reward plus the discounted future values.
 
@@ -216,7 +179,7 @@ $$
 \begin{aligned} Q(s, a) &= \mathbb{E} [R_{t+1} + \gamma V(S_{t+1}) \mid S_t = s, A_t = a] \\ &= \mathbb{E} [R_{t+1} + \gamma \mathbb{E}_{a\sim\pi} Q(S_{t+1}, a) \mid S_t = s, A_t = a] \end{aligned}
 $$
 
-### Bellman Expectation Equations[#](#bellman-expectation-equations)
+#### Bellman Expectation Equations[#](#bellman-expectation-equations)
 
 The recursive update process can be further decomposed to be equations built on both state-value and action-value functions. As we go further in future action steps, we extend V and Q alternatively by following the policy $\pi$.
 
@@ -228,7 +191,7 @@ $$
 \begin{aligned} V_{\pi}(s) &= \sum_{a \in \mathcal{A}} \pi(a \vert s) Q_{\pi}(s, a) \\ Q_{\pi}(s, a) &= R(s, a) + \gamma \sum_{s' \in \mathcal{S}} P_{ss'}^a V_{\pi} (s') \\ V_{\pi}(s) &= \sum_{a \in \mathcal{A}} \pi(a \vert s) \big( R(s, a) + \gamma \sum_{s' \in \mathcal{S}} P_{ss'}^a V_{\pi} (s') \big) \\ Q_{\pi}(s, a) &= R(s, a) + \gamma \sum_{s' \in \mathcal{S}} P_{ss'}^a \sum_{a' \in \mathcal{A}} \pi(a' \vert s') Q_{\pi} (s', a') \end{aligned}
 $$
 
-### Bellman Optimality Equations[#](#bellman-optimality-equations)
+#### Bellman Optimality Equations[#](#bellman-optimality-equations)
 
 If we are only interested in the optimal values, rather than computing the expectation following a policy, we could jump right into the maximum returns during the alternative updates without using a policy. RECAP: the optimal values $V_*$ and $Q_*$ are the best returns we can obtain, defined [here](#optimal-value-and-policy).
 
@@ -240,15 +203,15 @@ Unsurprisingly they look very similar to Bellman expectation equations.
 
 If we have complete information of the environment, this turns into a planning problem, solvable by DP. Unfortunately, in most scenarios, we do not know $P_{ss'}^a$ or $R(s, a)$, so we cannot solve MDPs by directly applying Bellmen equations, but it lays the theoretical foundation for many RL algorithms.
 
-# Common Approaches[#](#common-approaches)
+## Common Approaches[#](#common-approaches)
 
 Now it is the time to go through the major approaches and classic algorithms for solving RL problems. In future posts, I plan to dive into each approach further.
 
-## Dynamic Programming[#](#dynamic-programming)
+### Dynamic Programming[#](#dynamic-programming)
 
 When the model is fully known, following Bellman equations, we can use [Dynamic Programming](https://en.wikipedia.org/wiki/Dynamic_programming) (DP) to iteratively evaluate value functions and improve policy.
 
-### Policy Evaluation[#](#policy-evaluation)
+#### Policy Evaluation[#](#policy-evaluation)
 
 Policy Evaluation is to compute the state-value $V_\pi$ for a given policy $\pi$:
 
@@ -256,7 +219,7 @@ $$
 V_{t+1}(s) = \mathbb{E}_\pi [r + \gamma V_t(s') | S_t = s] = \sum_a \pi(a \vert s) \sum_{s', r} P(s', r \vert s, a) (r + \gamma V_t(s'))
 $$
 
-### Policy Improvement[#](#policy-improvement)
+#### Policy Improvement[#](#policy-improvement)
 
 Based on the value functions, Policy Improvement generates a better policy $\pi' \geq \pi$ by acting greedily.
 
@@ -264,7 +227,7 @@ $$
 Q_\pi(s, a) = \mathbb{E} [R_{t+1} + \gamma V_\pi(S_{t+1}) \vert S_t=s, A_t=a] = \sum_{s', r} P(s', r \vert s, a) (r + \gamma V_\pi(s'))
 $$
 
-### Policy Iteration[#](#policy-iteration)
+#### Policy Iteration[#](#policy-iteration)
 
 The _Generalized Policy Iteration (GPI)_ algorithm refers to an iterative procedure to improve the policy when combining policy evaluation and improvement.
 
@@ -280,7 +243,7 @@ $$
 \begin{aligned} Q_\pi(s, \pi'(s)) &= Q_\pi(s, \arg\max_{a \in \mathcal{A}} Q_\pi(s, a)) \\ &= \max_{a \in \mathcal{A}} Q_\pi(s, a) \geq Q_\pi(s, \pi(s)) = V_\pi(s) \end{aligned}
 $$
 
-## Monte-Carlo Methods[#](#monte-carlo-methods)
+### Monte-Carlo Methods[#](#monte-carlo-methods)
 
 First, let's recall that $V(s) = \mathbb{E}[ G_t \vert S_t=s]$. Monte-Carlo (MC) methods uses a simple idea: It learns from episodes of raw experience without modeling the environmental dynamics and computes the observed mean return as an approximation of the expected return. To compute the empirical return $G_t$, MC methods need to learn from **complete** episodes $S_1, A_1, R_2, \dots, S_T$ to compute $G_t = \sum_{k=0}^{T-t-1} \gamma^k R_{t+k+1}$ and all the episodes must eventually terminate.
 
@@ -304,15 +267,15 @@ To learn the optimal policy by MC, we iterate it by following a similar idea to 
 2.  Generate a new episode with the new policy $\pi$ (i.e. using algorithms like [ε-greedy](https://lilianweng.github.io/posts/2018-01-23-multi-armed-bandit/#%CE%B5-greedy-algorithm) helps us balance between exploitation and exploration.)
 3.  Estimate Q using the new episode: $q_\pi(s, a) = \frac{\sum_{t=1}^T \big( \mathbb{1}[S_t = s, A_t = a] \sum_{k=0}^{T-t-1} \gamma^k R_{t+k+1} \big)}{\sum_{t=1}^T \mathbb{1}[S_t = s, A_t = a]}$
 
-## Temporal-Difference Learning[#](#temporal-difference-learning)
+### Temporal-Difference Learning[#](#temporal-difference-learning)
 
 Similar to Monte-Carlo methods, Temporal-Difference (TD) Learning is model-free and learns from episodes of experience. However, TD learning can learn from **incomplete** episodes and hence we don't need to track the episode up to termination. TD learning is so important that Sutton & Barto (2017) in their RL book describes it as "one idea … central and novel to reinforcement learning".
 
-### Bootstrapping[#](#bootstrapping)
+#### Bootstrapping[#](#bootstrapping)
 
 TD learning methods update targets with regard to existing estimates rather than exclusively relying on actual rewards and complete returns as in MC methods. This approach is known as **bootstrapping**.
 
-### Value Estimation[#](#value-estimation)
+#### Value Estimation[#](#value-estimation)
 
 The key idea in TD learning is to update the value function $V(S_t)$ towards an estimated return $R_{t+1} + \gamma V(S_{t+1})$ (known as "**TD target**"). To what extent we want to update the value function is controlled by the learning rate hyperparameter α:
 
@@ -328,7 +291,7 @@ $$
 
 Next, let's dig into the fun part on how to learn optimal policy in TD learning (aka "TD control"). Be prepared, you are gonna see many famous names of classic algorithms in this section.
 
-### SARSA: On-Policy TD control[#](#sarsa-on-policy-td-control)
+#### SARSA: On-Policy TD control[#](#sarsa-on-policy-td-control)
 
 "SARSA" refers to the procedure of updaing Q-value by following a sequence of $\dots, S_t, A_t, R_{t+1}, S_{t+1}, A_{t+1}, \dots$. The idea follows the same route of [GPI](#policy-iteration). Within one episode, it works as follows:
 
@@ -341,7 +304,7 @@ Next, let's dig into the fun part on how to learn optimal policy in TD learning 
 
 In each step of SARSA, we need to choose the _next_ action according to the _current_ policy.
 
-### Q-Learning: Off-policy TD control[#](#q-learning-off-policy-td-control)
+#### Q-Learning: Off-policy TD control[#](#q-learning-off-policy-td-control)
 
 The development of Q-learning ([Watkins & Dayan, 1992](https://link.springer.com/content/pdf/10.1007/BF00992698.pdf)) is a big breakout in the early days of Reinforcement Learning. Within one episode, it works as follows:
 
@@ -358,7 +321,7 @@ The key difference from SARSA is that Q-learning does not follow the current pol
 
 Fig. 6. The backup diagrams for Q-learning and SARSA. (Image source: Replotted based on Figure 6.5 in Sutton & Barto (2017))
 
-### Deep Q-Network[#](#deep-q-network)
+#### Deep Q-Network[#](#deep-q-network)
 
 Theoretically, we can memorize $Q_*(.)$ for all state-action pairs in Q-learning, like in a gigantic table. However, it quickly becomes computationally infeasible when the state and action space are large. Thus people use functions (i.e. a machine learning model) to approximate Q values and this is called **function approximation**. For example, if we use a function with parameter $\theta$ to calculate Q values, we can label Q value function as $Q(s, a; \theta)$.
 
@@ -385,7 +348,7 @@ Fig. 7. Algorithm for DQN with experience replay and occasionally frozen optimiz
 
 There are many extensions of DQN to improve the original design, such as DQN with dueling architecture (Wang et al. 2016) which estimates state-value function V(s) and advantage function A(s, a) with shared network parameters.
 
-## Combining TD and MC Learning[#](#combining-td-and-mc-learning)
+### Combining TD and MC Learning[#](#combining-td-and-mc-learning)
 
 In the previous [section](#value-estimation) on value estimation in TD learning, we only trace one step further down the action chain when calculating the TD target. One can easily extend it to take multiple steps to estimate the return.
 
@@ -441,7 +404,7 @@ This weighted sum of many n-step returns is called λ-return $G_t^{\lambda} = (1
 
 Fig. 8. Comparison of the backup diagrams of Monte-Carlo, Temporal-Difference learning, and Dynamic Programming for state value functions. (Image source: David Silver's RL course [lecture 4](http://www0.cs.ucl.ac.uk/staff/d.silver/web/Teaching_files/MC-TD.pdf): "Model-Free Prediction")
 
-## Policy Gradient[#](#policy-gradient)
+### Policy Gradient[#](#policy-gradient)
 
 All the methods we have introduced above aim to learn the state/action value function and then to select actions accordingly. Policy Gradient methods instead learn the policy directly with a parameterized function respect to $\theta$, $\pi(a \vert s; \theta)$. Let's define the reward function (opposite of loss function) as _the expected return_ and train the algorithm with the goal to maximize the reward function. My [next post](https://lilianweng.github.io/posts/2018-04-08-policy-gradient/) described why the policy gradient theorem works (proof) and introduced a number of policy gradient algorithms.
 
@@ -463,7 +426,7 @@ where $d_{\pi_\theta}(s)$ is stationary distribution of Markov chain for $\pi_\t
 
 Using _gradient ascent_ we can find the best θ that produces the highest return. It is natural to expect policy-based methods are more useful in continuous space, because there is an infinite number of actions and/or states to estimate the values for in continuous space and hence value-based approaches are computationally much more expensive.
 
-### Policy Gradient Theorem[#](#policy-gradient-theorem)
+#### Policy Gradient Theorem[#](#policy-gradient-theorem)
 
 Computing the gradient _numerically_ can be done by perturbing θ by a small amount ε in the k-th dimension. It works even when $J(\theta)$ is not differentiable (nice!), but unsurprisingly very slow.
 
@@ -497,7 +460,7 @@ $$
 \nabla \mathcal{J}(\theta) = \mathbb{E}_{\pi_\theta} [\nabla \\ln \pi(a \vert s, \theta) Q_\pi(s, a)]
 $$
 
-### REINFORCE[#](#reinforce)
+#### REINFORCE[#](#reinforce)
 
 REINFORCE, also known as Monte-Carlo policy gradient, relies on $Q_\pi(s, a)$, an estimated return by [MC](#monte-carlo-methods) methods using episode samples, to update the policy parameter $\theta$.
 
@@ -509,7 +472,7 @@ A commonly used variation of REINFORCE is to subtract a baseline value from the 
     1.  Estimate the the return G_t since the time step t.
     2.  $\theta \leftarrow \theta + \alpha \gamma^t G_t \nabla \\ln \pi(A_t \vert S_t, \theta)$.
 
-### Actor-Critic[#](#actor-critic)
+#### Actor-Critic[#](#actor-critic)
 
 If the value function is learned in addition to the policy, we would get Actor-Critic algorithm.
 
@@ -531,7 +494,7 @@ Let's see how it works in an action-value actor-critic algorithm.
 
 $\alpha_\theta$ and $\alpha_w$ are two learning rates for policy and value function parameter updates, respectively.
 
-### A3C[#](#a3c)
+#### A3C[#](#a3c)
 
 **Asynchronous Advantage Actor-Critic** (Mnih et al., 2016), short for A3C, is a classic policy gradient method with the special focus on parallel training.
 
@@ -565,7 +528,7 @@ Here is the algorithm outline:
 
 A3C enables the parallelism in multiple agent training. The gradient accumulation step (6.2) can be considered as a reformation of minibatch-based stochastic gradient update: the values of $w$ or $\theta$ get corrected by a little bit in the direction of each training thread independently.
 
-## Evolution Strategies[#](#evolution-strategies)
+### Evolution Strategies[#](#evolution-strategies)
 
 [Evolution Strategies](https://en.wikipedia.org/wiki/Evolution_strategy) (ES) is a type of model-agnostic optimization approach. It learns the optimal solution by imitating Darwin's theory of the evolution of species by natural selection. Two prerequisites for applying ES: (1) our solutions can freely interact with the environment and see whether they can solve the problem; (2) we are able to compute a **fitness** score of how good each solution is. We don't have to know the environment configuration to solve the problem.
 
@@ -594,19 +557,19 @@ ES, as a black-box optimization algorithm, is another approach to RL problems (_
 - ES is invariant to delayed or long-term rewards;
 - ES is highly parallelizable with very little data communication.
 
-# Known Problems[#](#known-problems)
+## Known Problems[#](#known-problems)
 
-## Exploration-Exploitation Dilemma[#](#exploration-exploitation-dilemma)
+### Exploration-Exploitation Dilemma[#](#exploration-exploitation-dilemma)
 
 The problem of exploration vs exploitation dilemma has been discussed in my previous [post](https://lilianweng.github.io/posts/2018-01-23-multi-armed-bandit/#exploitation-vs-exploration). When the RL problem faces an unknown environment, this issue is especially a key to finding a good solution: without enough exploration, we cannot learn the environment well enough; without enough exploitation, we cannot complete our reward optimization task.
 
 Different RL algorithms balance between exploration and exploitation in different ways. In [MC](#monte-carlo-methods) methods, [Q-learning](#q-learning-off-policy-td-control) or many on-policy algorithms, the exploration is commonly implemented by [ε-greedy](https://lilianweng.github.io/posts/2018-01-23-multi-armed-bandit/#%CE%B5-greedy-algorithm); In [ES](#evolution-strategies), the exploration is captured by the policy parameter perturbation. Please keep this into consideration when develop a new RL algorithm.
 
-## Deadly Triad Issue[#](#deadly-triad-issue)
+### Deadly Triad Issue[#](#deadly-triad-issue)
 
 We do seek the efficiency and flexibility of TD methods that involve bootstrapping. However, when off-policy, nonlinear function approximation, and bootstrapping are combined in one RL algorithm, the training could be unstable and hard to converge. This issue is known as the **deadly triad** (Sutton & Barto, 2017). Many architectures using deep learning models were proposed to resolve the problem, including DQN to stabilize the training with experience replay and occasionally frozen target network.
 
-# Case Study: AlphaGo Zero[#](#case-study-alphago-zero)
+## Case Study: AlphaGo Zero[#](#case-study-alphago-zero)
 
 The game of [Go](<https://en.wikipedia.org/wiki/Go_(game)>) has been an extremely hard problem in the field of Artificial Intelligence for decades until recent years. AlphaGo and AlphaGo Zero are two programs developed by a team at DeepMind. Both involve deep Convolutional Neural Networks ([CNN](https://lilianweng.github.io/posts/2017-12-15-object-recognition-part-2/#cnn-for-image-classification)) and Monte Carlo Tree Search (MCTS) and both have been approved to achieve the level of professional human Go players. Different from AlphaGo that relied on supervised learning from expert human moves, AlphaGo Zero used only reinforcement learning and self-play without human knowledge beyond the basic rules.
 
@@ -656,7 +619,7 @@ Cited as:
 }
 ```
 
-# References[#](#references)
+## References[#](#references)
 
 [1] Yuxi Li. [Deep reinforcement learning: An overview.](https://arxiv.org/pdf/1701.07274.pdf) arXiv preprint arXiv:1701.07274. 2017.
 
