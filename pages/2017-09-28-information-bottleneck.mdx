@@ -72,7 +72,7 @@ The training data contains sampled observations from the joint distribution of $
 
 Fig. 1. The structure of a deep neural network, which consists of the target label $Y$, input layer $X$, hidden layers $h_1, \dots, h_m$ and the final prediction $\hat{Y}$. (Image source: [Tishby and Zaslavsky, 2015](https://arxiv.org/pdf/1503.02406.pdf))
 
-If we label the hidden layers of a DNN as $h_1, h_2, \dots, h_m$ as in Fig. 1, we can view each layer as one state of a Markov Chain: $ h_i \to h_{i+1}$. According to DPI, we would have:
+If we label the hidden layers of a DNN as $h_1, h_2, \dots, h_m$ as in Fig. 1, we can view each layer as one state of a Markov Chain: $ h*i \to h*{i+1}$. According to DPI, we would have:
 
 $$\begin{aligned} H(X) \geq I(X; h_1) \geq I(X; h_2) \geq \dots \geq I(X; h_m) \geq I(X; \hat{Y}) \\ I(X; Y) \geq I(h_1; Y) \geq I(h_2; Y) \geq \dots \geq I(h_m; Y) \geq I(\hat{Y}; Y) \end{aligned}$$
 
@@ -164,6 +164,7 @@ Fig. 7. The training data of different sizes is color-coded. The information pla
 ---
 
 Cited as:
+
 ```bibtex
 @article{weng2017infotheory,
   title   = "Anatomize Deep Learning with Information Theory",
@@ -173,6 +174,7 @@ Cited as:
   url     = "https://lilianweng.github.io/posts/2017-09-28-information-bottleneck/"
 }
 ```
+
 # References[#](#references)
 
 [1] Naftali Tishby. [Information Theory of Deep Learning](https://youtu.be/bLqJHjXihK8)

@@ -179,11 +179,11 @@ Despite of its popularity, Perspective API contains known biases, as summarized 
 
 **Self-diagnosis** ([Schick, et al. 2021](https://arxiv.org/abs/2103.00453)) is a process of exploiting the capacity of a pretrained language model to detect socially undesired attributes in its own outputs. The diagnosis depends on a predefined prompt template where the attributes are described in short text and measures the normalized probability of the model outputting "yes" versus "no". Note that self-diagnosis does not need to access a labelled dataset for training.
 
-```
-    # Self-diagnosis template
-    "{sample text}"
-    Question: Does the above text contain {undesired attribute}?
-    Answer: {yes/no}
+```yaml
+# Self-diagnosis template
+"{sample text}"
+Question: Does the above text contain {undesired attribute}?
+Answer: {yes/no}
 ```
 
 They use RealToxicityPrompts dataset and Perspective API for evaluation in the experiments. The self-diagnosis performance is positively correlated with the model size.
@@ -203,11 +203,13 @@ Fig. 7. Self-diagnosis abilities for identifying undesired attributes. The groun
 ## Prompt-based Detox[#](#prompt-based-detox)
 
 **Self-debiasing** ([Schick et al. 2021](https://arxiv.org/abs/2103.00453)) follows the similar idea as in [self-diagnosis](#prompt-based-detection). It is a process for using the internal knowledge of a pretrained language model to reduce the probability of undesired attributes in the model generation.
-```
+
+```yaml
     # Self-debiasing template, denoted as sdb(.)
     The following text contains {undesired attribute s}:
     {sample text x}
 ```
+
 Given an input prompt $\mathbf{x}$, a textual description of undesired attributes $s$, and the language model $M$, self-debiasing computes the difference between the probability of next words without and with the self-debiasing template $\text{sdb}(.)$:
 
 $$\Delta(w, \mathbf{x}, s) = p_M(w\vert\mathbf{x}) - p_M(w\vert\text{sdb}(\mathbf{x}, s))$$
@@ -368,7 +370,7 @@ They consider four general strategies in the recipes for making the bot safer:
 
 # Appendix: Datasets[#](#appendix-datasets)
 
-(*Only datasets in English are listed here.)
+(\*Only datasets in English are listed here.)
 
 **Hate Speech and Offensive Language** Dataset (2017): contains about 25k tweets, each labelled manually as one of three categories: hate speech, offensive but not hate speech, or neither offensive nor hate speech. [[Download](https://github.com/t-davidson/hate-speech-and-offensive-language/blob/master/data/readme.md)]
 

@@ -101,13 +101,13 @@ CM3 can be used to complete several types of tasks by prompt engineering:
 
 - Image in-filling:
 
-```
+```yaml
   Infilling Prompt: <img src="{prefix}<mask:0>{postfix}"><mask:0>
 ```
 
 - Conditional image in-filling:
 
-```
+```yaml
   Conditional Infilling Prompt:
 
   <img alt="Photo: {text}" src="{prefix}<mask:0>{postfix}"><mask:0>
@@ -115,13 +115,13 @@ CM3 can be used to complete several types of tasks by prompt engineering:
 
 - Conditional image generation:
 
-```
+```yaml
   Conditional Generation Prompt: <img alt="{prompt}
 ```
 
 - Image captions:
 
-```
+```yaml
   Captioning Masked Prompt #1:
 
   <img alt="Photo: A photo taken of<mask:0>" src="{image}">
@@ -132,7 +132,7 @@ CM3 can be used to complete several types of tasks by prompt engineering:
 
 - Entity disambiguation
 
-```
+```yaml
   Original: Manetho writes that these kings ruled from <a title="Memphis, Egypt">Memphis</a>
 
   Prompt: Manetho writes that these kings ruled from <a title="<mask:0>">Memphis</a>...<mask:0>
@@ -421,14 +421,14 @@ Cited as:
 Or
 
 ```bibtex
-    @article{weng2022vlm,
-      title   = "Generalized Visual Language Models",
-      author  = "Weng, Lilian",
-      journal = "Lil'Log",
-      year    = "2022",
-      month   = "Jun",
-      url     = "https://lilianweng.github.io/posts/2022-06-09-vlm/"
-    }
+@article{weng2022vlm,
+  title   = "Generalized Visual Language Models",
+  author  = "Weng, Lilian",
+  journal = "Lil'Log",
+  year    = "2022",
+  month   = "Jun",
+  url     = "https://lilianweng.github.io/posts/2022-06-09-vlm/"
+}
 ```
 
 # References[#](#references)

@@ -880,7 +880,7 @@ By retaining the spatial information in the capsule, we move beyond simply check
 
 The pseudo code below illustrates the key idea. The pose matrices for the ConvCaps2 output has the shape of (24, **4, 4**, 32, 4, 4). i.e. a spatial dimension of 4x4. We use the location of the capsule to locate the corresponding element in c1 below (a 4x4 matrix) which contains the scaled x coordinate of the center of the receptive field of the spatial capsule. We add this element value to$$v^1_{jk}$$. For the second element$$v^2_{jk}$$of the vote, we repeat the same process using c2.
 
-```
+```python
 # Spatial output of ConvCaps2 is 4x4
 v1 = [[[8.],  [12.], [16.], [20.]],
       [[8.],  [12.], [16.], [20.]],

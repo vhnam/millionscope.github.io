@@ -127,7 +127,7 @@ Explaining the desired audience is another smart way to give instructions
 
 _In-context instruction learning_ ([Ye et al. 2023](https://arxiv.org/abs/2302.14691)) combines few-shot learning with instruction prompting. It incorporates multiple demonstration examples across different tasks in the prompt, each demonstration consisting of instruction, task input and output. Note that their experiments were only on classification tasks and the instruction prompt contains all label options.
 
-```
+```yaml
     Definition: Determine the speaker of the dialogue, "agent" or "customer".
     Input: I have successfully booked your tickets.
     Ouput: agent
@@ -157,7 +157,7 @@ Two main types of CoT prompting:
 
 (All the math reasoning examples are from [GSM8k](https://github.com/openai/grade-school-math))
 
-```
+```yaml
     Question: Tom and Elizabeth have a competition to climb a hill. Elizabeth takes 30 minutes to climb the hill. Tom takes four times as long as Elizabeth does to climb the hill. How many hours does it take Tom to climb up the hill?
     Answer: It takes Tom 30*4 = <<30*4=120>>120 minutes to climb the hill.
     It takes Tom 120/60 = <<120/60=2>>2 hours to climb the hill.
@@ -175,7 +175,7 @@ Two main types of CoT prompting:
 
 - **Zero-shot CoT**. Use natural language statement like `Let's think step by step` to explicitly encourage the model to first generate reasoning chains and then to prompt with `Therefore, the answer is` to produce answers ([Kojima et al. 2022](https://arxiv.org/abs/2205.11916) ). Or a similar statement `Let's work this out it a step by step to be sure we have the right answer` ([Zhou et al. 2022](https://arxiv.org/abs/2211.01910)).
 
-```
+```yaml
   Question: Marty has 100 centimeters of ribbon that he must cut into 4 equal parts. Each of the cut parts must be divided into 5 equal parts. How long will each final cut be?
   Answer: Let's think step by step.
 ```
@@ -232,7 +232,7 @@ Often we need to complete tasks that require latest knowledge after the model pr
 
 For closed-book QA, each demonstration is formatted as follows to construct few-shot prompts. Swapping the question with the evidence (longer distance between questions and answers) is found to consistently yield lower results across all datasets.
 
-```
+```yaml
     Evidence: ...
     Question: ...
     Answer: ...
@@ -250,7 +250,7 @@ One observation with [SituatedQA](https://situatedqa.github.io/) dataset for que
 
 Interestingly it is found to be beneficial even with only "internal retrieval", that is, to generate knowledge about a topic before answering the question ([Liu et al. 2022](https://arxiv.org/abs/2110.08387)). First we can use the following template to extract knowledge:
 
-```
+```yaml
     Generate some knowledge about the input. Examples:
 
     Input: What type of water formation is formed by clouds?
@@ -338,14 +338,14 @@ Cited as:
 Or
 
 ```bibtex
-    @article{weng2023prompt,
-      title   = "Prompt Engineering",
-      author  = "Weng, Lilian",
-      journal = "lilianweng.github.io",
-      year    = "2023",
-      month   = "Mar",
-      url     = "https://lilianweng.github.io/posts/2023-03-15-prompt-engineering/"
-    }
+@article{weng2023prompt,
+  title   = "Prompt Engineering",
+  author  = "Weng, Lilian",
+  journal = "lilianweng.github.io",
+  year    = "2023",
+  month   = "Mar",
+  url     = "https://lilianweng.github.io/posts/2023-03-15-prompt-engineering/"
+}
 ```
 
 # References[#](#references)

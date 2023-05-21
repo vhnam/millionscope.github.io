@@ -150,7 +150,7 @@ This equation has a nice recursive form (see the red parts!) and the future stat
 
 Let's consider the following visitation sequence and label the probability of transitioning from state s to state x with policy $\pi_\theta$ after k step as $\rho^\pi(s \to x, k)$.
 
-$$s \\xrightarrow[]{a \sim \pi_\theta(.\vert s)} s' \\xrightarrow[]{a \sim \pi_\theta(.\vert s')} s'' \\xrightarrow[]{a \sim \pi_\theta(.\vert s'')} \dots$$
+$$s \xrightarrow[]{a \sim \pi_\theta(.\vert s)} s' \xrightarrow[]{a \sim \pi_\theta(.\vert s')} s'' \xrightarrow[]{a \sim \pi_\theta(.\vert s'')} \dots$$
 
 - When k = 0: $\rho^\pi(s \to s, k=0) = 1$.
 - When k = 1, we scan through all possible actions and sum up the transition probabilities to the target state: $\rho^\pi(s \to s', k=1) = \sum_a \pi_\theta(a \vert s) P(s' \vert s, a)$.
@@ -852,13 +852,13 @@ After reading through all the algorithms above, I list a few building blocks or 
 Cited as:
 
 ```bibtex
-    @article{weng2018PG,
-      title   = "Policy Gradient Algorithms",
-      author  = "Weng, Lilian",
-      journal = "lilianweng.github.io",
-      year    = "2018",
-      url     = "https://lilianweng.github.io/posts/2018-04-08-policy-gradient/"
-    }
+@article{weng2018PG,
+    title   = "Policy Gradient Algorithms",
+    author  = "Weng, Lilian",
+    journal = "lilianweng.github.io",
+    year    = "2018",
+    url     = "https://lilianweng.github.io/posts/2018-04-08-policy-gradient/"
+}
 ```
 
 # References[#](#references)

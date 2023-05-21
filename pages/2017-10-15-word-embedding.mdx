@@ -55,7 +55,7 @@ The following example demonstrates multiple pairs of target and context words as
 
 Sliding window (size = 5)
 
-```
+```yaml
 Target word
 
 Context
@@ -107,6 +107,7 @@ sword
 
 swing, the
 ```
+
 Each context-target pair is treated as a new observation in the data. For example, the target word "swing" in the above case produces four training samples: ("swing", "sentence"), ("swing", "should"), ("swing", "the"), and ("swing", "sword").
 
 ![](assets/images/2017-10-15-word-embedding/word2vec-skip-gram.png)
@@ -388,7 +389,8 @@ In the GoT word embedding space, the top similar words to "king" and "queen" are
 ---
 
 Cited as:
-```
+
+```bibtex
 @article{weng2017wordembedding,
     title   = "Learning word embedding",
     author  = "Weng, Lilian",
@@ -397,6 +399,7 @@ Cited as:
     url     = "https://lilianweng.github.io/posts/2017-10-15-word-embedding/"
 }
 ```
+
 # References[#](#references)
 
 [1] Tensorflow Tutorial [Vector Representations of Words](https://www.tensorflow.org/tutorials/word2vec).

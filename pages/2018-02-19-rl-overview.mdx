@@ -233,7 +233,7 @@ $$Q_\pi(s, a) = \mathbb{E} [R_{t+1} + \gamma V_\pi(S_{t+1}) \vert S_t=s, A_t=a] 
 
 The _Generalized Policy Iteration (GPI)_ algorithm refers to an iterative procedure to improve the policy when combining policy evaluation and improvement.
 
-$$\pi_0 \\xrightarrow[]{\text{evaluation}} V_{\pi_0} \\xrightarrow[]{\text{improve}} \pi_1 \\xrightarrow[]{\text{evaluation}} V_{\pi_1} \\xrightarrow[]{\text{improve}} \pi_2 \\xrightarrow[]{\text{evaluation}} \dots \\xrightarrow[]{\text{improve}} \pi_* \\xrightarrow[]{\text{evaluation}} V_*$$
+$$\pi_0 \xrightarrow[]{\text{evaluation}} V_{\pi_0} \xrightarrow[]{\text{improve}} \pi_1 \xrightarrow[]{\text{evaluation}} V_{\pi_1} \xrightarrow[]{\text{improve}} \pi_2 \xrightarrow[]{\text{evaluation}} \dots \xrightarrow[]{\text{improve}} \pi_* \xrightarrow[]{\text{evaluation}} V_*$$
 
 In GPI, the value function is approximated repeatedly to be closer to the true value of the current policy and in the meantime, the policy is improved repeatedly to approach optimality. This policy iteration process works and always converges to the optimality, but why this is the case?
 
@@ -473,24 +473,26 @@ In A3C, the critics learn the state-value function, $V(s; w)$, while multiple ac
 The loss function for state-value is to minimize the mean squared error, $\mathcal{J}_v (w) = (G_t - V(s; w))^2$ and we use gradient descent to find the optimal w. This state-value function is used as the baseline in the policy gradient update.
 
 Here is the algorithm outline:
-```
-1.  We have global parameters, θ and w; similar thread-specific parameters, θ' and w'.
-2.  Initialize the time step t = 1
-3.  While T <= T_MAX:
-    1.  Reset gradient: dθ = 0 and dw = 0.
-    2.  Synchronize thread-specific parameters with global ones: θ' = θ and w' = w.
-    3.  $t_\text{start}$ = t and get $s_t$.
-    4.  While ($s_t \neq \text{TERMINAL}$) and ($t - t_\text{start} <= t_\text{max}$):
+
+
+1.  We have global parameters, $\theta$ and $w$; similar thread-specific parameters, $\theta'$ and $w'$.
+2.  Initialize the time step $t = 1$
+3.  While $T \leq T_{MAX}$:
+    1.  Reset gradient: $d_{ \theta } = 0$ and $d_w = 0$.
+    2.  Synchronize thread-specific parameters with global ones: $\theta' = \theta$ and $w' = w$.
+    3.  $t_{\text{start}} = t$ and get $s_t$.
+    4.  While ($s_t \neq \text{TERMINAL}$) and $(t - t_{\text{start}} \leq t_{\text{max}})$:
         1.  Pick the action $a_t \sim \pi(a_t \vert s_t; \theta')$ and receive a new reward $r_t$ and a new state $s_{t+1}$.
-        2.  Update t = t + 1 and T = T + 1.
-    5.  Initialize the variable that holds the return estimation$$R = \begin{cases} 0 & \text{if } s_t \text{ is TERMINAL} \\ V(s_t; w') & \text{otherwise} \end{cases}$$.
+        2.  Update $t = t + 1$ and $T = T + 1$.
+    5.  Initialize the variable that holds the return estimation $$R = \begin{cases} 0 & \text{if } s_t \text{ is TERMINAL} \\ V(s_t; w') & \text{otherwise} \end{cases}$$.
     6.  For $i = t-1, \dots, t_\text{start}$:
         1.  $R \leftarrow r_i + \gamma R$; here R is a MC measure of $G_i$.
-        2.  Accumulate gradients w.r.t. θ': $d\theta \leftarrow d\theta + \nabla_{\theta'} \log \pi(a_i \vert s_i; \theta')(R - V(s_i; w'))$;  
-            Accumulate gradients w.r.t. w': $dw \leftarrow dw + \nabla_{w'} (R - V(s_i; w'))^2$.
-    7.  Update synchronously θ using dθ, and w using dw.
-```
-A3C enables the parallelism in multiple agent training. The gradient accumulation step (6.2) can be considered as a reformation of minibatch-based stochastic gradient update: the values of w or θ get corrected by a little bit in the direction of each training thread independently.
+        2.  Accumulate gradients w.r.t. $\theta'$: $d\theta \leftarrow d\theta + \nabla_{\theta'} \log \pi(a_i \vert s_i; \theta' )(R - V(s_i; w'))$;
+
+            Accumulate gradients w.r.t. $w'$: $dw \leftarrow dw + \nabla_{w'} (R - V(s_i; w'))^2$.
+    7.  Update synchronously $θ$ using $dθ$, and $w$ using $dw$.
+
+A3C enables the parallelism in multiple agent training. The gradient accumulation step (6.2) can be considered as a reformation of minibatch-based stochastic gradient update: the values of $w$ or $\theta$ get corrected by a little bit in the direction of each training thread independently.
 
 ## Evolution Strategies[#](#evolution-strategies)
 
@@ -566,13 +568,13 @@ I know this is a long read, but hopefully worth it. _If you notice mistakes and 
 Cited as:
 
 ```bibtex
-    @article{weng2018bandit,
-      title   = "A (Long) Peek into Reinforcement Learning",
-      author  = "Weng, Lilian",
-      journal = "lilianweng.github.io",
-      year    = "2018",
-      url     = "https://lilianweng.github.io/posts/2018-02-19-rl-overview/"
-    }
+@article{weng2018bandit,
+  title   = "A (Long) Peek into Reinforcement Learning",
+  author  = "Weng, Lilian",
+  journal = "lilianweng.github.io",
+  year    = "2018",
+  url     = "https://lilianweng.github.io/posts/2018-02-19-rl-overview/"
+}
 ```
 
 # References[#](#references)
