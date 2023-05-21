@@ -189,44 +189,39 @@ The generator is optimized with three objectives:
 
 1.  Goal **validity**: The proposed goal should be achievable by an expert policy. The corresponding generative loss is designed to increase the likelihood of generating goals that the solver policy has achieved before (like in [HER](https://arxiv.org/abs/1707.01495)).
 
-                    - $\mathcal{L}_\text{val}$ is the negative log-likelihood of generated goals that have been solved by the solver in the past.
-                      {/* - $$
+    - $\mathcal{L}_\text{val}$ is the negative log-likelihood of generated goals that have been solved by the solver in the past.
 
-                \begin{align*} \mathcal{L}*\text{val} = \mathbb{E}*{\substack{ g \sim \text{ achieved by solver}, \\
-                \xi \in \text{Uniform}(0, \delta), \\
-                f \in \text{Uniform}(0, 1) }} \big[ -\log p(G^{-1}(g + \xi, f)) \big] \end{align*}$$
-
-            _/}
-            {/_ - $$
-
-        \begin{align*} \mathcal{L}*\text{val} = \mathbb{E}*{\substack{ g \sim \text{ achieved by solver}, \\
-        \xi \in \text{Uniform}(0, \delta), \\
-        f \in \text{Uniform}(0, 1) }} \big[ -\log p(G^{-1}(g + \xi, f)) \big]\end{align*} $$
-
-    \*/} - $$
- \begin{aligned} \mathcal{L}_\text{val} = \mathbb{E}_{\substack{ g \sim \text{ achieved by solver}, \\
-\xi \in \text{Uniform}(0, \delta), \\
-f \in \text{Uniform}(0, 1) }} \big[ -\log p(G^{-1}(g + \xi, f)) \big] \end{aligned}$$
+    $$
+      \begin{aligned} \mathcal{L}_\text{val} = \mathbb{E}_{\substack{ g \sim \text{ achieved by solver}, \\\xi \in \text{Uniform}(0, \delta), \\    f \in \text{Uniform}(0, 1) }} \big[ -\log p(G^{-1}(g + \xi, f)) \big] \end{aligned}
+    $$
 
 2.  Goal **feasibility**: The proposed goal should be achievable by the current policy; that is, the level of difficulty should be appropriate.
 
-                - $\mathcal{L}_\text{feas}$ is the output probability by the judge model $D$ on the generated goal $G(z, f)$ should match the desired $f$.
-                  {/* - $$
+        - $\mathcal{L}_\text{feas}$ is the output probability by the judge model $D$ on the generated goal $G(z, f)$ should match the desired $f$.
 
-            \begin{align*} \mathcal{L}*\text{feas} = \mathbb{E}*{\substack{ z \in \mathcal{N}(0, 1), \\
-            f \in \text{Uniform}(0, 1) }} \big[ D(G(z, f)) - \sigma^{-1}(f)^2 \big] \end{align*}$$
+        {/* - $$\begin{align*} \mathcal{L}*\text{feas} = \mathbb{E}*{\substack{ z \in \mathcal{N}(0, 1), \\ f \in \text{Uniform}(0, 1) }} \big[ D(G(z, f)) - \sigma^{-1}(f)^2 \big] \end{align*}$$ */}
 
-        \*/} - $$
-
-    \begin{aligned} \mathcal{L}_\text{feas} = \mathbb{E}_{\substack{ z \in \mathcal{N}(0, 1), \\
-    f \in \text{Uniform}(0, 1) }} \big[ D(G(z, f)) - \sigma^{-1}(f)^2 \big] \end{aligned}$$
+    $$
+    \begin{align*}
+    \mathcal{L}_\text{feas} = \mathbb{E}_{\substack{
+    z \in \mathcal{N}(0, 1), \\
+    f \in \text{Uniform}(0, 1)
+    }} \big[ D(G(z, f)) - \sigma^{-1}(f)^2 \big]
+    \end{align*}
+    $$
 
 3.  Goal **coverage**: We should maximize the entropy of generated goals to encourage diverse goal and to improve the coverage over the goal space.
 
-        - $$
+{/* $$\begin{aligned} \mathcal{L}_\text{cov} = \mathbb{E}_{\substack{ z \in \mathcal{N}(0, 1), \\ f \in \text{Uniform}(0, 1) }} \big[ \log p(G(z, f)) \big] \end{aligned}$$ */}
 
-    \begin{aligned} \mathcal{L}_\text{cov} = \mathbb{E}_{\substack{ z \in \mathcal{N}(0, 1), \\
-    f \in \text{Uniform}(0, 1) }} \big[ \log p(G(z, f)) \big] \end{aligned}$$
+    $$
+    \begin{align*}
+    \mathcal{L}_\text{cov} = \mathbb{E}_{\substack{
+      z \in \mathcal{N}(0, 1), \\
+      f \in \text{Uniform}(0, 1)
+    }} \big[ \log p(G(z, f)) \big]
+    \end{align*}
+    $$
 
 Their experiments showed complex environments require all three losses above. When the environment is changing between episodes, both the goal generator and the discriminator need to be conditioned on environmental observation to produce better results. If there is a desired goal distribution, an additional loss can be added to match a desired goal distribution using Wasserstein distance. Using this loss, the generator can push the solver toward mastering the desired tasks more efficiently.
 
