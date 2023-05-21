@@ -231,7 +231,7 @@ In one minibatch, we approximate the closeness between every pair of samples, $c
 
 (3) **Historical Averaging**
 
-For both models, add $ | \Theta - \frac{1}{t} \sum_{i=1}^t \Theta_i |^2 $ into the loss function, where $\Theta$ is the model parameter and $\Theta_i$ is how the parameter is configured at the past training time $i$. This addition piece penalizes the training speed when $\Theta$ is changing too dramatically in time.
+For both models, add $ | \Theta - \frac{1}{t} \sum\_{i=1}^t \Theta_i |^2 $ into the loss function, where $\Theta$ is the model parameter and $\Theta_i$ is how the parameter is configured at the past training time $i$. This addition piece penalizes the training speed when $\Theta$ is changing too dramatically in time.
 
 (4) **One-sided Label Smoothing**
 
@@ -374,6 +374,7 @@ If you are interested in a commented version of [carpedm20/DCGAN-tensorflow](htt
 ---
 
 Cited as:
+
 ```bibtex
 @article{weng2017gan,
   title   = "From GAN to WGAN",
@@ -383,7 +384,9 @@ Cited as:
   url     = "https://lilianweng.github.io/posts/2017-08-20-gan/"
 }
 ```
+
 OR
+
 ```bibtex
 @misc{weng2019gan,
     title={From GAN to WGAN},
@@ -394,6 +397,7 @@ OR
     primaryClass={cs.LG}
 }
 ```
+
 # References[#](#references)
 
 [1] Goodfellow, Ian, et al. ["Generative adversarial nets."](https://arxiv.org/pdf/1406.2661.pdf) NIPS, 2014.

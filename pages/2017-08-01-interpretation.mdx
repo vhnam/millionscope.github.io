@@ -124,7 +124,7 @@ Where $p(y \vert x \leftarrow A_i=a_s)$ is the probability of getting label $y$ 
 
 With the help of the measures of prediction difference when omitting known features, we can _decompose_ the impact of each individual feature on the prediction.
 
-![](interpretability_prediction_decomposition.png)
+![](assets/images/2017-08-01-interpretation/interpretability_prediction_decomposition.png)
 
 Fig. 1. Explanations for a SVM model predicting the survival of one male adult first-class passenger in the [Titanic dataset](https://www.kaggle.com/c/titanic/data). The information difference is very similar to the probability difference, but it measures the amount of information necessary to find out $y$ is true for the given instance without the knowledge of $A\\_i$: $\text{infDiff}\\_i (y|x) = \log\\_2 p(y|x) - \log\\_2 p(y|x \\backslash A\\_i)$. Explanations for particular instance are depicted with dark bars. The light shaded half-height bars are average positive and negative explanations for given attributes' values. In this case, being a male adult makes it very less likely to survive; the class level does not impact as much.
 
@@ -156,7 +156,7 @@ $$\hat{f}_{\sigma} = \arg\min_{c \in \{1, \dots, C\}} \hat{p}_{\sigma}(y \neq c 
 
 Noted that we can generate the labeled data with the original model $f$, as much as we want, not restricted by the size of the training data. The hyperparameter $\sigma$ is selected to optimize the chances of $\hat{f}_{\sigma}(x) = f(x)$ to achieve high fidelity.
 
-![](interpretability_local_gradient.png)
+![](assets/images/2017-08-01-interpretation/interpretability_local_gradient.png)
 
 Fig. 2. An example of how local gradient explanation vector is applied on simple object classification with Gaussian Processes Classifier (GPC). The GPC model outputs the probability by nature. (a) shows the training points and their labels in red (positive 1) and blue (negative -1). (b) illustrates a probability function for the positive class. (c-d) shows the local gradients and the directions of the local explanation vectors.
 
@@ -173,7 +173,7 @@ Same as above, let us label the black-box model as $f$. LIME presents the follow
 - Text classifier: a binary vector indicating the presence or absence of a word
 - Image classifier: a binary vector indicating the presence or absence of a contiguous patch of similar pixels (super-pixel).
 
-![](LIME_interpretable_representation.png)
+![](assets/images/2017-08-01-interpretation/LIME_interpretable_representation.png)
 
 Fig. 3. An example of converting an image into interpretable data representation. (Image source: [www.oreilly.com/learning/introduction-to-local-interpretable-model-agnostic-explanations-lime](https://www.oreilly.com/learning/introduction-to-local-interpretable-model-agnostic-explanations-lime))
 
@@ -183,13 +183,13 @@ Then we recover $z_b$ back into the original input $z$ and get a prediction scor
 
 Use many such sampled data points $z_b \in \mathcal{Z}_b$ and their model predictions, we can learn an explanation model (such as in a form as simple as a regression) with local fidelity. The sampled data points are weighted differently based on how close they are to $x_b$. The paper used a lasso regression with preprocessing to select top $k$ most significant features beforehand, named "K-LASSO".
 
-![](LIME_illustration.png)
+![](assets/images/2017-08-01-interpretation/LIME_illustration.png)
 
 Fig. 4. The pink and blue areas are two classes predicted by the black-box model $f$. the big red cross is the point to be explained and other smaller crosses (predicted as pink by $f$) and dots (predicted as blue by $f$) are sampled data points. Even though the model can be very complicated, we are still able to learn a local explanation model as simple as the grey dash line. (Image source: [homes.cs.washington.edu/~marcotcr/blog/lime](https://homes.cs.washington.edu/~marcotcr/blog/lime/))
 
 Examining whether the explanation makes sense can directly decide whether the model is trustworthy because sometimes the model can pick up spurious correlation or generalization. One interesting example in the paper is to apply LIME on an SVM text classifier for differentiating "Christianity" from "Atheism". The model achieved a pretty good accuracy (94% on held-out testing set!), but the LIME explanation demonstrated that decisions were made by very arbitrary reasons, such as counting the words "re", "posting" and "host" which have no connection with neither "Christianity" nor "Atheism" directly. After such a diagnosis, we learned that even the model gives us a nice accuracy, it cannot be trusted. It also shed lights on ways to improve the model, such as better preprocessing on the text.
 
-![](LIME.png)
+![](assets/images/2017-08-01-interpretation/LIME.png)
 
 Fig. 5. Illustration of how to use LIME on an image classifier. (Image source: [www.oreilly.com/learning/introduction-to-local-interpretable-model-agnostic-explanations-lime](https://www.oreilly.com/learning/introduction-to-local-interpretable-model-agnostic-explanations-lime))
 
@@ -209,7 +209,7 @@ There are a ton of resources on feature selection so I would skip the topic in t
 
 The authors proposed an novel objective function so that the learning process is optimized for **high fidelity** (high agreement between explanation and the model), **low unambiguity** (little overlaps between decision rules in the explanation), and **high interpretability** (the explanation decision set is lightweight and small). These aspects are combined into one objection function to optimize for.
 
-![](BETA.png)
+![](assets/images/2017-08-01-interpretation/BETA.png)
 
 Fig. 6. Measures for desiderata of a good model explanation: fidelity, unambiguity, and interpretability. Given the target model is $\mathcal{B}$, its explanation is a two level decision set $\\Re$ containing a set of rules ${(q\\_1, s\\_1, c\\_1), \dots, (q\\_M, s\\_M, c\\_M)}$, where $q\\_i$ and $s\\_i$ are conjunctions of predicates of the form (feature, operator, value) and $c\\_i$ is a class label. Check [the paper](https://arxiv.org/abs/1707.01154) for more details. (Image source: [arxiv.org/abs/1707.01154](https://arxiv.org/abs/1707.01154))
 
@@ -221,7 +221,7 @@ With the progress of the deep learning applications, people start worrying about
 
 Studies on **adversarial examples** ([OpenAI Blog: Robust Adversarial Examples](https://blog.openai.com/robust-adversarial-inputs/), [Attacking Machine Learning with Adversarial Examples](https://blog.openai.com/adversarial-example-research/), [Goodfellow, Shlens & Szegedy, 2015](https://arxiv.org/pdf/1412.6572.pdf); [Nguyen, Yosinski, & Clune, 2015](http://www.cv-foundation.org/openaccess/content_cvpr_2015/papers/Nguyen_Deep_Neural_Networks_2015_CVPR_paper.pdf)) raise the alarm on the robustness and safety of AI applications. Sometimes the models could show unintended, unexpected and unpredictable behavior and we have no fast/good strategy to tell why.
 
-![](adversarial_examples.png)
+![](assets/images/2017-08-01-interpretation/adversarial_examples.png)
 
 Fig. 7. Illustrations of adversarial examples. (a-d) are adversarial images that are generated by adding human-imperceptible noises onto original images ([Szegedy et al., 2013](https://arxiv.org/abs/1312.6199)). A well-trained neural network model can successfully classify original ones but fail adversarial ones. (e-h) are patterns that are generated ([Nguyen, Yosinski & Clune, 2015](http://www.cv-foundation.org/openaccess/content_cvpr_2015/papers/Nguyen_Deep_Neural_Networks_2015_CVPR_paper.pdf)). A well-trained neural network model labels them into (e) school bus, (f) guitar, (g) peacock and (h) Pekinese respectively. (Image source: [Wang, Raj & Xing, 2017](https://arxiv.org/pdf/1702.07800.pdf))
 
@@ -233,13 +233,15 @@ Many exciting news and findings are happening in this evolving field every day. 
 
 Cited as:
 
-    @article{weng2017gan,
-      title   = "How to Explain the Prediction of a Machine Learning Model?",
-      author  = "Weng, Lilian",
-      journal = "lilianweng.github.io",
-      year    = "2017",
-      url     = "https://lilianweng.github.io/posts/2017-08-01-interpretation/"
-    }
+```
+@article{weng2017gan,
+  title   = "How to Explain the Prediction of a Machine Learning Model?",
+  author  = "Weng, Lilian",
+  journal = "lilianweng.github.io",
+  year    = "2017",
+  url     = "https://lilianweng.github.io/posts/2017-08-01-interpretation/"
+}
+```
 
 # References[#](#references)
 
