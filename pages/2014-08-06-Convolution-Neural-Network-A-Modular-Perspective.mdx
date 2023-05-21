@@ -12,7 +12,7 @@ mathjax: true
 
 Source : [https://colah.github.io/posts/2014-07-Conv-Nets-Modular/](https://colah.github.io/posts/2014-07-Conv-Nets-Modular/)
 
-# Introduction
+## Introduction
 
 {/* Trong vài năm gần đây, mạng neural networks đã có kết quả đột phá trên rất nhiều vấn đề nhận dạng mẫu như thị giác máy tính, nhận dạng giọng nói. Một trong những yếu tố cơ bản dẫn đến kết quả này là
 một loại đặc biệt của neural network được gọi là *convolution neural network* (mạng neural tích chập) .
@@ -40,9 +40,9 @@ places, making it easier to learn the model and reducing error.
 khiến cho chúng nhanh hơn để lập trình và kết quả ít lỗi. Tương tự, một mạng neurol tích chập có thể học một neuron một lần và sử dụng
 nó ở nhiều nơi, làm cho chúng dễ dàng hơn để học mô hình và giảm thiểu lỗi.
 
-# Cấu trúc của những mạng neurol tích chập (Convolution neural networks) */}
+## Cấu trúc của những mạng neurol tích chập (Convolution neural networks) */}
 
-## Structure of Convolutional Neural Networks
+### Structure of Convolutional Neural Networks
 
 Suppose you want a neural network to look at audio samples and predict whether a human is speaking or not. Maybe you want to do more analysis if someone is speaking.
 
@@ -130,7 +130,7 @@ In this model, $A$ would have multiple layers of neurons, with the final layer o
 
 That said, for the purposes of this post, we will focus on standard convolutional layers. There's already enough for us to consider there!
 
-# Results of Convolutional Neural Networks
+## Results of Convolutional Neural Networks
 
 Earlier, we alluded to recent breakthroughs in computer vision using convolutional neural networks. Before we go on, I'd like to briefly discuss some of these results as motivation.
 
@@ -184,7 +184,7 @@ These remarkable results (and other exciting results around that time) were only
 
 Convolutional neural networks are an essential tool in computer vision and modern pattern recognition.
 
-# Formalizing Convolutional Neural Networks
+## Formalizing Convolutional Neural Networks
 
 Consider a 1-dimensional convolutional layer with inputs ${x_n}$ and outputs ${y_n}$
 
@@ -255,7 +255,7 @@ For,[^1] us, convolution will provide a number of benefits. Firstly, it will all
 
 > I admire the elegance of your method of computation; it must be nice to ride through these fields upon the horse of true mathematics while the like of us have to make our way laboriously on foot.  — Albert Einstein
 
-# Acknowledgments
+## Acknowledgments
 
 1. It should be noted that not all neural networks that use multiple copies of the same neuron are convolutional neural networks. Convolutional neural networks are just one type of neural network that uses the more general trick, weight-tying. Other kinds of neural network that do this are recurrent neural networks and recursive neural networks.
 
