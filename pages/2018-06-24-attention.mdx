@@ -133,7 +133,7 @@ $\text{score}(\boldsymbol{s}_t, \boldsymbol{h}_i) = \text{cosine}[\boldsymbol{s}
 
 [Graves2014](https://arxiv.org/abs/1410.5401)
 
-Additive(\*)
+Additive(*)
 
 $\text{score}(\boldsymbol{s}_t, \boldsymbol{h}_i) = \mathbf{v}_a^\top \tanh(\mathbf{W}_a[\boldsymbol{s}_{t-1}; \boldsymbol{h}_i])$
 
@@ -166,7 +166,7 @@ Note: very similar to the dot-product attention except for a scaling factor; whe
 
 [Vaswani2017](http://papers.nips.cc/paper/7181-attention-is-all-you-need.pdf)
 
-(\*) Referred to as "concat" in Luong, et al., 2015 and as "additive attention" in Vaswani, et al., 2017.  
+(*) Referred to as "concat" in Luong, et al., 2015 and as "additive attention" in Vaswani, et al., 2017.  
 (^) It adds a scaling factor $1/\sqrt{n}$, motivated by the concern when the input is large, the softmax function may have an extremely small gradient, hard for efficient learning.
 
 Here are a summary of broader categories of attention mechanisms:

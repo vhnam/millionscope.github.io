@@ -150,15 +150,15 @@ $$\mathcal{L} = \mathcal{L}_\text{feat} + \mathcal{L}_\text{diff} = \|\phi(D \ci
 
 **Colorization** can be used as a powerful self-supervised task: a model is trained to color a grayscale input image; precisely the task is to map this image to a distribution over quantized color value outputs ([Zhang et al. 2016](https://arxiv.org/abs/1603.08511)).
 
-The model outputs colors in the the [CIE L_a_b\* color space](https://en.wikipedia.org/wiki/CIELAB_color_space). The L_a_b\* color is designed to approximate human vision, while, in contrast, RGB or CMYK models the color output of physical devices.
+The model outputs colors in the the [CIE L_a_b* color space](https://en.wikipedia.org/wiki/CIELAB_color_space). The L_a_b* color is designed to approximate human vision, while, in contrast, RGB or CMYK models the color output of physical devices.
 
-- L\* component matches human perception of lightness; L\* = 0 is black and L\* = 100 indicates white.
-- a\* component represents green (negative) / magenta (positive) value.
-- b\* component models blue (negative) /yellow (positive) value.
+- L* component matches human perception of lightness; L* = 0 is black and L* = 100 indicates white.
+- a* component represents green (negative) / magenta (positive) value.
+- b* component models blue (negative) /yellow (positive) value.
 
 Due to the multimodal nature of the colorization problem, cross-entropy loss of predicted probability distribution over binned color values works better than L2 loss of the raw color values. The a*b* color space is quantized with bucket size 10.
 
-To balance between common colors (usually low a*b* values, of common backgrounds like clouds, walls, and dirt) and rare colors (which are likely associated with key objects in the image), the loss function is rebalanced with a weighting term that boosts the loss of infrequent color buckets. This is just like why we need both [tf and idf](https://en.wikipedia.org/wiki/Tf%E2%80%93idf) for scoring words in information retrieval model. The weighting term is constructed as: $(1-\lambda)$ \* Gaussian-kernel-smoothed empirical probability distribution $+ \lambda$ \* a uniform distribution, where both distributions are over the quantized a*b* color space.
+To balance between common colors (usually low a*b* values, of common backgrounds like clouds, walls, and dirt) and rare colors (which are likely associated with key objects in the image), the loss function is rebalanced with a weighting term that boosts the loss of infrequent color buckets. This is just like why we need both [tf and idf](https://en.wikipedia.org/wiki/Tf%E2%80%93idf) for scoring words in information retrieval model. The weighting term is constructed as: $(1-\lambda)$ * Gaussian-kernel-smoothed empirical probability distribution $+ \lambda$ * a uniform distribution, where both distributions are over the quantized a*b* color space.
 
 ## Generative Modeling[#](#generative-modeling)
 
@@ -178,7 +178,7 @@ Fig. 8. Illustration of context encoder. (Image source: [Pathak, et al., 2016](h
 
 When applying a mask on an image, the context encoder removes information of all the color channels in partial regions. How about only hiding a subset of channels? The **split-brain autoencoder** ([Zhang et al., 2017](https://arxiv.org/abs/1611.09842)) does this by predicting a subset of color channels from the rest of channels. Let the data tensor $\mathbf{x} \in \mathbb{R}^{h \times w \times \vert C \vert }$ with $C$ color channels be the input for the $l$-th layer of the network. It is split into two disjoint parts, $\mathbf{x}_1 \in \mathbb{R}^{h \times w \times \vert C_1 \vert}$ and $\mathbf{x}_2 \in \mathbb{R}^{h \times w \times \vert C_2 \vert}$, where $C_1 , C_2 \subseteq C$. Then two sub-networks are trained to do two complementary predictions: one network $f_1$ predicts $\mathbf{x}_2$ from $\mathbf{x}_1$ and the other network $f_1$ predicts $\mathbf{x}_1$ from $\mathbf{x}_2$. The loss is either L1 loss or cross entropy if color values are quantized.
 
-The split can happen once on the RGB-D or L_a_b\* colorspace, or happen even in every layer of a CNN network in which the number of channels can be arbitrary.
+The split can happen once on the RGB-D or L_a_b* colorspace, or happen even in every layer of a CNN network in which the number of channels can be arbitrary.
 
 ![](assets/images/2019-11-10-self-supervised/split-brain-autoencoder.png)
 
@@ -494,7 +494,7 @@ Similar to DeepMDP, DBC models the dynamics by learning a reward model and a tra
 >
 > $$\mathcal{F}(d; \pi)(s_i, s_j) = (1-c) \vert \mathcal{R}_{s_i}^\pi - \mathcal{R}_{s_j}^\pi \vert + c W_d (\mathcal{P}_{s_i}^\pi, \mathcal{P}_{s_j}^\pi)$$
 >
-> Then, $\mathcal{F}$ has a unique fixed point $\tilde{d}$ which is a $\pi^\*$-bisimulation metric and $\tilde{d}(s_i, s_j) = 0 \\iff s_i \sim s_j$.
+> Then, $\mathcal{F}$ has a unique fixed point $\tilde{d}$ which is a $\pi^*$-bisimulation metric and $\tilde{d}(s_i, s_j) = 0 \\iff s_i \sim s_j$.
 
 [The proof is not trivial. I may or may not add it in the future _(:3」∠)_ …]
 

@@ -96,7 +96,7 @@ Similar to Hafez, [Baheti et al. (2018)](https://arxiv.org/abs/1809.01215) manua
 
 [Meister et al. (2020)](https://arxiv.org/abs/2010.02650) studied beam search in a regularized decoding framework:
 
-$$\mathbf{y}^\* = \arg\max_{\mathbf{y}\in\mathcal{Y}} \big( \underbrace{\log p_\theta(\mathbf{y}\vert\mathbf{x})}_\text{MAP} - \underbrace{\lambda\mathcal{R}(\mathbf{y})}_\text{regularizer} \big)$$
+$$\mathbf{y}^* = \arg\max_{\mathbf{y}\in\mathcal{Y}} \big( \underbrace{\log p_\theta(\mathbf{y}\vert\mathbf{x})}_\text{MAP} - \underbrace{\lambda\mathcal{R}(\mathbf{y})}_\text{regularizer} \big)$$
 
 Since we expect maximum probability to have minimum surprise, the surprisal of a LM at time step $t$ can be defined as follows:
 
@@ -331,17 +331,17 @@ Fine-tuning a sequential model with RL regarding any arbitrary and possibly non-
 
 [Ranzato et al (2015)](https://arxiv.org/abs/1511.06732) applied REINFORCE to train RNN models for sequence generation tasks. The model is first trained to predict the next token using cross-entropy loss (ML loss) and then fine-tuned alternatively by both ML loss and REINFORCE (RL loss). At the second fine-tuning stage, the number of training steps for next-token prediction is gradually decreasing until none and eventually only RL loss is used. This sequence-level RL fine-tuning was shown by experiments to lead to great improvements over several supervised learning baselines back then.
 
-Google implemented the similar approach in their neural machine translation system ([Wu et al., 2016](https://arxiv.org/abs/1609.08144)) and [Paulus et al (2017)](https://arxiv.org/abs/1705.04304) adopted such approach for summarization task. The training objective contains two parts, ML loss for next token prediction, $\mathcal{L}_\text{ML} = \sum_{(x, y^\*)\sim\mathcal{D}} \log p_\theta(y^\* \vert x)$, and RL loss $\mathcal{L}_\text{RL}$ for maximizing the expected reward where the reward per sequence is measured by BLEU or ROUGE. The model is first trained with $\mathcal{L}_\text{ML}$ until convergence and then fine-tuned with a linear combination of two losses, $\mathcal{L}_\text{mix} = \alpha \mathcal{L}_\text{ML} + (1 - \alpha)\mathcal{L}_\text{RL}$.
+Google implemented the similar approach in their neural machine translation system ([Wu et al., 2016](https://arxiv.org/abs/1609.08144)) and [Paulus et al (2017)](https://arxiv.org/abs/1705.04304) adopted such approach for summarization task. The training objective contains two parts, ML loss for next token prediction, $\mathcal{L}_\text{ML} = \sum_{(x, y^*)\sim\mathcal{D}} \log p_\theta(y^* \vert x)$, and RL loss $\mathcal{L}_\text{RL}$ for maximizing the expected reward where the reward per sequence is measured by BLEU or ROUGE. The model is first trained with $\mathcal{L}_\text{ML}$ until convergence and then fine-tuned with a linear combination of two losses, $\mathcal{L}_\text{mix} = \alpha \mathcal{L}_\text{ML} + (1 - \alpha)\mathcal{L}_\text{RL}$.
 
 The RL loss of Google NMT is to maximize the expected BLEU score:
 
-$$\mathcal{L}_\text{RL} = - \sum_{(x, y^\*)\sim\mathcal{D}} \mathbb{E}_{y\sim p_\theta(.\vert x)} [R(y, y^\*)]$$
+$$\mathcal{L}_\text{RL} = - \sum_{(x, y^*)\sim\mathcal{D}} \mathbb{E}_{y\sim p_\theta(.\vert x)} [R(y, y^*)]$$
 
-where $y$ is the predicted sequence and $y^\*$ is the ground truth.
+where $y$ is the predicted sequence and $y^*$ is the ground truth.
 
 [Paulus et al (2017)](https://arxiv.org/abs/1705.04304) added an extra weighting term based on the reward difference between two output sequences, $y$ by sampling the next token according to the predicted probability and $\hat{y}$ by greedily taking the most likely token. This RL loss maximizes the conditional likelihood of the sampled sequence $y$ if it obtains a higher reward than the greedy baseline $\hat{y}$:
 
-$$\mathcal{L}_\text{RL} = \sum_{(x, y^\*)\sim\mathcal{D}} (R(\hat{y}, y^\*) - R(y, y^\*)) \sum_{t=1}^{n'} \log p(y_t \vert y_{<{t}}, x)$$
+$$\mathcal{L}_\text{RL} = \sum_{(x, y^*)\sim\mathcal{D}} (R(\hat{y}, y^*) - R(y, y^*)) \sum_{t=1}^{n'} \log p(y_t \vert y_{<{t}}, x)$$
 
 ## RL Fine-tuning with Human Preferences[#](#rl-fine-tuning-with-human-preferences)
 
@@ -351,15 +351,15 @@ In order to generate more coherent conversation, [Yi et al (2019)](https://arxiv
 
 Let's define a learned reward function $R_\\psi(x, y)$ parameterized by $\\psi$ as a measurement for the quality of output $y$ given the input $x$.
 
-To learn the ground truth reward $R^\*$ defined by human judgements, [Böhm et al (2019)](https://arxiv.org/abs/1909.01214) compared two loss functions:
+To learn the ground truth reward $R^*$ defined by human judgements, [Böhm et al (2019)](https://arxiv.org/abs/1909.01214) compared two loss functions:
 
 (1) Regression loss: simply minimizing the mean squared error.
 
-$$\mathcal{L}^\text{MSE}_\text{rm} = [R^\*(x, y) - R_\\psi(x, y)]^2$$
+$$\mathcal{L}^\text{MSE}_\text{rm} = [R^*(x, y) - R_\\psi(x, y)]^2$$
 
 (2) Preference loss: learning to agree with the ground truth reward,
 
-$$\begin{aligned} \mathcal{L}^\text{pref}_\text{rm} =& - \sum_{i,j} \big(\mathbb{1}[R^\*(x, y_i) > R^\*(x, y_j)] \log P(y_i \\succ y_j) + \\ &\mathbb{1}[R^\*(x, y_j) > R^\*(x, y_i)] \log P(y_j \\succ y_i) \big)\\ \text{where }P(y_i \\succ y_j) =& \frac{\exp(R_\\psi(x, y_i))}{\exp(R_\\psi(x, y_i)) + \exp(R_\\psi(x, y_j))} \end{aligned}$$
+$$\begin{aligned} \mathcal{L}^\text{pref}_\text{rm} =& - \sum_{i,j} \big(\mathbb{1}[R^*(x, y_i) > R^*(x, y_j)] \log P(y_i \\succ y_j) + \\ &\mathbb{1}[R^*(x, y_j) > R^*(x, y_i)] \log P(y_j \\succ y_i) \big)\\ \text{where }P(y_i \\succ y_j) =& \frac{\exp(R_\\psi(x, y_i))}{\exp(R_\\psi(x, y_i)) + \exp(R_\\psi(x, y_j))} \end{aligned}$$
 
 Their experiments showed that the _preference loss_ achieves the best performance, where the reward model is a thin MLP layer on top of BERT sentence embedding.
 

@@ -296,7 +296,7 @@ This is the trickiest one to reproduce. The authors did give me a lot of good ad
 
 I did not train or tune each model long enough to get perfect training performance, but evaluation error indeed shows a special twist around the interpolation threshold, different from training error. For example, for MNIST, the threshold is the number of training samples times the number of classes (10), that is 40000.
 
-The x-axis is the number of model parameters: (28 \* 28 + 1) \* num. units + num. units \* 10, in logarithm.
+The x-axis is the number of model parameters: (28 * 28 + 1) * num. units + num. units * 10, in logarithm.
 
 ![](assets/images/2019-03-14-overfit/risk_curve_loss-mse_sample-4000_epoch-500.png)
 

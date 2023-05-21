@@ -205,7 +205,7 @@ Prompt is a sequence of prefix tokens that increase the probability of getting d
 **APE** (Automatic Prompt Engineer; [Zhou et al. 2022](https://arxiv.org/abs/2211.01910)) is a method to search over a pool of model-generated instruction candidates and then filters the candidate set according to a chosen score function to ultimately choose the best candidate with highest score.
 
 1.  Prompt LLM to generate instruction candidates based on a small set of demonstrations in the form of input-output pairs. E.g. `{{Given desired input-output pairs}}\n\nThe instruction is`.
-2.  Given a dataset of $\mathcal{D}_\text{train} = \{(x, y)\}$, we would like to find an instruction $\rho$ such that $\rho^\* = \arg\max_\rho \mathbb{E}_{(x, y) \in \mathcal{D}_\text{train}} [f(\rho, x, y)]$, where $f(.)$ is a per-sample score function, such as execution accuracy $\mathbb{1}[\text{LM}(.\vert \rho, x)=y]$ or log probability: $p_\text{LM}(y \mid \rho, x)$.
+2.  Given a dataset of $\mathcal{D}_\text{train} = \{(x, y)\}$, we would like to find an instruction $\rho$ such that $\rho^* = \arg\max_\rho \mathbb{E}_{(x, y) \in \mathcal{D}_\text{train}} [f(\rho, x, y)]$, where $f(.)$ is a per-sample score function, such as execution accuracy $\mathbb{1}[\text{LM}(.\vert \rho, x)=y]$ or log probability: $p_\text{LM}(y \mid \rho, x)$.
 3.  Use an iterative Monte Carlo search method to improve the best candidates by proposing semantically similar variants via prompts like `Generate a variation of the following instruction while keeping the semantic meaning.\n\nInput: ...\n\nOutput:...`
 
 To construct chain-of-thought prompts automatically, [Shum et al. (2023)](https://arxiv.org/abs/2302.12822) suggested augment-prune-select, a three-step process:
@@ -323,7 +323,7 @@ Toolformer is trained as follows:
 
       Only API calls with $L^-_i - L^+_i$ larger than a threshold are kept, meaning that adding this API call and its results help the model predict future tokens.
 
-3.  _Fine-tune LM on this annotated dataset._ The new training sequences are constructed as $\mathbf{x}^\* = x_{1:i-1}, e(c_i, r_i), x_{i:n}$ . The training data is a combination of the original dataset (e.g. a subset of CCNet, as in the paper) and its augmented version.
+3.  _Fine-tune LM on this annotated dataset._ The new training sequences are constructed as $\mathbf{x}^* = x_{1:i-1}, e(c_i, r_i), x_{i:n}$ . The training data is a combination of the original dataset (e.g. a subset of CCNet, as in the paper) and its augmented version.
 
 At inference time, decoding runs until the model produces "$\to$ " token, indicating that it is expecting response from an API call next.
 

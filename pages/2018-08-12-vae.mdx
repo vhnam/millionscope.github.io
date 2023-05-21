@@ -170,18 +170,18 @@ Instead of mapping the input into a _fixed_ vector, we want to map it into a dis
 - Likelihood $p_\theta(\mathbf{x}\vert\mathbf{z})$
 - Posterior $p_\theta(\mathbf{z}\vert\mathbf{x})$
 
-Assuming that we know the real parameter $\theta^{\*}$ for this distribution. In order to generate a sample that looks like a real data point $\mathbf{x}^{(i)}$, we follow these steps:
+Assuming that we know the real parameter $\theta^{*}$ for this distribution. In order to generate a sample that looks like a real data point $\mathbf{x}^{(i)}$, we follow these steps:
 
-1.  First, sample a $\mathbf{z}^{(i)}$ from a prior distribution $p_{\theta^\*}(\mathbf{z})$.
-2.  Then a value $\mathbf{x}^{(i)}$ is generated from a conditional distribution $p_{\theta^\*}(\mathbf{x} \vert \mathbf{z} = \mathbf{z}^{(i)})$.
+1.  First, sample a $\mathbf{z}^{(i)}$ from a prior distribution $p_{\theta^*}(\mathbf{z})$.
+2.  Then a value $\mathbf{x}^{(i)}$ is generated from a conditional distribution $p_{\theta^*}(\mathbf{x} \vert \mathbf{z} = \mathbf{z}^{(i)})$.
 
-The optimal parameter $\theta^{\*}$ is the one that maximizes the probability of generating real data samples:
+The optimal parameter $\theta^{*}$ is the one that maximizes the probability of generating real data samples:
 
-$$\theta^{\*} = \arg\max_\theta \prod_{i=1}^n p_\theta(\mathbf{x}^{(i)})$$
+$$\theta^{*} = \arg\max_\theta \prod_{i=1}^n p_\theta(\mathbf{x}^{(i)})$$
 
 Commonly we use the log probabilities to convert the product on RHS to a sum:
 
-$$\theta^{\*} = \arg\max_\theta \sum_{i=1}^n \log p_\theta(\mathbf{x}^{(i)})$$
+$$\theta^{*} = \arg\max_\theta \sum_{i=1}^n \log p_\theta(\mathbf{x}^{(i)})$$
 
 Now let's update the equation to better demonstrate the data generation process so as to involve the encoding vector:
 
@@ -229,7 +229,7 @@ The LHS of the equation is exactly what we want to maximize when learning the tr
 
 The negation of the above defines our loss function:
 
-$$\begin{aligned} L_\text{VAE}(\theta, \phi) &= -\log p_\theta(\mathbf{x}) + D_\text{KL}( q_\phi(\mathbf{z}\vert\mathbf{x}) \| p_\theta(\mathbf{z}\vert\mathbf{x}) )\\ &= - \mathbb{E}_{\mathbf{z} \sim q_\phi(\mathbf{z}\vert\mathbf{x})} \log p_\theta(\mathbf{x}\vert\mathbf{z}) + D_\text{KL}( q_\phi(\mathbf{z}\vert\mathbf{x}) \| p_\theta(\mathbf{z}) ) \\ \theta^{\*}, \phi^{\*} &= \arg\min_{\theta, \phi} L_\text{VAE} \end{aligned}$$
+$$\begin{aligned} L_\text{VAE}(\theta, \phi) &= -\log p_\theta(\mathbf{x}) + D_\text{KL}( q_\phi(\mathbf{z}\vert\mathbf{x}) \| p_\theta(\mathbf{z}\vert\mathbf{x}) )\\ &= - \mathbb{E}_{\mathbf{z} \sim q_\phi(\mathbf{z}\vert\mathbf{x})} \log p_\theta(\mathbf{x}\vert\mathbf{z}) + D_\text{KL}( q_\phi(\mathbf{z}\vert\mathbf{x}) \| p_\theta(\mathbf{z}) ) \\ \theta^{*}, \phi^{*} &= \arg\min_{\theta, \phi} L_\text{VAE} \end{aligned}$$
 
 In Variational Bayesian methods, this loss function is known as the _variational lower bound_, or _evidence lower bound_. The "lower bound" part in the name comes from the fact that KL divergence is always non-negative and thus $-L_\text{VAE}$ is the lower bound of $\log p_\theta (\mathbf{x})$.
 

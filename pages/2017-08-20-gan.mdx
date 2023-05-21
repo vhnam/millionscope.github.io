@@ -118,27 +118,27 @@ And then what is inside the integral (we can safely ignore the integral because 
 
 $$\begin{aligned} f(\tilde{x}) & = A log\tilde{x} + B log(1-\tilde{x}) \\ \frac{d f(\tilde{x})}{d \tilde{x}} & = A \frac{1}{ln10} \frac{1}{\tilde{x}} - B \frac{1}{ln10} \frac{1}{1 - \tilde{x}} \\ & = \frac{1}{ln10} (\frac{A}{\tilde{x}} - \frac{B}{1-\tilde{x}}) \\ & = \frac{1}{ln10} \frac{A - (A + B)\tilde{x}}{\tilde{x} (1 - \tilde{x})} \\ \end{aligned}$$
 
-Thus, set $\frac{d f(\tilde{x})}{d \tilde{x}} = 0$, we get the best value of the discriminator: $D^\*(x) = \tilde{x}^\* = \frac{A}{A + B} = \frac{p_{r}(x)}{p_{r}(x) + p_g(x)} \in [0, 1]$.
+Thus, set $\frac{d f(\tilde{x})}{d \tilde{x}} = 0$, we get the best value of the discriminator: $D^*(x) = \tilde{x}^* = \frac{A}{A + B} = \frac{p_{r}(x)}{p_{r}(x) + p_g(x)} \in [0, 1]$.
 
-Once the generator is trained to its optimal, $p_g$ gets very close to $p_{r}$. When $p_g = p_{r}$, $D^\*(x)$ becomes $1/2$.
+Once the generator is trained to its optimal, $p_g$ gets very close to $p_{r}$. When $p_g = p_{r}$, $D^*(x)$ becomes $1/2$.
 
 ## What is the global optimal?[#](#what-is-the-global-optimal)
 
-When both $G$ and $D$ are at their optimal values, we have $p_g = p_{r}$ and $D^\*(x) = 1/2$ and the loss function becomes:
+When both $G$ and $D$ are at their optimal values, we have $p_g = p_{r}$ and $D^*(x) = 1/2$ and the loss function becomes:
 
-$$\begin{aligned} L(G, D^\*) &= \int_x \bigg( p_{r}(x) \log(D^\*(x)) + p_g (x) \log(1 - D^\*(x)) \bigg) dx \\ &= \log \frac{1}{2} \int_x p_{r}(x) dx + \log \frac{1}{2} \int_x p_g(x) dx \\ &= -2\log2 \end{aligned}$$
+$$\begin{aligned} L(G, D^*) &= \int_x \bigg( p_{r}(x) \log(D^*(x)) + p_g (x) \log(1 - D^*(x)) \bigg) dx \\ &= \log \frac{1}{2} \int_x p_{r}(x) dx + \log \frac{1}{2} \int_x p_g(x) dx \\ &= -2\log2 \end{aligned}$$
 
 ## What does the loss function represent?[#](#what-does-the-loss-function-represent)
 
 According to the formula listed in the [previous section](https://lilianweng.github.io/posts/2017-08-20-gan/#kullbackleibler-and-jensenshannon-divergence), JS divergence between $p_{r}$ and $p_g$ can be computed as:
 
-$$\begin{aligned} D_{JS}(p_{r} \| p_g) =& \frac{1}{2} D_{KL}(p_{r} || \frac{p_{r} + p_g}{2}) + \frac{1}{2} D_{KL}(p_{g} || \frac{p_{r} + p_g}{2}) \\ =& \frac{1}{2} \bigg( \log2 + \int_x p_{r}(x) \log \frac{p_{r}(x)}{p_{r} + p_g(x)} dx \bigg) + \\& \frac{1}{2} \bigg( \log2 + \int_x p_g(x) \log \frac{p_g(x)}{p_{r} + p_g(x)} dx \bigg) \\ =& \frac{1}{2} \bigg( \log4 + L(G, D^\*) \bigg) \end{aligned}$$
+$$\begin{aligned} D_{JS}(p_{r} \| p_g) =& \frac{1}{2} D_{KL}(p_{r} || \frac{p_{r} + p_g}{2}) + \frac{1}{2} D_{KL}(p_{g} || \frac{p_{r} + p_g}{2}) \\ =& \frac{1}{2} \bigg( \log2 + \int_x p_{r}(x) \log \frac{p_{r}(x)}{p_{r} + p_g(x)} dx \bigg) + \\& \frac{1}{2} \bigg( \log2 + \int_x p_g(x) \log \frac{p_g(x)}{p_{r} + p_g(x)} dx \bigg) \\ =& \frac{1}{2} \bigg( \log4 + L(G, D^*) \bigg) \end{aligned}$$
 
 Thus,
 
-$$L(G, D^\*) = 2D_{JS}(p_{r} \| p_g) - 2\log2$$
+$$L(G, D^*) = 2D_{JS}(p_{r} \| p_g) - 2\log2$$
 
-Essentially the loss function of GAN quantifies the similarity between the generative data distribution $p_g$ and the real sample distribution $p_{r}$ by JS divergence when the discriminator is optimal. The best $G^\*$ that replicates the real data distribution leads to the minimum $L(G^\*, D^\*) = -2\log2$ which is aligned with equations above.
+Essentially the loss function of GAN quantifies the similarity between the generative data distribution $p_g$ and the real sample distribution $p_{r}$ by JS divergence when the discriminator is optimal. The best $G^*$ that replicates the real data distribution leads to the minimum $L(G^*, D^*) = -2\log2$ which is aligned with equations above.
 
 > **Other Variations of GAN**: There are many variations of GANs in different contexts or designed for different tasks. For example, for semi-supervised learning, one idea is to update the discriminator to output real class labels, $1, \dots, K-1$, as well as one fake class label $K$. The generator model aims to trick the discriminator to output a classification label smaller than $K$.
 
@@ -192,7 +192,7 @@ When the discriminator is perfect, we are guaranteed with $D(x) = 1, \forall x \
 
 ![](assets/images/2017-08-20-gan/GAN_vanishing_gradient.png)
 
-Fig. 5. First, a DCGAN is trained for 1, 10 and 25 epochs. Then, with the \*\*generator fixed\*\*, a discriminator is trained from scratch and measure the gradients with the original cost function. We see the gradient norms \*\*decay quickly\*\* (in log scale), in the best case 5 orders of magnitude after 4000 discriminator iterations. (Image source: [Arjovsky and Bottou, 2017](https://arxiv.org/pdf/1701.04862.pdf))
+Fig. 5. First, a DCGAN is trained for 1, 10 and 25 epochs. Then, with the **generator fixed**, a discriminator is trained from scratch and measure the gradients with the original cost function. We see the gradient norms **decay quickly** (in log scale), in the best case 5 orders of magnitude after 4000 discriminator iterations. (Image source: [Arjovsky and Bottou, 2017](https://arxiv.org/pdf/1701.04862.pdf))
 
 As a result, training a GAN faces a **dilemma**:
 
@@ -389,12 +389,12 @@ OR
 
 ```bibtex
 @misc{weng2019gan,
-    title={From GAN to WGAN},
-    author={Lilian Weng},
-    year={2019},
-    eprint={1904.08994},
-    archivePrefix={arXiv},
-    primaryClass={cs.LG}
+  title={From GAN to WGAN},
+  author={Lilian Weng},
+  year={2019},
+  eprint={1904.08994},
+  archivePrefix={arXiv},
+  primaryClass={cs.LG}
 }
 ```
 

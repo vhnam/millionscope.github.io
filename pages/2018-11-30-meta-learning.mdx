@@ -63,7 +63,7 @@ In this post, we focus on the case when each desired task is a supervised learni
 
 A good meta-learning model should be trained over a variety of learning tasks and optimized for the best performance on a distribution of tasks, including potentially unseen tasks. Each task is associated with a dataset $\mathcal{D}$, containing both feature vectors and true labels. The optimal model parameters are:
 
-$$\theta^\* = \arg\min_\theta \mathbb{E}_{\mathcal{D}\sim p(\mathcal{D})} [\mathcal{L}_\theta(\mathcal{D})]$$
+$$\theta^* = \arg\min_\theta \mathbb{E}_{\mathcal{D}\sim p(\mathcal{D})} [\mathcal{L}_\theta(\mathcal{D})]$$
 
 It looks very similar to a normal learning task, but _one dataset_ is considered as _one data sample_.
 
@@ -79,7 +79,7 @@ A dataset $\mathcal{D}$ contains pairs of feature vectors and labels, $\mathcal{
 
 The optimal parameters should maximize the probability of true labels across multiple training batches $B \subset \mathcal{D}$:
 
-$$\begin{aligned} \theta^\* &= {\arg\max}_{\theta} \mathbb{E}_{(\mathbf{x}, y)\in \mathcal{D}}[P_\theta(y \vert \mathbf{x})] &\\ \theta^\* &= {\arg\max}_{\theta} \mathbb{E}_{B\subset \mathcal{D}}[\sum_{(\mathbf{x}, y)\in B}P_\theta(y \vert \mathbf{x})] & \scriptstyle{\text{; trained with mini-batches.}} \end{aligned}$$
+$$\begin{aligned} \theta^* &= {\arg\max}_{\theta} \mathbb{E}_{(\mathbf{x}, y)\in \mathcal{D}}[P_\theta(y \vert \mathbf{x})] &\\ \theta^* &= {\arg\max}_{\theta} \mathbb{E}_{B\subset \mathcal{D}}[\sum_{(\mathbf{x}, y)\in B}P_\theta(y \vert \mathbf{x})] & \scriptstyle{\text{; trained with mini-batches.}} \end{aligned}$$
 
 In few-shot classification, the goal is to reduce the prediction error on data samples with unknown labels given a small support set for "fast learning" (think of how "fine-tuning" works). To make the training process mimics what happens during inference, we would like to "fake" datasets with a subset of labels to avoid exposing all the labels to the model and modify the optimization procedure accordingly to encourage fast learning:
 
@@ -129,11 +129,11 @@ Gradient descent
 
 $f_\theta(\mathbf{x}, S)$
 
-$\sum_{(\mathbf{x}_i, y_i) \in S} k_\theta(\mathbf{x}, \mathbf{x}_i)y_i$ (\*)
+$\sum_{(\mathbf{x}_i, y_i) \in S} k_\theta(\mathbf{x}, \mathbf{x}_i)y_i$ (*)
 
 $P_{g_\phi(\theta, S^L)}(y \vert \mathbf{x})$
 
-(\*) $k_\theta$ is a kernel function measuring the similarity between $\mathbf{x}_i$ and $\mathbf{x}$.
+(*) $k_\theta$ is a kernel function measuring the similarity between $\mathbf{x}_i$ and $\mathbf{x}$.
 
 Next we are gonna review classic models in each approach.
 
@@ -210,7 +210,7 @@ This embedding method is called "Full Contextual Embeddings (FCE)". Interestingl
 
 The training process in Matching Networks is designed to match inference at test time, see the details in the earlier [section](#training-in-the-same-way-as-testing). It is worthy of mentioning that the Matching Networks paper refined the idea that training and testing conditions should match.
 
-$$\theta^\* = \arg\max_\theta \mathbb{E}_{L\subset\mathcal{L}}[ \mathbb{E}_{S^L \subset\mathcal{D}, B^L \subset\mathcal{D}} [\sum_{(\mathbf{x}, y)\in B^L} P_\theta(y\vert\mathbf{x}, S^L)]]$$
+$$\theta^* = \arg\max_\theta \mathbb{E}_{L\subset\mathcal{L}}[ \mathbb{E}_{S^L \subset\mathcal{D}, B^L \subset\mathcal{D}} [\sum_{(\mathbf{x}, y)\in B^L} P_\theta(y\vert\mathbf{x}, S^L)]]$$
 
 ## Relation Network[#](#relation-network)
 
@@ -431,9 +431,9 @@ where $\mathcal{L}^{(0)}$ is the loss computed using the mini data batch with id
 
 Fig. 11. Diagram of MAML. (Image source: [original paper](https://arxiv.org/abs/1703.03400))
 
-Well, the above formula only optimizes for one task. To achieve a good generalization across a variety of tasks, we would like to find the optimal $\theta^\*$ so that the task-specific fine-tuning is more efficient. Now, we sample a new data batch with id (1) for updating the meta-objective. The loss, denoted as $\mathcal{L}^{(1)}$, depends on the mini batch (1). The superscripts in $\mathcal{L}^{(0)}$ and $\mathcal{L}^{(1)}$ only indicate different data batches, and they refer to the same loss objective for the same task.
+Well, the above formula only optimizes for one task. To achieve a good generalization across a variety of tasks, we would like to find the optimal $\theta^*$ so that the task-specific fine-tuning is more efficient. Now, we sample a new data batch with id (1) for updating the meta-objective. The loss, denoted as $\mathcal{L}^{(1)}$, depends on the mini batch (1). The superscripts in $\mathcal{L}^{(0)}$ and $\mathcal{L}^{(1)}$ only indicate different data batches, and they refer to the same loss objective for the same task.
 
-$$\begin{aligned} \theta^\* &= \arg\min_\theta \sum_{\tau_i \sim p(\tau)} \mathcal{L}_{\tau_i}^{(1)} (f_{\theta'_i}) = \arg\min_\theta \sum_{\tau_i \sim p(\tau)} \mathcal{L}_{\tau_i}^{(1)} (f_{\theta - \alpha\nabla_\theta \mathcal{L}_{\tau_i}^{(0)}(f_\theta)}) & \\ \theta &\leftarrow \theta - \beta \nabla_{\theta} \sum_{\tau_i \sim p(\tau)} \mathcal{L}_{\tau_i}^{(1)} (f_{\theta - \alpha\nabla_\theta \mathcal{L}_{\tau_i}^{(0)}(f_\theta)}) & \scriptstyle{\text{; updating rule}} \end{aligned}$$
+$$\begin{aligned} \theta^* &= \arg\min_\theta \sum_{\tau_i \sim p(\tau)} \mathcal{L}_{\tau_i}^{(1)} (f_{\theta'_i}) = \arg\min_\theta \sum_{\tau_i \sim p(\tau)} \mathcal{L}_{\tau_i}^{(1)} (f_{\theta - \alpha\nabla_\theta \mathcal{L}_{\tau_i}^{(0)}(f_\theta)}) & \\ \theta &\leftarrow \theta - \beta \nabla_{\theta} \sum_{\tau_i \sim p(\tau)} \mathcal{L}_{\tau_i}^{(1)} (f_{\theta - \alpha\nabla_\theta \mathcal{L}_{\tau_i}^{(0)}(f_\theta)}) & \scriptstyle{\text{; updating rule}} \end{aligned}$$
 
 ![](assets/images/2018-11-30-meta-learning/maml-algo.png)
 
@@ -479,29 +479,29 @@ At a glance, the algorithm looks a lot like an ordinary SGD. However, because th
 
 ### The Optimization Assumption[#](#the-optimization-assumption)
 
-Assuming that a task $\tau \sim p(\tau)$ has a manifold of optimal network configuration, $\mathcal{W}_{\tau}^\*$. The model $f_\theta$ achieves the best performance for task $\tau$ when $\theta$ lays on the surface of $\mathcal{W}_{\tau}^\*$. To find a solution that is good across tasks, we would like to find a parameter close to all the optimal manifolds of all tasks:
+Assuming that a task $\tau \sim p(\tau)$ has a manifold of optimal network configuration, $\mathcal{W}_{\tau}^*$. The model $f_\theta$ achieves the best performance for task $\tau$ when $\theta$ lays on the surface of $\mathcal{W}_{\tau}^*$. To find a solution that is good across tasks, we would like to find a parameter close to all the optimal manifolds of all tasks:
 
-$$\theta^\* = \arg\min_\theta \mathbb{E}_{\tau \sim p(\tau)} [\frac{1}{2} \text{dist}(\theta, \mathcal{W}_\tau^\*)^2]$$
+$$\theta^* = \arg\min_\theta \mathbb{E}_{\tau \sim p(\tau)} [\frac{1}{2} \text{dist}(\theta, \mathcal{W}_\tau^*)^2]$$
 
 ![](assets/images/2018-11-30-meta-learning/reptile-optim.png)
 
 Fig. 14. The Reptile algorithm updates the parameter alternatively to be closer to the optimal manifolds of different tasks. (Image source: [original paper](https://arxiv.org/abs/1803.02999))
 
-Let's use the L2 distance as $\text{dist}(.)$ and the distance between a point $\theta$ and a set $\mathcal{W}_\tau^\*$ equals to the distance between $\theta$ and a point $W_{\tau}^\*(\theta)$ on the manifold that is closest to $\theta$:
+Let's use the L2 distance as $\text{dist}(.)$ and the distance between a point $\theta$ and a set $\mathcal{W}_\tau^*$ equals to the distance between $\theta$ and a point $W_{\tau}^*(\theta)$ on the manifold that is closest to $\theta$:
 
-$$\text{dist}(\theta, \mathcal{W}_{\tau}^\*) = \text{dist}(\theta, W_{\tau}^\*(\theta)) \text{, where }W_{\tau}^\*(\theta) = \arg\min_{W\in\mathcal{W}_{\tau}^\*} \text{dist}(\theta, W)$$
+$$\text{dist}(\theta, \mathcal{W}_{\tau}^*) = \text{dist}(\theta, W_{\tau}^*(\theta)) \text{, where }W_{\tau}^*(\theta) = \arg\min_{W\in\mathcal{W}_{\tau}^*} \text{dist}(\theta, W)$$
 
 The gradient of the squared euclidean distance is:
 
-$$\begin{aligned} \nabla_\theta[\frac{1}{2}\text{dist}(\theta, \mathcal{W}_{\tau_i}^\*)^2] &= \nabla_\theta[\frac{1}{2}\text{dist}(\theta, W_{\tau_i}^\*(\theta))^2] & \\ &= \nabla_\theta[\frac{1}{2}(\theta - W_{\tau_i}^\*(\theta))^2] & \\ &= \theta - W_{\tau_i}^\*(\theta) & \scriptstyle{\text{; See notes.}} \end{aligned}$$
+$$\begin{aligned} \nabla_\theta[\frac{1}{2}\text{dist}(\theta, \mathcal{W}_{\tau_i}^*)^2] &= \nabla_\theta[\frac{1}{2}\text{dist}(\theta, W_{\tau_i}^*(\theta))^2] & \\ &= \nabla_\theta[\frac{1}{2}(\theta - W_{\tau_i}^*(\theta))^2] & \\ &= \theta - W_{\tau_i}^*(\theta) & \scriptstyle{\text{; See notes.}} \end{aligned}$$
 
 Notes: According to the Reptile paper, "_the gradient of the squared euclidean distance between a point Θ and a set S is the vector 2(Θ - p), where p is the closest point in S to Θ_". Technically the closest point in S is also a function of Θ, but I'm not sure why the gradient does not need to worry about the derivative of p. (Please feel free to leave me a comment or send me an email about this if you have ideas.)
 
 Thus the update rule for one stochastic gradient step is:
 
-$$\theta = \theta - \alpha \nabla_\theta[\frac{1}{2} \text{dist}(\theta, \mathcal{W}_{\tau_i}^\*)^2] = \theta - \alpha(\theta - W_{\tau_i}^\*(\theta)) = (1-\alpha)\theta + \alpha W_{\tau_i}^\*(\theta)$$
+$$\theta = \theta - \alpha \nabla_\theta[\frac{1}{2} \text{dist}(\theta, \mathcal{W}_{\tau_i}^*)^2] = \theta - \alpha(\theta - W_{\tau_i}^*(\theta)) = (1-\alpha)\theta + \alpha W_{\tau_i}^*(\theta)$$
 
-The closest point on the optimal task manifold $W_{\tau_i}^\*(\theta)$ cannot be computed exactly, but Reptile approximates it using $\text{SGD}(\mathcal{L}_\tau, \theta, k)$.
+The closest point on the optimal task manifold $W_{\tau_i}^*(\theta)$ cannot be computed exactly, but Reptile approximates it using $\text{SGD}(\mathcal{L}_\tau, \theta, k)$.
 
 ### Reptile vs FOMAML[#](#reptile-vs-fomaml)
 

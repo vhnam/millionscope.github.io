@@ -426,7 +426,7 @@ _Depth-adaptive transformer_ ([Elabyad et al. 2020](https://arxiv.org/abs/1910.1
 
 $$\text{LL}^n_t = \log p(y_t \vert \mathbf{h}^n_{t-1}) \quad \text{LL}^n = \sum_{t=1}^{\vert\mathbf{y}\vert} LL^n_t$$
 
-Adaptive depth classifiers outputs a parametric distribution $q_t$. It is trained with cross entropy loss against an oracle distribution $q^\*_t$. The paper explored three confiurations for how to learn such a classifier $q_t$.
+Adaptive depth classifiers outputs a parametric distribution $q_t$. It is trained with cross entropy loss against an oracle distribution $q^*_t$. The paper explored three confiurations for how to learn such a classifier $q_t$.
 
 ![](assets/images/2023-01-27-the-transformer-family-v2/depth-adaptive-classifier.png)
 
@@ -435,9 +435,9 @@ Fig. 16. Illustration of three types of adaptive depth classifiers.
 
 1.  _Sequence-specific depth classifier_: All tokens of the same sequence share the same exit block. It depends on the average of the encoder representation of the sequence. Given an input sequence $\mathbf{x}$ of length $L$, the classifier takes $\bar{\mathbf{x}} = \frac{1}{L} \sum_{t=1}^L \mathbf{x}_t$ as input and outputs a multinomial distribution of $N$ dimensions, corresponding to $N$ layers.
 
-   $$\begin{aligned} q(n \vert \mathbf{x}) &=\text{softmax}(\mathbf{W}_n \bar{\mathbf{x}} + b_n) \in \mathbb{R}^N \\ q_\text{lik}^\*(\mathbf{x}, \mathbf{y}) &= \delta(\arg\max_n \text{LL}^n - \lambda n) \\ \text{or }q_\text{corr}^\*(\mathbf{x}, \mathbf{y}) &= \delta(\arg\max_n C^n - \lambda n) \text{ where }C^n = \vert\{t \vert y_t = \arg\max_y p(y \vert \mathbf{h}^n_{t-1})\}\vert \\ \end{aligned}$$
+   $$\begin{aligned} q(n \vert \mathbf{x}) &=\text{softmax}(\mathbf{W}_n \bar{\mathbf{x}} + b_n) \in \mathbb{R}^N \\ q_\text{lik}^*(\mathbf{x}, \mathbf{y}) &= \delta(\arg\max_n \text{LL}^n - \lambda n) \\ \text{or }q_\text{corr}^*(\mathbf{x}, \mathbf{y}) &= \delta(\arg\max_n C^n - \lambda n) \text{ where }C^n = \vert\{t \vert y_t = \arg\max_y p(y \vert \mathbf{h}^n_{t-1})\}\vert \\ \end{aligned}$$
 
-    where $\delta$ is [dirac delta](https://en.wikipedia.org/wiki/Dirac_delta_function) (unit impulse) function and $-\lambda n$ is a regularization term to encourage lower layer exits. The ground truth $q^\*$ can be prepared in two way, based on maximum likelihood $q_\text{lik}^\*$ or correctness $q_\text{corr}^\*$.
+    where $\delta$ is [dirac delta](https://en.wikipedia.org/wiki/Dirac_delta_function) (unit impulse) function and $-\lambda n$ is a regularization term to encourage lower layer exits. The ground truth $q^*$ can be prepared in two way, based on maximum likelihood $q_\text{lik}^*$ or correctness $q_\text{corr}^*$.
 
 2.  _Token-specific depth classifier (multinomial)_: Each token is decoded with different exit block, predicted conditioned on the first decoder hidden state $\mathbf{h}^1_t$:
 
@@ -445,7 +445,7 @@ Fig. 16. Illustration of three types of adaptive depth classifiers.
 
 3.  _Token-specific depth classifier (geometric-like)_: A binary exit prediction distribution is made per layer per token, $\mathcal{X}^n_t$. The RBF kernel $\kappa(t, t') = \exp(\frac{\vert t - t' \vert^2}{\sigma})$ is used to smooth the predictions to incorporate the impact of current decision on future time steps.
 
-   $$\begin{aligned} \mathcal{X}^n_t &= \text{sigmoid}(\mathbf{w}_n^\top \mathbf{h}^n_t + b_n)\quad \forall n \in [1, \dots, N-1] \\ q_t(n \vert \mathbf{x}, \mathbf{y}_{< t}) &= \begin{cases} \mathcal{X}^n_t \prod_{n' < n} (1 - \mathcal{X}^{n'}_t) & \text{if } n < N\\ \prod_{n' < N} (1 - \mathcal{X}^{n'}_t) & \text{otherwise} \end{cases} \\ q_\text{lik}^\*(\mathbf{x}, \mathbf{y}) &= \delta(\arg\max_n \widetilde{\text{LL}}^n_t - \lambda n) \text{ where } \widetilde{\text{LL}}^n_t = \sum_{t'=1}^{\vert\mathbf{y}\vert}\kappa(t, t') LL^n_{t'} \\ \text{or }q_\text{cor}^\*(\mathbf{x}, \mathbf{y}) &= \delta(\arg\max_n \tilde{C}_t^n - \lambda n) \text{ where }C_t^n = \mathbb{1}[y_t = \arg\max_y p(y \vert \mathbf{h}^n_{t-1})],\; \tilde{C}^n_t = \sum_{t'=1}^{\vert\mathbf{y}\vert}\kappa(t, t') C^n_{t'} \\ \end{aligned}$$
+   $$\begin{aligned} \mathcal{X}^n_t &= \text{sigmoid}(\mathbf{w}_n^\top \mathbf{h}^n_t + b_n)\quad \forall n \in [1, \dots, N-1] \\ q_t(n \vert \mathbf{x}, \mathbf{y}_{< t}) &= \begin{cases} \mathcal{X}^n_t \prod_{n' < n} (1 - \mathcal{X}^{n'}_t) & \text{if } n < N\\ \prod_{n' < N} (1 - \mathcal{X}^{n'}_t) & \text{otherwise} \end{cases} \\ q_\text{lik}^*(\mathbf{x}, \mathbf{y}) &= \delta(\arg\max_n \widetilde{\text{LL}}^n_t - \lambda n) \text{ where } \widetilde{\text{LL}}^n_t = \sum_{t'=1}^{\vert\mathbf{y}\vert}\kappa(t, t') LL^n_{t'} \\ \text{or }q_\text{cor}^*(\mathbf{x}, \mathbf{y}) &= \delta(\arg\max_n \tilde{C}_t^n - \lambda n) \text{ where }C_t^n = \mathbb{1}[y_t = \arg\max_y p(y \vert \mathbf{h}^n_{t-1})],\; \tilde{C}^n_t = \sum_{t'=1}^{\vert\mathbf{y}\vert}\kappa(t, t') C^n_{t'} \\ \end{aligned}$$
 
 At inference time, the confidence threshold for making an exit decision needs to be calibrated. Depth-adaptive transformer finds such a threshold on a validation set via grid search. _CALM_ ([Schuster et al. 2022](https://arxiv.org/abs/2207.07061)) applied the Learn then Test (LTT) framework ([Angelopoulos et al. 2021](https://arxiv.org/abs/2110.01052)) to identify a subset of valid thresholds and chose the minimum value as the threshold for inference. Except for training per-layer exit classifier, CALM also explored other methods for adaptive depth prediction, including the softmax responses (i.e. difference between top two softmax outputs) and hidden state saturation (i.e. $\cos(\mathbf{h}^n_t, \mathbf{h}^{n+1}_t)$) as confidence scores for exit decisions. They found softmax responses result in best inference speedup.
 

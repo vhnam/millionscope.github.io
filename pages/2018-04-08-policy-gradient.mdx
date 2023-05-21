@@ -673,23 +673,23 @@ Therefore, to maximize $f(\pi_T)$, the dual problem is listed as below. Note tha
 
 $$\begin{aligned} \max_{\pi_T} \mathbb{E}[ r(s_T, a_T) ] &= \max_{\pi_T} f(\pi_T) \\ &= \min_{\alpha_T \geq 0} \max_{\pi_T} L(\pi_T, \alpha_T) \\ &= \min_{\alpha_T \geq 0} \max_{\pi_T} f(\pi_T) + \alpha_T h(\pi_T) \\ &= \min_{\alpha_T \geq 0} \max_{\pi_T} \mathbb{E}_{(s_T, a_T) \sim \rho_{\pi}} [ r(s_T, a_T) ] + \alpha_T ( \mathbb{E}_{(s_T, a_T) \sim \rho_{\pi}} [-\log \pi_T(a_T\vert s_T)] - \mathcal{H}_0) \\ &= \min_{\alpha_T \geq 0} \max_{\pi_T} \mathbb{E}_{(s_T, a_T) \sim \rho_{\pi}} [ r(s_T, a_T) - \alpha_T \log \pi_T(a_T\vert s_T)] - \alpha_T \mathcal{H}_0 \\ &= \min_{\alpha_T \geq 0} \max_{\pi_T} \mathbb{E}_{(s_T, a_T) \sim \rho_{\pi}} [ r(s_T, a_T) + \alpha_T \mathcal{H}(\pi_T) - \alpha_T \mathcal{H}_0 ] \end{aligned}$$
 
-We could compute the optimal $\pi_T$ and $\alpha_T$ iteratively. First given the current $\alpha_T$, get the best policy $\pi_T^{\*}$ that maximizes $L(\pi_T^{\*}, \alpha_T)$. Then plug in $\pi_T^{\*}$ and compute $\alpha_T^{\*}$ that minimizes $L(\pi_T^{\*}, \alpha_T)$. Assuming we have one neural network for policy and one network for temperature parameter, the iterative update process is more aligned with how we update network parameters during training.
+We could compute the optimal $\pi_T$ and $\alpha_T$ iteratively. First given the current $\alpha_T$, get the best policy $\pi_T^{*}$ that maximizes $L(\pi_T^{*}, \alpha_T)$. Then plug in $\pi_T^{*}$ and compute $\alpha_T^{*}$ that minimizes $L(\pi_T^{*}, \alpha_T)$. Assuming we have one neural network for policy and one network for temperature parameter, the iterative update process is more aligned with how we update network parameters during training.
 
-$$\begin{aligned} \pi^{\*}_T &= \arg\max_{\pi_T} \mathbb{E}_{(s_T, a_T) \sim \rho_{\pi}} [ r(s_T, a_T) + \alpha_T \mathcal{H}(\pi_T) - \alpha_T \mathcal{H}_0 ] \\ \color{blue}{\alpha^{\*}_T} &\color{blue}{=} \color{blue}{\arg\min_{\alpha_T \geq 0} \mathbb{E}_{(s_T, a_T) \sim \rho_{\pi^{\*}}} [\alpha_T \mathcal{H}(\pi^{\*}_T) - \alpha_T \mathcal{H}_0 ]} \end{aligned}$$
+$$\begin{aligned} \pi^{*}_T &= \arg\max_{\pi_T} \mathbb{E}_{(s_T, a_T) \sim \rho_{\pi}} [ r(s_T, a_T) + \alpha_T \mathcal{H}(\pi_T) - \alpha_T \mathcal{H}_0 ] \\ \color{blue}{\alpha^{*}_T} &\color{blue}{=} \color{blue}{\arg\min_{\alpha_T \geq 0} \mathbb{E}_{(s_T, a_T) \sim \rho_{\pi^{*}}} [\alpha_T \mathcal{H}(\pi^{*}_T) - \alpha_T \mathcal{H}_0 ]} \end{aligned}$$
 
-$$\text{Thus, }\max_{\pi_T} \mathbb{E} [ r(s_T, a_T) ] = \mathbb{E}_{(s_T, a_T) \sim \rho_{\pi^{\*}}} [ r(s_T, a_T) + \alpha^{\*}_T \mathcal{H}(\pi^{\*}_T) - \alpha^{\*}_T \mathcal{H}_0 ]$$
+$$\text{Thus, }\max_{\pi_T} \mathbb{E} [ r(s_T, a_T) ] = \mathbb{E}_{(s_T, a_T) \sim \rho_{\pi^{*}}} [ r(s_T, a_T) + \alpha^{*}_T \mathcal{H}(\pi^{*}_T) - \alpha^{*}_T \mathcal{H}_0 ]$$
 
 Now let's go back to the soft Q value function:
 
-$$\begin{aligned} Q_{T-1}(s_{T-1}, a_{T-1}) &= r(s_{T-1}, a_{T-1}) + \mathbb{E} [Q(s_T, a_T) - \alpha_T \log \pi(a_T \vert s_T)] \\ &= r(s_{T-1}, a_{T-1}) + \mathbb{E} [r(s_T, a_T)] + \alpha_T \mathcal{H}(\pi_T) \\ Q_{T-1}^{\*}(s_{T-1}, a_{T-1}) &= r(s_{T-1}, a_{T-1}) + \max_{\pi_T} \mathbb{E} [r(s_T, a_T)] + \alpha_T \mathcal{H}(\pi^{\*}_T) & \text{; plug in the optimal }\pi_T^{\*} \end{aligned}$$
+$$\begin{aligned} Q_{T-1}(s_{T-1}, a_{T-1}) &= r(s_{T-1}, a_{T-1}) + \mathbb{E} [Q(s_T, a_T) - \alpha_T \log \pi(a_T \vert s_T)] \\ &= r(s_{T-1}, a_{T-1}) + \mathbb{E} [r(s_T, a_T)] + \alpha_T \mathcal{H}(\pi_T) \\ Q_{T-1}^{*}(s_{T-1}, a_{T-1}) &= r(s_{T-1}, a_{T-1}) + \max_{\pi_T} \mathbb{E} [r(s_T, a_T)] + \alpha_T \mathcal{H}(\pi^{*}_T) & \text{; plug in the optimal }\pi_T^{*} \end{aligned}$$
 
 Therefore the expected return is as follows, when we take one step further back to the time step $T-1$:
 
-$$\begin{aligned} &\max_{\pi_{T-1}}\Big(\mathbb{E}[r(s_{T-1}, a_{T-1})] + \max_{\pi_T} \mathbb{E}[r(s_T, a_T] \Big) \\ &= \max_{\pi_{T-1}} \Big( Q^{\*}_{T-1}(s_{T-1}, a_{T-1}) - \alpha^{\*}_T \mathcal{H}(\pi^{\*}_T) \Big) & \text{; should s.t. } \mathcal{H}(\pi_{T-1}) - \mathcal{H}_0 \geq 0 \\ &= \min_{\alpha_{T-1} \geq 0} \max_{\pi_{T-1}} \Big( Q^{\*}_{T-1}(s_{T-1}, a_{T-1}) - \alpha^{\*}_T \mathcal{H}(\pi^{\*}_T) + \alpha_{T-1} \big( \mathcal{H}(\pi_{T-1}) - \mathcal{H}_0 \big) \Big) & \text{; dual problem w/ Lagrangian.} \\ &= \min_{\alpha_{T-1} \geq 0} \max_{\pi_{T-1}} \Big( Q^{\*}_{T-1}(s_{T-1}, a_{T-1}) + \alpha_{T-1} \mathcal{H}(\pi_{T-1}) - \alpha_{T-1}\mathcal{H}_0 \Big) - \alpha^{\*}_T \mathcal{H}(\pi^{\*}_T) \end{aligned}$$
+$$\begin{aligned} &\max_{\pi_{T-1}}\Big(\mathbb{E}[r(s_{T-1}, a_{T-1})] + \max_{\pi_T} \mathbb{E}[r(s_T, a_T] \Big) \\ &= \max_{\pi_{T-1}} \Big( Q^{*}_{T-1}(s_{T-1}, a_{T-1}) - \alpha^{*}_T \mathcal{H}(\pi^{*}_T) \Big) & \text{; should s.t. } \mathcal{H}(\pi_{T-1}) - \mathcal{H}_0 \geq 0 \\ &= \min_{\alpha_{T-1} \geq 0} \max_{\pi_{T-1}} \Big( Q^{*}_{T-1}(s_{T-1}, a_{T-1}) - \alpha^{*}_T \mathcal{H}(\pi^{*}_T) + \alpha_{T-1} \big( \mathcal{H}(\pi_{T-1}) - \mathcal{H}_0 \big) \Big) & \text{; dual problem w/ Lagrangian.} \\ &= \min_{\alpha_{T-1} \geq 0} \max_{\pi_{T-1}} \Big( Q^{*}_{T-1}(s_{T-1}, a_{T-1}) + \alpha_{T-1} \mathcal{H}(\pi_{T-1}) - \alpha_{T-1}\mathcal{H}_0 \Big) - \alpha^{*}_T \mathcal{H}(\pi^{*}_T) \end{aligned}$$
 
 Similar to the previous step,
 
-$$\begin{aligned} \pi^{\*}_{T-1} &= \arg\max_{\pi_{T-1}} \mathbb{E}_{(s_{T-1}, a_{T-1}) \sim \rho_\pi} [Q^{\*}_{T-1}(s_{T-1}, a_{T-1}) + \alpha_{T-1} \mathcal{H}(\pi_{T-1}) - \alpha_{T-1} \mathcal{H}_0 ] \\ \color{green}{\alpha^{\*}_{T-1}} &\color{green}{=} \color{green}{\arg\min_{\alpha_{T-1} \geq 0} \mathbb{E}_{(s_{T-1}, a_{T-1}) \sim \rho_{\pi^{\*}}} [ \alpha_{T-1} \mathcal{H}(\pi^{\*}_{T-1}) - \alpha_{T-1}\mathcal{H}_0 ]} \end{aligned}$$
+$$\begin{aligned} \pi^{*}_{T-1} &= \arg\max_{\pi_{T-1}} \mathbb{E}_{(s_{T-1}, a_{T-1}) \sim \rho_\pi} [Q^{*}_{T-1}(s_{T-1}, a_{T-1}) + \alpha_{T-1} \mathcal{H}(\pi_{T-1}) - \alpha_{T-1} \mathcal{H}_0 ] \\ \color{green}{\alpha^{*}_{T-1}} &\color{green}{=} \color{green}{\arg\min_{\alpha_{T-1} \geq 0} \mathbb{E}_{(s_{T-1}, a_{T-1}) \sim \rho_{\pi^{*}}} [ \alpha_{T-1} \mathcal{H}(\pi^{*}_{T-1}) - \alpha_{T-1}\mathcal{H}_0 ]} \end{aligned}$$
 
 The equation for updating $\alpha_{T-1}$ in green has the same format as the equation for updating $\alpha_{T-1}$ in blue above. By repeating this process, we can learn the optimal temperature parameter in every step by minimizing the same objective function:
 
@@ -755,15 +755,15 @@ $$\begin{aligned} \nabla_q \hat{J}(\theta) &= \nabla_q \big( \mathbb{E}_{\theta 
 
 The optimal distribution is:
 
-$$\log q^{\*}(\theta) = \frac{1}{\alpha} J(\theta) + \log q_0(\theta) - 1 \text{ thus } \underbrace{ q^{\*}(\theta) }_\textrm{"posterior"} \propto \underbrace{\exp ( J(\theta) / \alpha )}_\textrm{"likelihood"} \underbrace{q_0(\theta)}_\textrm{prior}$$
+$$\log q^{*}(\theta) = \frac{1}{\alpha} J(\theta) + \log q_0(\theta) - 1 \text{ thus } \underbrace{ q^{*}(\theta) }_\textrm{"posterior"} \propto \underbrace{\exp ( J(\theta) / \alpha )}_\textrm{"likelihood"} \underbrace{q_0(\theta)}_\textrm{prior}$$
 
 The temperature $\alpha$ decides a tradeoff between exploitation and exploration. When $\alpha \rightarrow 0$, $\theta$ is updated only according to the expected return $J(\theta)$. When $\alpha \rightarrow \infty$, $\theta$ always follows the prior belief.
 
 When using the SVGD method to estimate the target posterior distribution $q(\theta)$, it relies on a set of particle $\{\theta_i\}_{i=1}^n$ (independently trained policy agents) and each is updated:
 
-$$\theta_i \gets \theta_i + \epsilon \phi^{\*}(\theta_i) \text{ where } \phi^{\*} = \max_{\phi \in \mathcal{H}} \{ - \nabla_\epsilon D_\text{KL} (q'_{[\theta + \epsilon \phi(\theta)]} \| q) \text{ s.t. } \|\phi\|_{\mathcal{H}} \leq 1\}$$
+$$\theta_i \gets \theta_i + \epsilon \phi^{*}(\theta_i) \text{ where } \phi^{*} = \max_{\phi \in \mathcal{H}} \{ - \nabla_\epsilon D_\text{KL} (q'_{[\theta + \epsilon \phi(\theta)]} \| q) \text{ s.t. } \|\phi\|_{\mathcal{H}} \leq 1\}$$
 
-where $\epsilon$ is a learning rate and $\phi^{\*}$ is the unit ball of a [RKHS](http://mlss.tuebingen.mpg.de/2015/slides/gretton/part_1.pdf) (reproducing kernel Hilbert space) $\mathcal{H}$ of $\theta$-shaped value vectors that maximally decreases the KL divergence between the particles and the target distribution. $q'(.)$ is the distribution of $\theta + \epsilon \phi(\theta)$.
+where $\epsilon$ is a learning rate and $\phi^{*}$ is the unit ball of a [RKHS](http://mlss.tuebingen.mpg.de/2015/slides/gretton/part_1.pdf) (reproducing kernel Hilbert space) $\mathcal{H}$ of $\theta$-shaped value vectors that maximally decreases the KL divergence between the particles and the target distribution. $q'(.)$ is the distribution of $\theta + \epsilon \phi(\theta)$.
 
 Comparing different gradient-based update methods:
 
@@ -783,9 +783,9 @@ SVGD
 
 $\Delta \theta$ on the kernel function space (edited)
 
-One [estimation](https://arxiv.org/abs/1608.04471) of $\phi^{\*}$ has the following form. A positive definite kernel $k(\\vartheta, \theta)$, i.e. a Gaussian [radial basis function](https://en.wikipedia.org/wiki/Radial_basis_function), measures the similarity between particles.
+One [estimation](https://arxiv.org/abs/1608.04471) of $\phi^{*}$ has the following form. A positive definite kernel $k(\\vartheta, \theta)$, i.e. a Gaussian [radial basis function](https://en.wikipedia.org/wiki/Radial_basis_function), measures the similarity between particles.
 
-$$\begin{aligned} \phi^{\*}(\theta_i) &= \mathbb{E}_{\\vartheta \sim q'} [\nabla_\\vartheta \log q(\\vartheta) k(\\vartheta, \theta_i) + \nabla_\\vartheta k(\\vartheta, \theta_i)]\\ &= \frac{1}{n} \sum_{j=1}^n [\color{red}{\nabla_{\theta_j} \log q(\theta_j) k(\theta_j, \theta_i)} + \color{green}{\nabla_{\theta_j} k(\theta_j, \theta_i)}] & \scriptstyle{\text{;approximate }q'\text{ with current particle values}} \end{aligned}$$
+$$\begin{aligned} \phi^{*}(\theta_i) &= \mathbb{E}_{\\vartheta \sim q'} [\nabla_\\vartheta \log q(\\vartheta) k(\\vartheta, \theta_i) + \nabla_\\vartheta k(\\vartheta, \theta_i)]\\ &= \frac{1}{n} \sum_{j=1}^n [\color{red}{\nabla_{\theta_j} \log q(\theta_j) k(\theta_j, \theta_i)} + \color{green}{\nabla_{\theta_j} k(\theta_j, \theta_i)}] & \scriptstyle{\text{;approximate }q'\text{ with current particle values}} \end{aligned}$$
 
 - The first term in red encourages $\theta_i$ learning towards the high probability regions of $q$ that is shared across similar particles. => to be similar to other particles
 - The second term in green pushes particles away from each other and therefore diversifies the policy. => to be dissimilar to other particles

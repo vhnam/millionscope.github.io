@@ -152,7 +152,7 @@ Q-BERT ([Shen, Dong & Ye, et al. 2020](https://arxiv.org/abs/1909.05840)) develo
 
 In another viewpoint, the problem of quantization is an optimization problem. Given a weight matrix $\mathbf{W}$ and an input matrix $\mathbf{X}$ , we want to find a quantized weight matrix $\hat{\mathbf{W}}$ to minimize the MSE:
 
-$$\hat{\mathbf{W}}^\* = {\arg\min}\_{\hat{\mathbf{W}}} | \mathbf{W}\mathbf{X} - \hat{\mathbf{W}}\mathbf{X}|$$
+$$\hat{\mathbf{W}}^* = {\arg\min}\_{\hat{\mathbf{W}}} | \mathbf{W}\mathbf{X} - \hat{\mathbf{W}}\mathbf{X}|$$
 
 **GPTQ** ([Frantar et al. 2022](https://arxiv.org/abs/2210.17323)) treats the weight matrix $\mathbf{W}$ as a collection of row vectors ${\mathbf{w}}$ and applies quantization to each row independently. GPTQ iteratively quantizes more weights that are selected greedily to minimize the quantization error. The update on selected weights has a closed-form formula, utilizing Hessian matrices. Read more details in the paper and the OBQ (Optimal Brain Quantization; [Frantar & Alistarh 2022](https://arxiv.org/abs/2208.11580)) method if interested. GPTQ can reduce the bitwidth of weights in OPT-175B down to 3 or 4 bits without much performance loss, but it only applies to model weights not activation.
 
@@ -307,7 +307,7 @@ where each activation in $Y_\text{sparse}$ corresponds to one column in $W_1$ an
 
 ![](assets/images/2023-01-10-inference-optimization/sparse-FFN.png)
 
-Fig. 14. (a) Sparse FFN layer; columns in red are not loaded in memory for faster inference. (b) Sparse FFN controller for 1:4 sparsity. (Image source: [Jaszczur et al. 2021](https://arxiv.org/abs/2111.12763)) \*Lilian's side note\*: Fig (a) in the illustration from the paper is actually $Y_\text{sparse} = \max\big(0, (xW_1 + b_1) \odot \text{Controller}(x)\big)$, but it doesn't change the results.
+Fig. 14. (a) Sparse FFN layer; columns in red are not loaded in memory for faster inference. (b) Sparse FFN controller for 1:4 sparsity. (Image source: [Jaszczur et al. 2021](https://arxiv.org/abs/2111.12763)) *Lilian's side note*: Fig (a) in the illustration from the paper is actually $Y_\text{sparse} = \max\big(0, (xW_1 + b_1) \odot \text{Controller}(x)\big)$, but it doesn't change the results.
 
 **Sparse QKV (attention) layer**: In the attention layer, the dimensionality $d_\text{model}$ is divided into $S$ modules, each of size $M=d_\text{model} /S$. To make sure each subdivision can access any part of the embedding, Scaling Transformer introduces a multiplicative layer (i.e., a multiplication layer multiplies inputs from multiple neural network layers element-wise) which can represent arbitrary permutation but contains fewer parameters than a dense layer.
 

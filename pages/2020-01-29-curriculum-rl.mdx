@@ -148,7 +148,7 @@ Often RL policy needs to be able to perform over a set of tasks. The goal should
 
 The approach of Generative Goal Learning ([Florensa, et al. 2018](https://arxiv.org/abs/1705.06366)) relies on a **Goal GAN** to generate desired goals automatically. In their experiment, the reward is very sparse, just a binary flag for whether a goal is achieved or not and the policy is conditioned on goal,
 
-$$\begin{aligned} \pi^{\*}(a_t\vert s_t, g) &= \arg\max_\pi \mathbb{E}_{g\sim p_g(.)} R^g(\pi) \\ \text{where }R^g(\pi) &= \mathbb{E}_\pi(.\mid s_t, g) \mathbf{1}[\exists t \in [1,\dots, T]: s_t \in S^g] \end{aligned}$$
+$$\begin{aligned} \pi^{*}(a_t\vert s_t, g) &= \arg\max_\pi \mathbb{E}_{g\sim p_g(.)} R^g(\pi) \\ \text{where }R^g(\pi) &= \mathbb{E}_\pi(.\mid s_t, g) \mathbf{1}[\exists t \in [1,\dots, T]: s_t \in S^g] \end{aligned}$$
 
 Here $R^g(\pi)$ is the expected return, also equivalent to the success probability. Given sampled trajectories from the current policy, as long as any state belongs to the goal set, the return will be positive.
 
@@ -193,14 +193,14 @@ The generator is optimized with three objectives:
 1.  Goal **validity**: The proposed goal should be achievable by an expert policy. The corresponding generative loss is designed to increase the likelihood of generating goals that the solver policy has achieved before (like in [HER](https://arxiv.org/abs/1707.01495)).
 
     - $\mathcal{L}_\text{val}$ is the negative log-likelihood of generated goals that have been solved by the solver in the past.
-      {/* - $$\begin{align\*} \mathcal{L}_\text{val} = \mathbb{E}_{\substack{ g \sim \text{ achieved by solver}, \\ \xi \in \text{Uniform}(0, \delta), \\ f \in \text{Uniform}(0, 1) }} \big[ -\log p(G^{-1}(g + \xi, f)) \big] \end{align\*}$$ */}
+      {/* - $$\begin{align*} \mathcal{L}_\text{val} = \mathbb{E}_{\substack{ g \sim \text{ achieved by solver}, \\ \xi \in \text{Uniform}(0, \delta), \\ f \in \text{Uniform}(0, 1) }} \big[ -\log p(G^{-1}(g + \xi, f)) \big] \end{align*}$$ */}
       {/* - $$ \begin{align*} \mathcal{L}_\text{val} = \mathbb{E}_{\substack{ g \sim \text{ achieved by solver}, \\ \xi \in \text{Uniform}(0, \delta), \\ f \in \text{Uniform}(0, 1) }} \big[ -\log p(G^{-1}(g + \xi, f)) \big]\end{align*} $$ */}
     - $$ \begin{aligned} \mathcal{L}_\text{val} = \mathbb{E}_{\substack{ g \sim \text{ achieved by solver}, \\ \xi \in \text{Uniform}(0, \delta), \\ f \in \text{Uniform}(0, 1) }} \big[ -\log p(G^{-1}(g + \xi, f)) \big] \end{aligned}$$
 
 2.  Goal **feasibility**: The proposed goal should be achievable by the current policy; that is, the level of difficulty should be appropriate.
 
     - $\mathcal{L}_\text{feas}$ is the output probability by the judge model $D$ on the generated goal $G(z, f)$ should match the desired $f$.
-      {/* - $$\begin{align\*} \mathcal{L}_\text{feas} = \mathbb{E}_{\substack{ z \in \mathcal{N}(0, 1), \\ f \in \text{Uniform}(0, 1) }} \big[ D(G(z, f)) - \sigma^{-1}(f)^2 \big] \end{align\*}$$ */}
+      {/* - $$\begin{align*} \mathcal{L}_\text{feas} = \mathbb{E}_{\substack{ z \in \mathcal{N}(0, 1), \\ f \in \text{Uniform}(0, 1) }} \big[ D(G(z, f)) - \sigma^{-1}(f)^2 \big] \end{align*}$$ */}
     - $$\begin{aligned} \mathcal{L}_\text{feas} = \mathbb{E}_{\substack{ z \in \mathcal{N}(0, 1), \\ f \in \text{Uniform}(0, 1) }} \big[ D(G(z, f)) - \sigma^{-1}(f)^2 \big] \end{aligned}$$
 
 3.  Goal **coverage**: We should maximize the entropy of generated goals to encourage diverse goal and to improve the coverage over the goal space.

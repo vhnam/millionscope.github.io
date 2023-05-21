@@ -260,11 +260,11 @@ Natural Evolution Strategies (**NES**; [Wierstra, et al, 2008](https://arxiv.org
 
 Given an objective function $\mathcal{J}(\theta)$ parameterized by $\theta$, let's say our goal is to find the optimal $\theta$ to maximize the objective function value. A _plain gradient_ finds the steepest direction within a small Euclidean distance from the current $\theta$; the distance restriction is applied on the parameter space. In other words, we compute the plain gradient with respect to a small change of the absolute value of $\theta$. The optimal step is:
 
-$$d^{\*} = \\operatorname\*{argmax}_{\|d\| = \epsilon} \mathcal{J}(\theta + d)\text{, where }\epsilon \to 0$$
+$$d^{*} = \\operatorname*{argmax}_{\|d\| = \epsilon} \mathcal{J}(\theta + d)\text{, where }\epsilon \to 0$$
 
 Differently, _natural gradient_ works with a probability [distribution](https://arxiv.org/abs/1301.3584v7) [space](https://wiseodd.github.io/techblog/2018/03/14/natural-gradient/) parameterized by $\theta$, $p_\theta(x)$ (referred to as "search distribution” in NES [paper](https://arxiv.org/abs/1106.4487)). It looks for the steepest direction within a small step in the distribution space where the distance is measured by KL divergence. With this constraint we ensure that each update is moving along the distributional manifold with constant speed, without being slowed down by its curvature.
 
-$$d^{\*}_\text{N} = \\operatorname\*{argmax}_{\text{KL}[p_\theta \| p_{\theta+d}] = \epsilon} \mathcal{J}(\theta + d)$$
+$$d^{*}_\text{N} = \\operatorname*{argmax}_{\text{KL}[p_\theta \| p_{\theta+d}] = \epsilon} \mathcal{J}(\theta + d)$$
 
 ## Estimation using Fisher Information Matrix[#](#estimation-using-fisher-information-matrix)
 
@@ -288,9 +288,9 @@ $$\max \mathcal{J}(\theta + d) \approx \max \big( \mathcal{J}(\theta) + {\nabla_
 
 can be found using a Lagrangian multiplier,
 
-$$\begin{aligned} \mathcal{L}(\theta, d, \beta) &= \mathcal{J}(\theta) + \nabla_\theta\mathcal{J}(\theta)^\top d - \beta (\frac{1}{2}d^\top \mathbf{F}_\theta d + \epsilon) = 0 \text{ s.t. } \beta > 0 \\ \nabla_d \mathcal{L}(\theta, d, \beta) &= \nabla_\theta\mathcal{J}(\theta) - \beta\mathbf{F}_\theta d = 0 \\ \text{Thus } d_\text{N}^\* &= \nabla_\theta^\text{N} \mathcal{J}(\theta) = \mathbf{F}_\theta^{-1} \nabla_\theta\mathcal{J}(\theta) \end{aligned}$$
+$$\begin{aligned} \mathcal{L}(\theta, d, \beta) &= \mathcal{J}(\theta) + \nabla_\theta\mathcal{J}(\theta)^\top d - \beta (\frac{1}{2}d^\top \mathbf{F}_\theta d + \epsilon) = 0 \text{ s.t. } \beta > 0 \\ \nabla_d \mathcal{L}(\theta, d, \beta) &= \nabla_\theta\mathcal{J}(\theta) - \beta\mathbf{F}_\theta d = 0 \\ \text{Thus } d_\text{N}^* &= \nabla_\theta^\text{N} \mathcal{J}(\theta) = \mathbf{F}_\theta^{-1} \nabla_\theta\mathcal{J}(\theta) \end{aligned}$$
 
-where $d_\text{N}^\*$ only extracts the direction of the optimal moving step on $\theta$, ignoring the scalar $\beta^{-1}$.
+where $d_\text{N}^*$ only extracts the direction of the optimal moving step on $\theta$, ignoring the scalar $\beta^{-1}$.
 
 ![](assets/images/2019-11-10-self-supervised/CMA-ES-coordinates.png)
 

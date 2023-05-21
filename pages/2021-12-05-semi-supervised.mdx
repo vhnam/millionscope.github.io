@@ -232,7 +232,7 @@ For images, UDA adopts RandAugment ([Cubuk et al. 2019](https://arxiv.org/abs/19
 
 ![](assets/images/2021-12-05-semi-supervised/UDA-image-results.png)
 
-Fig. 7. Comparison of various semi-supervised learning methods on CIFAR-10 classification. Fully supervised Wide-ResNet-28-2 and PyramidNet+ShakeDrop have an error rate of \*\*5.4\*\* and \*\*2.7\*\* respectively when trained on 50,000 examples without RandAugment. (Image source: [Xie et al. 2020](https://arxiv.org/abs/1904.12848))
+Fig. 7. Comparison of various semi-supervised learning methods on CIFAR-10 classification. Fully supervised Wide-ResNet-28-2 and PyramidNet+ShakeDrop have an error rate of **5.4** and **2.7** respectively when trained on 50,000 examples without RandAugment. (Image source: [Xie et al. 2020](https://arxiv.org/abs/1904.12848))
 
 For language, UDA combines back-translation and TF-IDF based word replacement. Back-translation preserves the high-level meaning but may not retain certain words, while TF-IDF based word replacement drops uninformative words with low TF-IDF scores. In the experiments on language tasks, they found UDA to be complementary to transfer learning and representation learning; For example, BERT fine-tuned (i.e. $\text{BERT}_\text{FINETUNE}$ in Fig. 8.) on in-domain unlabeled data can further improve the performance.
 

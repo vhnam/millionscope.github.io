@@ -217,9 +217,9 @@ In their experiments, EA and RL work equally well in terms of the final validati
 
 Constructing a model architecture is a sequential process. Every additional operator or layer brings extra complexity. If we guide the search model to start the investigation from simple models and gradually evolve to more complex architectures, it is like to introduce ["curriculum"](https://lilianweng.github.io/posts/2020-01-29-curriculum-rl/) into the search model's learning process.
 
-_Progressive NAS_ (**PNAS**; [Liu, et al 2018](https://arxiv.org/abs/1712.00559)) frames the problem of NAS as a progressive procedure for searching models of increasing complexity. Instead of RL or EA, PNAS adopts a Sequential Model-based Bayesian Optimization (SMBO) as the search strategy. PNAS works similar to A\* search, as it searches for models from simple to hard while simultaneously learning a surrogate function to guide the search.
+_Progressive NAS_ (**PNAS**; [Liu, et al 2018](https://arxiv.org/abs/1712.00559)) frames the problem of NAS as a progressive procedure for searching models of increasing complexity. Instead of RL or EA, PNAS adopts a Sequential Model-based Bayesian Optimization (SMBO) as the search strategy. PNAS works similar to A* search, as it searches for models from simple to hard while simultaneously learning a surrogate function to guide the search.
 
-> [A\* search algorithm](https://en.wikipedia.org/wiki/A*_search_algorithm) ("best-first search") is a popular algorithm for path finding. The problem is framed as finding a path of smallest cost from a specific starting node to a given target node in a weighted graph. At each iteration, A\* finds a path to extend by minimizing: $f(n)=g(n)+h(n)$, where $n$ is the next node, $g(n)$ is the cost from start to $n$, and $h(n)$ is the heuristic function that estimates the minimum cost of going from node $n$ to the goal.
+> [A* search algorithm](https://en.wikipedia.org/wiki/A*_search_algorithm) ("best-first search") is a popular algorithm for path finding. The problem is framed as finding a path of smallest cost from a specific starting node to a given target node in a weighted graph. At each iteration, A* finds a path to extend by minimizing: $f(n)=g(n)+h(n)$, where $n$ is the next node, $g(n)$ is the cost from start to $n$, and $h(n)$ is the heuristic function that estimates the minimum cost of going from node $n$ to the goal.
 
 PNAS uses the [NASNet](#cell-based-representation) search space. Each block is specified as a 5-element tuple and PNAS only considers the element-wise addition as the step 5 combination operator, no concatenation. Differently, instead of setting the number of blocks $B$ at a fixed number, PNAS starts with $B=1$, a model with only one block in a cell, and gradually increases $B$.
 
@@ -330,7 +330,7 @@ where $\alpha_{ij}$ is a vector of dimension $\vert \mathcal{O} \vert$, containi
 
 The bilevel optimization exists as we want to optimize both the network weights $w$ and the architecture representation $\alpha$:
 
-$$\begin{aligned} \min_\alpha & \mathcal{L}_\text{validate} (w^\*(\alpha), \alpha) \\ \text{s.t.} & w^\*(\alpha) = \arg\min_w \mathcal{L}_\text{train} (w, \alpha) \end{aligned}$$
+$$\begin{aligned} \min_\alpha & \mathcal{L}_\text{validate} (w^*(\alpha), \alpha) \\ \text{s.t.} & w^*(\alpha) = \arg\min_w \mathcal{L}_\text{train} (w, \alpha) \end{aligned}$$
 
 At step $k$, given the current architecture parameters $\alpha_{k-1}$, we first optimize weights $w_k$ by moving $w_{k-1}$ in the direction of minimizing the training loss $\mathcal{L}_\text{train}(w_{k-1}, \alpha_{k-1})$ with a learning rate $\xi$. Next, while keeping the newly updated weights $w_k$ fixed, we update the mixing probabilities so as to minimize the validation loss _after a single step of gradient descent w.r.t. the weights_:
 

@@ -104,11 +104,11 @@ Then let's convert the equation to be a function of $\mathbf{z}_i$ so that we ca
 
 $$\begin{aligned} p_i(\mathbf{z}_i) &= p_{i-1}(f_i^{-1}(\mathbf{z}_i)) \\left\vert \\det\\dfrac{d f_i^{-1}}{d \mathbf{z}_i} \\right\vert \\ &= p_{i-1}(\mathbf{z}_{i-1}) \\left\vert \\det \color{red}{\Big(\\dfrac{d f_i}{d\mathbf{z}_{i-1}}\Big)^{-1}} \\right\vert & \scriptstyle{\text{; According to the inverse func theorem.}} \\ &= p_{i-1}(\mathbf{z}_{i-1}) \color{red}{\\left\vert \\det \\dfrac{d f_i}{d\mathbf{z}_{i-1}} \\right\vert^{-1}} & \scriptstyle{\text{; According to a property of Jacobians of invertible func.}} \\ \log p_i(\mathbf{z}_i) &= \log p_{i-1}(\mathbf{z}_{i-1}) - \log \\left\vert \\det \\dfrac{d f_i}{d\mathbf{z}_{i-1}} \\right\vert \end{aligned}$$
 
-(\*) A note on the _"inverse function theorem"_: If $y=f(x)$ and $x=f^{-1}(y)$, we have:
+(*) A note on the _"inverse function theorem"_: If $y=f(x)$ and $x=f^{-1}(y)$, we have:
 
 $$\\dfrac{df^{-1}(y)}{dy} = \\dfrac{dx}{dy} = (\\dfrac{dy}{dx})^{-1} = (\\dfrac{df(x)}{dx})^{-1}$$
 
-(\*) A note on _"Jacobians of invertible function"_: The determinant of the inverse of an invertible matrix is the inverse of the determinant: $\\det(M^{-1}) = (\\det(M))^{-1}$, [because](#jacobian-matrix-and-determinant) $\\det(M)\\det(M^{-1}) = \\det(M \cdot M^{-1}) = \\det(I) = 1$.
+(*) A note on _"Jacobians of invertible function"_: The determinant of the inverse of an invertible matrix is the inverse of the determinant: $\\det(M^{-1}) = (\\det(M))^{-1}$, [because](#jacobian-matrix-and-determinant) $\\det(M)\\det(M^{-1}) = \\det(M \cdot M^{-1}) = \\det(I) = 1$.
 
 Given such a chain of probability density functions, we know the relationship between each pair of consecutive variables. We can expand the equation of the output $\mathbf{x}$ step by step until tracing back to the initial distribution $\mathbf{z}_0$.
 

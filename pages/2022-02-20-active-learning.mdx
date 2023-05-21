@@ -240,7 +240,7 @@ $$\mathcal{L}_\text{CE} = -\mathbb{E}_{(\mathbf{x}^l, y) \sim \mathcal{X}} \sum_
 
 (2) When training on the unlabeled examples, MAL relies on a _minimax_ game setup
 
-$$\begin{aligned} \mathcal{L}_\text{Ent} &= -\sum^K_{k=1} p(y=k \vert \mathbf{u}) \log p(y=k\vert \mathbf{u}) \\ \theta^\*_F, \theta^\*_C &= \min_F\max_C \mathcal{L}_\text{Ent} \\ \theta_F &\gets \theta_F - \alpha_1 \nabla \mathcal{L}_\text{Ent} \\ \theta_C &\gets \theta_C + \alpha_2 \nabla \mathcal{L}_\text{Ent} \end{aligned}$$
+$$\begin{aligned} \mathcal{L}_\text{Ent} &= -\sum^K_{k=1} p(y=k \vert \mathbf{u}) \log p(y=k\vert \mathbf{u}) \\ \theta^*_F, \theta^*_C &= \min_F\max_C \mathcal{L}_\text{Ent} \\ \theta_F &\gets \theta_F - \alpha_1 \nabla \mathcal{L}_\text{Ent} \\ \theta_C &\gets \theta_C + \alpha_2 \nabla \mathcal{L}_\text{Ent} \end{aligned}$$
 
 where,
 
@@ -336,9 +336,9 @@ They found that there are a large number of unforgettable examples that are neve
 
 In the implementation, the forgetting event is only counted when a sample is included in the current training batch; that is, they compute forgetting across presentations of the same example in subsequent mini-batches. The number of forgetting events per sample is quite stable across different seeds and forgettable examples have a small tendency to be first-time learned later in the training. The forgetting events are also found to be transferable throughout the training period and between architectures.
 
-Forgetting events can be used as a signal for active learning acquisition if we hypothesize a model changing predictions during training is an indicator of model uncertainty. However, ground truth is unknown for unlabeled samples. [Bengar et al. (2021)](https://arxiv.org/abs/2107.14707) proposed a new metric called **label dispersion** for such a purpose. Let's see across the training time, $c^\*$ is the most commonly predicted label for the input $\mathbf{x}$ and the label dispersion measures the fraction of training steps when the model does not assign $c^\*\*$ to this sample:
+Forgetting events can be used as a signal for active learning acquisition if we hypothesize a model changing predictions during training is an indicator of model uncertainty. However, ground truth is unknown for unlabeled samples. [Bengar et al. (2021)](https://arxiv.org/abs/2107.14707) proposed a new metric called **label dispersion** for such a purpose. Let's see across the training time, $c^*$ is the most commonly predicted label for the input $\mathbf{x}$ and the label dispersion measures the fraction of training steps when the model does not assign $c^**$ to this sample:
 
-$$\text{Dispersion}(\mathbf{x}) = 1 - \frac{f_\mathbf{x}}{T} \text{ where } f_\mathbf{x} = \sum_{t=1}^T \mathbb{1}[\hat{y}_t = c^\*], c^\* = \arg\max_{c=1,\dots,C}\sum_{t=1}^T \mathbb{1}[\hat{y}_t = c]$$
+$$\text{Dispersion}(\mathbf{x}) = 1 - \frac{f_\mathbf{x}}{T} \text{ where } f_\mathbf{x} = \sum_{t=1}^T \mathbb{1}[\hat{y}_t = c^*], c^* = \arg\max_{c=1,\dots,C}\sum_{t=1}^T \mathbb{1}[\hat{y}_t = c]$$
 
 In their implementation, dispersion is computed at every epoch. Label dispersion is low if the model consistently assigns the same label to the same sample but high if the prediction changes often. Label dispersion is correlated with network uncertainty, as shown in Fig. 11.
 

@@ -151,7 +151,7 @@ For all possible $(i,j,k)$ tuples where $j-i < J$, the text span embeddings are 
 
 Fig. 4. An illustration of Dense-Sparse Phrase Index (DenSPI) architecture. (Image source: [Seo et al., 2019](https://arxiv.org/abs/1906.05807))
 
-At the inference time, the question is mapped into the same vector space $x=[d', s'] \in \mathbb{R}^{d^d + d^s}$, where the dense vector $d'$ is extracted from the BERT embedding of the special `[CLS]` symbol. The same BERT model is shared for encoding both questions and phrases. The final answer is predicted by $k^\*, i^\*, j^\* = \arg\max x^\top z_k^{(i:j)}$.
+At the inference time, the question is mapped into the same vector space $x=[d', s'] \in \mathbb{R}^{d^d + d^s}$, where the dense vector $d'$ is extracted from the BERT embedding of the special `[CLS]` symbol. The same BERT model is shared for encoding both questions and phrases. The final answer is predicted by $k^*, i^*, j^* = \arg\max x^\top z_k^{(i:j)}$.
 
 ## Reader Model[#](#reader-model)
 
