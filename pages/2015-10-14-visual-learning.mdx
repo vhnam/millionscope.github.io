@@ -146,7 +146,9 @@ It turns out that this code is the best possible code. There is no code which, f
 
 There is simply a fundamental limit. Communicating what word was said, what event from this distribution occurred, requires us to communicate at least 1.75 bits on average. No matter how clever our code, it's impossible to get the average message length to be less. We call this fundamental limit the entropy of the distribution - we'll discuss it in much more detail shortly.
 
-![](assets/images/2015-09-Visual-Information/EntropOptimalLengthExample.png)
+<div style={{ textAlign: "center" }}>
+  ![](assets/images/2015-09-Visual-Information/EntropOptimalLengthExample.png)
+</div>
 
 If we want to understand this limit, the crux of the matter is understanding the trade off between making some codewords short and others long. Once we understand that, we'll be able to understand what the best possible codes are like.
 
@@ -154,15 +156,17 @@ If we want to understand this limit, the crux of the matter is understanding the
 
 There are two codes with a length of 1 bit: 0 and 1. There are four codes with a length of 2 bits: 00, 01, 10, and 11. Every bit you add on doubles the number of possible codes.
 
-
-![](assets/images/2015-09-Visual-Information/CodeSpace.png)
+<div style={{ textAlign: "center" }}>
+  ![](assets/images/2015-09-Visual-Information/CodeSpace.png)
+</div>
 
 We're interested in variable-length codes, where some codewords are longer than others. We might have simple situations where we have eight codewords that are 3 bits long. We might also have more complicated mixtures, like two codewords of length 2, and four codewords of length 3. What decides how many codewords we can have of different lengths?
 
 Recall that Bob turns his messages into encoded strings by replacing each word with its codeword and concatenating them.
 
-
-![](assets/images/2015-09-Visual-Information/encode.png)
+<div style={{ textAlign: "center", margin: "0 auto" }}>
+  ![](assets/images/2015-09-Visual-Information/encode.png)
+</div>
 
 There's a slightly subtle issue one needs to be careful of, when crafting a variable length code. How do we split the encoded string back into the codewords? When all the codewords are the same length, it's easy - just split the string every couple of steps. But since there are codewords of different lengths, we need to actually pay attention to the content.
 
@@ -206,7 +210,7 @@ That's a pretty natural thing to do, but is it the optimal thing to do? It is, a
 
 _The following proof is visual and should be accessible, but will take work to get through and is definitely the hardest part of this essay. Readers should feel free to skip to accept this as a given and jump to the next section._
 
-Let's picture a concrete example where we need to communicate which of two possible events happened. Event$$a$$happens$$p(a)$$of the time and event$$b$$happens$$p(b)$$of the time. We distribute our budget in the natural way described above, spending$$p(a)$$of our budget on getting$$a$$a short codeword, and$$p(b)$$on getting$$b$$a short codeword.
+Let's picture a concrete example where we need to communicate which of two possible events happened. Event $$ a $$ happens $$ p(a) $$ of the time and event $$ b $$ happens $$ p(b) $$ of the time. We distribute our budget in the natural way described above, spending $$ p(a) $$ of our budget on getting $$ a $$ a short codeword, and $$ p(b) $$ on getting $$ b $$ a short codeword.
 
 ![](assets/images/2015-09-Visual-Information/code-auction-balanced-noderivs.png)
 
@@ -216,22 +220,22 @@ Well, consider what happens to the cost and the length contribution if we slight
 
 ![](assets/images/2015-09-Visual-Information/code-derivs.png)
 
-So, the cost to make the codeword for$$a$$shorter is$$p(a)$$. At the same time, we don't care about the length of each codeword equally, we care about them in proportion to how much we have to use them. In the case of$$a$$, that is$$p(a)$$. The benefit to us of making the codeword for$$a$$a bit shorter is$$p(a)$$.
+So, the cost to make the codeword for $$ a $$ shorter is $$ p(a) $$ . At the same time, we don't care about the length of each codeword equally, we care about them in proportion to how much we have to use them. In the case of $$ a $$ , that is $$ p(a) $$ . The benefit to us of making the codeword for $$ a $$ a bit shorter is $$ p(a) $$ .
 
-It's interesting that both derivatives are the same. It means that our initial budget has the interesting property that, if you had a bit more to spend, it would be equally good to invest in making any codeword shorter. What we really care about, in the end, is the benefit/cost ratio - that's what decides what we should invest more in. In this case, the ratio is$$\frac{p(a)}{p(a)}$$, which is equal to one. This is independent of the value of$$p(a)$$- it's always one. And we can apply the same argument to other events. The benefit/cost is always one, so it makes equal sense to invest a bit more in any of them.
+It's interesting that both derivatives are the same. It means that our initial budget has the interesting property that, if you had a bit more to spend, it would be equally good to invest in making any codeword shorter. What we really care about, in the end, is the benefit/cost ratio - that's what decides what we should invest more in. In this case, the ratio is $$ \frac{p(a)}{p(a)} $$ , which is equal to one. This is independent of the value of $$ p(a) $$ - it's always one. And we can apply the same argument to other events. The benefit/cost is always one, so it makes equal sense to invest a bit more in any of them.
 
 ![](assets/images/2015-09-Visual-Information/code-auction-balanced.png)
 
-Infinitesimally, it doesn't make sense to change the budget. But that isn't a proof that it's the best budget. To prove that, we'll consider a different budget, where we spend a bit extra on one codeword at the expense of another. We'll invest$$\epsilon$$less in$$b$$, and invest it in$$a$$instead. This makes the codeword for$$a$$a bit shorter, and the codeword for$$b$$a bit longer.
+Infinitesimally, it doesn't make sense to change the budget. But that isn't a proof that it's the best budget. To prove that, we'll consider a different budget, where we spend a bit extra on one codeword at the expense of another. We'll invest $$ \epsilon $$ less in $$ b $$ , and invest it in $$ a $$ instead. This makes the codeword for $$ a $$ a bit shorter, and the codeword for $$ b $$ a bit longer.
 
-Now the cost of buying a shorter codeword for$$a$$is$$p(a) + \epsilon$$, and the cost of buying a shorter codeword for$$b$$is$$p(b) - \epsilon$$.
+Now the cost of buying a shorter codeword for $$ a $$ is $$ p(a) + \epsilon $$ , and the cost of buying a shorter codeword for $$ b $$ is $$ p(b) - \epsilon $$ .
 But the benefits are still the same.
-This leads the benefit cost ratio for buying$$a$$to be$$\frac{p(a)}{p(a) + \epsilon}$$
-which is less than one. On the other hand, the benefit cost ratio of buying$$b$$is$$\frac{p(b)}{p(b) - \epsilon}$$which is greater than one.
+This leads the benefit cost ratio for buying $$ a $$ to be $$ \frac{p(a)}{p(a) + \epsilon} $$
+which is less than one. On the other hand, the benefit cost ratio of buying $$ b $$ is $$ \frac{p(b)}{p(b) - \epsilon} $$ which is greater than one.
 
 ![](assets/images/2015-09-Visual-Information/code-auction-eps.png)
 
-The prices are no longer balanced.$$b$$is a better deal than$$a$$. The investors scream: 'Buy$$b$$! Sell$$a$$!' We do this, and end back at our original budget plan. All budgets can be improved by shifting towards our original plan.
+The prices are no longer balanced. $$ b $$ is a better deal than $$ a $$ . The investors scream: 'Buy $$ b $$ ! Sell $$ a $$ !' We do this, and end back at our original budget plan. All budgets can be improved by shifting towards our original plan.
 
 The original budget - investing in each codeword in proportion to how often we use it - wasn't just the natural thing to do, it was the optimal thing to do. (While this proof only works for two codewords, it easily generalizes to more.)
 
@@ -239,17 +243,17 @@ The original budget - investing in each codeword in proportion to how often we u
 
 ## Calculating Entropy
 
-Recall that the cost of a message of length$$L$$is$$\frac{1}{2^L}$$. We can invert this to get the length of a message that costs a given amount:$$\log_2\left(\frac{1}{\text{cost}}\right)$$. Since we spend$$p(x)$$on a codeword for$$x$$, the length is$$\log_2\left(\frac{1}{p(x)}\right)$$. Those are the best choices of lengths.
+Recall that the cost of a message of length $$ L $$ is $$ \frac{1}{2^L} $$ . We can invert this to get the length of a message that costs a given amount: $$ \log_2\left(\frac{1}{\text{cost}}\right) $$ . Since we spend $$ p(x) $$ on a codeword for $$ x $$ , the length is $$ \log_2\left(\frac{1}{p(x)}\right) $$ . Those are the best choices of lengths.
 
 ![](assets/images/2015-09-Visual-Information/entropy-def-notitle.png)
 
-Earlier, we discussed how there is a fundamental limit to how short one can get the average message to communicate events from a particular probability distribution,$$p$$. This limit, the average message length using the best possible code, is called the entropy of$$p$$,$$H(p)$$. Now that we know the optimal lengths of the codewords, we can actually calculate it!
+Earlier, we discussed how there is a fundamental limit to how short one can get the average message to communicate events from a particular probability distribution, $$ p $$ . This limit, the average message length using the best possible code, is called the entropy of $$ p $$ , $$ H(p) $$ . Now that we know the optimal lengths of the codewords, we can actually calculate it!
 
 $$
 H(p) = \sum_x p(x)\log_2\left(\frac{1}{p(x)}\right)
 $$
 
-_(People often write entropy as$$H(p) = - \sum p(x)\log_2(p(x))$$using the identity$$\log(1/a) = -\log(a)$$. I think the first version is more intuitive, and will continue to use it in this essay.)_
+_(People often write entropy as $$ H(p) = - \sum p(x)\log_2(p(x)) $$ using the identity $$ \log(1/a) = -\log(a) $$ . I think the first version is more intuitive, and will continue to use it in this essay.)_
 
 No matter what I do, on average I need to send at least that number of bits if I want to communicate which event occurred.
 
@@ -269,7 +273,7 @@ The two of them say the same words, just at different frequencies. Bob talks abo
 
 Initially, Alice sent me messages using Bob's code. Unfortunately, her messages were longer than they needed to be. Bob's code was optimized to his probability distribution. Alice has a different probability distribution, and the code is suboptimal for it. While the average length of a codeword when Bob uses his own code is 1.75 bits, when Alice uses his code it's 2.25. It would be worse if the two weren't so similar!
 
-This length - the average length of communicating an event from one distribution with the optimal code for another distribution - is called the cross-entropy. Formally, we can define cross-entropy as:[4](#fn4)$$H_p(q) = \sum_x q(x)\log_2\left(\frac{1}{p(x)}\right)$$
+This length - the average length of communicating an event from one distribution with the optimal code for another distribution - is called the cross-entropy. Formally, we can define cross-entropy as: $$ H_p(q) = \sum_x q(x)\log_2\left(\frac{1}{p(x)}\right) $$
 
 In this case, it's the cross-entropy of Alice the cat-lovers word frequency with respect to the Bob the dog-lovers word frequency.
 
@@ -279,34 +283,36 @@ To keep the cost of our communications down, I asked Alice to use her own code. 
 
 So, now we have four possibilities:
 
-- Bob using his own code$$(H(p) = 1.75 ~\text{bits})$$
-- Alice using Bob's code$$(H_p(q) = 2.25 ~\text{bits})$$
-- Alice using her own code$$(H(q) = 1.75 ~\text{bits})$$
-- Bob using Alice's code$$(H_q(p) = 2.375 ~\text{bits})$$
+- Bob using his own code $$ (H(p) = 1.75 ~\text{bits}) $$
+- Alice using Bob's code $$ (H_p(q) = 2.25 ~\text{bits}) $$
+- Alice using her own code $$ (H(q) = 1.75 ~\text{bits}) $$
+- Bob using Alice's code $$ (H_q(p) = 2.375 ~\text{bits}) $$
 
-This isn't necessarily as intuitive as one might think. For example, we can see that$$H_p(q) \neq H_q(p)$$. Is there some way we can see how these four values relate to each other?
+This isn't necessarily as intuitive as one might think. For example, we can see that $$ H_p(q) \neq H_q(p) $$ . Is there some way we can see how these four values relate to each other?
 
 In the following diagram, each subplot represents one of these 4 possibilities. Each subplot visualizes average message length the same way our previous diagrams did. They are organized in a square, so that if the messages are coming from the same distribution the plots are beside each other, and if they use the same codes they are on top of each other. This allows you to kind of visually slide the distributions and codes together.
 
 ![](assets/images/2015-09-Visual-Information/CrossEntropyCompare.png)
 
-Can you see why$$H_p(q) \neq H_q(p)$$?$$H_q(p)$$is large because there is an event (blue) which is very common under$$p$$but gets a long code because it is very uncommon under$$q$$. On the other hand, common events under$$q$$are less common under$$p$$, but the difference is less drastic, so$$H_p(q)$$isn't as high.
+Can you see why $$ H_p(q) \neq H_q(p) $$ ? $$ H_q(p) $$ is large because there is an event (blue) which is very common under $$ p $$ but gets a long code because it is very uncommon under $$ q $$ . On the other hand, common events under $$ q $$ are less common under $$ p $$ , but the difference is less drastic, so $$ H_p(q) $$ isn't as high.
 
 Cross-entropy isn't symmetric.
 
-So, why should you care about cross-entropy? Well, cross-entropy gives us a way to express how different two probability distributions are. The more different the distributions$$p$$and$$q$$are, the more the cross-entropy of$$p$$with respect to$$q$$will be bigger than the entropy of$$p$$.
+So, why should you care about cross-entropy? Well, cross-entropy gives us a way to express how different two probability distributions are. The more different the distributions $$ p $$ and $$ q $$ are, the more the cross-entropy of $$ p $$ with respect to $$ q $$ will be bigger than the entropy of $$ p $$ .
 
 ![](assets/images/2015-09-Visual-Information/CrossEntropyQP.png)
 
-Similarly, the more different$$p$$is from$$q$$, the more the cross-entropy of$$q$$with respect to$$p$$will be bigger than the entropy of$$q$$.
+Similarly, the more different $$ p $$ is from $$ q $$ , the more the cross-entropy of $$ q $$ with respect to $$ p $$ will be bigger than the entropy of $$ q $$ .
 
 ![](assets/images/2015-09-Visual-Information/CrossEntropyPQ.png)
 
 The really interesting thing is the difference between the entropy and the cross-entropy. That difference is how much longer our messages are because we used a code optimized for a different distribution. If the distributions are the same, this difference will be zero. As the difference grows, it will get bigger.
 
-We call this difference the Kullback-Leibler divergence, or just the KL divergence. The KL divergence of$$p$$with respect to$$q$$,$$D_q(p)$$,[5](#fn5) is defined:[6](#fn6)
+We call this difference the Kullback-Leibler divergence, or just the KL divergence. The KL divergence of $$ p $$ with respect to $$ q $$ , $$ D_q(p) $$ ,[5](#fn5) is defined:[6](#fn6)
 
-$$D_q(p) = H_q(p) - H(p)$$
+$$
+D_q(p) = H_q(p) - H(p)
+$$
 
 The really neat thing about KL divergence is that it's like a distance between two distributions. It measures how different they are! (If you take that idea seriously, you end up with information geometry.)
 
@@ -328,9 +334,11 @@ Now we can figure out the optimal codewords for events of these probabilities an
 
 ![](assets/images/2015-09-Visual-Information/Hxy-flat.png)
 
-We call this the joint entropy of$$X$$and$$Y$$, defined
+We call this the joint entropy of $$ X $$ and $$ Y $$ , defined
 
-$$H(X,Y) = \sum_{x,y} p(x,y) \log_2\left(\frac{1}{p(x,y)}\right)$$
+$$
+H(X,Y) = \sum_{x,y} p(x,y) \log_2\left(\frac{1}{p(x,y)}\right)
+$$
 
 This is the exact same as our normal definition, except with two variables instead of one.
 
@@ -350,37 +358,39 @@ In both cases, I don't need to send very much information on average, because th
 
 We call this the conditional entropy. If you formalize it into an equation, you get:
 
-$$H(X|Y) = \sum_y p(y) \sum_x p(x|y) \log_2\left(\frac{1}{p(x|y)}\right)$$$$~~~~ = \sum_{x,y} p(x,y) \log_2\left(\frac{1}{p(x|y)}\right)$$
+$$
+H(X|Y) = \sum_y p(y) \sum_x p(x|y) \log_2\left(\frac{1}{p(x|y)}\right) = \sum_{x,y} p(x,y) \log_2\left(\frac{1}{p(x|y)}\right)
+$$
 
 ## Mutual Information
 
 In the previous section, we observed that knowing one variable can mean that communicating another variable requires less information.
 
-One nice way to think about this is to imagine amounts of information as bars. These bars overlap if there's shared information between them. For example, some of the information in$$X$$and$$Y$$is shared between them, so$$H(X)$$and$$H(Y)$$are overlapping bars. And since$$H(X,Y)$$is the information in both, it's the union of the bars$$H(X)$$and$$H(Y)$$.[7](#fn7)
+One nice way to think about this is to imagine amounts of information as bars. These bars overlap if there's shared information between them. For example, some of the information in $$ X $$ and $$ Y $$ is shared between them, so $$ H(X) $$ and $$ H(Y) $$ are overlapping bars. And since $$ H(X,Y) $$ is the information in both, it's the union of the bars $$ H(X) $$ and $$ H(Y) $$ .[7](#fn7)
 
 ![](assets/images/2015-09-Visual-Information/Hxy-info-1.png)
 
 Once we think about things this way, a lot of things become easier to see.
 
-For example, we previously noted it takes more information to communicate both$$X$$and$$Y$$(the "joint entropy,"$$H(X,Y)$$) than it takes to just communicate$$X$$(the "marginal entropy,"$$H(X)$$). But if you already know$$Y$$, then it takes less information to communicate$$X$$(the "conditional entropy,"$$H(X|Y)$$) than it would if you didn't!
+For example, we previously noted it takes more information to communicate both $$ X $$ and $$ Y $$ (the "joint entropy," $$ H(X,Y) $$ ) than it takes to just communicate $$ X $$ (the "marginal entropy," $$ H(X) $$ ). But if you already know $$ Y $$ , then it takes less information to communicate $$ X $$ (the "conditional entropy," $$ H(X|Y) $$ ) than it would if you didn't!
 
 ![](assets/images/2015-09-Visual-Information/Hxy-overview.png)
 
-That sounds a bit complicated, but it's very simple when we think about it from the bar perspective.$$H(X|Y)$$is the information we need to send to communicate$$X$$to someone who already knows$$Y$$, the information in$$X$$which isn't also in$$Y$$. Visually, that means$$H(X|Y)$$is the part of$$H(X)$$bar which doesn't overlap with$$H(Y)$$.
+That sounds a bit complicated, but it's very simple when we think about it from the bar perspective. $$ H(X|Y) $$ is the information we need to send to communicate $$ X $$ to someone who already knows $$ Y $$ , the information in $$ X $$ which isn't also in $$ Y $$ . Visually, that means $$ H(X|Y) $$ is the part of $$ H(X) $$ bar which doesn't overlap with $$ H(Y) $$ .
 
-You can now read the inequality$$H(X,Y) \geq H(X) \geq H(X|Y)$$right off the following diagram.
+You can now read the inequality $$ H(X,Y) \geq H(X) \geq H(X|Y) $$ right off the following diagram.
 
 ![](assets/images/2015-09-Visual-Information/Hxy-info-4.png)
 
-Another identity is that$$H(X,Y) = H(Y) + H(X|Y)$$. That is, the information in$$X$$and$$Y$$is the information in$$Y$$plus the information in$$X$$which is not in$$Y$$.
+Another identity is that $$ H(X,Y) = H(Y) + H(X|Y) $$ . That is, the information in $$ X $$ and $$ Y $$ is the information in $$ Y $$ plus the information in $$ X $$ which is not in $$ Y $$ .
 
 ![](assets/images/2015-09-Visual-Information/Hxy-overview-sum.png)
 
 Again, it's difficult to see in the equations, but easy to see if you're thinking in terms of these overlapping bars of information.
 
-At this point, we've broken the information in$$X$$and$$Y$$up in several ways. We have the information in each variable,$$H(X)$$and$$H(Y)$$. We have the the union of the information in both,$$H(X,Y)$$. We have the information which is in one but not the other,$$H(X|Y)$$and$$H(Y|X)$$. A lot of this seems to revolve around the information shared between the variables, the intersection of their information. We call this "mutual information,"$$I(X,Y)$$, defined as:[8](#fn8)$$I(X,Y) = H(X) + H(Y) - H(X,Y)$$This definition works because$$H(X) + H(Y)$$has two copies of the mutual information, since it's in both$$X$$and$$Y$$, while$$H(X,Y)$$only has one. (Consider the previous bar diagr$$
+At this point, we've broken the information in $$ X $$ and $$ Y $$ up in several ways. We have the information in each variable, $$ H(X) $$ and $$ H(Y) $$ . We have the the union of the information in both, $$ H(X,Y) $$ . We have the information which is in one but not the other, $$ H(X|Y) $$ and $$ H(Y|X) $$ . A lot of this seems to revolve around the information shared between the variables, the intersection of their information. We call this "mutual information," $$ I(X,Y) $$ , defined as:[8](#fn8) $$ I(X,Y) = H(X) + H(Y) - H(X,Y) $$ This definition works because $$ H(X) + H(Y) $$ has two copies of the mutual information, since it's in both $$ X $$ and $$ Y $$ , while $$ H(X,Y) $$ only has one. (Consider the previous bar diagr $$
 
-Closely related to the mutual information is the variation of information. The variation of information is the information which isn't shared between the variables. We can define it like so:$$V(X,Y) = H(X,Y) - I(X,Y)$$Variation of information is interesting because it gives us a metric, a notion of distance, between different variables. The variation of information between two variables is zero if knowing the value of one tells you the value of the other and increases as they become more independ$$
+Closely related to the mutual information is the variation of information. The variation of information is the information which isn't shared between the variables. We can define it like so: $$ V(X,Y) = H(X,Y) - I(X,Y) $$ Variation of information is interesting because it gives us a metric, a notion of distance, between different variables. The variation of information between two variables is zero if knowing the value of one tells you the value of the other and increases as they become more independ
 
 How does this relate to KL divergence, which also gave us a notion of distance? Well, KL divergence gives us a distance between two distributions over the same variable or set of variables. In contrast, variation of information gives us distance between two jointly distributed variables. KL divergence is between distributions, variation of information within a distribution.
 
@@ -396,17 +406,17 @@ Here's the easy answer: often, we're interested in the average length of a messa
 
 But that answer is really dodging the issue. Often, the optimal lengths of codewords are fractional. What do those mean?
 
-To be concrete, let's consider a probability distribution where one event,$$a$$, happens 71% of the time and another event,$$b$$, occurs 29% of the time.
+To be concrete, let's consider a probability distribution where one event, $$ a $$ , happens 71% of the time and another event, $$ b $$ , occurs 29% of the time.
 
 ![](assets/images/2015-09-Visual-Information/halfbit-ab.png)
 
-The optimal code would use 0.5 bits to represent$$a$$, and 1.7 bits to represent$$b$$. Well, if we want to send a single one of these codewords, it simply isn't possible. We're forced to round to a whole number of bits, and send on average 1 bit.
+The optimal code would use 0.5 bits to represent $$ a $$ , and 1.7 bits to represent $$ b $$ . Well, if we want to send a single one of these codewords, it simply isn't possible. We're forced to round to a whole number of bits, and send on average 1 bit.
 
 … But if we're sending multiple messages at once, it turns out that we can do better. Let's consider communicating two events from this distribution. If we sent them independently, we'd need to send two bits. Can we do better?
 
 ![](assets/images/2015-09-Visual-Information/halfbit-ab2.png)
 
-Half the time, we need to communicate$$aa$$,$$21\%$$of the time we need to send$$ab$$or$$ba$$, and$$8\%$$of the time we need to communicate$$bb$$. Again, the ideal code involves fractional numbers of bits.
+Half the time, we need to communicate $$ aa $$ , $$ 21\% $$ of the time we need to send $$ ab $$ or $$ ba $$ , and $$ 8\% $$ of the time we need to communicate $$ bb $$ . Again, the ideal code involves fractional numbers of bits.
 
 ![](assets/images/2015-09-Visual-Information/halfbit-ab-idealcode.png)
 
@@ -414,9 +424,9 @@ If we round the codeword lengths, we'll get something like this:
 
 ![](assets/images/2015-09-Visual-Information/halfbit-ab-code.png)
 
-This codes give us an average message length of 1.8 bits. That's less than the 2 bits when we send them independently. Another way of thinking of this is that we're sending 0.9 bits on average for each event. If we were to send more events at once, it would become smaller still. As$$n$$tends to infinity, the overhead due to rounding our code would vanish, and the number of bits per codeword would approach the entropy.
+This codes give us an average message length of 1.8 bits. That's less than the 2 bits when we send them independently. Another way of thinking of this is that we're sending 0.9 bits on average for each event. If we were to send more events at once, it would become smaller still. As $$ n $$ tends to infinity, the overhead due to rounding our code would vanish, and the number of bits per codeword would approach the entropy.
 
-Further, notice that the ideal codeword length for$$a$$was 0.5 bits, and the ideal codeword length for$$aa$$was 1 bit. Ideal codeword lengths add, even when they're fractional! So, if we communicate a lot of events at once, the lengths will add.
+Further, notice that the ideal codeword length for $$ a $$ was 0.5 bits, and the ideal codeword length for $$ aa $$ was 1 bit. Ideal codeword lengths add, even when they're fractional! So, if we communicate a lot of events at once, the lengths will add.
 
 There is a very real sense in which one can have fractional numbers of bits of information, even if actual codes can only use whole numbers.
 
@@ -454,18 +464,20 @@ Finally, thanks to the readers who caught errors and omissions. In particular, t
 
 1.  It's fun to use this to visualize naive Bayesian classifiers, which assume independence…[↩](#fnref1)
 2.  But horribly inefficient! If we have an extra symbol to use in our codes, only using it at the end of codewords like this would be a terrible waste.[↩](#fnref2)
-3.  I'm cheating a little here. I've been using an exponential of base 2 where this is not true, and am going to switch to a natural exponential. This saves us having a lot of$$log(2)$$s in our proof, and makes it visually a lot nicer.[↩](#fnref3)
-4.  Note that this notation for cross-entropy is non-standard. The normal notation is$$H(p,q)$$. This notation is horrible for two reasons. Firstly, the exact same notation is also used for joint entropy. Secondly, it makes it seem like cross-entropy is symmetric. This is ridiculous, and I'll be writing$$H_q(p)$$instead.[↩](#fnref4)
+3.  I'm cheating a little here. I've been using an exponential of base 2 where this is not true, and am going to switch to a natural exponential. This saves us having a lot of $$ log(2) $$ s in our proof, and makes it visually a lot nicer.[↩](#fnref3)
+4.  Note that this notation for cross-entropy is non-standard. The normal notation is $$ H(p,q) $$ . This notation is horrible for two reasons. Firstly, the exact same notation is also used for joint entropy. Secondly, it makes it seem like cross-entropy is symmetric. This is ridiculous, and I'll be writing $$ H_q(p) $$ instead.[↩](#fnref4)
 5.  Also non-standard notation.[↩](#fnref5)
-6.  If you expand the definition of KL divergence, you get:$$D_q(p) = \sum_x p(x)\log_2\left(\frac{p(x)}{q(x)} \right)$$That might look a bit strange. How should we interpret it? Well,$$\log_2\left(\frac{p(x)}{q(x)} \right)$$is just the difference between how many bits a code optimized for$$q$$and a code optimized for$$p$$would use to represent$$x$$. The expression as a whole is the expected difference in how many bits the two codes would use.[↩](#fnr)
+6.  If you expand the definition of KL divergence, you get: $$ D_q(p) = \sum_x p(x)\log_2\left(\frac{p(x)}{q(x)} \right) $$ That might look a bit strange. How should we interpret it? Well, $$ \log_2\left(\frac{p(x)}{q(x)} \right) $$ is just the difference between how many bits a code optimized for $$ q $$ and a code optimized for $$ p $$ would use to represent $$ x $$ . The expression as a whole is the expected difference in how many bits the two codes would use.[↩](#fnr)
 7.  This builds off the set interpretation of information theory layed out in Raymond W. Yeung's paper [A New Outlook on Shannon's Information Measures](http://www.cnd.mcgill.ca/~ivan/it_ineq_script/Raymond%20Yeung%20papers/A%20New%20Outlook%20on%20Shannon%E2%80%99s%20Information%20Measures%2000079902.pdf).[↩](#fnref7)
 8.  If you expand the definition of mutual information out, you get:
 
-$$I(X,Y) = \sum_{x,y} p(x,y) \log_2\left(\frac{p(x,y)}{p(x)p(y)} \right)$$
+$$
+I(X,Y) = \sum\_{x,y} p(x,y) \log_2\left(\frac{p(x,y)}{p(x)p(y)} \right)
+$$
 
     That looks suspiciously like KL divergence!
 
-    What's going on? Well, it is KL divergence. It's the KL divergence of P(X,Y) and its naive approximation P(X)P(Y). That is, it's the number of bits you save representing$$X$$and$$Y$$if you understand the relationship between them instead of assuming they're independent.
+    What's going on? Well, it is KL divergence. It's the KL divergence of P(X,Y) and its naive approximation P(X)P(Y). That is, it's the number of bits you save representing $$ X $$ and $$ Y $$ if you understand the relationship between them instead of assuming they're independent.
 
     One cute way to visualize this is to literally picture the ratio between a distribution and its naive approximation:
 
