@@ -12,8 +12,6 @@ Source : https://lilianweng.github.io/posts/2017-09-28-information-bottleneck/
 
 # Anatomize Deep Learning with Information Theory
 
-September 28, 2017 · 9 min · Lilian Weng
-
 Table of Contents
 
 - [Basic Concepts](#basic-concepts)
@@ -62,7 +60,7 @@ A deep neural network can be viewed as a Markov chain, and thus when we are movi
 
 [**Reparametrization invariance**](https://en.wikipedia.org/wiki/Parametrization#Parametrization_invariance)
 
-For two invertible functions $\phi$, $\\psi$, the mutual information still holds: $I(X; Y) = I(\phi(X); \\psi(Y))$.
+For two invertible functions $\phi$, $\psi$, the mutual information still holds: $I(X; Y) = I(\phi(X); \psi(Y))$.
 
 For example, if we shuffle the weights in one layer of DNN, it would not affect the mutual information between this layer and another.
 
@@ -70,9 +68,9 @@ For example, if we shuffle the weights in one layer of DNN, it would not affect 
 
 The training data contains sampled observations from the joint distribution of $X$ and $Y$. The input variable $X$ and weights of hidden layers are all high-dimensional random variable. The ground truth target $Y$ and the predicted value $\hat{Y}$ are random variables of smaller dimensions in the classification settings.
 
-![](ib-dnn-structure.png)
+![](assets/images/2017-09-28-information-bottleneck/ib-dnn-structure.png)
 
-Fig. 1. The structure of a deep neural network, which consists of the target label $Y$, input layer $X$, hidden layers $h\\_1, \dots, h\\_m$ and the final prediction $\hat{Y}$. (Image source: [Tishby and Zaslavsky, 2015](https://arxiv.org/pdf/1503.02406.pdf))
+Fig. 1. The structure of a deep neural network, which consists of the target label $Y$, input layer $X$, hidden layers $h_1, \dots, h_m$ and the final prediction $\hat{Y}$. (Image source: [Tishby and Zaslavsky, 2015](https://arxiv.org/pdf/1503.02406.pdf))
 
 If we label the hidden layers of a DNN as $h_1, h_2, \dots, h_m$ as in Fig. 1, we can view each layer as one state of a Markov Chain: $ h_i \to h_{i+1}$. According to DPI, we would have:
 
@@ -89,13 +87,13 @@ Precisely, in an information plane plot:
 - **X-axis**: The sample complexity of $T_i$ is determined by the encoder mutual information $I(X; T_i)$. Sample complexity refers to how many samples you need to achieve certain accuracy and generalization.
 - **Y-axis**: The accuracy (generalization error) is determined by the decoder mutual information $I(T_i; Y)$.
 
-![](ib-information-plane.png)
+![](assets/images/2017-09-28-information-bottleneck/ib-information-plane.png)
 
 Fig. 2. The encoder vs decoder mutual information of DNN hidden layers of 50 experiments. Different layers are color-coders, with green being the layer right next to the input and the orange being the furthest. There are three snapshots, at the initial epoch, 400 epochs and 9000 epochs respectively. (Image source: [Shwartz-Ziv and Tishby, 2017](https://arxiv.org/pdf/1703.00810.pdf))
 
 Each dot in Fig. 2. marks the encoder/ decoder mutual information of one hidden layer of one network simulation (no regularization is applied; no weights decay, no dropout, etc.). They move up as expected because the knowledge about the true labels is increasing (accuracy increases). At the early stage, the hidden layers learn a lot about the input $X$, but later they start to compress to forget some information about the input. Tishby believes that _"the most important part of learning is actually forgetting"_. Check out this [nice video](https://youtu.be/P1A1yNsxMjc) that demonstrates how the mutual information measures of layers are changing in epoch time.
 
-![](ib-information-plane-merged.png)
+![](assets/images/2017-09-28-information-bottleneck/ib-information-plane-merged.png)
 
 Fig. 3. Here is an aggregated view of Fig 2. The compression happens after the generalization error becomes very small. (Image source: [Tishby' talk 15:15](https://youtu.be/bLqJHjXihK8?t=15m15s))
 
@@ -103,7 +101,7 @@ Fig. 3. Here is an aggregated view of Fig 2. The compression happens after the g
 
 Tracking the normalized mean and standard deviation of each layer's weights in time also reveals two optimization phases of the training process.
 
-![](ib-mean-variation.png)
+![](assets/images/2017-09-28-information-bottleneck/ib-mean-variation.png)
 
 Fig. 4. The norm of mean and standard deviation of each layer's weight gradients for each layer as a function of training epochs. Different layers are color-coded. (Image source: [Shwartz-Ziv and Tishby, 2017](https://arxiv.org/pdf/1703.00810.pdf))
 
@@ -139,7 +137,7 @@ When $X$ is large, the size of $X$ is approximately $2^{H(X)}$. Each cell in the
 
 $$\epsilon^2 < \frac{2^{I(T_\epsilon; X)} + \log{1/\delta}}{2m}$$
 
-![](ib-bound.png)
+![](assets/images/2017-09-28-information-bottleneck/ib-bound.png)
 
 Fig. 5. The black line is the optimal achievable information bottleneck (IB) limit. The red line corresponds to the upper bound on the out-of-sample IB distortion, when trained on a finite sample set. $\Delta C$ is the complexity gap and $\Delta G$ is the generalization gap. (Recreated based on [Tishby' talk 24:50](https://youtu.be/bLqJHjXihK8?t=24m56s))
 
@@ -149,7 +147,7 @@ Fig. 5. The black line is the optimal achievable information bottleneck (IB) lim
 
 Having more layers give us computational benefits and speed up the training process for good generalization.
 
-![](ib-layers.png)
+![](assets/images/2017-09-28-information-bottleneck/ib-layers.png)
 
 Fig. 6. The optimization time is much shorter (fewer epochs) with more hidden layers. (Image source: [Shwartz-Ziv and Tishby, 2017](https://arxiv.org/pdf/1703.00810.pdf))
 
@@ -159,22 +157,22 @@ Fig. 6. The optimization time is much shorter (fewer epochs) with more hidden la
 
 Fitting more training data requires more information captured by the hidden layers. With increased training data size, the decoder mutual information (recall that this is directly related to the generalization error), $I(T; Y)$, is pushed up and gets closer to the theoretical information bottleneck bound. Tishby emphasized that It is the mutual information, not the layer size or the VC dimension, that determines generalization, different from standard theories.
 
-![](ib-training-size.png)
+![](assets/images/2017-09-28-information-bottleneck/ib-training-size.png)
 
 Fig. 7. The training data of different sizes is color-coded. The information plane of multiple converged networks are plotted. More training data leads to better generalization. (Image source: [Shwartz-Ziv and Tishby, 2017](https://arxiv.org/pdf/1703.00810.pdf))
 
 ---
 
 Cited as:
-
-    @article{weng2017infotheory,
-      title   = "Anatomize Deep Learning with Information Theory",
-      author  = "Weng, Lilian",
-      journal = "lilianweng.github.io",
-      year    = "2017",
-      url     = "https://lilianweng.github.io/posts/2017-09-28-information-bottleneck/"
-    }
-
+```bibtex
+@article{weng2017infotheory,
+  title   = "Anatomize Deep Learning with Information Theory",
+  author  = "Weng, Lilian",
+  journal = "lilianweng.github.io",
+  year    = "2017",
+  url     = "https://lilianweng.github.io/posts/2017-09-28-information-bottleneck/"
+}
+```
 # References[#](#references)
 
 [1] Naftali Tishby. [Information Theory of Deep Learning](https://youtu.be/bLqJHjXihK8)

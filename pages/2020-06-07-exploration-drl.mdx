@@ -162,7 +162,7 @@ Instead of autoencoder, _Intrinsic Curiosity Module_ (**ICM**; [Pathak, et al., 
 
 Given a forward model $f$, an inverse dynamics model $g$ and an observation $(s_t, a_t, s_{t+1})$:
 
-$$g_{\\psi_I}(\phi(s_t), \phi(s_{t+1})) = \hat{a}_t \quad f_{\\psi_F}(\phi(s_t), a_t) = \hat{\phi}(s_{t+1}) \quad r_t^i = \| \hat{\phi}(s_{t+1}) - \phi(s_{t+1}) \|_2^2$$
+$$g_{\psi_I}(\phi(s_t), \phi(s_{t+1})) = \hat{a}_t \quad f_{\psi_F}(\phi(s_t), a_t) = \hat{\phi}(s_{t+1}) \quad r_t^i = \| \hat{\phi}(s_{t+1}) - \phi(s_{t+1}) \|_2^2$$
 
 Such $\phi(.)$ is expected to be robust to uncontrollable aspects of the environment.
 

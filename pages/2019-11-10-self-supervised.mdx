@@ -409,9 +409,9 @@ Fig. 22. The workflow of RIG. (Image source: [Nair et al., 2018](https://arxiv.o
 
 The task is to control a robot arm to push a small puck on a table to a desired position. The desired position, or the goal, is present in an image. During training, it learns latent embedding of both state $s$ and goal $g$ through $\beta$-VAE encoder and the control policy operates entirely in the latent space.
 
-Let's say a [$\beta$-VAE](https://lilianweng.github.io/posts/2018-08-12-vae/#beta-vae) has an encoder $q_\phi$ mapping input states to latent variable $z$ which is modeled by a Gaussian distribution and a decoder $p_\\psi$ mapping $z$ back to the states. The state encoder in RIG is set to be the mean of $\beta$-VAE encoder.
+Let's say a [$\beta$-VAE](https://lilianweng.github.io/posts/2018-08-12-vae/#beta-vae) has an encoder $q_\phi$ mapping input states to latent variable $z$ which is modeled by a Gaussian distribution and a decoder $p_\psi$ mapping $z$ back to the states. The state encoder in RIG is set to be the mean of $\beta$-VAE encoder.
 
-$$\begin{aligned} z &\sim q_\phi(z \vert s) = \mathcal{N}(z; \mu_\phi(s), \sigma^2_\phi(s)) \\ \mathcal{L}_{\beta\text{-VAE}} &= - \mathbb{E}_{z \sim q_\phi(z \vert s)} [\log p_\\psi (s \vert z)] + \beta D_\text{KL}(q_\phi(z \vert s) \| p_\\psi(s)) \\ e(s) &\\triangleq \mu_\phi(s) \end{aligned}$$
+$$\begin{aligned} z &\sim q_\phi(z \vert s) = \mathcal{N}(z; \mu_\phi(s), \sigma^2_\phi(s)) \\ \mathcal{L}_{\beta\text{-VAE}} &= - \mathbb{E}_{z \sim q_\phi(z \vert s)} [\log p_\psi (s \vert z)] + \beta D_\text{KL}(q_\phi(z \vert s) \| p_\psi(s)) \\ e(s) &\\triangleq \mu_\phi(s) \end{aligned}$$
 
 The reward is the Euclidean distance between state and goal embedding vectors: $r(s, g) = -|e(s) - e(g)|$. Similar to [grasp2vec](#grasp2vec), RIG applies data augmentation as well by latent goal relabeling: precisely half of the goals are generated from the prior at random and the other half are selected using HER. Also same as grasp2vec, rewards do not depend on any ground truth states but only the learned state encoding, so it can be used for training on real robots.
 
@@ -425,9 +425,9 @@ The problem with RIG is a lack of object variations in the imagined goal picture
 
 Fig. 24. The workflow of context-conditioned RIG. (Image source: [Nair, et al., 2019](https://arxiv.org/abs/1910.11670)).
 
-A CVAE conditions on a context variable $c$. It trains an encoder $q_\phi(z \vert s, c)$ and a decoder $p_\\psi (s \vert z, c)$ and note that both have access to $c$. The CVAE loss penalizes information passing from the input state $s$ through an information bottleneck but allows for _unrestricted_ information flow from $c$ to both encoder and decoder.
+A CVAE conditions on a context variable $c$. It trains an encoder $q_\phi(z \vert s, c)$ and a decoder $p_\psi (s \vert z, c)$ and note that both have access to $c$. The CVAE loss penalizes information passing from the input state $s$ through an information bottleneck but allows for _unrestricted_ information flow from $c$ to both encoder and decoder.
 
-$$\mathcal{L}_\text{CVAE} = - \mathbb{E}_{z \sim q_\phi(z \vert s,c)} [\log p_\\psi (s \vert z, c)] + \beta D_\text{KL}(q_\phi(z \vert s, c) \| p_\\psi(s))$$
+$$\mathcal{L}_\text{CVAE} = - \mathbb{E}_{z \sim q_\phi(z \vert s,c)} [\log p_\psi (s \vert z, c)] + \beta D_\text{KL}(q_\phi(z \vert s, c) \| p_\psi(s))$$
 
 To create plausible goals, CC-VAE conditions on a starting state $s_0$ so that the generated goal presents a consistent type of object as in $s_0$. This goal consistency is necessary; e.g. if the current scene contains a red puck but the goal has a blue block, it would confuse the policy.
 
