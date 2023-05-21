@@ -17,9 +17,9 @@ To recap, a good meta-learning model is expected to generalize to new tasks or n
 
 Training RL algorithms can be notoriously difficult sometimes. If the meta-learning agent could become so smart that the distribution of solvable unseen tasks grows extremely broad, we are on track towards [general purpose methods](http://incompleteideas.net/IncIdeas/BitterLesson.html) — essentially building a "brain" which would solve all kinds of RL problems without much human interference or manual feature engineering. Sounds amazing, right? 💖
 
-## On the Origin of Meta-RL[#](#on-the-origin-of-meta-rl)
+## On the Origin of Meta-RL
 
-### Back in 2001[#](#back-in-2001)
+### Back in 2001
 
 I encountered a paper written in 2001 by [Hochreiter et al.](http://snowedin.net/tmp/Hochreiter2001.pdf) when reading [Wang et al., 2016](https://arxiv.org/pdf/1611.05763.pdf). Although the idea was proposed for supervised learning, there are so many resemblances to the current approach to meta-RL.
 
@@ -37,15 +37,15 @@ Noted that _the last label_ $\mathbf{y}^k_{i-1}$ is also provided as an auxiliar
 
 In the experiment of decoding two-dimensional quadratic functions, $a x_1^2 + b x_2^2 + c x_1 x_2 + d x_1 + e x_2 + f$, with coefficients $a$-$f$ are randomly sampled from [-1, 1], this meta-learning system was able to approximate the function after seeing only ~35 examples.
 
-### Proposal in 2016[#](#proposal-in-2016)
+### Proposal in 2016
 
 In the modern days of DL, [Wang et al.](https://arxiv.org/abs/1611.05763) (2016) and [Duan et al.](https://arxiv.org/abs/1611.02779) (2017) simultaneously proposed the very similar idea of **Meta-RL** (it is called **RL^2** in the second paper). A meta-RL model is trained over a distribution of MDPs, and at test time, it is able to learn to solve a new task quickly. The goal of meta-RL is ambitious, taking one step further towards general algorithms.
 
-## Define Meta-RL[#](#define-meta-rl)
+## Define Meta-RL
 
 _Meta Reinforcement Learning_, in short, is to do [meta-learning](https://lilianweng.github.io/posts/2018-11-30-meta-learning/) in the field of [reinforcement learning](https://lilianweng.github.io/posts/2018-02-19-rl-overview/). Usually the train and test tasks are different but drawn from the same family of problems; i.e., experiments in the papers included multi-armed bandit with different reward probabilities, mazes with different layouts, same robots but with different physical parameters in simulator, and many others.
 
-### Formulation[#](#formulation)
+### Formulation
 
 Let's say we have a distribution of tasks, each formularized as an [MDP](https://lilianweng.github.io/posts/2018-02-19-rl-overview/#markov-decision-processes) (Markov Decision Process), $M_i \in \mathcal{M}$. An MDP is determined by a 4-tuple, $M_i= \langle \mathcal{S}, \mathcal{A}, P_i, R_i \rangle$:
 
@@ -77,7 +77,7 @@ Note that common state $\mathcal{S}$ and action space $\mathcal{A}$ are used abo
 
 Fig. 2. Illustration of meta-RL, containing two optimization loops. The outer loop samples a new environment in every iteration and adjusts parameters that determine the agent's behavior. In the inner loop, the agent interacts with the environment and optimizes for the maximal reward. (Image source: [Botvinick, et al. 2019](https://www.cell.com/action/showPdf?pii=S1364-6613%2819%2930061-0))
 
-### Main Differences from RL[#](#main-differences-from-rl)
+### Main Differences from RL
 
 The overall configure of meta-RL is very similar to an ordinary RL algorithm, except that **the last reward** $r_{t-1}$ and **the last action** $a_{t-1}$ are also incorporated into the policy observation in addition to the current state $s_t$.
 
@@ -101,7 +101,7 @@ Fig. 3. In the meta-RL paper, different actor-critic architectures all use a rec
 
 Fig. 4. As described in the RL^2 paper, illustration of the procedure of the model interacting with a series of MDPs in training time . (Image source: [Duan et al., 2017](https://arxiv.org/abs/1611.02779))
 
-### Key Components[#](#key-components)
+### Key Components
 
 There are three key components in Meta-RL:
 
@@ -124,15 +124,15 @@ Meta-RL interestingly and not very surprisingly matches the ideas in the [AI-GAs
 
 The topic of designing good recurrent network architectures is a bit too broad to be discussed here, so I will skip it. Next, let's look further into another two components: meta-learning algorithms in the context of meta-RL and how to acquire a variety of training MDPs.
 
-## Meta-Learning Algorithms for Meta-RL[#](#meta-learning-algorithms-for-meta-rl)
+## Meta-Learning Algorithms for Meta-RL
 
 My previous [post](https://lilianweng.github.io/posts/2018-11-30-meta-learning/) on meta-learning has covered several classic meta-learning algorithms. Here I'm gonna include more related to RL.
 
-### Optimizing Model Weights for Meta-learning[#](#optimizing-model-weights-for-meta-learning)
+### Optimizing Model Weights for Meta-learning
 
 Both MAML ([Finn, et al. 2017](https://arxiv.org/abs/1703.03400)) and Reptile ([Nichol et al., 2018](https://arxiv.org/abs/1803.02999)) are methods on updating model parameters in order to achieve good generalization performance on new tasks. See an earlier post [section](https://lilianweng.github.io/posts/2018-11-30-meta-learning/#optimization-based) on MAML and Reptile.
 
-### Meta-learning Hyperparameters[#](#meta-learning-hyperparameters)
+### Meta-learning Hyperparameters
 
 The [return](https://lilianweng.github.io/posts/2018-02-19-rl-overview/#value-function) function in an RL problem, $G_t^{(n)}$ or $G_t^\lambda$, involves a few hyperparameters that are often set heuristically, like the discount factor [$\gamma$](https://lilianweng.github.io/posts/2018-02-19-rl-overview/#value-function) and the bootstrapping parameter [$\lambda$](https://lilianweng.github.io/posts/2018-02-19-rl-overview/#combining-td-and-mc-learning). Meta-gradient RL ([Xu et al., 2018](http://papers.nips.cc/paper/7507-meta-gradient-reinforcement-learning.pdf)) considers them as _meta-parameters_, $\eta=\{\gamma, \lambda \}$, that can be tuned and learned _online_ while an agent is interacting with the environment. Therefore, the return becomes a function of $\eta$ and dynamically adapts itself to a specific task over time.
 
@@ -172,7 +172,7 @@ $$
 J(\tau', \theta', \bar{\eta}) &= (G^\lambda_{\bar{\eta}}(\tau') - v_{\theta'}(s'))^2 \end{aligned}
 $$
 
-### Meta-learning the Loss Function[#](#meta-learning-the-loss-function)
+### Meta-learning the Loss Function
 
 In policy gradient algorithms, the expected total reward is maximized by updating the policy parameters $\theta$ in the direction of estimated gradient ([Schulman et al., 2016](https://arxiv.org/abs/1506.02438)),
 
@@ -211,7 +211,7 @@ where $\alpha_\text{out}$ is the learning rate of the outer loop.
 
 In practice, the loss $L_\phi$ is bootstrapped with an ordinary policy gradient (such as REINFORCE or PPO) surrogate loss $L_\text{pg}$, $\hat{L} = (1-\alpha) L_\phi + \alpha L_\text{pg}$. The weight $\alpha$ is annealing from 1 to 0 gradually during training. At test time, the loss function parameter $\phi$ stays fixed and the loss value is computed over a history of experience to update the policy parameters $\theta$.
 
-### Meta-learning the Exploration Strategies[#](#meta-learning-the-exploration-strategies)
+### Meta-learning the Exploration Strategies
 
 The [exploitation vs exploration](https://lilianweng.github.io/posts/2018-01-23-multi-armed-bandit/#exploitation-vs-exploration) dilemma is a critical problem in RL. Common ways to do exploration include $\epsilon$-greedy, random noise on actions, or stochastic policy with built-in randomness on the action space.
 
@@ -223,7 +223,7 @@ In addition, the loss function includes a KL divergence between the learned late
 
 Fig. 5. The policy is conditioned on a latent variable variable $z_i \sim \mathcal{N}(\mu, \sigma)$ that is sampled once every episode. Each task has different hyperparameters for the latent variable distribution, $(\mu_i, \sigma_i)$ and they are optimized in the outer loop. (Image source: [Gupta et al, 2018](http://papers.nips.cc/paper/7776-meta-reinforcement-learning-of-structured-exploration-strategies.pdf))
 
-### Episodic Control[#](#episodic-control)
+### Episodic Control
 
 A major criticism of RL is on its sample inefficiency. A large number of samples and small learning steps are required for incremental parameter adjustment in RL in order to maximize generalization and avoid catastrophic forgetting of earlier learning ([Botvinick et al., 2019](<https://www.cell.com/trends/cognitive-sciences/fulltext/S1364-6613(19)30061-0>)).
 
@@ -270,18 +270,18 @@ This architecture provides a shortcut to the prior experience through context-ba
 
 Overall the capacity of episodic control is limited by the complexity of the environment. It is very rare for an agent to repeatedly visit exactly the same states in a real-world task, so properly encoding the states is critical. The learned embedding space compresses the observation data into a lower dimension space and, in the meantime, two states being close in this space are expected to demand similar strategies.
 
-## Training Task Acquisition[#](#training-task-acquisition)
+## Training Task Acquisition
 
 Among three key components, how to design a proper distribution of tasks is the less studied and probably the most specific one to meta-RL itself. As described [above](#formulation), each task is a MDP: $M_i = \langle \mathcal{S}, \mathcal{A}, P_i, R_i \rangle \in \mathcal{M}$. We can build a distribution of MDPs by modifying:
 
 - The _reward configuration_: Among different tasks, same behavior might get rewarded differently according to $R_i$.
 - Or, the _environment_: The transition function $P_i$ can be reshaped by initializing the environment with varying shifts between states.
 
-### Task Generation by Domain Randomization[#](#task-generation-by-domain-randomization)
+### Task Generation by Domain Randomization
 
 Randomizing parameters in a simulator is an easy way to obtain tasks with modified transition functions. If interested in learning further, check my last [post](https://lilianweng.github.io/posts/2019-05-05-domain-randomization/) on **domain randomization**.
 
-### Evolutionary Algorithm on Environment Generation[#](#evolutionary-algorithm-on-environment-generation)
+### Evolutionary Algorithm on Environment Generation
 
 [Evolutionary algorithm](https://en.wikipedia.org/wiki/Evolutionary_algorithm) is a gradient-free heuristic-based optimization method, inspired by natural selection. A population of solutions follows a loop of evaluation, selection, reproduction, and mutation. Eventually, good solutions survive and thus get selected.
 
@@ -299,7 +299,7 @@ The 2D bipedal walking environment is evolving: from a simple flat surface to a 
 
 The procedure above is quite similar to [PBT](https://arxiv.org/abs/1711.09846), but PBT mutates and evolves hyperparameters instead. To some extent, POET is doing [domain randomization](https://lilianweng.github.io/posts/2019-05-05-domain-randomization/), as all the gaps, stumps and terrain roughness are controlled by some randomization probability parameters. Different from DR, the agents are not exposed to a fully randomized difficult environment all at once, but instead they are learning gradually with a curriculum configured by the evolutionary algorithm.
 
-### Learning with Random Rewards[#](#learning-with-random-rewards)
+### Learning with Random Rewards
 
 An MDP without a reward function $R$ is known as a _Controlled Markov process_ (CMP). Given a predefined CMP, $\langle \mathcal{S}, \mathcal{A}, P\rangle$, we can acquire a variety of tasks by generating a collection of reward functions $\mathcal{R}$ that encourage the training of an effective meta-learning policy.
 
@@ -345,7 +345,7 @@ Cited as:
 }
 ```
 
-## References[#](#references)
+## References
 
 [1] Richard S. Sutton. ["The Bitter Lesson."](http://incompleteideas.net/IncIdeas/BitterLesson.html) March 13, 2019.
 

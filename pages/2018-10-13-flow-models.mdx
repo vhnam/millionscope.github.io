@@ -13,7 +13,7 @@ Source : https://lilianweng.github.io
 
 Flow-based deep generative models conquer this hard problem with the help of [normalizing flows](https://arxiv.org/abs/1505.05770), a powerful statistics tool for density estimation. A good estimation of $p(\mathbf{x})$ makes it possible to efficiently complete many downstream tasks: sample unobserved but realistic new data points (data generation), predict the rareness of future events (density estimation), infer latent variables, fill in incomplete data samples, etc.
 
-## Types of Generative Models[#](#types-of-generative-models)
+## Types of Generative Models
 
 Here is a quick summary of the difference between GAN, VAE, and flow-based generative models:
 
@@ -25,11 +25,11 @@ Here is a quick summary of the difference between GAN, VAE, and flow-based gener
 
 Fig. 1. Comparison of three categories of generative models.
 
-## Linear Algebra Basics Recap[#](#linear-algebra-basics-recap)
+## Linear Algebra Basics Recap
 
 We should understand two key concepts before getting into the flow-based generative model: the Jacobian determinant and the change of variable rule. Pretty basic, so feel free to skip.
 
-### Jacobian Matrix and Determinant[#](#jacobian-matrix-and-determinant)
+### Jacobian Matrix and Determinant
 
 Given a function of mapping a $n$-dimensional input vector $\mathbf{x}$ to a $m$-dimensional output vector, $\mathbf{f}: \mathbb{R}^n \mapsto \mathbb{R}^m$, the matrix of all first-order partial derivatives of this function is called the **Jacobian matrix**, $\mathbf{J}$ where one entry on the i-th row and j-th column is $\mathbf{J}_{ij} = \frac{\partial f_i}{\partial x_j}$.
 
@@ -58,7 +58,7 @@ The determinant of a square matrix $M$ detects whether it is invertible: If $\de
 
 The determinant of the product is equivalent to the product of the determinants: $\det(AB) = \det(A)\det(B)$. ([proof](https://proofwiki.org/wiki/Determinant_of_Matrix_Product))
 
-### Change of Variable Theorem[#](#change-of-variable-theorem)
+### Change of Variable Theorem
 
 Let's review the change of variable theorem specifically in the context of probability density estimation, starting with a single variable case.
 
@@ -80,7 +80,7 @@ $$
 
 where $\det \frac{\partial f}{\partial\mathbf{z}}$ is the Jacobian determinant of the function $f$. The full proof of the multivariate version is out of the scope of this post; ask Google if interested ;)
 
-## What is Normalizing Flows?[#](#what-is-normalizing-flows)
+## What is Normalizing Flows?
 
 Being able to do good density estimation has direct applications in many machine learning problems, but it is very hard. For example, since we need to run backward propagation in deep learning models, the embedded probability distribution (i.e. posterior $p(\mathbf{z}\vert\mathbf{x})$) is expected to be simple enough to calculate the derivative easily and efficiently. That is why Gaussian distribution is often used in latent variable generative models, even though most of real world distributions are much more complicated than Gaussian.
 
@@ -130,7 +130,7 @@ The path traversed by the random variables $\mathbf{z}_i = f_i(\mathbf{z}_{i-1})
 1.  It is easily invertible.
 2.  Its Jacobian determinant is easy to compute.
 
-## Models with Normalizing Flows[#](#models-with-normalizing-flows)
+## Models with Normalizing Flows
 
 With normalizing flows in our toolbox, the exact log-likelihood of input data $\log p(\mathbf{x})$ becomes tractable. As a result, the training criterion of flow-based generative model is simply the negative log-likelihood (NLL) over the training dataset $\mathcal{D}$:
 
@@ -138,7 +138,7 @@ $$
 \mathcal{L}(\mathcal{D}) = - \frac{1}{\vert\mathcal{D}\vert}\sum_{\mathbf{x} \in \mathcal{D}} \log p(\mathbf{x})
 $$
 
-### RealNVP[#](#realnvp)
+### RealNVP
 
 The **RealNVP** (Real-valued Non-Volume Preserving; [Dinh et al., 2017](https://arxiv.org/abs/1605.08803)) model implements a normalizing flow by stacking a sequence of invertible bijective transformation functions. In each bijection $f: \mathbf{x} \mapsto \mathbf{y}$, known as _affine coupling layer_, the input dimensions are split into two parts:
 
@@ -187,7 +187,7 @@ In one affine coupling layer, some dimensions (channels) remain unchanged. To ma
 
 Furthermore, RealNVP can work in a multi-scale architecture to build a more efficient model for large inputs. The multi-scale architecture applies several "sampling" operations to normal affine layers, including spatial checkerboard pattern masking, squeezing operation, and channel-wise masking. Read the [paper](https://arxiv.org/abs/1605.08803) for more details on the multi-scale architecture.
 
-### NICE[#](#nice)
+### NICE
 
 The **NICE** (Non-linear Independent Component Estimation; [Dinh, et al. 2015](https://arxiv.org/abs/1410.8516)) model is a predecessor of [RealNVP](#realnvp). The transformation in NICE is the affine coupling layer without the scale term, known as _additive coupling layer_.
 
@@ -197,7 +197,7 @@ $$
 \mathbf{x}_{d+1:D} &= \mathbf{y}_{d+1:D} - m(\mathbf{y}_{1:d}) \end{cases}
 $$
 
-### Glow[#](#glow)
+### Glow
 
 The **Glow** ([Kingma and Dhariwal, 2018](https://arxiv.org/abs/1807.03039)) model extends the previous reversible generative models, NICE and RealNVP, and simplifies the architecture by replacing the reverse permutation operation on the channel ordering with invertible 1x1 convolutions.
 
@@ -233,7 +233,7 @@ The design is same as in RealNVP.
 
 Fig. 4. Three substeps in one step of flow in Glow. (Image source: [Kingma and Dhariwal, 2018](https://arxiv.org/abs/1807.03039))
 
-## Models with Autoregressive Flows[#](#models-with-autoregressive-flows)
+## Models with Autoregressive Flows
 
 The **autoregressive** constraint is a way to model sequential data, $\mathbf{x} = [x_1, \dots, x_D]$: each output only depends on the data observed in the past, but not on the future ones. In other words, the probability of observing $x_i$ is conditioned on $x_1, \dots, x_{i-1}$ and the product of these conditional probabilities gives us the probability of observing the full sequence:
 
@@ -247,7 +247,7 @@ If a flow transformation in a normalizing flow is framed as an autoregressive mo
 
 This section starts with several classic autoregressive models (MADE, PixelRNN, WaveNet) and then we dive into autoregressive flow models (MAF and IAF).
 
-### MADE[#](#made)
+### MADE
 
 **MADE** (Masked Autoencoder for Distribution Estimation; [Germain et al., 2015](https://arxiv.org/abs/1502.03509)) is a specially designed architecture to enforce the autoregressive property in the autoencoder _efficiently_. When using an autoencoder to predict the conditional probabilities, rather than feeding the autoencoder with input of different observation windows $D$ times, MADE removes the contribution from certain hidden units by multiplying binary mask matrices so that each input dimension is reconstructed only from previous dimensions in a _given_ ordering in a _single pass_.
 
@@ -283,7 +283,7 @@ MADE training can be further facilitated by:
 - _Order-agnostic training_: shuffle the input dimensions, so that MADE is able to model any arbitrary ordering; can create an ensemble of autoregressive models at the runtime.
 - _Connectivity-agnostic training_: to avoid a model being tied up to a specific connectivity pattern constraints, resample $m^l_k$ for each training minibatch.
 
-### PixelRNN[#](#pixelrnn)
+### PixelRNN
 
 PixelRNN ([Oord et al, 2016](https://arxiv.org/abs/1601.06759)) is a deep generative model for images. The image is generated one pixel at a time and each new pixel is sampled conditional on the pixels that have been seen before.
 
@@ -315,7 +315,7 @@ The diagonal BiLSTM layers are capable of processing an unbounded context field,
 
 Fig. 8. PixelCNN with masked convolution constructed by an elementwise product of a mask tensor and the convolution kernel before applying it. (Image source: http://slazebni.cs.illinois.edu/spring17/lec13_advanced.pdf)
 
-### WaveNet[#](#wavenet)
+### WaveNet
 
 **WaveNet** ([Van Den Oord, et al. 2016](https://arxiv.org/abs/1609.03499)) is very similar to PixelCNN but applied to 1-D audio signals. WaveNet consists of a stack of _causal convolution_ which is a convolution operation designed to respect the ordering: the prediction at a certain timestamp can only consume the data observed in the past, no dependency on the future. In PixelCNN, the causal convolution is implemented by masked convolution kernel. The causal convolution in WaveNet is simply to shift the output by a number of timestamps to the future so that the output is aligned with the last input element.
 
@@ -333,7 +333,7 @@ $$
 
 where $\mathbf{W}_{f,k}$ and $\mathbf{W}_{g,k}$ are convolution filter and gate weight matrix of the $k$-th layer, respectively; both are learnable.
 
-### Masked Autoregressive Flow[#](#masked-autoregressive-flow)
+### Masked Autoregressive Flow
 
 **Masked Autoregressive Flow** (**MAF**; [Papamakarios et al., 2017](https://arxiv.org/abs/1705.07057)) is a type of normalizing flows, where the transformation layer is built as an autoregressive neural network. MAF is very similar to **Inverse Autoregressive Flow** (IAF) introduced later. See more discussion on the relationship between MAF and IAF in the next section.
 
@@ -351,7 +351,7 @@ $p(\mathbf{x}) = \prod_{i=1}^D p(x_i\vert\mathbf{x}_{1:i-1})$
 
 The generation procedure is sequential, so it is slow by design. While density estimation only needs one pass the network using architecture like [MADE](#MADE). The transformation function is trivial to inverse and the Jacobian determinant is easy to compute too.
 
-### Inverse Autoregressive Flow[#](#inverse-autoregressive-flow)
+### Inverse Autoregressive Flow
 
 Similar to MAF, **Inverse autoregressive flow** (**IAF**; [Kingma et al., 2016](https://arxiv.org/abs/1606.04934)) models the conditional probability of the target variable as an autoregressive model too, but with a reversed flow, thus achieving a much efficient sampling process.
 
@@ -430,7 +430,7 @@ Sequential; slow
 
 ———-
 
-## VAE + Flows[#](#vae--flows)
+## VAE + Flows
 
 In [Variational Autoencoder](https://lilianweng.github.io/posts/2018-08-12-vae/#vae-variational-autoencoder), if we want to model the posterior $p(\mathbf{z}\vert\mathbf{x})$ as a more complicated distribution rather than simple Gaussian. Intuitively we can use normalizing flow to transform the base Gaussian for better density approximation. The encoder then would predict a set of scale and shift terms $(\mu_i, \sigma_i)$ which are all functions of input $\mathbf{x}$. Read the [paper](https://arxiv.org/abs/1809.05861) for more details if interested.
 
@@ -454,7 +454,7 @@ Cited as:
 }
 ```
 
-## Reference[#](#reference)
+## Reference
 
 [1] Danilo Jimenez Rezende, and Shakir Mohamed. ["Variational inference with normalizing flows."](https://arxiv.org/abs/1505.05770) ICML 2015.
 

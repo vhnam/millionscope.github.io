@@ -11,11 +11,11 @@ Source : https://lilianweng.github.io
 
 # Policy Gradient Algorithms
 
-## What is Policy Gradient[#](#what-is-policy-gradient)
+## What is Policy Gradient
 
 Policy gradient is an approach to solve reinforcement learning problems. If you haven't looked into the field of reinforcement learning, please first read the section ["A (Long) Peek into Reinforcement Learning » Key Concepts"](https://lilianweng.github.io/posts/2018-02-19-rl-overview/#key-concepts) for the problem definition and key concepts.
 
-### Notations[#](#notations)
+### Notations
 
 Here is a list of notations to help you read through equations in the post easily.
 
@@ -79,7 +79,7 @@ $A(s, a)$
 
 Advantage function, $A(s, a) = Q(s, a) - V(s)$; it can be considered as another version of Q-value with lower variance by taking the state-value off as the baseline.
 
-### Policy Gradient[#](#policy-gradient)
+### Policy Gradient
 
 The goal of reinforcement learning is to find an optimal behavior strategy for the agent to obtain optimal rewards. The **policy gradient** methods target at modeling and optimizing the policy directly. The policy is usually modeled with a parameterized function respect to $\theta$, $\pi_\theta(a \vert s)$. The value of the reward (objective) function depends on this policy and then various algorithms can be applied to optimize $\theta$ for the best reward.
 
@@ -97,7 +97,7 @@ It is natural to expect policy-based methods are more useful in the continuous s
 
 Using _gradient ascent_, we can move $\theta$ toward the direction suggested by the gradient $\nabla_\theta J(\theta)$ to find the best $\theta$ for $\pi_\theta$ that produces the highest return.
 
-### Policy Gradient Theorem[#](#policy-gradient-theorem)
+### Policy Gradient Theorem
 
 Computing the gradient $\nabla_\theta J(\theta)$ is tricky because it depends on both the action selection (directly determined by $\pi_\theta$) and the stationary distribution of states following the target selection behavior (indirectly determined by $\pi_\theta$). Given that the environment is generally unknown, it is difficult to estimate the effect on the state distribution by a policy update.
 
@@ -108,7 +108,7 @@ $$
 &\propto \sum_{s \in \mathcal{S}} d^\pi(s) \sum_{a \in \mathcal{A}} Q^\pi(s, a) \nabla_\theta \pi_\theta(a \vert s) \end{aligned}
 $$
 
-### Proof of Policy Gradient Theorem[#](#proof-of-policy-gradient-theorem)
+### Proof of Policy Gradient Theorem
 
 This session is pretty dense, as it is the time for us to go through the proof ([Sutton & Barto, 2017](http://incompleteideas.net/book/bookdraft2017nov5.pdf); Sec. 13.1) and figure out why the policy gradient theorem is correct.
 
@@ -189,11 +189,11 @@ Here is a nice summary of a general form of policy gradient methods borrowed fro
 
 Fig. 1. A general form of policy gradient methods. (Image source: [Schulman et al., 2016](https://arxiv.org/abs/1506.02438))
 
-## Policy Gradient Algorithms[#](#policy-gradient-algorithms)
+## Policy Gradient Algorithms
 
 Tons of policy gradient algorithms have been proposed during recent years and there is no way for me to exhaust them. I'm introducing some of them that I happened to know and read about.
 
-### REINFORCE[#](#reinforce)
+### REINFORCE
 
 **REINFORCE** (Monte-Carlo policy gradient) relies on an estimated return by [Monte-Carlo](https://lilianweng.github.io/posts/2018-02-19-rl-overview/#monte-carlo-methods) methods using episode samples to update the policy parameter $\theta$. REINFORCE works because the expectation of the sample gradient is equal to the actual gradient:
 
@@ -214,7 +214,7 @@ The process is pretty straightforward:
 
 A widely used variation of REINFORCE is to subtract a baseline value from the return $G_t$ to _reduce the variance of gradient estimation while keeping the bias unchanged_ (Remember we always want to do this when possible). For example, a common baseline is to subtract state-value from action-value, and if applied, we would use advantage $A(s, a) = Q(s, a) - V(s)$ in the gradient ascent update. This [post](https://danieltakeshi.github.io/2017/03/28/going-deeper-into-reinforcement-learning-fundamentals-of-policy-gradients/) nicely explained why a baseline works for reducing the variance, in addition to a set of fundamentals of policy gradient.
 
-### Actor-Critic[#](#actor-critic)
+### Actor-Critic
 
 Two main components in policy gradient are the policy model and the value function. It makes a lot of sense to learn the value function in addition to the policy, since knowing the value function can assist the policy update, such as by reducing gradient variance in vanilla policy gradients, and that is exactly what the **Actor-Critic** method does.
 
@@ -238,7 +238,7 @@ Let's see how it works in a simple action-value actor-critic algorithm.
 
 Two learning rates, $\alpha_\theta$ and $\alpha_w$, are predefined for policy and value function parameter updates respectively.
 
-### Off-Policy Policy Gradient[#](#off-policy-policy-gradient)
+### Off-Policy Policy Gradient
 
 Both REINFORCE and the vanilla version of actor-critic method are on-policy: training samples are collected according to the target policy — the very same policy that we try to optimize for. Off policy methods, however, result in several additional advantages:
 
@@ -267,7 +267,7 @@ where $\frac{\pi_\theta(a \vert s)}{\beta(a \vert s)}$ is the [importance weight
 
 In summary, when applying policy gradient in the off-policy setting, we can simple adjust it with a weighted sum and the weight is the ratio of the target policy to the behavior policy, $\frac{\pi_\theta(a \vert s)}{\beta(a \vert s)}$.
 
-### A3C[#](#a3c)
+### A3C
 
 [[paper](https://arxiv.org/abs/1602.01783)|[code](https://github.com/dennybritz/reinforcement-learning/tree/master/PolicyGradient/a3c)]
 
@@ -300,7 +300,7 @@ Here is the algorithm outline:
 
 A3C enables the parallelism in multiple agent training. The gradient accumulation step (6.2) can be considered as a parallelized reformation of minibatch-based stochastic gradient update: the values of $w$ or $\theta$ get corrected by a little bit in the direction of each training thread independently.
 
-### A2C[#](#a2c)
+### A2C
 
 [[paper](https://arxiv.org/abs/1602.01783)|[code](https://github.com/openai/baselines/blob/master/baselines/a2c/a2c.py)]
 
@@ -312,7 +312,7 @@ A2C has been [shown](https://blog.openai.com/baselines-acktr-a2c/) to be able to
 
 Fig. 2. The architecture of A3C versus A2C.
 
-### DPG[#](#dpg)
+### DPG
 
 [[paper](https://hal.inria.fr/file/index/docid/938992/filename/dpg-icml2014.pdf)|code]
 
@@ -360,7 +360,7 @@ $$
 
 Note that because the policy is deterministic, we only need $Q^\mu(s, \mu_\theta(s))$ rather than $\sum_a \pi(a \vert s) Q^\pi(s, a)$ as the estimated reward of a given state s. In the off-policy approach with a stochastic policy, importance sampling is often used to correct the mismatch between behavior and target policies, as what we have described [above](#off-policy-policy-gradient). However, because the deterministic policy gradient removes the integral over actions, we can avoid importance sampling.
 
-### DDPG[#](#ddpg)
+### DDPG
 
 [[paper](https://arxiv.org/pdf/1509.02971.pdf)|[code](https://github.com/openai/baselines/tree/master/baselines/ddpg)]
 
@@ -380,7 +380,7 @@ One detail in the paper that is particularly useful in robotics is on how to nor
 
 Fig 3. DDPG Algorithm. (Image source: [Lillicrap, et al., 2015](https://arxiv.org/pdf/1509.02971.pdf))
 
-### D4PG[#](#d4pg)
+### D4PG
 
 [[paper](https://openreview.net/forum?id=SyZipzbCb)|code (Search "github d4pg" and you will see a few.)]
 
@@ -409,7 +409,7 @@ $$
 
 Fig. 4. D4PG algorithm (Image source: [Barth-Maron, et al. 2018](https://openreview.net/forum?id=SyZipzbCb)); Note that in the original paper, the variable letters are chosen slightly differently from what in the post; i.e. I use $\mu(.)$ for representing a deterministic policy instead of $\pi(.)$.
 
-### MADDPG[#](#maddpg)
+### MADDPG
 
 [[paper](https://arxiv.org/pdf/1706.02275.pdf)|[code](https://github.com/openai/maddpg)]
 
@@ -456,7 +456,7 @@ In summary, MADDPG added three additional ingredients on top of DDPG to make it 
 
 Fig. 5. The architecture design of MADDPG. (Image source: [Lowe et al., 2017](https://arxiv.org/pdf/1706.02275.pdf))
 
-### TRPO[#](#trpo)
+### TRPO
 
 [[paper](https://arxiv.org/pdf/1502.05477.pdf)|[code](https://github.com/openai/baselines/tree/master/baselines/trpo_mpi)]
 
@@ -486,7 +486,7 @@ $$
 
 In this way, the old and new policies would not diverge too much when this hard constraint is met. While still, TRPO can guarantee a monotonic improvement over policy iteration (Neat, right?). Please read the proof in the [paper](https://arxiv.org/pdf/1502.05477.pdf) if interested :)
 
-### PPO[#](#ppo)
+### PPO
 
 [[paper](https://arxiv.org/pdf/1707.06347.pdf)|[code](https://github.com/openai/baselines/tree/master/baselines/ppo1)]
 
@@ -534,7 +534,7 @@ Discretizing the action space or use Beta distribution helps avoid failure mode 
 
 ![](assets/images/2018-04-08-policy-gradient/ppo-loss-functions.png)
 
-### PPG[#](#ppg)
+### PPG
 
 [[paper](https://arxiv.org/abs/2009.04416)|[code](https://github.com/openai/phasic-policy-gradient)]
 
@@ -566,7 +566,7 @@ PPG leads to a significant improvement on sample efficiency compared to PPO.
 
 Fig. 7. The mean normalized performance of PPG vs PPO on the [Procgen](https://arxiv.org/abs/1912.01588) benchmark. (Image source: [Cobbe, et al 2020](https://arxiv.org/abs/2009.04416))
 
-### ACER[#](#acer)
+### ACER
 
 [[paper](https://arxiv.org/pdf/1611.01224.pdf)|[code](https://github.com/openai/baselines/tree/master/baselines/acer)]
 
@@ -617,7 +617,7 @@ Furthermore, ACER adopts the idea of TRPO but with a small adjustment to make it
 
 The ACER [paper](https://arxiv.org/pdf/1611.01224.pdf) is pretty dense with many equations. Hopefully, with the prior knowledge on TD learning, Q-learning, importance sampling and TRPO, you will find the [paper](https://arxiv.org/pdf/1611.01224.pdf) slightly easier to follow :)
 
-### ACTKR[#](#actkr)
+### ACTKR
 
 [[paper](https://arxiv.org/pdf/1708.05144.pdf)|[code](https://github.com/openai/baselines/tree/master/baselines/acktr)]
 
@@ -639,7 +639,7 @@ Here is a high level summary from the K-FAC [paper](https://arxiv.org/pdf/1503.0
 
 > In the second stage, this matrix is further approximated as having an inverse which is either block-diagonal or block-tridiagonal. We justify this approximation through a careful examination of the relationships between inverse covariances, tree-structured graphical models, and linear regression. Notably, this justification doesn't apply to the Fisher itself, and our experiments confirm that while the inverse Fisher does indeed possess this structure (approximately), the Fisher itself does not."
 
-### SAC[#](#sac)
+### SAC
 
 [[paper](https://arxiv.org/abs/1801.01290)|[code](https://github.com/haarnoja/sac)]
 
@@ -716,7 +716,7 @@ Once we have defined the objective functions and gradients for soft action-state
 
 Fig. 8. The soft actor-critic algorithm. (Image source: [original paper](https://arxiv.org/abs/1801.01290))
 
-### SAC with Automatically Adjusted Temperature[#](#sac-with-automatically-adjusted-temperature)
+### SAC with Automatically Adjusted Temperature
 
 [[paper](https://arxiv.org/abs/1812.05905)|[code](https://github.com/rail-berkeley/softlearning)]
 
@@ -835,7 +835,7 @@ The final algorithm is same as SAC except for learning $\alpha$ explicitly with 
 
 Fig. 9. The soft actor-critic algorithm with automatically adjusted temperature. (Image source: [original paper](https://arxiv.org/abs/1812.05905))
 
-### TD3[#](#td3)
+### TD3
 
 [[paper](https://arxiv.org/abs/1802.09477)|[code](https://github.com/sfujim/TD3)]
 
@@ -876,7 +876,7 @@ Here is the final algorithm:
 
 Fig. 10. TD3 Algorithm. (Image source: [Fujimoto et al., 2018](https://arxiv.org/abs/1802.09477))
 
-### SVPG[#](#svpg)
+### SVPG
 
 [[paper](https://arxiv.org/abs/1704.02399)|[code](https://github.com/dilinwang820/Stein-Variational-Gradient-Descent) for SVPG]
 
@@ -955,7 +955,7 @@ $$
 
 Usually the temperature $\alpha$ follows an annealing scheme so that the training process does more exploration at the beginning but more exploitation at a later stage.
 
-### IMPALA[#](#impala)
+### IMPALA
 
 [[paper](https://arxiv.org/abs/1802.01561)|[code](https://github.com/deepmind/scalable_agent)]
 
@@ -997,7 +997,7 @@ In the experiments, IMPALA is used to train one agent over multiple tasks. Two d
 
 ![](assets/images/2018-04-08-policy-gradient/IMPALA-arch.png)
 
-## Quick Summary[#](#quick-summary)
+## Quick Summary
 
 After reading through all the algorithms above, I list a few building blocks or principles that seem to be common among them:
 
@@ -1030,7 +1030,7 @@ Cited as:
 }
 ```
 
-## References[#](#references)
+## References
 
 [1] jeremykun.com [Markov Chain Monte Carlo Without all the Bullshit](https://jeremykun.com/2015/04/06/markov-chain-monte-carlo-without-all-the-bullshit/)
 

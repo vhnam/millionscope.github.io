@@ -15,7 +15,7 @@ The full implementation is available in [lilianweng/deep-reinforcement-learning-
 
 In the previous two posts, I have introduced the algorithms of many deep reinforcement learning models. Now it is the time to get our hands dirty and practice how to implement the models in the wild. The implementation is gonna be built in Tensorflow and OpenAI [gym](https://github.com/openai/gym) environment. The full version of the code in this tutorial is available in [[lilian/deep-reinforcement-learning-gym]](https://github.com/lilianweng/deep-reinforcement-learning-gym).
 
-## Environment Setup[#](#environment-setup)
+## Environment Setup
 
 0.  Make sure you have [Homebrew](https://docs.brew.sh/Installation) installed:
 
@@ -70,7 +70,7 @@ pip install -e . ## install the "playground" project.
 pip install -r requirements.txt ## install required packages.
 ```
 
-## Gym Environment[#](#gym-environment)
+## Gym Environment
 
 The [OpenAI Gym](https://gym.openai.com/) toolkit provides a set of physical simulation environments, games, and robot simulators that we can play with and design reinforcement learning agents for. An environment object can be initialized by `gym.make("{environment name}"`:
 
@@ -100,7 +100,7 @@ We interact with the env through two major api calls:
 - Applies one action in the env which should be compatible with `env.action_space`.
 - Gets back the new observation `ob_next` (env.observation_space), a reward (float), a `done` flag (bool), and other meta information (dict). If `done=True`, the episode is complete and we should reset the env to restart. Read more [here](https://gym.openai.com/docs/#observations).
 
-## Naive Q-Learning[#](#naive-q-learning)
+## Naive Q-Learning
 
 [Q-learning](https://lilianweng.github.io/posts/2018-02-19-rl-overview/#q-learning-off-policy-td-control) (Watkins & Dayan, 1992) learns the action value ("Q-value") and update it according to the [Bellman equation](https://lilianweng.github.io/posts/2018-02-19-rl-overview/#bellman-equations). The key point is while estimating what is the next action, it does not follow the current policy but rather adopt the best Q value (the part in red) independently.
 
@@ -202,7 +202,7 @@ for step in range(n_steps):
 
 Often we start with a high `epsilon` and gradually decrease it during the training, known as "epsilon annealing". The full code of `QLearningPolicy` is available [here](https://github.com/lilianweng/deep-reinforcement-learning-gym/blob/master/playground/policies/qlearning.py).
 
-## Deep Q-Network[#](#deep-q-network)
+## Deep Q-Network
 
 [Deep Q-network](https://lilianweng.github.io/posts/2018-02-19-rl-overview/#deep-q-network) is a seminal piece of work to make the training of Q-learning more stable and more data-efficient, when the Q value is approximated with a nonlinear function. Two key ingredients are experience replay and a separately updated target network.
 
@@ -304,7 +304,7 @@ def update_target_q_net_soft(tau=0.05):
     sess.run([v_t.assign(v_t * (1. - tau) + v * tau) for v_t, v in zip(q_target_vars, q_vars)])
 ```
 
-### Double Q-Learning[#](#double-q-learning)
+### Double Q-Learning
 
 If we look into the standard form of the Q value target, $Y(s, a) = r + \gamma \max_{a' \in \mathcal{A}} Q_\theta (s', a')$, it is easy to notice that we use $Q_\theta$ to select the best next action at state s' and then apply the action value predicted by the same $Q_\theta$. This two-step reinforcing procedure could potentially lead to overestimation of an (already) overestimated value, further leading to training instability. The solution proposed by double Q-learning ([Hasselt, 2010](http://papers.nips.cc/paper/3964-double-q-learning.pdf)) is to decouple the action selection and action value estimation by using two Q networks, $Q_1$ and $Q_2$: when $Q_1$ is being updated, $Q_2$ decides the best next action, and vice versa.
 
@@ -345,7 +345,7 @@ During the episode rollout, we compute the `actions_next` by feeding the next st
 actions_next = sess.run(actions_selected_by_q, {states: batch_data['s_next']})
 ```
 
-### Dueling Q-Network[#](#dueling-q-network)
+### Dueling Q-Network
 
 The dueling Q-network ([Wang et al., 2016](https://arxiv.org/pdf/1511.06581.pdf)) is equipped with an enhanced network architecture: the output layer branches out into two heads, one for predicting state value, V, and the other for [advantage](https://lilianweng.github.io/posts/2018-02-19-rl-overview/#value-function), A. The Q-value is then reconstructed, $Q(s, a) = V(s) + A(s, a)$.
 
@@ -378,7 +378,7 @@ q = v + (adv - tf.reduce_mean(adv, reduction_indices=1, keepdims=True))
 
 Check the [code](https://github.com/lilianweng/deep-reinforcement-learning-gym/blob/master/playground/policies/dqn.py) for the complete flow.
 
-## Monte-Carlo Policy Gradient[#](#monte-carlo-policy-gradient)
+## Monte-Carlo Policy Gradient
 
 I reviewed a number of popular policy gradient methods in my [last post](https://lilianweng.github.io/posts/2018-04-08-policy-gradient/). Monte-Carlo policy gradient, also known as [REINFORCE](https://lilianweng.github.io/posts/2018-04-08-policy-gradient/#reinforce), is a classic on-policy method that learns the policy model explicitly. It uses the return estimated from a full on-policy trajectory and updates the policy parameters with policy gradient.
 
@@ -451,7 +451,7 @@ for _ in range(n_episodes):
 
 The full implementation of REINFORCE is [here](https://github.com/lilianweng/deep-reinforcement-learning-gym/blob/master/playground/policies/reinforce.py).
 
-## Actor-Critic[#](#actor-critic)
+## Actor-Critic
 
 The [actor-critic](https://lilianweng.github.io/posts/2018-04-08-policy-gradient/#actor-critic) algorithm learns two models at the same time, the actor for learning the best policy and the critic for estimating the state value.
 
@@ -496,7 +496,7 @@ train_ops = [optim_c, optim_a]
 
 The tensorboard graph is always helpful: ![](assets/images/2018-05-05-drl-implementation/actor-critic-tensorboard-graph.png)
 
-## References[#](#references)
+## References
 
 [1] [Tensorflow API Docs](https://www.tensorflow.org/api_docs/)
 

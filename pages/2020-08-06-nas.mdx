@@ -25,11 +25,11 @@ As I started looking into NAS, I found this nice survey very helpful by [Elsken,
 
 Fig. 1. Three main components of Neural Architecture Search (NAS) models. (Image source: [Elsken, et al. 2019](https://arxiv.org/abs/1808.05377) with customized annotation in red)
 
-## Search Space[#](#search-space)
+## Search Space
 
 The NAS search space defines a set of basic network operations and how operations can be connected to construct valid network architectures.
 
-### Sequential Layer-wise Operations[#](#sequential-layer-wise-operations)
+### Sequential Layer-wise Operations
 
 The most naive way to design the search space for neural network architectures is to depict network topologies, either CNN or RNN, with a list of _sequential layer-wise operations_, as seen in the early work of [Zoph & Le 2017](https://arxiv.org/abs/1611.01578) & [Baker et al. 2017](https://arxiv.org/abs/1611.02167). The serialization of network representation requires a decent amount of expert knowledge, since each operation is associated with different layer-specific parameters and such associations need to be hardcoded. For example, after predicting a `conv` op, the model should output kernel size, stride size, etc; or after predicting an `FC` op, we need to see the number of units as the next prediction.
 
@@ -52,7 +52,7 @@ $$
 
 The sequential search space has a lot of representation power, but it is very large and consumes a ton of computation resources to exhaustively cover the search space. In the experiments by [Zoph & Le 2017](https://arxiv.org/abs/1611.01578), they were running 800 GPUs in parallel for 28 days and [Baker et al. 2017](https://arxiv.org/abs/1611.02167) restricted the search space to contain at most 2 `FC` layers.
 
-### Cell-based Representation[#](#cell-based-representation)
+### Cell-based Representation
 
 Inspired by the design of using repeated modules in successful vision model architectures (e.g. Inception, ResNet), the _NASNet search space_ ([Zoph et al. 2018](https://arxiv.org/abs/1707.07012)) defines the architecture of a conv net as the same cell getting repeated multiple times and each cell contains several operations predicted by the NAS algorithm. A well-designed cell module enables transferability between datasets. It is also easy to scale down or up the model size by adjusting the number of cell repeats.
 
@@ -79,7 +79,7 @@ During the experiments, they discovered that a modified version of [_DropPath_](
 2.  The [motif](https://en.wikipedia.org/wiki/Network_motif)\-based architecture can be more easily transferred to different datasets.
 3.  It demonstrates a strong proof of a useful design pattern of repeatedly stacking modules in architecture engineering. For example, we can build strong models by stacking residual blocks in CNN or stacking multi-headed attention blocks in Transformer.
 
-### Hierarchical Structure[#](#hierarchical-structure)
+### Hierarchical Structure
 
 To take advantage of already discovered well-designed network [motifs](https://en.wikipedia.org/wiki/Network_motif), the NAS search space can be constrained as a hierarchical structure, as in _Hierarchical NAS_ (**HNAS**; ([Liu et al 2017](https://arxiv.org/abs/1711.00436))). It starts with a small set of primitives, including individual operations like convolution operation, pooling, identity, etc. Then small sub-graphs (or "motifs") that consist of primitive operations are recursively used to form higher-level computation graphs.
 
@@ -116,7 +116,7 @@ Same as NASNet, experiments in [Liu et al (2017)](https://arxiv.org/abs/1711.004
 
 Fig. 6. An illustration of transforming a single layer to a tree-structured motif via path-level transformation operations. (Image source: [Cai et al. 2018b](https://arxiv.org/abs/1806.02639))
 
-### Memory-bank Representation[#](#memory-bank-representation)
+### Memory-bank Representation
 
 A memory-bank representation of feed-forward networks is proposed by [Brock et al. (2017)](https://arxiv.org/abs/1708.05344) in [SMASH](#prediction-based). Instead of a graph of operations, they view a neural network as a system with multiple memory blocks which can read and write. Each layer operation is designed to: (1) read from a subset of memory blocks; (2) computes results; finally (3) write the results into another subset of blocks. For example, in a sequential model, a single memory block would get read and overwritten consistently.
 
@@ -124,15 +124,15 @@ A memory-bank representation of feed-forward networks is proposed by [Brock et a
 
 Fig. 7. Memory-bank representation of several popular network architecture blocks. (Image source: [Brock et al. 2017](https://arxiv.org/abs/1708.05344))
 
-## Search Algorithms[#](#search-algorithms)
+## Search Algorithms
 
 NAS search algorithms sample a population of child networks. It receives the child models' performance metrics as rewards and learns to generate high-performance architecture candidates. You may a lot in common with the field of hyperparameter search.
 
-### Random Search[#](#random-search)
+### Random Search
 
 Random search is the most naive baseline. It samples a valid architecture candidate from the search space _at random_ and no learning model is involved. Random search has proved to be quite useful in hyperparameter search ([Bergstra & Bengio 2012](http://www.jmlr.org/papers/volume13/bergstra12a/bergstra12a.pdf)). With a well-designed search space, random search could be a very challenging baseline to beat.
 
-### Reinforcement Learning[#](#reinforcement-learning)
+### Reinforcement Learning
 
 The initial design of **NAS** ([Zoph & Le 2017](https://arxiv.org/abs/1611.01578)) involves a RL-based controller for proposing child model architectures for evaluation. The controller is implemented as a RNN, outputting a variable-length sequence of tokens used for configuring a network architecture.
 
@@ -162,7 +162,7 @@ where a state $s_t$ is a tuple of layer operation and related parameters. An act
 
 Fig. 9. Overview of MetaQNN - designing CNN models with Q-Learning. (Image source: [Baker et al. 2017](https://arxiv.org/abs/1611.02167))
 
-### Evolutionary Algorithms[#](#evolutionary-algorithms)
+### Evolutionary Algorithms
 
 **NEAT** (short for _NeuroEvolution of Augmenting Topologies_) is an approach for evolving neural network topologies with [genetic algorithm (GA)](https://en.wikipedia.org/wiki/Genetic_algorithm), proposed by [Stanley & Miikkulainen](http://nn.cs.utexas.edu/downloads/papers/stanley.ec02.pdf) in 2002. NEAT evolves both connection weights and network topology together. Each gene encodes the full information for configuring a network, including node weights and edges. The population grows by applying mutation of both weights and connections, as well as crossover between two parent genes. For more in neuroevolution, please refer to the in-depth [survey](https://www.nature.com/articles/s42256-018-0006-z) by Stanley et al. (2019).
 
@@ -198,7 +198,7 @@ In their experiments, EA and RL work equally well in terms of the final validati
 
 **HNAS** ([Liu et al 2017](https://arxiv.org/abs/1711.00436)) also employs the evolutionary algorithms (the original tournament selection) as their search strategy. In the [hierarchical structure](#hierarchical-structure) search space, each edge is an operation. Thus genotype mutation in their experiments is applied by replacing a random edge with a different operation. The replacement set includes an `none` op, so it can alter, remove and add an edge. The initial set of genotypes is created by applying a large number of random mutations on "trivial" motifs (all identity mappings).
 
-### Progressive Decision Process[#](#progressive-decision-process)
+### Progressive Decision Process
 
 Constructing a model architecture is a sequential process. Every additional operator or layer brings extra complexity. If we guide the search model to start the investigation from simple models and gradually evolve to more complex architectures, it is like to introduce ["curriculum"](https://lilianweng.github.io/posts/2020-01-29-curriculum-rl/) into the search model's learning process.
 
@@ -214,19 +214,19 @@ The performance on a validation set is used as feedback to train a _surrogate_ m
 
 Fig. 13. The algorithm of Progressive NAS. (Image source: [Liu, et al 2018](https://arxiv.org/abs/1712.00559))
 
-### Gradient descent[#](#gradient-descent)
+### Gradient descent
 
 Using gradient descent to update the architecture search model requires an effort to make the process of choosing discrete operations differentiable. These approaches usually combine the learning of both architecture parameters and network weights together into one model. See more in the [section](#one-shot-approach-search--evaluation) on the _"one-shot"_ approach.
 
-## Evaluation Strategy[#](#evaluation-strategy)
+## Evaluation Strategy
 
 We need to measure, estimate or predict the performance of every child model in order to obtain feedback for optimizing the search algorithm. The process of candidate evaluation could be very expensive and many new evaluation methods have been proposed to save time or computation. When evaluating a child model, we mostly care about its performance measured as accuracy on a validation set. Recent work has started looking into other factors of a model, such as model size and latency, as certain devices may have limitations on memory or demand fast response time.
 
-### Training from Scratch[#](#training-from-scratch)
+### Training from Scratch
 
 The most naive approach is to train every child network independently from scratch until _convergence_ and then measure its accuracy on a validation set ([Zoph & Le 2017](https://arxiv.org/abs/1611.01578)). It provides solid performance numbers, but one complete train-converge-evaluate loop only generates a single data sample for training the RL controller (let alone RL is known to be sample-inefficient in general). Thus it is very expensive in terms of computation consumption.
 
-### Proxy Task Performance[#](#proxy-task-performance)
+### Proxy Task Performance
 
 There are several approaches for using a proxy task performance as the performance estimator of a child network, which is generally cheaper and faster to calculate:
 
@@ -235,7 +235,7 @@ There are several approaches for using a proxy task performance as the performan
 - Train and evaluate a down-scaled model in the search stage. For example, once a cell structure is learned, we can play with the number of cell repeats or scale up the number of filters ([Zoph et al. 2018](https://arxiv.org/abs/1707.07012)).
 - Predict the learning curve. [Baker et al (2018)](https://arxiv.org/abs/1705.10823) model the prediction of validation accuracies as a time-series regression problem. The features for the regression model ($nu$-support vector machine regressions; $nu$-SVR) include the early sequences of accuracy per epoch, architecture parameters, and hyperparameters.
 
-### Parameter Sharing[#](#parameter-sharing)
+### Parameter Sharing
 
 Instead of training every child model independently from scratch. You may ask, ok, what if we fabricate dependency between them and find a way to reuse weights? Some researchers succeeded to make such approaches work.
 
@@ -261,7 +261,7 @@ ENAS alternates between training the shared model weights $\omega$ and training 
 1.  The parameters of the controller LSTM $\theta$ are trained with [REINFORCE](https://lilianweng.github.io/posts/2018-04-08-policy-gradient/#reinforce), where the reward $R(\mathbf{m}, \omega)$ is computed on the validation set.
 2.  The shared parameters of the child models $\omega$ are trained with standard supervised learning loss. Note that different operators associated with the same node in the supergraph would have their own distinct parameters.
 
-### Prediction-Based[#](#prediction-based)
+### Prediction-Based
 
 A routine child model evaluation loop is to update model weights via standard gradient descent. SMASH ([Brock et al. 2017](https://arxiv.org/abs/1708.05344)) proposes a different and interesting idea: _Can we predict the model weights directly based on the network architecture parameters?_
 
@@ -279,7 +279,7 @@ Fig. 17. The algorithm of SMASH. (Image source: [Brock et al. 2017](https://arxi
 
 SMASH can be viewed as another way to implement the idea of [parameter sharing](#parameter-sharing). One problem of SMASH as pointed out by [Pham et al. (2018)](https://arxiv.org/abs/1802.03268) is: The usage of HyperNet restricts the weights of SMASH child models to a _low-rank space_, because weights are generated via tensor products. In comparison, [ENAS](#ENAS) has no such restrictions.
 
-## One-Shot Approach: Search + Evaluation[#](#one-shot-approach-search--evaluation)
+## One-Shot Approach: Search + Evaluation
 
 Running search & evaluation independently for a large population of child models is expensive. We have seen promising approaches like [Brock et al. (2017)](https://arxiv.org/abs/1708.05344) or [Pham et al. (2018)](https://arxiv.org/abs/1802.03268), where training a single model is enough for emulating any child model in the search space.
 
@@ -399,7 +399,7 @@ Besides accuracy, ProxylessNAS also considers _latency_ as an important metric t
 
 Fig. 23. Add a differentiable latency loss into the training of ProxylessNAS. (Image source: [Cai et al., 2019](https://arxiv.org/abs/1812.00332))
 
-## What's the Future?[#](#whats-the-future)
+## What's the Future?
 
 So far we have seen many interesting new ideas on automating the network architecture engineering through neural architecture search and many have achieved very impressive performance. However, it is a bit hard to do inference on _why_ some architecture work well and how we can develop modules generalizable across tasks rather than being very dataset-specific.
 
@@ -444,7 +444,7 @@ Three types of operations are considered when mutating a parent genotype:
 
 Fig. 25. An illustration of evolutionary progress on projected binary CIFAR-10 with example code. (Image source: [Real et al 2020](https://arxiv.org/abs/2003.03384))
 
-## Appendix: Summary of NAS Papers[#](#appendix-summary-of-nas-papers)
+## Appendix: Summary of NAS Papers
 
 Model name
 
@@ -560,7 +560,7 @@ NASNet search space
 
 Gradient descent (concrete distribution)
 
-## Citation[#](#citation)
+## Citation
 
 Cited as:
 
@@ -579,7 +579,7 @@ Or
 }
 ```
 
-## Reference[#](#reference)
+## Reference
 
 [1] Thomas Elsken, Jan Hendrik Metzen, Frank Hutter. ["Neural Architecture Search: A Survey"](https://arxiv.org/abs/1808.05377) JMLR 20 (2019) 1-21.
 

@@ -17,7 +17,7 @@ Recently I watched the talk ["Information Theory in Deep Learning"](https://yout
 
 Most of the materials in this post are from Prof Tishby's talk and [related papers](https://lilianweng.github.io/posts/2017-09-28-information-bottleneck/#references).
 
-## Basic Concepts[#](#basic-concepts)
+## Basic Concepts
 
 [**Markov Chain**](https://en.wikipedia.org/wiki/Markov_chain)
 
@@ -59,7 +59,7 @@ For two invertible functions $\phi$, $\psi$, the mutual information still holds:
 
 For example, if we shuffle the weights in one layer of DNN, it would not affect the mutual information between this layer and another.
 
-## Deep Neural Networks as Markov Chains[#](#deep-neural-networks-as-markov-chains)
+## Deep Neural Networks as Markov Chains
 
 The training data contains sampled observations from the joint distribution of $X$ and $Y$. The input variable $X$ and weights of hidden layers are all high-dimensional random variable. The ground truth target $Y$ and the predicted value $\hat{Y}$ are random variables of smaller dimensions in the classification settings.
 
@@ -76,7 +76,7 @@ $$
 
 A DNN is designed to learn how to describe $X$ to predict $Y$ and eventually, to compress $X$ to only hold the information related to $Y$. Tishby describes this processing as _"successive refinement of relevant information"_.
 
-### Information Plane Theorem[#](#information-plane-theorem)
+### Information Plane Theorem
 
 A DNN has successive internal representations of $X$, a set of hidden layers $\{T_i\}$. The _information plane_ theorem characterizes each layer by its encoder and decoder information. The encoder is a representation of the input data $X$, while the decoder translates the information in the current layer to the target ouput $Y$.
 
@@ -95,7 +95,7 @@ Each dot in Fig. 2. marks the encoder/ decoder mutual information of one hidden 
 
 Fig. 3. Here is an aggregated view of Fig 2. The compression happens after the generalization error becomes very small. (Image source: [Tishby' talk 15:15](https://youtu.be/bLqJHjXihK8?t=15m15s))
 
-### Two Optimization Phases[#](#two-optimization-phases)
+### Two Optimization Phases
 
 Tracking the normalized mean and standard deviation of each layer's weights in time also reveals two optimization phases of the training process.
 
@@ -105,9 +105,9 @@ Fig. 4. The norm of mean and standard deviation of each layer's weight gradients
 
 Among early epochs, the mean values are three magnitudes larger than the standard deviations. After a sufficient number of epochs, the error saturates and the standard deviations become much noisier afterward. The further a layer is away from the output, the noisier it gets, because the noises can get amplified and accumulated through the back-prop process (not due to the width of the layer).
 
-## Learning Theory[#](#learning-theory)
+## Learning Theory
 
-### "Old" Generalization Bounds[#](#old-generalization-bounds)
+### "Old" Generalization Bounds
 
 The generalization bounds defined by the classic learning theory is:
 
@@ -123,7 +123,7 @@ This definition states that the difference between the training error and the ge
 
 However, it does not work for deep learning. The larger a network is, the more parameters it needs to learn. With this generalization bounds, larger networks (larger $d$) would have worse bounds. This is contrary to the intuition that larger networks are able to achieve better performance with higher expressivity.
 
-### "New" Input compression bound[#](#new-input-compression-bound)
+### "New" Input compression bound
 
 To solve this counterintuitive observation, Tishby et al. proposed a new input compression bound for DNN.
 
@@ -139,9 +139,9 @@ $$\epsilon^2 < \frac{2^{I(T_\epsilon; X)} + \log{1/\delta}}{2m}$$
 
 Fig. 5. The black line is the optimal achievable information bottleneck (IB) limit. The red line corresponds to the upper bound on the out-of-sample IB distortion, when trained on a finite sample set. $\Delta C$ is the complexity gap and $\Delta G$ is the generalization gap. (Recreated based on [Tishby' talk 24:50](https://youtu.be/bLqJHjXihK8?t=24m56s))
 
-## Network Size and Training Data Size[#](#network-size-and-training-data-size)
+## Network Size and Training Data Size
 
-### The Benefit of More Hidden Layers[#](#the-benefit-of-more-hidden-layers)
+### The Benefit of More Hidden Layers
 
 Having more layers give us computational benefits and speed up the training process for good generalization.
 
@@ -151,7 +151,7 @@ Fig. 6. The optimization time is much shorter (fewer epochs) with more hidden la
 
 **Compression through stochastic relaxation**: According to the [diffusion equation](https://en.wikipedia.org/wiki/Fokker%E2%80%93Planck_equation), the relaxation time of layer $k$ is proportional to the exponential of this layer's compression amount $\Delta S_k$: $\Delta t_k \sim \exp(\Delta S_k)$. We can compute the layer compression as $\Delta S_k = I(X; T_k) - I(X; T_{k-1})$. Because $\exp(\sum_k \Delta S_k) \geq \sum_k \exp(\Delta S_k)$, we would expect an exponential decrease in training epochs with more hidden layers (larger $k$).
 
-### The Benefit of More Training Samples[#](#the-benefit-of-more-training-samples)
+### The Benefit of More Training Samples
 
 Fitting more training data requires more information captured by the hidden layers. With increased training data size, the decoder mutual information (recall that this is directly related to the generalization error), $I(T; Y)$, is pushed up and gets closer to the theoretical information bottleneck bound. Tishby emphasized that It is the mutual information, not the layer size or the VC dimension, that determines generalization, different from standard theories.
 
@@ -173,7 +173,7 @@ Cited as:
 }
 ```
 
-## References[#](#references)
+## References
 
 [1] Naftali Tishby. [Information Theory of Deep Learning](https://youtu.be/bLqJHjXihK8)
 

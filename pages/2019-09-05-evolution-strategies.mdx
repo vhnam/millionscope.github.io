@@ -15,7 +15,7 @@ Stochastic gradient descent is a universal choice for optimizing deep learning m
 
 **Evolution Strategies (ES)** is one type of black-box optimization algorithms, born in the family of **Evolutionary Algorithms (EA)**. In this post, I would dive into a couple of classic ES methods and introduce a few applications of how ES can play a role in deep reinforcement learning.
 
-## What are Evolution Strategies?[#](#what-are-evolution-strategies)
+## What are Evolution Strategies?
 
 Evolution strategies (ES) belong to the big family of evolutionary algorithms. The optimization targets of ES are vectors of real numbers, $x \in \mathbb{R}^n$.
 
@@ -39,7 +39,7 @@ Starting with an initial value of $\theta$, we can continuously update $\theta$ 
 
 In **Genetic Algorithms (GA)**, another popular subcategory of EA, $x$ is a sequence of binary codes, $x \in \{0, 1\}^n$. While in ES, $x$ is just a vector of real numbers, $x \in \mathbb{R}^n$.
 
-## Simple Gaussian Evolution Strategies[#](#simple-gaussian-evolution-strategies)
+## Simple Gaussian Evolution Strategies
 
 [This](http://blog.otoro.net/2017/10/29/visual-evolution-strategies/) is the most basic and canonical version of evolution strategies. It models $p_\theta(x)$ as a $n$-dimensional isotropic Gaussian distribution, in which $\theta$ only tracks the mean $\mu$ and standard deviation $\sigma$.
 
@@ -68,7 +68,7 @@ $$
 
 5.  Repeat steps (2)-(4) until the result is good enough ✌️
 
-## Covariance Matrix Adaptation Evolution Strategies (CMA-ES)[#](#covariance-matrix-adaptation-evolution-strategies-cma-es)
+## Covariance Matrix Adaptation Evolution Strategies (CMA-ES)
 
 The standard deviation $\sigma$ accounts for the level of exploration: the larger $\sigma$ the bigger search space we can sample our offspring population. In [vanilla ES](#simple-gaussian-evolution-strategies), $\sigma^{(t+1)}$ is highly correlated with $\sigma^{(t)}$, so the algorithm is not able to rapidly adjust the exploration space when needed (i.e. when the confidence level changes).
 
@@ -174,7 +174,7 @@ $\alpha_{c1}$
 
 learning rate for $C$'s rank-1 update
 
-### Updating the Mean[#](#updating-the-mean)
+### Updating the Mean
 
 $$
 \mu^{(t+1)} = \mu^{(t)} + \alpha_\mu \frac{1}{\lambda}\sum_{i=1}^\lambda (x_i^{(t+1)} - \mu^{(t)})
@@ -182,7 +182,7 @@ $$
 
 CMA-ES has a learning rate $\alpha_\mu \leq 1$ to control how fast the mean $\mu$ should be updated. Usually it is set to 1 and thus the equation becomes the same as in vanilla ES, $\mu^{(t+1)} = \frac{1}{\lambda}\sum_{i=1}^\lambda (x_i^{(t+1)}$.
 
-### Controlling the Step Size[#](#controlling-the-step-size)
+### Controlling the Step Size
 
 The sampling process can be decoupled from the mean and standard deviation:
 
@@ -226,7 +226,7 @@ $$
 
 where $d_\sigma \approx 1$ is a damping parameter, scaling how fast $\ln\sigma$ should be changed.
 
-### Adapting the Covariance Matrix[#](#adapting-the-covariance-matrix)
+### Adapting the Covariance Matrix
 
 For the covariance matrix, it can be estimated from scratch using $y_i$ of elite samples (recall that $y_i \sim \mathcal{N}(0, C)$):
 
@@ -278,11 +278,11 @@ In all my examples above, each elite sample is considered to contribute an equal
 
 Fig. 3. Illustration of how CMA-ES works on a 2D optimization problem (the lighter color the better). Black dots are samples in one generation. The samples are more spread out initially but when the model has higher confidence in finding a good solution in the late stage, the samples become very concentrated over the global optimum. (Image source: [Wikipedia CMA-ES](https://en.wikipedia.org/wiki/CMA-ES))
 
-## Natural Evolution Strategies[#](#natural-evolution-strategies)
+## Natural Evolution Strategies
 
 Natural Evolution Strategies (**NES**; [Wierstra, et al, 2008](https://arxiv.org/abs/1106.4487)) optimizes in a search distribution of parameters and moves the distribution in the direction of high fitness indicated by the _natural gradient_.
 
-### Natural Gradients[#](#natural-gradients)
+### Natural Gradients
 
 Given an objective function $\mathcal{J}(\theta)$ parameterized by $\theta$, let's say our goal is to find the optimal $\theta$ to maximize the objective function value. A _plain gradient_ finds the steepest direction within a small Euclidean distance from the current $\theta$; the distance restriction is applied on the parameter space. In other words, we compute the plain gradient with respect to a small change of the absolute value of $\theta$. The optimal step is:
 
@@ -296,7 +296,7 @@ $$
 d^{*}_\text{N} = \operatorname*{argmax}_{\text{KL}[p_\theta \| p_{\theta+d}] = \epsilon} \mathcal{J}(\theta + d)
 $$
 
-### Estimation using Fisher Information Matrix[#](#estimation-using-fisher-information-matrix)
+### Estimation using Fisher Information Matrix
 
 But, how to compute $\text{KL}[p_\theta | p_{\theta+\Delta\theta}]$ precisely? By running Taylor expansion of $\log p_{\theta + d}$ at $\theta$, we get:
 
@@ -344,7 +344,7 @@ where $d_\text{N}^*$ only extracts the direction of the optimal moving step on $
 
 Fig. 4. The natural gradient samples (black solid arrows) in the right are the plain gradient samples (black solid arrows) in the left multiplied by the inverse of their covariance. In this way, a gradient direction with high uncertainty (indicated by high covariance with other samples) are penalized with a small weight. The aggregated natural gradient (red dash arrow) is therefore more trustworthy than the natural gradient (green solid arrow). (Image source: additional annotations on Fig 2 in [NES](https://arxiv.org/abs/1106.4487) paper)
 
-### NES Algorithm[#](#nes-algorithm)
+### NES Algorithm
 
 The fitness associated with one sample is labeled as $f(x)$ and the search distribution over $x$ is parameterized by $\theta$. NES is expected to optimize the parameter $\theta$ to achieve maximum expected fitness:
 
@@ -368,9 +368,9 @@ Besides natural gradients, NES adopts a couple of important heuristics to make t
 - NES applies **rank-based fitness shaping**, that is to use the _rank_ under monotonically increasing fitness values instead of using $f(x)$ directly. Or it can be a function of the rank ("utility function”), which is considered as a free parameter of NES.
 - NES adopts **adaptation sampling** to adjust hyperparameters at run time. When changing $\theta \to \theta'$, samples drawn from $p_\theta$ are compared with samples from $p_{\theta'}$ using [Mann-Whitney U-test(https://en.wikipedia.org/wiki/Mann%E2%80%93Whitney_U_test)]; if there shows a positive or negative sign, the target hyperparameter decreases or increases by a multiplication constant. Note the score of a sample $x'_i \sim p_{\theta'}(x)$ has importance sampling weights applied $w_i' = p_\theta(x) / p_{\theta'}(x)$.
 
-## Applications: ES in Deep Reinforcement Learning[#](#applications-es-in-deep-reinforcement-learning)
+## Applications: ES in Deep Reinforcement Learning
 
-### OpenAI ES for RL[#](#openai-es-for-rl)
+### OpenAI ES for RL
 
 The concept of using evolutionary algorithms in reinforcement learning can be traced back [long ago](https://arxiv.org/abs/1106.0221), but only constrained to tabular RL due to computational limitations.
 
@@ -402,7 +402,7 @@ Fig. 5. The algorithm for training a RL policy using evolution strategies. (Imag
 
 To make the performance more robust, OpenAI ES adopts virtual batch normalization (BN with mini-batch used for calculating statistics fixed), mirror sampling (sampling a pair of $(-\epsilon, \epsilon)$ for evaluation), and [fitness shaping](#fitness-shaping).
 
-### Exploration with ES[#](#exploration-with-es)
+### Exploration with ES
 
 Exploration ([vs exploitation](https://lilianweng.github.io/posts/2018-01-23-multi-armed-bandit/#exploitation-vs-exploration)) is an important topic in RL. The optimization direction in the ES algorithm [above](TBA) is only extracted from the cumulative return $F(\theta)$. Without explicit exploration, the agent might get trapped in a local optimum.
 
@@ -448,7 +448,7 @@ $$
 
 Fig. 6. (Left) The environment is Humanoid locomotion with a three-sided wall which plays a role as a deceptive trap to create local optimum. (Right) Experiments compare ES baseline and other variations that encourage exploration. (Image source: [NS-ES](https://arxiv.org/abs/1712.06560) paper)
 
-### CEM-RL[#](#cem-rl)
+### CEM-RL
 
 ![](assets/images/2019-09-05-evolution-strategies/CEM-RL.png)
 
@@ -467,7 +467,7 @@ Workflow:
   - c. The other half are updated together with the critic.
   - d. The new $\pi_mu$ and $\sigma$ is computed using top performing elite samples. [CMA-ES](#covariance-matrix-adaptation-evolution-strategies-cma-es) can be used for parameter update too.
 
-## Extension: EA in Deep Learning[#](#extension-ea-in-deep-learning)
+## Extension: EA in Deep Learning
 
 (This section is not on evolution strategies, but still an interesting and relevant reading.)
 
@@ -475,7 +475,7 @@ The _Evolutionary Algorithms_ have been applied on many deep learning problems. 
 
 Below I would like to introduce two applications in more detail, _Population-Based Training (PBT)_ and _Weight-Agnostic Neural Networks (WANN)_.
 
-### Hyperparameter Tuning: PBT[#](#hyperparameter-tuning-pbt)
+### Hyperparameter Tuning: PBT
 
 ![](assets/images/2019-09-05-evolution-strategies/PBT.png)
 
@@ -494,7 +494,7 @@ In this process, only promising model and hyperparameter pairs can survive and k
 
 Fig. 9. The algorithm of population-based training. (Image source: [PBT](https://arxiv.org/abs/1711.09846) paper)
 
-### Network Topology Optimization: WANN[#](#network-topology-optimization-wann)
+### Network Topology Optimization: WANN
 
 _Weight Agnostic Neural_ Networks (short for **WANN**; [Gaier & Ha 2019](https://arxiv.org/abs/1906.04358)) experiments with searching for the smallest network topologies that can achieve the optimal performance without training the network weights. By not considering the best configuration of network weights, WANN puts much more emphasis on the architecture itself, making the focus different from [NAS](http://openaccess.thecvf.com/content_cvpr_2018/papers/Zoph_Learning_Transferable_Architectures_CVPR_2018_paper.pdf). WANN is heavily inspired by a classic genetic algorithm to evolve network topologies, called _NEAT_ ("Neuroevolution of Augmenting Topologies”; [Stanley & Miikkulainen 2002](http://nn.cs.utexas.edu/downloads/papers/stanley.gecco02_1.pdf)).
 
@@ -531,7 +531,7 @@ Cited as:
 }
 ```
 
-## References[#](#references)
+## References
 
 [1] Nikolaus Hansen. ["The CMA Evolution Strategy: A Tutorial”](https://arxiv.org/abs/1604.00772) arXiv preprint arXiv:1604.00772 (2016).
 

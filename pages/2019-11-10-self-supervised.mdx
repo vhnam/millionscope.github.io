@@ -25,7 +25,7 @@ Fig. 1. A great summary of how self-supervised learning tasks can be constructed
 
 Note that this post does not focus on either NLP / [language modeling](https://lilianweng.github.io/posts/2019-01-31-lm/) or [generative modeling](https://lilianweng.github.io/tags/generative-model/).
 
-## Why Self-Supervised Learning?[#](#why-self-supervised-learning)
+## Why Self-Supervised Learning?
 
 Self-supervised learning empowers us to exploit a variety of labels that come with the data for free. The motivation is quite straightforward. Producing a dataset with clean labels is expensive but unlabeled data is being generated all the time. To make use of this much larger amount of unlabeled data, one way is to set the learning objectives properly so as to get supervision from the data itself.
 
@@ -35,13 +35,13 @@ For example, we might rotate images at random and train a model to predict how e
 
 Broadly speaking, all the generative models can be considered as self-supervised, but with different goals: Generative models focus on creating diverse and realistic images, while self-supervised representation learning care about producing good features generally helpful for many tasks. Generative modeling is not the focus of this post, but feel free to check my [previous posts](https://lilianweng.github.io/tags/generative-model/).
 
-## Images-Based[#](#images-based)
+## Images-Based
 
 Many ideas have been proposed for self-supervised representation learning on images. A common workflow is to train a model on one or multiple pretext tasks with unlabelled images and then use one intermediate feature layer of this model to feed a multinomial logistic regression classifier on ImageNet classification. The final classification accuracy quantifies how good the learned representation is.
 
 Recently, some researchers proposed to train supervised learning on labelled data and self-supervised pretext tasks on unlabelled data simultaneously with shared weights, like in [Zhai et al, 2019](https://arxiv.org/abs/1905.03670) and [Sun et al, 2019](https://arxiv.org/abs/1909.11825).
 
-### Distortion[#](#distortion)
+### Distortion
 
 We expect small distortion on an image does not modify its original semantic meaning or geometric forms. Slightly distorted images are considered the same as original and thus the learned features are expected to be invariant to distortion.
 
@@ -63,7 +63,7 @@ In order to identify the same image with different rotations, the model has to l
 
 Fig. 3. Illustration of self-supervised learning by rotating the entire input images. The model learns to predict which rotation is applied. (Image source: [Gidaris et al. 2018](https://arxiv.org/abs/1803.07728))
 
-### Patches[#](#patches)
+### Patches
 
 The second category of self-supervised learning tasks extract multiple patches from one image and ask the model to predict the relationship between these patches.
 
@@ -129,7 +129,7 @@ $$
 
 [Fig. 7. Self-supervised representation learning by counting features. (Image source:](#counting-feature-loss) [Noroozi, et al, 2017](https://arxiv.org/abs/1708.06734))
 
-### Colorization[#](#colorization)
+### Colorization
 
 **Colorization** can be used as a powerful self-supervised task: a model is trained to color a grayscale input image; precisely the task is to map this image to a distribution over quantized color value outputs ([Zhang et al. 2016](https://arxiv.org/abs/1603.08511)).
 
@@ -143,7 +143,7 @@ Due to the multimodal nature of the colorization problem, cross-entropy loss of 
 
 To balance between common colors (usually low a*b* values, of common backgrounds like clouds, walls, and dirt) and rare colors (which are likely associated with key objects in the image), the loss function is rebalanced with a weighting term that boosts the loss of infrequent color buckets. This is just like why we need both [tf and idf](https://en.wikipedia.org/wiki/Tf%E2%80%93idf) for scoring words in information retrieval model. The weighting term is constructed as: $(1-\lambda)$ _ Gaussian-kernel-smoothed empirical probability distribution $+ \lambda$ _ a uniform distribution, where both distributions are over the quantized a*b* color space.
 
-### Generative Modeling[#](#generative-modeling)
+### Generative Modeling
 
 The pretext task in generative modeling is to reconstruct the original input while learning meaningful latent representation.
 
@@ -183,7 +183,7 @@ $$
 
 Fig. 10. Illustration of how Bidirectional GAN works. (Image source: [Donahue, et al, 2017](https://arxiv.org/abs/1605.09782))
 
-### Contrastive Learning[#](#contrastive-learning)
+### Contrastive Learning
 
 The **Contrastive Predictive Coding (CPC)** ([van den Oord, et al. 2018](https://arxiv.org/abs/1807.03748)) is an approach for unsupervised learning from high-dimensional data by translating a generative modeling problem to a classification problem. The _contrastive loss_ or _InfoNCE loss_ in CPC, inspired by [Noise Contrastive Estimation (NCE)](https://lilianweng.github.io/posts/2017-10-15-word-embedding/#noise-contrastive-estimation-nce), uses cross-entropy loss to measure how well the model can classify the "future" representation amongst a set of unrelated "negative" samples. Such design is partially motivated by the fact that the unimodal loss like MSE has no enough capacity but learning a full generative model could be too expensive.
 
@@ -231,13 +231,13 @@ $$
 
 For more content on contrastive learning, check out the post on ["Contrastive Representation Learning"](https://lilianweng.github.io/posts/2021-05-31-contrastive/).
 
-## Video-Based[#](#video-based)
+## Video-Based
 
 A video contains a sequence of semantically related frames. Nearby frames are close in time and more correlated than frames further away. The order of frames describes certain rules of reasonings and physical logics; such as that object motion should be smooth and gravity is pointing down.
 
 A common workflow is to train a model on one or multiple pretext tasks with unlabelled videos and then feed one intermediate feature layer of this model to fine-tune a simple model on downstream tasks of action classification, segmentation or object tracking.
 
-### Tracking[#](#tracking)
+### Tracking
 
 The movement of an object is traced by a sequence of video frames. The difference between how the same object is captured on the screen in close frames is usually not big, commonly triggered by small motion of the object or the camera. Therefore any visual representation learned for the same object across close frames should be close in the latent feature space. Motivated by this idea, [Wang & Gupta, 2015](https://arxiv.org/abs/1505.00687) proposed a way of unsupervised learning of visual representation by **tracking moving objects** in videos.
 
@@ -274,7 +274,7 @@ Relevant patches are tracked and extracted through a two-step unsupervised [opti
 
 During training, given a pair of correlated patches $\mathbf{x}$ and $\mathbf{x}^+$, $K$ random patches $\{\mathbf{x}^-\}$ are sampled in this same batch to form $K$ training triplets. After a couple of epochs, _hard negative mining_ is applied to make the training harder and more efficient, that is, to search for random patches that maximize the loss and use them to do gradient updates.
 
-### Frame Sequence[#](#frame-sequence)
+### Frame Sequence
 
 Video frames are naturally positioned in chronological order. Researchers have proposed several self-supervised tasks, motivated by the expectation that good representation should learn the _correct sequence_ of frames.
 
@@ -307,7 +307,7 @@ Interestingly, there exist a couple of artificial cues in the dataset. If not ha
 
 The AoT pretext task is shown to improve the performance on action classification downstream task when used as a pretraining step. Note that fine-tuning is still needed.
 
-### Video Colorization[#](#video-colorization)
+### Video Colorization
 
 [Vondrick et al. (2018)](https://arxiv.org/abs/1806.09594) proposed **video colorization** as a self-supervised learning problem, resulting in a rich representation that can be used for video segmentation and unlabelled visual region tracking, _without extra fine-tuning_.
 
@@ -337,13 +337,13 @@ Fig. 17. Use video colorization to track object segmentation and human pose in t
 > - Deeper networks improve the quality of representation;
 > - Supervised learning baselines still beat all of them by far.
 
-## Control-Based[#](#control-based)
+## Control-Based
 
 When running a RL policy in the real world, such as controlling a physical robot on visual inputs, it is non-trivial to properly track states, obtain reward signals or determine whether a goal is achieved for real. The visual data has a lot of noise that is irrelevant to the true state and thus the equivalence of states cannot be inferred from pixel-level comparison. Self-supervised representation learning has shown great potential in learning useful state embedding that can be used directly as input to a control policy.
 
 All the cases discussed in this section are in robotic learning, mainly for state representation from multiple camera views and goal representation.
 
-### Multi-View Metric Learning[#](#multi-view-metric-learning)
+### Multi-View Metric Learning
 
 The concept of metric learning has been mentioned multiple times in the [previous](#counting-feature-loss) [sections](#tracking). A common setting is: Given a triple of samples, (_anchor_ $s_a$, _positive_ sample $s_p$, _negative_ sample $s_n$), the learned representation embedding $\phi(s)$ fulfills that $s_a$ stays close to $s_p$ but far away from $s_n$ in the latent space.
 
@@ -407,7 +407,7 @@ The training data is sampled as follows:
 
 mfTCN embedding can capture the position and velocity of objects in the scene (e.g. in cartpole) and can also be used as inputs for policy.
 
-### Autonomous Goal Generation[#](#autonomous-goal-generation)
+### Autonomous Goal Generation
 
 **RIG** (**Reinforcement learning with Imagined Goals**; [Nair et al., 2018](https://arxiv.org/abs/1807.04742)) described a way to train a goal-conditioned policy with unsupervised representation learning. A policy learns from self-supervised practice by first imagining "fake" goals and then trying to achieve them.
 
@@ -455,7 +455,7 @@ $$
 
 Fig. 25. Examples of imagined goals generated by CVAE that conditions on the context image (the first row), while VAE fails to capture the object consistency. (Image source: [Nair, et al., 2019](https://arxiv.org/abs/1910.11670)).
 
-### Bisimulation[#](#bisimulation)
+### Bisimulation
 
 Task-agnostic representation (e.g. a model that intends to represent all the dynamics in the system) may distract the RL algorithms as irrelevant information is also presented. For example, if we just train an auto-encoder to reconstruct the input image, there is no guarantee that the entire learned representation will be useful for RL. Therefore, we need to move away from reconstruction-based representation learning if we only want to learn information relevant to control, as irrelevant details are still important for reconstruction.
 
@@ -554,7 +554,7 @@ Cited as:
 }
 ```
 
-## References[#](#references)
+## References
 
 [1] Alexey Dosovitskiy, et al. ["Discriminative unsupervised feature learning with exemplar convolutional neural networks."](https://arxiv.org/abs/1406.6909) IEEE transactions on pattern analysis and machine intelligence 38.9 (2015): 1734-1747.
 

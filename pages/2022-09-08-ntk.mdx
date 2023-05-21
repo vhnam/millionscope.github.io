@@ -17,11 +17,11 @@ Neural networks are [well known](https://lilianweng.github.io/posts/2019-03-14-o
 
 > 🤓 Different from my previous posts, this one mainly focuses on a small number of core papers, less on the breadth of the literature review in the field. There are many interesting works after NTK, with modification or expansion of the theory for understanding the learning dynamics of NNs, but they won't be covered here. The goal is to show all the math behind NTK in a clear and easy-to-follow format, so the post is quite math-intensive. If you notice any mistakes, please let me know and I will be happy to correct them quickly. Thanks in advance!
 
-## Basics[#](#basics)
+## Basics
 
 This section contains reviews of several very basic concepts which are core to understanding of neural tangent kernel. Feel free to skip.
 
-### Vector-to-vector Derivative[#](#vector-to-vector-derivative)
+### Vector-to-vector Derivative
 
 Given an input vector $\mathbf{x} \in \mathbb{R}^n$ (as a column vector) and a function $f: \mathbb{R}^n \to \mathbb{R}^m$, the derivative of $f$ with respective to $\mathbf{x}$ is a $m\times n$ matrix, also known as [_Jacobian matrix_](https://en.wikipedia.org/wiki/Jacobian_matrix_and_determinant):
 
@@ -36,7 +36,7 @@ Throughout the post, I use integer subscript(s) to refer to a single entry out o
 
 The gradient of a vector with respect to a vector is defined as $\nabla_\mathbf{x} f = J^\top \in \mathbb{R}^{n \times m}$ and this formation is also valid when $m=1$ (i.e., scalar output).
 
-### Differential Equations[#](#differential-equations)
+### Differential Equations
 
 Differential equations describe the relationship between one or multiple functions and their derivatives. There are two main types of differential equations.
 
@@ -53,7 +53,7 @@ $$
 \text{Finally}\quad y &= e^{ax + C'} = C e^{ax} \end{aligned}
 $$
 
-### Central Limit Theorem[#](#central-limit-theorem)
+### Central Limit Theorem
 
 Given a collection of i.i.d. random variables, $x_1, \dots, x_N$ with mean $\mu$ and variance $\sigma^2$, the _Central Limit Theorem (CTL)_ states that the expectation would be Gaussian distributed when $N$ becomes really large.
 
@@ -63,7 +63,7 @@ $$
 
 CTL can also apply to multidimensional vectors, and then instead of a single scale $\sigma^2$ we need to compute the covariance matrix of random variable $\sigma$.
 
-### Taylor Expansion[#](#taylor-expansion)
+### Taylor Expansion
 
 The [_Taylor expansion_](https://en.wikipedia.org/wiki/Taylor_series) is to express a function as an infinite sum of components, each represented in terms of this function's derivatives. The Tayler expansion of a function $f(x)$ at $x=a$ can be written as:$$
 f(x) = f(a) + \sum*{k=1}^\infty \frac{1}{k!} (x - a)^k\nabla^k_xf(x)\vert*{x=a}$$
@@ -75,7 +75,7 @@ $$
 f(x) \approx f(a) + (x - a)\nabla*x f(x)\vert*{x=a}
 $$
 
-### Kernel & Kernel Methods[#](#kernel--kernel-methods)
+### Kernel & Kernel Methods
 
 A [_kernel_](https://en.wikipedia.org/wiki/Kernel_method) is essentially a similarity function between two data points, $K: \mathcal{X} \times \mathcal{X} \to \mathbb{R}$. It describes how sensitive the prediction for one data sample is to the prediction for the other; or in other words, how similar two data points are. The kernel should be symmetric, $K(x, x') = K(x', x)$.
 
@@ -83,7 +83,7 @@ Depending on the problem structure, some kernels can be decomposed into two feat
 
 _Kernel methods_ are a type of non-parametric, instance-based machine learning algorithms. Assuming we have known all the labels of training samples $\{x^{(i)}, y^{(i)}\}$, the label for a new input $x$ is predicted by a weighted sum $\sum_{i} K(x^{(i)}, x)y^{(i)}$.
 
-### Gaussian Processes[#](#gaussian-processes)
+### Gaussian Processes
 
 _Gaussian process (GP)_ is a non-parametric method by modeling a multivariate Gaussian probability distribution over a collection of random variables. GP assumes a prior over functions and then updates the posterior over functions based on what data points are observed.
 
@@ -91,7 +91,7 @@ Given a collection of data points $\{x^{(1)}, \dots, x^{(N)}\}$, GP assumes that
 
 Check [this post](https://distill.pub/2019/visual-exploration-gaussian-processes/) for a high-quality and highly visualization tutorial on what Gaussian Processes are.
 
-## Notation[#](#notation)
+## Notation
 
 Let us consider a fully-connected neural networks with parameter $\theta$, $f(.;\theta): \mathbb{R}^{n_0} \to \mathbb{R}^{n_L}$. Layers are indexed from 0 (input) to $L$ (output), each containing $n_0, \dots, n_L$ neurons, including the input of size $n_0$ and the output of size $n_L$. There are $P = \sum_{l=0}^{L-1} (n_l + 1) n_{l+1}$ parameters in total and thus we have $\theta \in \mathbb{R}^P$.
 
@@ -109,7 +109,7 @@ Note that the _NTK parameterization_ applies a rescale weight $1/\sqrt{n_l}$ on 
 
 All the network parameters are initialized as an i.i.d Gaussian $\mathcal{N}(0, 1)$ in the following analysis.
 
-## Neural Tangent Kernel[#](#neural-tangent-kernel)
+## Neural Tangent Kernel
 
 **Neural tangent kernel (NTK)** ([Jacot et al. 2018](https://arxiv.org/abs/1806.07572)) is an important concept for understanding neural network training via gradient descent. At its core, it explains how updating the model parameters on one data sample affects the predictions for other samples.
 
@@ -153,11 +153,11 @@ $$
 
 The "feature map" form of one input $\mathbf{x}$ is $\varphi(\mathbf{x}) = \nabla_\theta f(\mathbf{x};\theta)$.
 
-## Infinite Width Networks[#](#infinite-width-networks)
+## Infinite Width Networks
 
 To understand why the effect of one gradient descent is so similar for different initializations of network parameters, several pioneering theoretical work starts with infinite width networks. We will look into detailed proof using NTK of how it guarantees that infinite width networks can converge to a global minimum when trained to minimize an empirical loss.
 
-### Connection with Gaussian Processes[#](#connection-with-gaussian-processes)
+### Connection with Gaussian Processes
 
 Deep neural networks have deep connection with gaussian processes ([Neal 1994](https://www.cs.toronto.edu/~radford/ftp/pin.pdf)). The output functions of a $L$-layer network, $f_i(\mathbf{x}; \theta)$ for $i=1, \dots, n_L$ , are i.i.d. centered Gaussian process of covariance $\sigma^{(L)}$, defined recursively as:
 
@@ -219,7 +219,7 @@ $$
 
 The form of Gaussian processes in the above process is referred to as the _Neural Network Gaussian Process (NNGP)_ ([Lee & Bahri et al. (2018)](https://arxiv.org/abs/1711.00165)).
 
-### Deterministic Neural Tangent Kernel[#](#deterministic-neural-tangent-kernel)
+### Deterministic Neural Tangent Kernel
 
 Finally we are now prepared enough to look into the most critical proposition from the NTK paper:
 
@@ -314,7 +314,7 @@ $$
 
 Later, [Arora et al. (2019)](https://arxiv.org/abs/1904.11955) provided a proof with a weaker limit, that does not require all the hidden layers to be infinitely wide, but only requires the minimum width to be sufficiently large.
 
-### Linearized Models[#](#linearized-models)
+### Linearized Models
 
 From the [previous section](#neural-tangent-kernel), according to the derivative chain rule, we have known that the gradient update on the output of an infinite width network is as follows; For brevity, we omit the inputs in the following analysis:
 
@@ -360,7 +360,7 @@ f(\theta) = (f(\theta(0)) - \mathcal{Y})e^{-\eta K*\infty t} + \mathcal{Y} \\
 = f(\theta(0))e^{-K*\infty t} + (I - e^{-\eta K\_\infty t})\mathcal{Y}
 $$
 
-### Lazy Training[#](#lazy-training)
+### Lazy Training
 
 People observe that when a neural network is heavily over-parameterized, the model is able to learn with the training loss quickly converging to zero but the network parameters hardly change. _Lazy training_ refers to the phenomenon. In other words, when the loss $\mathcal{L}$ has a decent amount of reduction, the change in the differential of the network $f$ (aka the Jacobian matrix) is still very small.
 
@@ -387,7 +387,7 @@ $$
 
 [Chizat et al. (2019)](https://arxiv.org/abs/1812.07956) showed the proof for a two-layer neural network that $\mathbb{E}[\kappa(\theta_0)] \to 0$ (getting into the lazy regime) when the number of hidden neurons $\to \infty$. Also, recommend [this post](https://rajatvd.github.io/NTK/) for more discussion on linearized models and lazy training.
 
-## Citation[#](#citation)
+## Citation
 
 Cited as:
 
@@ -406,7 +406,7 @@ Or
 }
 ```
 
-## References[#](#references)
+## References
 
 [1] Jacot et al. ["Neural Tangent Kernel: Convergence and Generalization in Neural Networks."](https://arxiv.org/abs/1806.07572) NeuriPS 2018.
 

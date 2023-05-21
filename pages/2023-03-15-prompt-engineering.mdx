@@ -26,11 +26,11 @@ Useful Resources
 - [PromptPerfect](https://promptperfect.jina.ai)
 - [Semantic Kernel](https://github.com/microsoft/semantic-kernel)
 
-## Basic Prompting[#](#basic-prompting)
+## Basic Prompting
 
 Zero-shot and few-shot learning are two most basic approaches for prompting the model, pioneered by many LLM papers and commonly used for benchmarking LLM performance.
 
-### Zero-Shot[#](#zero-shot)
+### Zero-Shot
 
 **Zero-shot learning** is to simply feed the task text to the model and ask for results.
 
@@ -39,7 +39,7 @@ Zero-shot and few-shot learning are two most basic approaches for prompting the 
     Text: i'll bet the video game is a lot more fun than the film.
     Sentiment:
 
-### Few-shot[#](#few-shot)
+### Few-shot
 
 **Few-shot learning** presents a set of high-quality demonstrations, each consisting of both input and desired output, on the target task. As the model first sees good examples, it can better understand human intention and criteria for what kinds of answers are wanted. Therefore, few-shot learning often leads to better performance than zero-shot. However, it comes at the cost of more token consumption and may hit the context length limit when input and output text are long.
 
@@ -59,7 +59,7 @@ Many studies looked into how to construct in-context examples to maximize the pe
 
 [Zhao et al. (2021)](https://arxiv.org/abs/2102.09690) investigated the case of few-shot classification and proposed that several biases with LLM (they use GPT-3 in the experiments) contribute to such high variance: (1) _Majority label bias_ exists if distribution of labels among the examples is unbalanced; (2) _Recency bias_ refers to the tendency where the model may repeat the label at the end; (3) _Common token bias_ indicates that LLM tends to produce common tokens more often than rare tokens. To conquer such bias, they proposed a method to calibrate the label probabilities output by the model to be uniform when the input string is `N/A`.
 
-#### Tips for Example Selection[#](#tips-for-example-selection)
+#### Tips for Example Selection
 
 - Choose examples that are semantically similar to the test example using $k$-NN clustering in the embedding space ([Liu et al., 2021](https://arxiv.org/abs/2101.06804))
 - To select a diverse and representative set of examples, [Su et al. (2022)](https://arxiv.org/abs/2209.01975) proposed to use a graph-based approach:
@@ -79,12 +79,12 @@ Many studies looked into how to construct in-context examples to maximize the pe
 - Some researchers tried [Q-Learning](https://lilianweng.github.io/posts/2018-02-19-rl-overview/#q-learning-off-policy-td-control) to do sample selection. ([Zhang et al. 2022](https://arxiv.org/abs/2211.04486))
 - Motivated by uncertainty-based [active learning](https://lilianweng.github.io/posts/2022-02-20-active-learning/), [Diao et al. (2023)](https://arxiv.org/abs/2302.12246) suggested to identify examples with high disagreement or entropy among multiple sampling trials. Then annotate these examples to be used in few-shot prompts.
 
-#### Tips for Example Ordering[#](#tips-for-example-ordering)
+#### Tips for Example Ordering
 
 - A general suggestion is to keep the selection of examples diverse, relevant to the test sample and in random order to avoid majority label bias and recency bias.
 - Increasing model sizes or including more training examples does not reduce variance among different permutations of in-context examples. Same order may work well for one model but badly for another. When the validation set is limited, consider choosing the order such that the model does not produce extremely unbalanced predictions or being overconfident about its predictions. ([Lu et al. 2022](https://arxiv.org/abs/2104.08786))
 
-## Instruction Prompting[#](#instruction-prompting)
+## Instruction Prompting
 
 The purpose of presenting few-shot examples in the prompt is to explain our intent to the model; in other words, describe the task instruction to the model in the form of demonstrations. However, few-shot can be expensive in terms of token usage and restricts the input length due to limited context length. So, why not just give the instruction directly?
 
@@ -122,15 +122,15 @@ _In-context instruction learning_ ([Ye et al. 2023](https://arxiv.org/abs/2302.1
     Output:
 ```
 
-## Self-Consistency Sampling[#](#self-consistency-sampling)
+## Self-Consistency Sampling
 
 **Self-consistency sampling** ([Wang et al. 2022a](https://arxiv.org/abs/2203.11171)) is to sample multiple outputs with temperature > 0 and then selecting the best one out of these candidates. The criteria for selecting the best candidate can vary from task to task. A general solution is to pick **majority vote**. For tasks that are easy to validate such as a programming question with unit tests, we can simply run through the interpreter and verify the correctness with unit tests.
 
-## Chain-of-Thought (CoT)[#](#chain-of-thought-cot)
+## Chain-of-Thought (CoT)
 
 **Chain-of-thought (CoT) prompting** ([Wei et al. 2022](https://arxiv.org/abs/2201.11903)) generates a sequence of short sentences to describe reasoning logics step by step, known as _reasoning chains_ or _rationales_, to eventually lead to the final answer. The benefit of CoT is more pronounced for **complicated reasoning tasks**, while using **large models** (e.g. with more than 50B parameters). Simple tasks only benefit slightly from CoT prompting.
 
-### Types of CoT prompts[#](#types-of-cot-prompts)
+### Types of CoT prompts
 
 Two main types of CoT prompting:
 
@@ -161,7 +161,7 @@ Question: Marty has 100 centimeters of ribbon that he must cut into 4 equal part
 Answer: Let's think step by step.
 ```
 
-### Tips and Extensions[#](#tips-and-extensions)
+### Tips and Extensions
 
 - [Self-consistency sampling](#self-consistency-sampling) can improve reasoning accuracy by sampling a number of diverse answers and then taking the majority vote. ([Wang et al. 2022a](https://arxiv.org/abs/2203.11171))
 - Another approach for ensemble learning is to alter the example order or use model generated rationales to replace human-written ones to introduce randomness during multiple sample trials. Then aggregate model outputs with a majority vote to get final answer. ([Wang et al. 2022b](https://arxiv.org/abs/2207.00747))
@@ -179,7 +179,7 @@ Answer: Let's think step by step.
 Fig. 1. How Self-Ask works with external search queries.  
 (Image source: [Press et al. 2022](https://arxiv.org/abs/2210.03350)).
 
-## Automatic Prompt Design[#](#automatic-prompt-design)
+## Automatic Prompt Design
 
 Prompt is a sequence of prefix tokens that increase the probability of getting desired output given input. Therefore we can treat them as trainable parameters and [optimize them directly](https://lilianweng.github.io/posts/2021-01-02-controllable-text-generation/#smart-prompt-design) on the embedding space via gradient descent, such as **AutoPrompt** ([Shin et al., 2020](https://arxiv.org/abs/2010.15980), **Prefix-Tuning** ([Li & Liang (2021)](https://arxiv.org/abs/2101.00190)), **P-tuning** ([Liu et al. 2021](https://arxiv.org/abs/2103.10385)) and **Prompt-Tuning** ([Lester et al. 2021](https://arxiv.org/abs/2104.08691)). [This section in my "Controllable Neural Text Generation" post](https://lilianweng.github.io/posts/2021-01-02-controllable-text-generation/#smart-prompt-design) has a good coverage of them. The trend from AutoPrompt to Prompt-Tuning is that the setup gets gradually simplified.
 
@@ -201,11 +201,11 @@ To construct chain-of-thought prompts automatically, [Shum et al. (2023)](https:
 2.  _Demonstration selection_: Select a set of representative questions from each cluster; i.e. one demonstration from one cluster. Samples in each cluster are sorted by distance to the cluster centroid and those closer to the centroid are selected first.
 3.  _Rationale generation_: Use zero-shot CoT to generate reasoning chains for selected questions and construct few-shot prompt to run inference.
 
-## Augmented Language Models[#](#augmented-language-models)
+## Augmented Language Models
 
 A survey on augmented language models by [Mialon et al. (2023)](https://arxiv.org/abs/2302.07842) has great coverage over multiple categories of language models augmented with reasoning skills and the ability of using external tools. Recommend it.
 
-### Retrieval[#](#retrieval)
+### Retrieval
 
 Often we need to complete tasks that require latest knowledge after the model pretraining time cutoff or internal/private knowledge base. In that case, the model would not know the context if we don't explicitly provide it in the prompt. Many methods for [Open Domain Question Answering](https://lilianweng.github.io/posts/2020-10-29-odqa/) depend on first doing retrieval over a knowledge base and then incorporating the retrieved content as part of the prompt. The accuracy of such a process depends on the quality of both retrieval and generation steps.
 
@@ -243,7 +243,7 @@ Interestingly it is found to be beneficial even with only "internal retrieval", 
 
 And then with model-generated knowledge, prompt the LM further to get the answer.
 
-### Programming Language[#](#programming-language)
+### Programming Language
 
 Both **PAL** (Program-aided language models); [Gao et al. 2022](https://arxiv.org/abs/2211.10435)) and **PoT** (Program of Thoughts prompting; [Chen et al. 2022](https://arxiv.org/abs/2211.12588)) ask LLM to generate programming language statements to resolve natural language reasoning problems, hence offloading the solution step to a runtime such as a Python interpreter. Such setup decouples complex computation and reasoning. It relies on a LM with good enough coding skills.
 
@@ -251,7 +251,7 @@ Both **PAL** (Program-aided language models); [Gao et al. 2022](https://arxiv.or
 
 Fig. 2. Comparing CoT and PoT. (Image source: [Chen et al. 2022](https://arxiv.org/abs/2211.12588)).
 
-### External APIs[#](#external-apis)
+### External APIs
 
 **TALM** (Tool Augmented Language Models; [Parisi et al. 2022](https://arxiv.org/abs/2205.12255)) is a language model augmented with text-to-text API calls. LM is guided to generate `|tool-call` and `tool input text` conditioned on task input text to construct API call requests. When `|result` shows up, the specified tool API is called and the returned result gets appended to the text sequence. The final output is generated following `|output` token.
 
@@ -317,7 +317,7 @@ At inference time, decoding runs until the model produces "$\to$ " token, indica
 
 Toolformer currently does not support tool use in a chain (i.e. using the output of one tool as an input for another tool) or in an interactive way (i.e. adopt API response after human selection). Both are interesting future directions to expand the model for.
 
-## Citation[#](#citation)
+## Citation
 
 Cited as:
 
@@ -336,7 +336,7 @@ Or
 }
 ```
 
-## References[#](#references)
+## References
 
 [1] Zhao et al. ["Calibrate Before Use: Improving Few-shot Performance of Language Models."](https://arxiv.org/abs/2102.09690) ICML 2021
 

@@ -15,7 +15,7 @@ Source : https://lilianweng.github.io
 
 I would like to discuss several common exploration strategies in Deep RL here. As this is a very big topic, my post by no means can cover all the important subtopics. I plan to update it periodically and keep further enriching the content gradually in time.
 
-## Classic Exploration Strategies[#](#classic-exploration-strategies)
+## Classic Exploration Strategies
 
 As a quick recap, let's first go through several classic exploration algorithms that work out pretty well in the multi-armed bandit problem or simple tabular RL.
 
@@ -29,17 +29,17 @@ The following strategies could be used for better exploration in deep RL trainin
 - **Entropy loss term**: Add an entropy term $H(\pi(a \vert s))$ into the loss function, encouraging the policy to take diverse actions.
 - **Noise-based Exploration**: Add noise into the observation, action or even parameter space ([Fortunato, et al. 2017](https://arxiv.org/abs/1706.10295), [Plappert, et al. 2017](https://arxiv.org/abs/1706.01905)).
 
-## Key Exploration Problems[#](#key-exploration-problems)
+## Key Exploration Problems
 
 Good exploration becomes especially hard when the environment rarely provides rewards as feedback or the environment has distracting noise. Many exploration strategies are proposed to solve one or both of the following problems.
 
-### The Hard-Exploration Problem[#](#the-hard-exploration-problem)
+### The Hard-Exploration Problem
 
 The "hard-exploration" problem refers to exploration in an environment with very sparse or even deceptive reward. It is difficult because random exploration in such scenarios can rarely discover successful states or obtain meaningful feedback.
 
 [Montezuma's Revenge](<https://en.wikipedia.org/wiki/Montezuma%27s_Revenge_(video_game)>) is a concrete example for the hard-exploration problem. It remains as a few challenging games in Atari for DRL to solve. Many papers use Montezuma's Revenge to benchmark their results.
 
-### The Noisy-TV Problem[#](#the-noisy-tv-problem)
+### The Noisy-TV Problem
 
 The "Noisy-TV" problem started as a thought experiment in [Burda, et al (2018)](https://arxiv.org/abs/1810.12894). Imagine that an RL agent is rewarded with seeking novel experience, a TV with uncontrollable & unpredictable random noise outputs would be able to attract the agent's attention forever. The agent obtains new rewards from noisy TV consistently, but it fails to make any meaningful progress and becomes a "couch potato".
 
@@ -47,7 +47,7 @@ The "Noisy-TV" problem started as a thought experiment in [Burda, et al (2018)](
 
 Fig. 1. An agent is rewarded with novel experience in the experiment. If a maze has a noisy TC set up, the agent would be attracted and stop moving in the maze. (Image source: OpenAI Blog: ["Reinforcement Learning with Prediction-Based Rewards"](https://openai.com/blog/reinforcement-learning-with-prediction-based-rewards/))
 
-## Intrinsic Rewards as Exploration Bonuses[#](#intrinsic-rewards-as-exploration-bonuses)
+## Intrinsic Rewards as Exploration Bonuses
 
 One common approach to better exploration, especially for solving the [hard-exploration](#the-hard-exploration-problem) problem, is to augment the environment reward with an additional bonus signal to encourage extra exploration. The policy is thus trained with a reward composed of two terms, $r_t = r^e_t + \beta r^i_t$, where $\beta$ is a hyperparameter adjusting the balance between exploitation and exploration.
 
@@ -61,13 +61,13 @@ Same ideas can be applied to RL algorithms. In the following sections, methods o
 1.  Discovery of novel states
 2.  Improvement of the agent's knowledge about the environment.
 
-### Count-based Exploration[#](#count-based-exploration)
+### Count-based Exploration
 
 If we consider intrinsic rewards as rewarding conditions that surprise us, we need a way to measure whether a state is novel or appears often. One intuitive way is to count how many times a state has been encountered and to assign a bonus accordingly. The bonus guides the agent's behavior to prefer rarely visited states to common states. This is known as the **count-based exploration** method.
 
 Let $N_n(s)$ be the _empirical count_ function that tracks the real number of visits of a state $s$ in the sequence of $s_{1:n}$. Unfortunately, using $N_n(s)$ for exploration directly is not practical, because most of the states would have $N_n(s)=0$, especially considering that the state space is often continuous or high-dimensional. We need an non-zero count for most states, even when they haven't been seen before.
 
-#### Counting by Density Model[#](#counting-by-density-model)
+#### Counting by Density Model
 
 [Bellemare, et al. (2016)](https://arxiv.org/abs/1606.01868) used a **density model** to approximate the frequency of state visits and a novel algorithm for deriving a _pseudo-count_ from this density model. Let's first define a conditional probability over the state space, $\rho_n(s) = \rho(s \vert s_{1:n})$ as the probability of the $(n+1)$-th state being $s$ given the first $n$ states are $s_{1:n}$. To measure this empirically, we can simply use $N_n(s)/n$.
 
@@ -99,7 +99,7 @@ Experiments in [Bellemare et al., (2016)](https://arxiv.org/abs/1606.01868) adop
 
 The density model can also be a Gaussian Mixture Model as in [Zhao & Tresp (2018)](https://arxiv.org/abs/1902.08039). They used a variational GMM to estimate the density of trajectories (e.g. concatenation of a sequence of states) and its predicted probabilities to guide prioritization in experience replay in off-policy setting.
 
-#### Counting after Hashing[#](#counting-after-hashing)
+#### Counting after Hashing
 
 Another idea to make it possible to count high-dimensional states is to map states into **hash codes** so that the occurrences of states become trackable ([Tang et al. 2017](https://arxiv.org/abs/1611.04717)). The state space is discretized with a hash function $\phi: \mathcal{S} \mapsto \mathbb{Z}^k$. An exploration bonus $r^{i}: \mathcal{S} \mapsto \mathbb{R}$ is added to the reward function, defined as $r^{i}(s) = {N(\phi(s))}^{-1/2}$, where $N(\phi(s))$ is an empirical count of occurrences of $\phi(s)$.
 
@@ -123,11 +123,11 @@ $$
 
 One problem with this approach is that dissimilar inputs $s_i, s_j$ may be mapped to identical hash codes but the AE still reconstructs them perfectly. One can imagine replacing the bottleneck layer $b(s)$ with the hash codes $\lfloor b(s)\rceil$, but then gradients cannot be back-propagated through the rounding function. Injecting uniform noise could mitigate this effect, as the AE has to learn to push the latent variable far apart to counteract the noise.
 
-### Prediction-based Exploration[#](#prediction-based-exploration)
+### Prediction-based Exploration
 
 The second category of intrinsic exploration bonuses are rewarded for improvement of the agent's knowledge about the environment. The agent's familiarity with the environment dynamics can be estimated through a prediction model. This idea of using a prediction model to measure _curiosity_ was actually proposed quite a long time ago ([Schmidhuber, 1991](http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.45.957)).
 
-#### Forward Dynamics[#](#forward-dynamics)
+#### Forward Dynamics
 
 Learning a **forward dynamics prediction model** is a great way to approximate how much knowledge our model has obtained about the environment and the task MDPs. It captures an agent's capability of predicting the consequence of its own behavior, $f: (s_t, a_t) \mapsto s_{t+1}$. Such a model cannot be perfect (e.g. due to partial observation), the error $e(s_t, a_t) = | f(s_t, a_t) - s_{t+1} |^2_2$ can be used for providing intrinsic exploration rewards. The higher the prediction error, the less familiar we are with that state. The faster the error rate drops, the more learning progress signals we acquire.
 
@@ -223,7 +223,7 @@ Fig. 7. Illustration of training architecture for self-supervised exploration vi
 
 Because $r^i_t$ is differentiable, the intrinsic reward in the model could be directly optimized through gradient descent so as to inform the policy agent to change actions. This differentiable exploration approach is very efficient but limited by having a short exploration horizon.
 
-#### Random Networks[#](#random-networks)
+#### Random Networks
 
 But, what if the prediction task is not about the environment dynamics at all? It turns out when the prediction is for a random task, it still can help exploration.
 
@@ -249,7 +249,7 @@ Two factors are important in RND experiments:
 
 The RND setup works well for resolving the hard-exploration problem. For example, maximizing the RND exploration bonus consistently finds more than half of the rooms in Montezuma's Revenge.
 
-#### Physical Properties[#](#physical-properties)
+#### Physical Properties
 
 Different from games in simulators, some RL applications like Robotics need to understand objects and intuitive reasoning in the physical world. Some prediction tasks require the agent to perform a sequence of interactions with the environment and to observe the corresponding consequences, such as estimating some hidden properties in physics (e.g. mass, friction, etc).
 
@@ -262,7 +262,7 @@ The agent in the experiments first goes through an exploration phase to interact
 
 In their experiments, the agent is able to learn in both tasks with performance varied by the difficulty of the task. Although the paper didn't use the physics prediction task to provide intrinsic reward bonus along with extrinsic reward associated with another learning task, rather it focused on the exploration tasks themselves. I do enjoy the idea of encouraging sophisticated exploration behavior by predicting hidden physics properties in the environment.
 
-## Memory-based Exploration[#](#memory-based-exploration)
+## Memory-based Exploration
 
 Reward-based exploration suffers from several drawbacks:
 
@@ -272,7 +272,7 @@ Reward-based exploration suffers from several drawbacks:
 
 Methods in this section rely on external memory to resolve disadvantages of reward bonus-based exploration.
 
-### Episodic Memory[#](#episodic-memory)
+### Episodic Memory
 
 As mentioned above, [RND](#RND) is better running in an non-episodic setting, meaning the prediction knowledge is accumulated across multiple episodes. The exploration strategy, **Never Give Up** (**NGU**; [Badia, et al. 2020a](https://arxiv.org/abs/2002.06038)), combines an episodic novelty module that can rapidly adapt within one episode with RND as a lifelong novelty module.
 
@@ -344,7 +344,7 @@ They claimed that the EC module can overcome the [noisy-TV](#the-noisy-tv-proble
 
 Fig. 12. The architecture of episodic curiosity (EC) module for intrinsic reward generation. (Image source: [Savinov, et al. 2019](https://arxiv.org/abs/1810.02274))
 
-### Direct Exploration[#](#direct-exploration)
+### Direct Exploration
 
 **Go-Explore** ([Ecoffet, et al., 2019](https://arxiv.org/abs/1901.10995)) is an algorithm aiming to solve the "hard-exploration" problem. It is composed of the following two phases.
 
@@ -378,7 +378,7 @@ Fig. 15. Different components in directed exploration with function approximatio
 
 The uncertainty measure of a state can be something simple like count-based bonuses or something complex like density or bayesian models. The paper trained a forward dynamics model and took its prediction error as the uncertainty metric.
 
-## Q-Value Exploration[#](#q-value-exploration)
+## Q-Value Exploration
 
 Inspired by [Thompson sampling](https://lilianweng.github.io/posts/2018-01-23-multi-armed-bandit/#thompson-sampling), **Bootstrapped DQN** ([Osband, et al. 2016](https://arxiv.org/abs/1602.04621)) introduces a notion of uncertainty in Q-value approximation in classic [DQN](https://lilianweng.github.io/posts/2018-02-19-rl-overview/#deep-q-network) by using the [bootstrapping](<https://en.wikipedia.org/wiki/Bootstrapping_(statistics)>) method. Bootstrapping is to approximate a distribution by sampling with replacement from the same population multiple times and then aggregate the results.
 
@@ -401,7 +401,7 @@ $$
 \mathcal{L}(\theta, \theta^{-}, p, \mathcal{D}; \gamma) = \sum_{t\in\mathcal{D}}\Big( r_t + \gamma \max_{a'\in\mathcal{A}} (\underbrace{Q_{\theta^-} + p)}_\text{target Q}(s'_t, a') - \underbrace{(Q_\theta + p)}_\text{Q to optimize}(s_t, a_t) \Big)^2
 $$
 
-## Varitional Options[#](#varitional-options)
+## Varitional Options
 
 Options are policies with termination conditions. There are a large set of options available in the search space and they are independent of an agent's intentions. By explicitly including intrinsic options into modeling, the agent can obtain intrinsic rewards for exploration.
 
@@ -447,7 +447,7 @@ Fig. 18. The decoder of VALOR is a biLSTM which takes $N = 11$ equally spaced ob
 
 DIAYN ("Diversity is all you need"; [Eysenbach, et al. 2018](https://arxiv.org/abs/1802.06070)) has the idea lying in the same direction, although with a different name — DIAYN models the policies conditioned on a latent _skill_ variable. See my [previous post](https://lilianweng.github.io/posts/2019-06-23-meta-rl/#learning-with-random-rewards) for more details.
 
-## Citation[#](#citation)
+## Citation
 
 Cited as:
 
@@ -466,7 +466,7 @@ Or
 }
 ```
 
-## Reference[#](#reference)
+## Reference
 
 [1] Pierre-Yves Oudeyer & Frederic Kaplan. ["How can we define intrinsic motivation?"](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.567.6524&rep=rep1&type=pdf) Conf. on Epigenetic Robotics, 2008.
 

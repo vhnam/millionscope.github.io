@@ -21,7 +21,7 @@ Disclaimers given so many papers in the wild:
 - We mostly focus on QA models that contain neural networks, specially Transformer-based language models.
 - I admit that I missed a lot of papers with architectures designed specifically for QA tasks between 2017-2019😔
 
-## What is Open-Domain Question Answering?[#](#what-is-open-domain-question-answering)
+## What is Open-Domain Question Answering?
 
 **Open-domain Question Answering (ODQA)** is a type of language tasks, asking a model to produce answers to factoid questions in natural language. The true answer is objective, so it is simple to evaluate model performance.
 
@@ -44,17 +44,17 @@ When considering different types of open-domain questions, I like the classifica
 
 Fig. 1. Overview of three frameworks discussed in this post.
 
-### Notation[#](#notation)
+### Notation
 
 Given a question $x$ and a ground truth answer span $y$, the context passage containing the true answer is labelled as $z \in \mathcal{Z}$, where $\mathcal{Z}$ is an external knowledge corpus. Wikipedia is a common choice for such an external knowledge source.
 
-### Concerns of QA data fine-tuning[#](#concerns-of-qa-data-fine-tuning)
+### Concerns of QA data fine-tuning
 
 Before we dive into the details of many models below. I would like to point out one concern of fine-tuning a model with common QA datasets, which appears as one fine-tuning step in several ODQA models. It could be concerning, because there is a significant overlap between questions in the train and test sets in several public QA datasets.
 
 [Lewis, et al., (2020)](https://arxiv.org/abs/2008.02637) ([code](https://github.com/facebookresearch/QA-Overlap)) found that 58-71% of test-time answers are also present somewhere in the training sets and 28-34% of test-set questions have a near-duplicate paraphrase in their corresponding training sets. In their experiments, several models performed notably worse when duplicated or paraphrased questions were removed from the training set.
 
-## Open-book QA: Retriever-Reader[#](#open-book-qa-retriever-reader)
+## Open-book QA: Retriever-Reader
 
 Given a factoid question, if a language model has no context or is not big enough to memorize the context which exists in the training dataset, it is unlikely to guess the correct answer. In an open-book exam, students are allowed to refer to external resources like notes and books while answering test questions. Similarly, a ODQA system can be paired with a rich knowledge base to identify relevant documents as evidence of answers.
 
@@ -69,11 +69,11 @@ Fig. 2. The retriever-reader QA framework combines information retrieval with ma
 
 Such a retriever + reader framework was first proposed in **DrQA** ("Document retriever Question-Answering" by [Chen et al., 2017](https://arxiv.org/abs/1704.00051); [code](https://github.com/facebookresearch/DrQA)). The retriever and the reader components can be set up and trained independently, or jointly trained [end-to-end](#end-to-end-joint-training).
 
-### Retriever Model[#](#retriever-model)
+### Retriever Model
 
 Two popular approaches for implementing the retriever is to use the information retrieval (IR) system that depends on (1) the classic non-learning-based [TF-IDF](https://en.wikipedia.org/wiki/Tf%E2%80%93idf) features ("classic IR") or (2) dense embedding vectors of text produced by neural networks ("neural IR").
 
-#### Classic IR[#](#classic-ir)
+#### Classic IR
 
 **DrQA** ([Chen et al., 2017](https://arxiv.org/abs/1704.00051)) adopts an efficient non-learning-based search engine based on the [vector space model](https://en.wikipedia.org/wiki/Vector_space_model). Every query and document is modelled as a bag-of-word vector, where each term is weighted by TF-IDF (term frequency $\times$ inverse document frequency).
 
@@ -95,7 +95,7 @@ Fig. 3. An illustration of BERTserini architecture. (Image source: [Yang et al.,
 
 _ElasticSearch + BM25_ is used by the **Multi-passage BERT** QA model ([Wang et al., 2019](https://arxiv.org/abs/1908.08167)). They found that splitting articles into passages with the length of 100 words by _sliding window_ brings 4% improvements, since splitting documents into passages without overlap may cause some near-boundary evidence to lose useful contexts.
 
-#### Neural IR[#](#neural-ir)
+#### Neural IR
 
 There is a long history in learning a low-dimensional representation of text, denser than raw term-based vectors ([Deerwester et al., 1990](http://lsa.colorado.edu/papers/JASIS.lsi.90.pdf); [Yih, et al., 2011](https://www.aclweb.org/anthology/W11-0329/)). Dense representations can be learned through matrix decomposition or some neural network architectures (e.g. MLP, LSTM, bidirectional LSTM, etc). When involving neural networks, such approaches are referred to as "Neural IR", Neural IR is a new category of methods for retrieval problems, but it is not necessary to perform better/superior than classic IR ([Lim, 2018](https://sigir.org/wp-content/uploads/2019/01/p040.pdf)).
 
@@ -135,11 +135,11 @@ Fig. 4. An illustration of Dense-Sparse Phrase Index (DenSPI) architecture. (Ima
 
 At the inference time, the question is mapped into the same vector space $x=[d', s'] \in \mathbb{R}^{d^d + d^s}$, where the dense vector $d'$ is extracted from the BERT embedding of the special `[CLS]` symbol. The same BERT model is shared for encoding both questions and phrases. The final answer is predicted by $k^*, i^*, j^* = \arg\max x^\top z_k^{(i:j)}$.
 
-### Reader Model[#](#reader-model)
+### Reader Model
 
 The reader model learns to solve the reading comprehension task — extract an answer for a given question from a given context document. Here we only discuss approaches for machine comprehension using neural networks.
 
-#### Bi-directional LSTM[#](#bi-directional-lstm)
+#### Bi-directional LSTM
 
 The reader model for answer detection of **DrQA** ([Chen et al., 2017](https://arxiv.org/abs/1704.00051)) is a 3-layer bidirectional LSTM with hidden size 128. Every relevant paragraph of retrieved Wikipedia articles is encoded by a sequence of feature vector, $\{\tilde{\mathbf{z}}_1, \dots, \tilde{\mathbf{z}}_m \}$. Each feature vector $\hat{\mathbf{z}}_i \in \mathbb{R}^{d_z}$ is expected to capture useful contextual information around one token $z_i$. The feature consists of several categories of features:
 
@@ -180,7 +180,7 @@ $$
 
 where $\mathbf{W}_s$ and $\mathbf{W}_e$ are learned parameters.
 
-#### BERT-universe[#](#bert-universe)
+#### BERT-universe
 
 Following the success of [BERT](https://lilianweng.github.io/posts/2019-01-31-lm/#bert) ([Devlin et al., 2018](https://arxiv.org/abs/1810.04805)), many QA models develop the machine comprehension component based on BERT. Let's define the BERT model as a function that can take one or multiple strings (concatenated by `[SEP]`) as input and outputs a set of BERT encoding vectors for the special `[CLS]` token and every input token:
 
@@ -208,7 +208,7 @@ In addition, multi-passage BERT implemented an independent _passage ranker_ mode
 
 Interestingly, [Wang et al., 2019](https://arxiv.org/abs/1908.08167) found that _explicit inter-sentence matching_ does not seem to be critical for RC tasks with BERT; check the original paper for how the experiments were designed. One possible reason is that the multi-head self-attention layers in BERT has already embedded the inter-sentence matching.
 
-### End-to-end Joint Training[#](#end-to-end-joint-training)
+### End-to-end Joint Training
 
 The retriever and reader components can be jointly trained. This section covers R^3, ORQA, REALM and DPR. There are a lot of common designs, such as BERT-based dense vectors for retrieval and the loss function on maximizing the marginal likelihood of obtaining true answers.
 
@@ -375,7 +375,7 @@ DPR did a set of comparison experiments involving several different types of neg
 
 DPR found that using gold passages from the same mini-batch and one negative passage with high BM25 score works the best. To further improve the retrieval results, DPR also explored a setting where a BM25 score and a dense embedding retrieval score are linearly combined to serve as a new ranking function.
 
-## Open-book QA: Retriever-Generator[#](#open-book-qa-retriever-generator)
+## Open-book QA: Retriever-Generator
 
 Compared to the retriever-reader approach, the retriever-generator also has 2 stages but the second stage is to generate free text directly to answer the question rather than to extract start/end position in a retrieved passage. Some paper also refer to this as _Generative question answering_.
 
@@ -423,7 +423,7 @@ The _Fusion-in-Decoder_ approach, proposed by [Izacard & Grave (2020)](https://a
 
 Note that they did fine-tune the pretrained LM independently for each dataset.
 
-## Closed-book QA: Generative Language Model[#](#closed-book-qa-generative-language-model)
+## Closed-book QA: Generative Language Model
 
 Big language models have been pre-trained on a large collection of unsupervised textual corpus. Given enough parameters, these models are able to memorize some factual knowledge within parameter weights. Therefore, we can use these models to do question-answering without explicit context, just like in a closed-book exam. The pre-trained language models produce _free text_ to respond to questions, no explicit reading comprehension.
 
@@ -497,22 +497,22 @@ Check out this cool example in OpenAI API [playground viewer](https://beta.opena
     Q: What is H1N1?
     A: H1N1 is a strain of influenza.
 
-## Related Techniques[#](#related-techniques)
+## Related Techniques
 
-### Fast Maximum Inner Product Search (MIPS)[#](#fast-maximum-inner-product-search-mips)
+### Fast Maximum Inner Product Search (MIPS)
 
 MIPS (maximum inner product search) is a crucial component in many open-domain question answering models. In retriever + reader/generator framework, a large number of passages from the knowledge source are encoded and stored in a memory. A retrieval model is able to query the memory to identify the top relevant passages which have the maximum inner product with the question's embedding.
 
 We need fast MIPS because the number of precomputed passage representations can be gigantic. There are several ways to achieve fast MIPS at run time, such as [asymmetric LSH](https://papers.nips.cc/paper/5329-asymmetric-lsh-alsh-for-sublinear-time-maximum-inner-product-search-mips.pdf), [data-dependent hashing](https://arxiv.org/abs/1501.01062), and [FAISS](https://github.com/facebookresearch/faiss).
 
-### Language Model Pre-training[#](#language-model-pre-training)
+### Language Model Pre-training
 
 Two pre-training tasks are especially helpful for QA tasks, as we have discussed above.
 
 - **Inverse Cloze Task** (proposed by [ORQA](#ORQA)): The goal of [Cloze Task](https://en.wikipedia.org/wiki/Cloze_test) is to predict masked-out text based on its context. The prediction of Inverse Cloze Task (ICT) is in the reverse direction, aiming to predict the context given a sentence. In the context of QA tasks, a random sentence can be treated as a pseudo-question, and its context can be treated as pseudo-evidence.
 - **Salient Spans Masking** (proposed by [REALM](#REALM)): Salient span masking is a special case for MLM task in language model training. First, we find _salient spans_ by using a tagger to identify named entities and a regular expression to identify dates. Then one of the detected salient spans is selected and masked. The task is to predict this masked salient span.
 
-## Summary[#](#summary)
+## Summary
 
 Model
 
@@ -638,7 +638,7 @@ No
 
 Fig. 16. A comparison of performance of several QA models on common QA datasets. On TriviaQA, two columns of results are reported, on the open domain test set (left) and on the hidden test set (right). (Image source: [Izacard & Grave, 2020](https://arxiv.org/abs/2007.01282)).
 
-## Citation[#](#citation)
+## Citation
 
 Cited as:
 
@@ -657,7 +657,7 @@ Or
 }
 ```
 
-## Appendix: QA Datasets[#](#appendix-qa-datasets)
+## Appendix: QA Datasets
 
 - [SQuAD 2.0](https://rajpurkar.github.io/SQuAD-explorer/): the Stanford QA dataset.
 - [RACE](http://www.qizhexie.com/data/RACE_leaderboard): a reading comprehension dataset collected from English Examinations that are created for middle school and high school students.
@@ -680,7 +680,7 @@ Or
 - [AmbigNQ](https://nlp.cs.washington.edu/ambigqa/): ambiguous questions selected from NQ-OPEN dataset.
 - [QA-Overlap](https://github.com/facebookresearch/QA-Overlap): a collections of overlapped answers/questions between train and test set for Natural Questions, TriviaQA, and WebQuestions.
 
-## References[#](#references)
+## References
 
 [1] Danqi Chen & Scott Yih. ["ACL2020 Tutorial: Open-Domain Question Answering"](https://github.com/danqi/acl2020-openqa-tutorial) July 2020.
 

@@ -20,7 +20,7 @@ There are two main approaches for learning word embedding, both relying on the c
 - **Count-based**: The first one is unsupervised, based on matrix factorization of a global word co-occurrence matrix. Raw co-occurrence counts do not work well, so we want to do smart things on top.
 - **Context-based**: The second approach is supervised. Given a local context, we want to design a model to predict the target words and in the meantime, this model learns the efficient word embedding representation.
 
-## Count-Based Vector Space Model[#](#count-based-vector-space-model)
+## Count-Based Vector Space Model
 
 Count-based vector space models heavily rely on the word frequency and co-occurrence matrix with the assumption that words in the same contexts share similar or related semantic meanings. The models map count-based statistics like co-occurrences between neighboring words down to a small and dense word vectors. PCA, topic models, and neural probabilistic language models are all good examples of this category.
 
@@ -28,7 +28,7 @@ Count-based vector space models heavily rely on the word frequency and co-occurr
 
 Different from the count-based approaches, context-based methods build predictive models that directly target at predicting a word given its neighbors. The dense word vectors are part of the model parameters. The best vector representation of each word is learned during the model training process.
 
-## Context-Based: Skip-Gram Model[#](#context-based-skip-gram-model)
+## Context-Based: Skip-Gram Model
 
 Suppose that you have a sliding window of a fixed size moving along a sentence: the word in the middle is the "target" and those on its left and right within the sliding window are the context words. The skip-gram model ([Mikolov et al., 2013](https://arxiv.org/pdf/1301.3781.pdf)) is trained to predict the probabilities of a word being a context word for the given target.
 
@@ -107,7 +107,7 @@ According to Fig. 1,
 - The multiplication of the hidden layer and the word context matrix $W'$ of size $N \times V$ produces the output one-hot encoded vector $\mathbf{y}$.
 - The output context matrix $W'$ encodes the meanings of words as context, different from the embedding matrix $W$. NOTE: Despite the name, $W'$ is independent of $W$, not a transpose or inverse or whatsoever.
 
-## Context-Based: Continuous Bag-of-Words (CBOW)[#](#context-based-continuous-bag-of-words-cbow)
+## Context-Based: Continuous Bag-of-Words (CBOW)
 
 The Continuous Bag-of-Words (CBOW) is another similar model for learning word vectors. It predicts the target word (i.e. "swing") from source context words (i.e., "sentence should the sword").
 
@@ -117,11 +117,11 @@ Fig. 2. The CBOW model. Word vectors of multiple context words are averaged to g
 
 Because there are multiple contextual words, we average their corresponding word vectors, constructed by the multiplication of the input vector and the matrix $W$. Because the averaging stage smoothes over a lot of the distributional information, some people believe the CBOW model is better for small dataset.
 
-## Loss Functions[#](#loss-functions)
+## Loss Functions
 
 Both the skip-gram model and the CBOW model should be trained to minimize a well-designed loss/objective function. There are several loss functions we can incorporate to train these language models. In the following discussion, we will use the skip-gram model as an example to describe how the loss is computed.
 
-### Full Softmax[#](#full-softmax)
+### Full Softmax
 
 The skip-gram model defines the embedding vector of every word by the matrix $W$ and the context vector by the output matrix $W'$. Given an input word $w_I$, let us label the corresponding row of $W$ as vector $v_{w_I}$ (embedding vector) and its corresponding column of $W'$ as $v'_{w_I}$ (context vector). The final output layer applies softmax to compute the probability of predicting the output word $w_O$ given $w_I$, and therefore:
 
@@ -129,7 +129,7 @@ $$p(w_O \vert w_I) = \frac{\exp({v'_{w_O}}^{\top} v_{w_I})}{\sum_{i=1}^V \exp({v
 
 This is accurate as presented in Fig. 1. However, when $V$ is extremely large, calculating the denominator by going through all the words for every single sample is computationally impractical. The demand for more efficient conditional probability estimation leads to the new methods like _hierarchical softmax_.
 
-### Hierarchical Softmax[#](#hierarchical-softmax)
+### Hierarchical Softmax
 
 Morin and Bengio ([2005](https://www.iro.umontreal.ca/~lisa/pointeurs/hierarchical-nnlm-aistats05.pdf)) proposed hierarchical softmax to make the sum calculation faster with the help of a binary tree structure. The hierarchical softmax encodes the language model's output softmax layer into a tree hierarchy, where each leaf is one word and each internal node stands for relative probabilities of the children nodes.
 
@@ -154,7 +154,7 @@ where $L(w_O)$ is the depth of the path leading to the word $w_O$ and $\mathbb{I
 
 A good tree structure is crucial to the model performance. Several handy principles are: group words by frequency like what is implemented by Huffman tree for simple speedup; group similar words into same or close branches (i.e. use predefined word clusters, WordNet).
 
-### Cross Entropy[#](#cross-entropy)
+### Cross Entropy
 
 Another approach completely steers away from the softmax framework. Instead, the loss function measures the cross entropy between the predicted probabilities $p$ and the true binary labels $\mathbf{y}$.
 
@@ -187,7 +187,7 @@ According to the formula above, the correct output word has a positive reinforce
 
 How to estimate $\mathbb{E}_{w_i \sim Q(\tilde{w})} \nabla_\theta {v'_{w_i}}^{\top}{v_{w_I}}$ with a sample set of noise words rather than scanning through the entire vocabulary is the key of using cross-entropy-based sampling approach.
 
-### Noise Contrastive Estimation (NCE)[#](#noise-contrastive-estimation-nce)
+### Noise Contrastive Estimation (NCE)
 
 The Noise Contrastive Estimation (NCE) metric intends to differentiate the target word from noise samples using a logistic regression classifier ([Gutmann and Hyvärinen, 2010](http://proceedings.mlr.press/v9/gutmann10a/gutmann10a.pdf)).
 
@@ -243,7 +243,7 @@ The noise distribution $Q$ is a tunable parameter and we would like to design it
 
 For example, the sampling implementation ([log_uniform_candidate_sampler](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/python/ops/candidate_sampling_ops.py#L83)) of NCE loss in tensorflow assumes that such noise samples follow a log-uniform distribution, also known as [Zipfian's law](https://en.wikipedia.org/wiki/Zipf%27s_law). The probability of a given word in logarithm is expected to be reversely proportional to its rank, while high-frequency words are assigned with lower ranks. In this case, $q(\tilde{w}) = \frac{1}{ \log V}(\log (r_{\tilde{w}} + 1) - \log r_{\tilde{w}})$, where $r_{\tilde{w}} \in [1, V]$ is the rank of a word by frequency in descending order.
 
-### Negative Sampling (NEG)[#](#negative-sampling-neg)
+### Negative Sampling (NEG)
 
 The Negative Sampling (NEG) proposed by Mikolov et al. ([2013](https://papers.nips.cc/paper/5021-distributed-representations-of-words-and-phrases-and-their-compositionality.pdf)) is a simplified variation of NCE loss. It is especially famous for training Google's [word2vec](https://code.google.com/archive/p/word2vec/) project. Different from NCE Loss which attempts to approximately maximize the log probability of the softmax output, negative sampling did further simplification because it focuses on learning high-quality word embedding rather than modeling the word distribution in natural language.
 
@@ -261,7 +261,7 @@ $$
 \tilde{w}_i \sim Q}}^N \log \sigma(-{v'_{\tilde{w}_i}}^\top v_{w_I})]
 $$
 
-## Other Tips for Learning Word Embedding[#](#other-tips-for-learning-word-embedding)
+## Other Tips for Learning Word Embedding
 
 Mikolov et al. ([2013](https://papers.nips.cc/paper/5021-distributed-representations-of-words-and-phrases-and-their-compositionality.pdf)) suggested several helpful practices that could result in good word embedding learning outcomes.
 
@@ -269,7 +269,7 @@ Mikolov et al. ([2013](https://papers.nips.cc/paper/5021-distributed-representat
 - **Subsampling frequent words**. Extremely frequent words might be too general to differentiate the context (i.e. think about stopwords). While on the other hand, rare words are more likely to carry distinct information. To balance the frequent and rare words, Mikolov et al. proposed to discard words $w$ with probability $1-\sqrt{t/f(w)}$ during sampling. Here $f(w)$ is the word frequency and $t$ is an adjustable threshold.
 - **Learning phrases first**. A phrase often stands as a conceptual unit, rather than a simple composition of individual words. For example, we cannot really tell "New York" is a city name even we know the meanings of "new" and "york". Learning such phrases first and treating them as word units before training the word embedding model improves the outcome quality. A simple data-driven approach is based on unigram and bigram counts: $s_{\text{phrase}} = \frac{C(w_i w_j) - \delta}{ C(w_i)C(w_j)}$, where $C(.)$ is simple count of an unigram $w_i$ or bigram $w_i w_j$ and $\delta$ is a discounting threshold to prevent super infrequent words and phrases. Higher scores indicate higher chances of being phrases. To form phrases longer than two words, we can scan the vocabulary multiple times with decreasing score cutoff values.
 
-## GloVe: Global Vectors[#](#glove-global-vectors)
+## GloVe: Global Vectors
 
 The Global Vector (GloVe) model proposed by Pennington et al. ([2014](http://www.aclweb.org/anthology/D14-1162)) aims to combine the count-based matrix factorization and the context-based skip-gram model together.
 
@@ -325,7 +325,7 @@ f(c) = \begin{cases} (\frac{c}{c_{\max}})^\alpha & \text{if } c < c_{\max} \text
 1 & \text{if } \text{otherwise} \end{cases}
 $$
 
-## Examples: word2vec on "Game of Thrones"[#](#examples-word2vec-on-game-of-thrones)
+## Examples: word2vec on "Game of Thrones"
 
 After reviewing all the theoretical knowledge above, let's try a little experiment in word embedding extracted from "the Games of Thrones corpus". The process is super straightforward using [gensim](https://radimrehurek.com/gensim/models/word2vec.html).
 
@@ -434,7 +434,7 @@ Cited as:
 }
 ```
 
-## References[#](#references)
+## References
 
 [1] Tensorflow Tutorial [Vector Representations of Words](https://www.tensorflow.org/tutorials/word2vec).
 

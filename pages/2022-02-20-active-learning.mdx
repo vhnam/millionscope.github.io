@@ -13,7 +13,7 @@ Source : https://lilianweng.github.io
 
 This is part 2 of what to do when facing a limited amount of labeled data for supervised learning tasks. This time we will get some amount of human labeling work involved, but within a budget limit, and therefore we need to be smart when selecting which samples to label.
 
-## Notations[#](#notations)
+## Notations
 
 Symbol
 
@@ -63,7 +63,7 @@ $b$
 
 Batch size.
 
-## What is Active Learning?[#](#what-is-active-learning)
+## What is Active Learning?
 
 Given an unlabeled dataset $\mathcal{U}$ and a fixed amount of labeling cost $B$, active learning aims to select a subset of $B$ examples from $\mathcal{U}$ to be labeled such that they can result in maximized improvement in model performance. This is an effective way of learning especially when data labeling is difficult and costly, e.g. medical images. This classical [survey paper](https://burrsettles.com/pub/settles.activelearning.pdf) in 2010 lists many key concepts. While some conventional approaches may not apply to deep learning, discussion in this post mainly focuses on deep neural models and training in batch mode.
 
@@ -73,13 +73,13 @@ Fig. 1. Illustration of a cyclic workflow of active learning, producing better m
 
 To simplify the discussion, we assume that the task is a $K$-class classification problem in all the following sections. The model with parameters $\theta$ outputs a probability distribution over the label candidates, which may or may not be calibrated, $P_\theta(y \vert \mathbf{x})$ and the most likely prediction is $\hat{y} = \arg\max_{y \in \mathcal{Y}} P_\theta(y \vert \mathbf{x})$.
 
-## Acquisition Function[#](#acquisition-function)
+## Acquisition Function
 
 The process of identifying the most valuable examples to label next is referred to as "sampling strategy" or "query strategy". The scoring function in the sampling process is named "acquisition function", denoted as $U(\mathbf{x})$. Data points with higher scores are expected to produce higher value for model training if they get labeled.
 
 Here is a list of basic sampling strategies.
 
-### Uncertainty Sampling[#](#uncertainty-sampling)
+### Uncertainty Sampling
 
 **Uncertainty sampling** selects examples for which the model produces most uncertain predictions. Given a single model, uncertainty can be estimated by the predicted probabilities, although one common complaint is that deep learning model predictions are often not calibrated and not correlated with true uncertainty well. In fact, deep learning models are often overconfident.
 
@@ -93,28 +93,28 @@ Another way to quantify uncertainty is to rely on a committee of expert models, 
 - _Consensus entropy_: $U(\mathbf{x}) = \mathcal{H}(P_\mathcal{C})$, where $P_\mathcal{C}$ is the prediction averaging across the committee.
 - _KL divergence_: $U(\mathbf{x}) = \frac{1}{C} \sum_{c=1}^C D_\text{KL} (P_{\theta_c} | P_\mathcal{C})$
 
-### Diversity Sampling[#](#diversity-sampling)
+### Diversity Sampling
 
 **Diversity sampling** intend to find a collection of samples that can well represent the entire data distribution. Diversity is important because the model is expected to work well on any data in the wild, just not on a narrow subset. Selected samples should be representative of the underlying distribution. Common approaches often rely on quantifying the similarity between samples.
 
-### Expected Model Change[#](#expected-model-change)
+### Expected Model Change
 
 **Expected model change** refers to the impact that a sample brings onto the model training. The impact can be the influence on the model weights or the improvement over the training loss. A [later section](#measuring-training-effects) reviews several works on how to measure model impact triggered by selected data samples.
 
-### Hybrid Strategy[#](#hybrid-strategy)
+### Hybrid Strategy
 
 Many methods above are not mutually exclusive. A **hybrid** sampling strategy values different attributes of data points, combining different sampling preferences into one. Often we want to select uncertain but also highly representative samples.
 
-## Deep Acquisition Function[#](#deep-acquisition-function)
+## Deep Acquisition Function
 
-### Measuring Uncertainty[#](#measuring-uncertainty)
+### Measuring Uncertainty
 
 The model uncertainty is commonly categorized into two buckets ([Der Kiureghian & Ditlevsen 2009](https://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.455.9057&rep=rep1&type=pdf), [Kendall & Gal 2017](https://arxiv.org/abs/1703.04977)):
 
 - _Aleatoric uncertainty_ is introduced by noise in the data (e.g. sensor data, noise in the measurement process) and it can be input-dependent or input-independent. It is generally considered as irreducible since there is missing information about the ground truth.
 - _Epistemic uncertainty_ refers to the uncertainty within the model parameters and therefore we do not know whether the model can best explain the data. This type of uncertainty is theoretically reducible given more data
 
-#### Ensemble and Approximated Ensemble[#](#ensemble-and-approximated-ensemble)
+#### Ensemble and Approximated Ensemble
 
 There is a long tradition in machine learning of using ensembles to improve model performance. When there is a significant diversity among models, ensembles are expected to yield better results. This ensemble theory is proved to be correct by many ML algorithms; for example, [AdaBoost](https://en.wikipedia.org/wiki/AdaBoost) aggregates many weak learners to perform similar or even better than a single strong learner. [Bootstrapping](<https://en.wikipedia.org/wiki/Bootstrapping_(statistics)>) ensembles multiple trials of resampling to achieve more accurate estimation of metrics. Random forests or [GBM](https://en.wikipedia.org/wiki/Gradient_boosting) is also a good example for the effectiveness of ensembling.
 
@@ -136,7 +136,7 @@ Fig. 2. Active learning results of DBAL on MNIST. (Image source: [Gal et al. 201
 
 Unfortunately all the cheap implicit ensemble options above perform worse than naive ensembles. Considering the limit on computational resources, MC dropout is still a pretty good and economical choice. Naturally, people also try to combine ensemble and MC dropout ([Pop & Fulop 2018](https://arxiv.org/abs/1811.03897)) to get a bit of additional performance gain by stochastic ensemble.
 
-#### Uncertainty in Parameter Space[#](#uncertainty-in-parameter-space)
+#### Uncertainty in Parameter Space
 
 **Bayes-by-backprop** ([Blundell et al. 2015](https://arxiv.org/abs/1505.05424)) measures weight uncertainty in neural networks directly. The method maintains a probability distribution over the weights $\mathbf{w}$, which is modeled as a variational distribution $q(\mathbf{w} \vert \theta)$ since the true posterior $p(\mathbf{w} \vert \mathcal{D})$ is not tractable directly. The loss is to minimize the KL divergence between $q(\mathbf{w} \vert \theta)$ and $p(\mathbf{w} \vert \mathcal{D})$,
 
@@ -158,7 +158,7 @@ The process of Bayes-by-backprop can be summarized as:
 5.  Calculate the gradient of $f(\mathbf{w}, \theta)$ w.r.t. to $\mu$ and $\rho$ and then update $\theta$.
 6.  Uncertainty is measured by sampling different model weights during inference.
 
-#### Loss Prediction[#](#loss-prediction)
+#### Loss Prediction
 
 The loss objective guides model training. A low loss value indicates that a model can make good and accurate predictions. [Yoo & Kweon (2019)](https://arxiv.org/abs/1905.03677) designed a **loss prediction module** to predict the loss value for unlabeled inputs, as an estimation of how good a model prediction is on the given data. Data samples are selected if the loss prediction module makes uncertain predictions (high loss value) for them. The loss prediction module is a simple MLP with dropout, that takes several intermediate layer features as inputs and concatenates them after a global average pooling.
 
@@ -182,7 +182,7 @@ In experiments on three vision tasks, active learning selection based on the los
 
 Fig. 4. Active learning results of loss prediction module based selection, in comparison with other approaches. (Image source: [Yoo & Kweon 2019](https://arxiv.org/abs/1905.03677))
 
-#### Adversarial Setup[#](#adversarial-setup)
+#### Adversarial Setup
 
 [Sinha et al. (2019)](https://arxiv.org/abs/1904.00370) proposed a GAN-like setup, named **VAAL** (Variational Adversarial Active Learning), where a discriminator is trained to distinguish unlabeled data from labeled data. Interestingly, active learning acquisition criteria does not depend on the task performance in VAAL.
 
@@ -270,9 +270,9 @@ Given an unlabeled sample $\mathbf{x}$, CAL runs the following process:
 
 On a variety of classification tasks, the experiment results of CAL look similar to the entropy baseline.
 
-### Measuring Representativeness[#](#measuring-representativeness)
+### Measuring Representativeness
 
-#### Core-sets Approach[#](#core-sets-approach)
+#### Core-sets Approach
 
 A **core-set** is a concept in computational geometry, referring to a small set of points that approximates the shape of a larger point set. Approximation can be captured by some geometric measure. In the active learning, we expect a model that is trained over the core-set to behave comparably with the model on the entire data points.
 
@@ -300,7 +300,7 @@ It works well on image classification tasks when there is a small number of clas
 
 Because the core-set selection is expensive, [Coleman et al. (2020)](https://arxiv.org/abs/1906.11829) experimented with a weaker model (e.g. smaller, weaker architecture, not fully trained) and found that empirically using a weaker model as a proxy can significantly shorten each repeated data selection cycle of training models and selecting samples, without hurting the final error much. Their method is referred to as **SVP** (Selection via Proxy).
 
-#### Diverse Gradient Embedding[#](#diverse-gradient-embedding)
+#### Diverse Gradient Embedding
 
 **BADGE** (Batch Active learning by Diverse Gradient Embeddings; [Ash et al. 2020](https://arxiv.org/abs/1906.03671)) tracks both model uncertainty and data diversity in the gradient space. Uncertainty is measured by the gradient magnitude w.r.t. the final layer of the network and diversity is captured by a diverse set of samples that span in the gradient space.
 
@@ -311,9 +311,9 @@ Because the core-set selection is expensive, [Coleman et al. (2020)](https://arx
 
 Fig. 10. Algorithm of BADGE (batch active learning by diverse gradient embeddings). (Image source: [Ash et al. 2020](https://arxiv.org/abs/1906.03671))
 
-### Measuring Training Effects[#](#measuring-training-effects)
+### Measuring Training Effects
 
-#### Quantify Model Changes[#](#quantify-model-changes)
+#### Quantify Model Changes
 
 [Settles et al. (2008)](https://papers.nips.cc/paper/2007/hash/a1519de5b5d44b31a01de013b9b51a80-Abstract.html) introduced an active learning query strategy, named **EGL** (Expected Gradient Length). The motivation is to find samples that can trigger the greatest update on the model if their labels are known.
 
@@ -334,7 +334,7 @@ The underlying interpretation is to "seek $\mathbf{x}$ for which the model is ma
 
 BALD was originally proposed for an individual sample and [Kirsch et al. (2019)](https://arxiv.org/abs/1906.08158) extended it to work in batch mode.
 
-#### Forgetting Events[#](#forgetting-events)
+#### Forgetting Events
 
 To investigate whether neural networks have a tendency to **forget** previously learned information, [Mariya Toneva et al. (2019)](https://arxiv.org/abs/1812.05159) designed an experiment: They track the model prediction for each sample during the training process and count the transitions for each sample from being classified correctly to incorrectly or vice-versa. Then samples can be categorized accordingly,
 
@@ -357,7 +357,7 @@ In their implementation, dispersion is computed at every epoch. Label dispersion
 
 Fig. 11. Label dispersion is correlated with network uncertainty. On the x-axis, data points are sorted by label dispersion scores. The y-axis is the model prediction accuracy when the model trys to infer the labels for those samples. (Image source: [Bengar et al. 2021](https://arxiv.org/abs/2107.14707))
 
-### Hybrid[#](#hybrid)
+### Hybrid
 
 When running active learning in batch mode, it is important to control diversity within a batch. **Suggestive Annotation** (**SA**; [Yang et al. 2017](https://arxiv.org/abs/1706.04737)) is a two-step hybrid strategy, aiming to select both high uncertainty & highly representative labeled samples. It uses uncertainty obtained from an ensemble of models trained on the labeled data and core-sets for choosing representative data samples.
 
@@ -390,7 +390,7 @@ Active learning can be further combined with [semi-supervised learning](https://
 
 Fig. 12. Illustration of CEAL (cost-effective active learning). (Image source: [Yang et al. 2017](https://arxiv.org/abs/1701.03551))
 
-## Citation[#](#citation)
+## Citation
 
 Cited as:
 
@@ -409,7 +409,7 @@ Or
 }
 ```
 
-## References[#](#references)
+## References
 
 [1] Burr Settles. [Active learning literature survey.](https://burrsettles.com/pub/settles.activelearning.pdf) University of Wisconsin, Madison, 52(55-66):11, 2010.
 

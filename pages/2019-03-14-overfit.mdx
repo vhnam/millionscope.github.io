@@ -17,13 +17,13 @@ The effort in understanding why deep neural networks can generalize somehow remi
 
 I would like to discuss a couple of papers on generalizability and complexity measurement of deep learning models in the post. Hopefully, it could shed light on your thinking path towards the understanding of why DNN can generalize.
 
-## Classic Theorems on Compression and Model Selection[#](#classic-theorems-on-compression-and-model-selection)
+## Classic Theorems on Compression and Model Selection
 
 Let's say we have a classification problem and a dataset, we can develop many models to solve it, from fitting a simple linear regression to memorizing the full dataset in disk space. Which one is better? If we only care about the accuracy over training data (especially given that testing data is likely unknown), the memorization approach seems to be the best — well, it doesn't sound right.
 
 There are many classic theorems to guide us when deciding what types of properties a good model should possess in such scenarios.
 
-### Occam's Razor[#](#occams-razor)
+### Occam's Razor
 
 [Occam's Razor](http://pespmc1.vub.ac.be/OCCAMRAZ.html) is an informal principle for problem-solving, proposed by [William of Ockham](https://en.wikipedia.org/wiki/William_of_Ockham) in the 14th century:
 
@@ -33,7 +33,7 @@ The statement is extremely powerful when we are facing multiple candidates of un
 
 Think of this, it took people hundreds of years to figure out that the sky is blue in the daytime but reddish at sunset are because of the same reason ([Rayleigh scattering](https://en.wikipedia.org/wiki/Rayleigh_scattering)), although two phenomena look very different. People must have proposed many other explanations for them separately but the unified and simple version won eventually.
 
-### Minimum Description Length principle[#](#minimum-description-length-principle)
+### Minimum Description Length principle
 
 The principle of Occam's Razor can be similarly applied to machine learning models. A formalized version of such concept is called the _Minimum Description Length (MDL)_ principle, used for comparing competing models / explanations given data observed.
 
@@ -56,7 +56,7 @@ In simple words, the _best_ model is the _smallest_ model containing the encoded
 
 People might argue Occam's Razor is wrong, as given the real world can be arbitrarily complicated, why do we have to find simple models? One interesting view by MDL is to consider models as **"languages"** instead of fundamental generative theorems. We would like to find good compression strategies to describe regularity in a small set of samples, and they **do not have to be the "real" generative model** for explaining the phenomenon. Models can be wrong but still useful (i.e., think of any Bayesian prior).
 
-### Kolmogorov Complexity[#](#kolmogorov-complexity)
+### Kolmogorov Complexity
 
 Kolmogorov Complexity relies on the concept of modern computers to define the algorithmic (descriptive) complexity of an object: It is _the length of the shortest binary computer program that describes the object_. Following MDL, a computer is essentially the most general form of data decompressor.
 
@@ -70,17 +70,17 @@ Note that a universal computer is one that can mimic the actions of any other co
 
 There are a lot of connections between Kolmogorov Complexity and Shannon Information Theory, as both are tied to universal coding. It is an amazing fact that the expected Kolmogorov Complexity of a random variable is approximately equal to its Shannon entropy (see Sec 2.3 of [the report](https://homepages.cwi.nl/~paulv/papers/info.pdf)). More on this topic is out of the scope here, but there are many interesting readings online. Help yourself :)
 
-### Solomonoff's Inference Theory[#](#solomonoffs-inference-theory)
+### Solomonoff's Inference Theory
 
 Another mathematical formalization of Occam's Razor is Solomonoff's theory of universal inductive inference ([Solomonoff](https://www.sciencedirect.com/science/article/pii/S0019995864902232), [1964](https://www.sciencedirect.com/science/article/pii/S0019995864901317)). The principle is to favor models that correspond to the "shortest program" to produce the training data, based on its Kolmogorov complexity
 
-## Expressive Power of DL Models[#](#expressive-power-of-dl-models)
+## Expressive Power of DL Models
 
 Deep neural networks have an extremely large number of parameters compared to the traditional statistical models. If we use MDL to measure the complexity of a deep neural network and consider the number of parameters as the model description length, it would look awful. The model description $L(\mathcal{H})$ can easily grow out of control.
 
 However, having numerous parameters is _necessary_ for a neural network to obtain high expressivity power. Because of its great capability to capture any flexible data representation, deep neural networks have achieved great success in many applications.
 
-### Universal Approximation Theorem[#](#universal-approximation-theorem)
+### Universal Approximation Theorem
 
 The _Universal Approximation Theorem_ states that a feedforward network with: 1) a linear output layer, 2) at least one hidden layer containing a finite number of neurons and 3) some activation function can approximate **any** continuous functions on a compact subset of $\mathbb{R}^n$ to arbitrary accuracy. The theorem was first proved for sigmoid activation function ([Cybenko, 1989](https://pdfs.semanticscholar.org/05ce/b32839c26c8d2cb38d5529cf7720a68c3fab.pdf)). Later it was shown that the universal approximation property is not specific to the choice of activation ([Hornik, 1991](http://zmjones.com/static/statistical-learning/hornik-nn-1991.pdf)) but the multilayer feedforward architecture.
 
@@ -88,7 +88,7 @@ Although a feedforward network with a single layer is sufficient to represent an
 
 To take advantage of the universal approximation theorem, we can always find a neural network to represent the target function with error under any desired threshold, but we need to pay the price — the network might grow super large.
 
-### Proof: Finite Sample Expressivity of Two-layer NN[#](#proof-finite-sample-expressivity-of-two-layer-nn)
+### Proof: Finite Sample Expressivity of Two-layer NN
 
 The Universal Approximation Theorem we have discussed so far does not consider a finite sample set. [Zhang, et al. (2017)](https://arxiv.org/abs/1611.03530) provided a neat proof on the finite-sample expressivity of two-layer neural networks.
 
@@ -140,7 +140,7 @@ $$
 
 It is a nonsingular square matrix as $\det(\mathbf{M}_\text{ReLU}) \neq 0$, so we can always find suitable $\boldsymbol{v}$ to solve $\boldsymbol{v}\mathbf{M}_\text{ReLU}=\boldsymbol{y}$ (In other words, the column space of $\mathbf{M}_\text{ReLU}$ is all of $\mathbb{R}^n$ and we can find a linear combination of column vectors to obtain any $\boldsymbol{y}$).
 
-### Deep NN can Learn Random Noise[#](#deep-nn-can-learn-random-noise)
+### Deep NN can Learn Random Noise
 
 As we know two-layer neural networks are universal approximators, it is less surprising to see that they are able to learn unstructured random noise perfectly, as shown in [Zhang, et al. (2017)](https://arxiv.org/abs/1611.03530). If labels of image classification dataset are randomly shuffled, the high expressivity power of deep neural networks can still empower them to achieve near-zero training loss. These results do not change with regularization terms added.
 
@@ -148,11 +148,11 @@ As we know two-layer neural networks are universal approximators, it is less sur
 
 Fig. 1. Fit models on CIFAR10 with random labels or random pixels: (a) learning curves; (b-c) label corruption ratio is the percentage of randomly shuffled labels. (Image source: [Zhang et al. 2017](https://arxiv.org/abs/1611.03530))
 
-## Are Deep Learning Models Dramatically Overfitted?[#](#are-deep-learning-models-dramatically-overfitted)
+## Are Deep Learning Models Dramatically Overfitted?
 
 Deep learning models are heavily over-parameterized and can often get to perfect results on training data. In the traditional view, like bias-variance trade-offs, this could be a disaster that nothing may generalize to the unseen test data. However, as is often the case, such "overfitted" (training error = 0) deep learning models still present a decent performance on out-of-sample test data. Hmm … interesting and why?
 
-### Modern Risk Curve for Deep Learning[#](#modern-risk-curve-for-deep-learning)
+### Modern Risk Curve for Deep Learning
 
 The traditional machine learning uses the following U-shape risk curve to measure the bias-variance trade-offs and quantify how generalizable a model is. If I get asked how to tell whether a model is overfitted, this would be the first thing popping into my mind.
 
@@ -179,7 +179,7 @@ The double-U-shaped risk curve was observed empirically, as shown in the paper. 
 
 Fig. 4. Training and evaluation errors of a one hidden layer fc network of different numbers of hidden units, trained on 4000 data points sampled from MNIST. (Image source: [original paper](https://arxiv.org/abs/1812.11118))
 
-### Regularization is not the Key to Generalization[#](#regularization-is-not-the-key-to-generalization)
+### Regularization is not the Key to Generalization
 
 Regularization is a common way to control overfitting and improve model generalization performance. Interestingly some research ([Zhang, et al. 2017](https://arxiv.org/abs/1611.03530)) has shown that explicit regularization (i.e. data augmentation, weight decay and dropout) is neither necessary or sufficient for reducing generalization error.
 
@@ -189,7 +189,7 @@ Taking the Inception model trained on CIFAR10 as an example (see Fig. 5), regula
 
 Fig. 5. The accuracy of Inception model trained on CIFAR10 with different combinations of taking on or off data augmentation and weight decay. (Image source: Table 1 in the [original paper](https://arxiv.org/abs/1611.03530))
 
-### Intrinsic Dimension[#](#intrinsic-dimension)
+### Intrinsic Dimension
 
 The number of parameters is not correlated with model overfitting in the field of deep learning, suggesting that parameter counting cannot indicate the true complexity of deep neural networks.
 
@@ -231,7 +231,7 @@ Fig. 8. The measured intrinsic dimensions $d$ for various models achieving 90% o
 
 The measurement of intrinsic dimensions suggests that deep learning models are significantly simpler than what they might appear to be.
 
-### Heterogeneous Layer Robustness[#](#heterogeneous-layer-robustness)
+### Heterogeneous Layer Robustness
 
 [Zhang et al. (2019)](https://arxiv.org/abs/1902.01996) investigated the role of parameters in different layers. The fundamental question raised by the paper is: _"are all layers created equal?"_ The short answer is: No. The model is more sensitive to changes in some layers but not others.
 
@@ -263,7 +263,7 @@ Based on the fact that many top layers in deep neural networks are not critical 
 
 We can consider re-initialization as a way to reduce the effective number of parameters, and thus the observation is aligned with what intrinsic dimension has demonstrated.
 
-### The Lottery Ticket Hypothesis[#](#the-lottery-ticket-hypothesis)
+### The Lottery Ticket Hypothesis
 
 The lottery ticket hypothesis ([Frankle & Carbin, 2019](https://arxiv.org/abs/1803.03635)) is another intriguing and inspiring discovery, supporting that only a subset of network parameters have impact on the model performance and thus the network is not overfitted. The lottery ticket hypothesis states that a randomly initialized, dense, feed-forward network contains a pool of subnetworks and among them only a subset are _"winning tickets"_ which can achieve the optimal performance when _trained in isolation_.
 
@@ -280,7 +280,7 @@ Only training the small "winning ticket" subset of parameters with the initial v
 
 The lottery ticket hypothesis opens a new perspective about interpreting and dissecting deep neural network results. Many interesting following-up works are on the way.
 
-## Experiments[#](#experiments)
+## Experiments
 
 After seeing all the interesting findings above, it should be pretty fun to reproduce them. Some results are easily to reproduce than others. Details are described below. My code is available on github [lilianweng/generalization-experiment](https://github.com/lilianweng/generalization-experiment).
 
@@ -335,7 +335,7 @@ Cited as:
 }
 ```
 
-## References[#](#references)
+## References
 
 [1] Wikipedia page on [Occam's Razor](https://en.wikipedia.org/wiki/Occam%27s_razor).
 

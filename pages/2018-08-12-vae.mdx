@@ -13,7 +13,7 @@ Source : https://lilianweng.github.io/posts/2018-08-12-vae
 
 Autocoder is invented to reconstruct high-dimensional data using a neural network model with a narrow bottleneck layer in the middle (oops, this is probably not true for [Variational Autoencoder](#vae-variational-autoencoder), and we will investigate it in details in later sections). A nice byproduct is dimension reduction: the bottleneck layer captures a compressed latent encoding. Such a low-dimensional representation can be used as en embedding vector in various applications (i.e. search), help data compression, or reveal the underlying data generative factors.
 
-## Notation[#](#notation)
+## Notation
 
 Symbol
 
@@ -63,7 +63,7 @@ $p_{\theta}(\mathbf{x}\vert\mathbf{z})$
 
 Likelihood of generating true data sample given the latent code, also known as **probabilistic decoder**.
 
-## Autoencoder[#](#autoencoder)
+## Autoencoder
 
 **Autoencoder** is a neural network designed to learn an identity function in an unsupervised way to reconstruct the original input while compressing the data in the process so as to discover a more efficient and compressed representation. The idea was originated in [the 1980s](https://en.wikipedia.org/wiki/Autoencoder), and later promoted by the seminal paper by [Hinton & Salakhutdinov, 2006](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.459.3788&rep=rep1&type=pdf).
 
@@ -86,7 +86,7 @@ $$
 L_\text{AE}(\theta, \phi) = \frac{1}{n}\sum_{i=1}^n (\mathbf{x}^{(i)} - f_\theta(g_\phi(\mathbf{x}^{(i)})))^2
 $$
 
-## Denoising Autoencoder[#](#denoising-autoencoder)
+## Denoising Autoencoder
 
 Since the autoencoder learns the identity function, we are facing the risk of "overfitting" when there are more network parameters than the number of data points.
 
@@ -111,7 +111,7 @@ The noise is controlled by a stochastic mapping $\mathcal{M}_\mathcal{D}(\tilde{
 
 In the experiment of the original DAE paper, the noise is applied in this way: a fixed proportion of input dimensions are selected at random and their values are forced to 0. Sounds a lot like dropout, right? Well, the denoising autoencoder was proposed in 2008, 4 years before the dropout paper ([Hinton, et al. 2012](https://www.cs.toronto.edu/~hinton/absps/JMLRdropout.pdf)) ;)
 
-## Sparse Autoencoder[#](#sparse-autoencoder)
+## Sparse Autoencoder
 
 **Sparse Autoencoder** applies a "sparse" constraint on the hidden unit activation to avoid overfitting and improve robustness. It forces the model to only have a small number of hidden units being activated at the same time, or in other words, one hidden neuron should be inactivate most of time.
 
@@ -142,7 +142,7 @@ In $k$-Sparse Autoencoder ([Makhzani and Frey, 2013](https://arxiv.org/abs/1312.
 
 Fig. 5. Filters of the k-sparse autoencoder for different sparsity levels k, learnt from MNIST with 1000 hidden units.. (Image source: [Makhzani and Frey, 2013](https://arxiv.org/abs/1312.5663))
 
-## Contractive Autoencoder[#](#contractive-autoencoder)
+## Contractive Autoencoder
 
 Similar to sparse autoencoder, **Contractive Autoencoder** ([Rifai, et al, 2011](http://www.icml-2011.org/papers/455_icmlpaper.pdf)) encourages the learned representation to stay in a contractive space for better robustness.
 
@@ -156,7 +156,7 @@ where $h_j$ is one unit output in the compressed code $\mathbf{z} = f(x)$.
 
 This penalty term is the sum of squares of all partial derivatives of the learned encoding with respect to input dimensions. The authors claimed that empirically this penalty was found to carve a representation that corresponds to a lower-dimensional non-linear manifold, while staying more invariant to majority directions orthogonal to the manifold.
 
-## VAE: Variational Autoencoder[#](#vae-variational-autoencoder)
+## VAE: Variational Autoencoder
 
 The idea of **Variational Autoencoder** ([Kingma & Welling, 2014](https://arxiv.org/abs/1312.6114)), short for **VAE**, is actually less similar to all the autoencoder models above, but deeply rooted in the methods of variational bayesian and graphical model.
 
@@ -200,7 +200,7 @@ Now the structure looks a lot like an autoencoder:
 - The conditional probability $p_\theta(\mathbf{x} \vert \mathbf{z})$ defines a generative model, similar to the decoder $f_\theta(\mathbf{x} \vert \mathbf{z})$ introduced above. $p_\theta(\mathbf{x} \vert \mathbf{z})$ is also known as _probabilistic decoder_.
 - The approximation function $q_\phi(\mathbf{z} \vert \mathbf{x})$ is the _probabilistic encoder_, playing a similar role as $g_\phi(\mathbf{z} \vert \mathbf{x})$ above.
 
-### Loss Function: ELBO[#](#loss-function-elbo)
+### Loss Function: ELBO
 
 The estimated posterior $q_\phi(\mathbf{z}\vert\mathbf{x})$ should be very close to the real one $p_\theta(\mathbf{z}\vert\mathbf{x})$. We can use [Kullback-Leibler divergence](https://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence) to quantify the distance between these two distributions. KL divergence $D_\text{KL}(X|Y)$ measures how much information is lost if the distribution Y is used to represent X.
 
@@ -258,7 +258,7 @@ $$
 
 Therefore by minimizing the loss, we are maximizing the lower bound of the probability of generating real data samples.
 
-### Reparameterization Trick[#](#reparameterization-trick)
+### Reparameterization Trick
 
 The expectation term in the loss function invokes generating samples from $\mathbf{z} \sim q_\phi(\mathbf{z}\vert\mathbf{x})$. Sampling is a stochastic process and therefore we cannot backpropagate the gradient. To make it trainable, the reparameterization trick is introduced: It is often possible to express the random variable $\mathbf{z}$ as a deterministic variable $\mathbf{z} = \mathcal{T}_\phi(\mathbf{x}, \boldsymbol{\epsilon})$, where $\boldsymbol{\epsilon}$ is an auxiliary independent random variable, and the transformation function $\mathcal{T}_\phi$ parameterized by $\phi$ converts $\boldsymbol{\epsilon}$ to $\mathbf{z}$.
 
@@ -281,7 +281,7 @@ The reparameterization trick works for other types of distributions too, not onl
 
 Fig. 9. Illustration of variational autoencoder model with the multivariate Gaussian assumption.
 
-## Beta-VAE[#](#beta-vae)
+## Beta-VAE
 
 If each variable in the inferred latent representation $\mathbf{z}$ is only sensitive to one single generative factor and relatively invariant to other factors, we will say this representation is disentangled or factorized. One benefit that often comes with disentangled representation is _good interpretability_ and easy generalization to a variety of tasks.
 
@@ -316,7 +316,7 @@ When $\beta=1$, it is same as VAE. When $\beta > 1$, it applies a stronger const
 
 [Burgess, et al. (2017)](https://arxiv.org/pdf/1804.03599.pdf) discussed the distentangling in $\beta$-VAE in depth with an inspiration by the [information bottleneck theory](https://lilianweng.github.io/posts/2017-09-28-information-bottleneck/) and further proposed a modification to $\beta$-VAE to better control the encoding representation capacity.
 
-## VQ-VAE and VQ-VAE-2[#](#vq-vae-and-vq-vae-2)
+## VQ-VAE and VQ-VAE-2
 
 The **VQ-VAE** ("Vector Quantised-Variational AutoEncoder"; [van den Oord, et al. 2017](http://papers.nips.cc/paper/7210-neural-discrete-representation-learning.pdf)) model learns a discrete latent variable by the encoder, since discrete representations may be a more natural fit for problems like language, speech, reasoning, etc.
 
@@ -370,7 +370,7 @@ Fig. 11. Architecture of hierarchical VQ-VAE and multi-stage image generation. (
 
 Fig. 12. The VQ-VAE-2 algorithm. (Image source: [Ali Razavi, et al. 2019](https://arxiv.org/abs/1906.00446))
 
-## TD-VAE[#](#td-vae)
+## TD-VAE
 
 **TD-VAE** ("Temporal Difference VAE"; [Gregor et al., 2019](https://arxiv.org/abs/1806.03107)) works with sequential data. It relies on three main ideas, described below.
 
@@ -467,7 +467,7 @@ Cited as:
 }
 ```
 
-## References[#](#references)
+## References
 
 [1] Geoffrey E. Hinton, and Ruslan R. Salakhutdinov. ["Reducing the dimensionality of data with neural networks."](https://pdfs.semanticscholar.org/c50d/ca78e97e335d362d6b991ae0e1448914e9a3.pdf) Science 313.5786 (2006): 504-507.
 
