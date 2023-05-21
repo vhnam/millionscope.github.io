@@ -8,7 +8,7 @@ author: Lilian Weng
 date: 2017-06-21
 ---
 
-Source : https://lilianweng.github.io
+Source : https://lilianweng.github.io/posts/2019-11-10-self-supervised
 
 # Self-Supervised Representation Learning
 
@@ -136,13 +136,12 @@ We expect to learn:
 
 $$\phi(\mathbf{x}) = \phi(D \circ \mathbf{x}) = \sum_{i=1}^4 \phi(T_i \circ \mathbf{x})$$
 
-[Thus the MSE loss is: $\mathcal{L}_\text{feat} = |\phi(D \circ \mathbf{x}) - \sum_{i=1}^4 \phi(T_i \circ \mathbf{x})|^2_2$. To avoid trivial solution $\phi(\mathbf{x}) = \mathbf{0}, \forall{\mathbf{x}}$, another loss term is added to encourage the difference between features of two different images: $\mathcal{L}_\text{diff} = \max(0, c -|\phi(D \circ \mathbf{y}) - \sum_{i=1}^4 \phi(T_i \circ \mathbf{x})|^2_2)$, where $\mathbf{y}$ is another input image different from $\mathbf{x}$ and $c$ is a scalar constant. The final loss is:](#counting-feature-loss)
-
-[
+Thus the MSE loss is: $\mathcal{L}_\text{feat} = |\phi(D \circ \mathbf{x}) - \sum_{i=1}^4 \phi(T_i \circ \mathbf{x})|^2_2$. To avoid trivial solution $\phi(\mathbf{x}) = \mathbf{0}, \forall{\mathbf{x}}$, another loss term is added to encourage the difference between features of two different images: $\mathcal{L}_\text{diff} = \max(0, c -|\phi(D \circ \mathbf{y}) - \sum_{i=1}^4 \phi(T_i \circ \mathbf{x})|^2_2)$, where $\mathbf{y}$ is another input image different from $\mathbf{x}$ and $c$ is a scalar constant. 
+The final loss is:
 
 $$\mathcal{L} = \mathcal{L}_\text{feat} + \mathcal{L}_\text{diff} = \|\phi(D \circ \mathbf{x}) - \sum_{i=1}^4 \phi(T_i \circ \mathbf{x})\|^2_2 + \max(0, M -\|\phi(D \circ \mathbf{y}) - \sum_{i=1}^4 \phi(T_i \circ \mathbf{x})\|^2_2)$$
 
-![](assets/images/2019-11-10-self-supervised/self-sup-counting-features.png)](#counting-feature-loss)
+![](assets/images/2019-11-10-self-supervised/self-sup-counting-features.png)
 
 [Fig. 7. Self-supervised representation learning by counting features. (Image source:](#counting-feature-loss) [Noroozi, et al, 2017](https://arxiv.org/abs/1708.06734))
 
@@ -411,7 +410,7 @@ The task is to control a robot arm to push a small puck on a table to a desired 
 
 Let's say a [$\beta$-VAE](https://lilianweng.github.io/posts/2018-08-12-vae/#beta-vae) has an encoder $q_\phi$ mapping input states to latent variable $z$ which is modeled by a Gaussian distribution and a decoder $p_\psi$ mapping $z$ back to the states. The state encoder in RIG is set to be the mean of $\beta$-VAE encoder.
 
-$$\begin{aligned} z &\sim q_\phi(z \vert s) = \mathcal{N}(z; \mu_\phi(s), \sigma^2_\phi(s)) \\ \mathcal{L}_{\beta\text{-VAE}} &= - \mathbb{E}_{z \sim q_\phi(z \vert s)} [\log p_\psi (s \vert z)] + \beta D_\text{KL}(q_\phi(z \vert s) \| p_\psi(s)) \\ e(s) &\\triangleq \mu_\phi(s) \end{aligned}$$
+$$\begin{aligned} z &\sim q_\phi(z \vert s) = \mathcal{N}(z; \mu_\phi(s), \sigma^2_\phi(s)) \\ \mathcal{L}_{\beta\text{-VAE}} &= - \mathbb{E}_{z \sim q_\phi(z \vert s)} [\log p_\psi (s \vert z)] + \beta D_\text{KL}(q_\phi(z \vert s) \| p_\psi(s)) \\ e(s) & \triangleq \mu_\phi(s) \end{aligned}$$
 
 The reward is the Euclidean distance between state and goal embedding vectors: $r(s, g) = -|e(s) - e(g)|$. Similar to [grasp2vec](#grasp2vec), RIG applies data augmentation as well by latent goal relabeling: precisely half of the goals are generated from the prior at random and the other half are selected using HER. Also same as grasp2vec, rewards do not depend on any ground truth states but only the learned state encoding, so it can be used for training on real robots.
 
@@ -515,13 +514,13 @@ Fig. 28. The algorithm of Deep Bisimulation for Control. (Image source: [Zhang e
 Cited as:
 
 ```bibtex
-    @article{weng2019selfsup,
-      title   = "Self-Supervised Representation Learning",
-      author  = "Weng, Lilian",
-      journal = "lilianweng.github.io",
-      year    = "2019",
-      url     = "https://lilianweng.github.io/posts/2019-11-10-self-supervised/"
-    }
+@article{weng2019selfsup,
+  title   = "Self-Supervised Representation Learning",
+  author  = "Weng, Lilian",
+  journal = "lilianweng.github.io",
+  year    = "2019",
+  url     = "https://lilianweng.github.io/posts/2019-11-10-self-supervised/"
+}
 ```
 
 # References[#](#references)
