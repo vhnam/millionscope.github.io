@@ -335,7 +335,7 @@ Fig. 9. Algorithm of Barlow Twins in Pytorch style pseudo code. (Image source: [
 
 ### BYOL[#](#byol)
 
-Different from the above approaches, interestingly, **BYOL** (Bootstrap Your Own Latent; [Grill, et al 2020](https://arxiv.org/abs/2006.07733)) claims to achieve a new state-of-the-art results _without using egative samples_. It relies on two neural networks, referred to as _online_ and _target_ networks that interact and learn from each other. The target network (parameterized by $\xi$) has the same architecture as the online one (parameterized by $\theta$), but with polyak averaged weights, $\xi \\leftarrow \tau \xi + (1-\tau) \theta$.
+Different from the above approaches, interestingly, **BYOL** (Bootstrap Your Own Latent; [Grill, et al 2020](https://arxiv.org/abs/2006.07733)) claims to achieve a new state-of-the-art results _without using egative samples_. It relies on two neural networks, referred to as _online_ and _target_ networks that interact and learn from each other. The target network (parameterized by $\xi$) has the same architecture as the online one (parameterized by $\theta$), but with polyak averaged weights, $\xi \leftarrow \tau \xi + (1-\tau) \theta$.
 
 The goal is to learn a presentation $y$ that can be used in downstream tasks. The online network parameterized by $\theta$ contains:
 
@@ -343,7 +343,7 @@ The goal is to learn a presentation $y$ that can be used in downstream tasks. Th
 - A projector $g_\theta$;
 - A predictor $q_\theta$.
 
-The target network has the same network architecture, but with different parameter $\xi$, updated by polyak averaging $\theta$: $\xi \\leftarrow \tau \xi + (1-\tau) \theta$.
+The target network has the same network architecture, but with different parameter $\xi$, updated by polyak averaging $\theta$: $\xi \leftarrow \tau \xi + (1-\tau) \theta$.
 
 ![](assets/images/2021-05-31-contrastive/BYOL.png)
 
@@ -407,7 +407,7 @@ Compared to the [memory bank](#instance-discrimination-with-memoy-bank), a queue
 
 The MoCo dictionary is not differentiable as a queue, so we cannot rely on back-propagation to update the key encoder $f_k$. One naive way might be to use the same encoder for both $f_q$ and $f_k$. Differently, MoCo proposed to use a momentum-based update with a momentum coefficient $m \in [0, 1)$. Say, the parameters of $f_q$ and $f_k$ are labeled as $\theta_q$ and $\theta_k$, respectively.
 
-$$\theta_k \\leftarrow m \theta_k + (1-m) \theta_q$$
+$$\theta_k \leftarrow m \theta_k + (1-m) \theta_q$$
 
 ![](assets/images/2021-05-31-contrastive/MoCo.png)
 

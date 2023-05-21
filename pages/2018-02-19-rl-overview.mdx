@@ -273,11 +273,11 @@ TD learning methods update targets with regard to existing estimates rather than
 
 The key idea in TD learning is to update the value function $V(S_t)$ towards an estimated return $R_{t+1} + \gamma V(S_{t+1})$ (known as "**TD target**"). To what extent we want to update the value function is controlled by the learning rate hyperparameter α:
 
-$$\begin{aligned} V(S_t) &\\leftarrow (1- \alpha) V(S_t) + \alpha G_t \\ V(S_t) &\\leftarrow V(S_t) + \alpha (G_t - V(S_t)) \\ V(S_t) &\\leftarrow V(S_t) + \alpha (R_{t+1} + \gamma V(S_{t+1}) - V(S_t)) \end{aligned}$$
+$$\begin{aligned} V(S_t) &\leftarrow (1- \alpha) V(S_t) + \alpha G_t \\ V(S_t) &\leftarrow V(S_t) + \alpha (G_t - V(S_t)) \\ V(S_t) &\leftarrow V(S_t) + \alpha (R_{t+1} + \gamma V(S_{t+1}) - V(S_t)) \end{aligned}$$
 
 Similarly, for action-value estimation:
 
-$$Q(S_t, A_t) \\leftarrow Q(S_t, A_t) + \alpha (R_{t+1} + \gamma Q(S_{t+1}, A_{t+1}) - Q(S_t, A_t))$$
+$$Q(S_t, A_t) \leftarrow Q(S_t, A_t) + \alpha (R_{t+1} + \gamma Q(S_{t+1}, A_{t+1}) - Q(S_t, A_t))$$
 
 Next, let's dig into the fun part on how to learn optimal policy in TD learning (aka "TD control"). Be prepared, you are gonna see many famous names of classic algorithms in this section.
 
@@ -289,7 +289,7 @@ Next, let's dig into the fun part on how to learn optimal policy in TD learning 
 2.  Start with $S_0$ and choose action $A_0 = \arg\max_{a \in \mathcal{A}} Q(S_0, a)$, where $\epsilon$-greedy is commonly applied.
 3.  At time $t$, after applying action $A_t$, we observe reward $R_{t+1}$ and get into the next state $S_{t+1}$.
 4.  Then pick the next action in the same way as in step 2: $A_{t+1} = \arg\max_{a \in \mathcal{A}} Q(S_{t+1}, a)$.
-5.  Update the Q-value function: $ Q(S*t, A_t) \\leftarrow Q(S_t, A_t) + \alpha (R*{t+1} + \gamma Q(S*{t+1}, A*{t+1}) - Q(S_t, A_t)) $.
+5.  Update the Q-value function: $ Q(S*t, A_t) \leftarrow Q(S_t, A_t) + \alpha (R*{t+1} + \gamma Q(S*{t+1}, A*{t+1}) - Q(S_t, A_t)) $.
 6.  Set $t = t+1$ and repeat from step 3.
 
 In each step of SARSA, we need to choose the _next_ action according to the _current_ policy.
@@ -302,7 +302,7 @@ The development of Q-learning ([Watkins & Dayan, 1992](https://link.springer.com
 2.  Starts with $S_0$.
 3.  At time step $t$, we pick the action according to Q values, $A_t = \arg\max_{a \in \mathcal{A}} Q(S_t, a)$ and $\epsilon$-greedy is commonly applied.
 4.  After applying action $A_t$, we observe reward $R_{t+1}$ and get into the next state $S_{t+1}$.
-5.  Update the Q-value function: $Q(S_t, A_t) \\leftarrow Q(S_t, A_t) + \alpha (R_{t+1} + \gamma \max_{a \in \mathcal{A}} Q(S_{t+1}, a) - Q(S_t, A_t))$.
+5.  Update the Q-value function: $Q(S_t, A_t) \leftarrow Q(S_t, A_t) + \alpha (R_{t+1} + \gamma \max_{a \in \mathcal{A}} Q(S_{t+1}, a) - Q(S_t, A_t))$.
 6.  $t = t+1$ and repeat from step 3.
 
 The key difference from SARSA is that Q-learning does not follow the current policy to pick the second action $A_{t+1}$. It estimates $Q^\*$ out of the best Q values, but which action (denoted as $a^\*$) leads to this maximal Q does not matter and in the next step Q-learning may not follow $a^\*$.
@@ -374,7 +374,7 @@ MC estimation
 
 The generalized n-step TD learning still has the [same](#value-estimation) form for updating the value function:
 
-$$V(S_t) \\leftarrow V(S_t) + \alpha (G_t^{(n)} - V(S_t))$$
+$$V(S_t) \leftarrow V(S_t) + \alpha (G_t^{(n)} - V(S_t))$$
 
 ![](assets/images/2018-02-19-rl-overview/TD_lambda.png)
 
@@ -440,7 +440,7 @@ A commonly used variation of REINFORCE is to subtract a baseline value from the 
 2.  Generate one episode $S_1, A_1, R_2, S_2, A_2, \dots, S_T$
 3.  For t=1, 2, … , T:
     1.  Estimate the the return G_t since the time step t.
-    2.  $\theta \\leftarrow \theta + \alpha \gamma^t G_t \nabla \\ln \pi(A_t \vert S_t, \theta)$.
+    2.  $\theta \leftarrow \theta + \alpha \gamma^t G_t \nabla \\ln \pi(A_t \vert S_t, \theta)$.
 
 ### Actor-Critic[#](#actor-critic)
 
@@ -455,12 +455,12 @@ Let's see how it works in an action-value actor-critic algorithm.
 2.  For t = 1… T:
     1.  Sample reward $r_t \sim R(s, a)$ and next state $s' \sim P(s' \vert s, a)$.
     2.  Then sample the next action $a' \sim \pi(s', a'; \theta)$.
-    3.  Update policy parameters: $\theta \\leftarrow \theta + \alpha_\theta Q(s, a; w) \nabla_\theta \\ln \pi(a \vert s; \theta)$.
+    3.  Update policy parameters: $\theta \leftarrow \theta + \alpha_\theta Q(s, a; w) \nabla_\theta \\ln \pi(a \vert s; \theta)$.
     4.  Compute the correction for action-value at time t:  
         $G_{t:t+1} = r_t + \gamma Q(s', a'; w) - Q(s, a; w)$  
         and use it to update value function parameters:  
-        $w \\leftarrow w + \alpha*w G*{t:t+1} \nabla_w Q(s, a; w) $.
-    5.  Update $a \\leftarrow a'$ and $s \\leftarrow s'$.
+        $w \leftarrow w + \alpha*w G*{t:t+1} \nabla_w Q(s, a; w) $.
+    5.  Update $a \leftarrow a'$ and $s \leftarrow s'$.
 
 $\alpha_\theta$ and $\alpha_w$ are two learning rates for policy and value function parameter updates, respectively.
 
@@ -485,9 +485,9 @@ Here is the algorithm outline:
         2.  Update t = t + 1 and T = T + 1.
     5.  Initialize the variable that holds the return estimation$$R = \begin{cases} 0 & \text{if } s_t \text{ is TERMINAL} \\ V(s_t; w') & \text{otherwise} \end{cases}$$.
     6.  For $i = t-1, \dots, t_\text{start}$:
-        1.  $R \\leftarrow r_i + \gamma R$; here R is a MC measure of $G_i$.
-        2.  Accumulate gradients w.r.t. θ': $d\theta \\leftarrow d\theta + \nabla_{\theta'} \log \pi(a_i \vert s_i; \theta')(R - V(s_i; w'))$;  
-            Accumulate gradients w.r.t. w': $dw \\leftarrow dw + \nabla_{w'} (R - V(s_i; w'))^2$.
+        1.  $R \leftarrow r_i + \gamma R$; here R is a MC measure of $G_i$.
+        2.  Accumulate gradients w.r.t. θ': $d\theta \leftarrow d\theta + \nabla_{\theta'} \log \pi(a_i \vert s_i; \theta')(R - V(s_i; w'))$;  
+            Accumulate gradients w.r.t. w': $dw \leftarrow dw + \nabla_{w'} (R - V(s_i; w'))^2$.
     7.  Update synchronously θ using dθ, and w using dw.
 ```
 A3C enables the parallelism in multiple agent training. The gradient accumulation step (6.2) can be considered as a reformation of minibatch-based stochastic gradient update: the values of w or θ get corrected by a little bit in the direction of each training thread independently.

@@ -198,7 +198,7 @@ The process is pretty straightforward:
 2.  Generate one trajectory on policy $\pi_\theta$: $S_1, A_1, R_2, S_2, A_2, \dots, S_T$.
 3.  For t=1, 2, … , T:
     1.  Estimate the the return $G_t$;
-    2.  Update policy parameters: $\theta \\leftarrow \theta + \alpha \gamma^t G_t \nabla_\theta \\ln \pi_\theta(A_t \vert S_t)$
+    2.  Update policy parameters: $\theta \leftarrow \theta + \alpha \gamma^t G_t \nabla_\theta \\ln \pi_\theta(A_t \vert S_t)$
 
 A widely used variation of REINFORCE is to subtract a baseline value from the return $G_t$ to _reduce the variance of gradient estimation while keeping the bias unchanged_ (Remember we always want to do this when possible). For example, a common baseline is to subtract state-value from action-value, and if applied, we would use advantage $A(s, a) = Q(s, a) - V(s)$ in the gradient ascent update. This [post](https://danieltakeshi.github.io/2017/03/28/going-deeper-into-reinforcement-learning-fundamentals-of-policy-gradients/) nicely explained why a baseline works for reducing the variance, in addition to a set of fundamentals of policy gradient.
 
@@ -217,12 +217,12 @@ Let's see how it works in a simple action-value actor-critic algorithm.
 2.  For $t = 1 \dots T$:
     1.  Sample reward $r_t \sim R(s, a)$ and next state $s' \sim P(s' \vert s, a)$;
     2.  Then sample the next action $a' \sim \pi_\theta(a' \vert s')$;
-    3.  Update the policy parameters: $\theta \\leftarrow \theta + \alpha_\theta Q_w(s, a) \nabla_\theta \\ln \pi_\theta(a \vert s)$;
+    3.  Update the policy parameters: $\theta \leftarrow \theta + \alpha_\theta Q_w(s, a) \nabla_\theta \\ln \pi_\theta(a \vert s)$;
     4.  Compute the correction (TD error) for action-value at time t:  
         $\delta_t = r_t + \gamma Q_w(s', a') - Q_w(s, a)$  
         and use it to update the parameters of action-value function:  
-        $w \\leftarrow w + \alpha_w \delta_t \nabla_w Q_w(s, a)$
-    5.  Update $a \\leftarrow a'$ and $s \\leftarrow s'$.
+        $w \leftarrow w + \alpha_w \delta_t \nabla_w Q_w(s, a)$
+    5.  Update $a \leftarrow a'$ and $s \leftarrow s'$.
 
 Two learning rates, $\alpha_\theta$ and $\alpha_w$, are predefined for policy and value function parameter updates respectively.
 
@@ -273,8 +273,8 @@ Here is the algorithm outline:
 
 $$R = \begin{cases} 0 & \text{if } s_t \text{ is TERMINAL} \\ V_{w'}(s_t) & \text{otherwise} \end{cases}$$
 
-    6\. For $i = t-1, \dots, t\\_\text{start}$: 1. $R \\leftarrow \gamma R + R\\_i$; here R is a MC measure of $G\\_i$. 2. Accumulate gradients w.r.t. $\theta'$: $d\theta \\leftarrow d\theta + \nabla\\_{\theta'} \log \pi\\_{\theta'}(a\\_i \vert s\\_i)(R - V\\_{w'}(s\\_i))$;
-    Accumulate gradients w.r.t. w': $dw \\leftarrow dw + 2 (R - V\\_{w'}(s\\_i)) \nabla\\_{w'} (R - V\\_{w'}(s\\_i))$. 7. Update asynchronously $\theta$ using $\mathrm{d}\theta$, and $w$ using $\mathrm{d}w$.
+    6\. For $i = t-1, \dots, t\\_\text{start}$: 1. $R \leftarrow \gamma R + R\\_i$; here R is a MC measure of $G\\_i$. 2. Accumulate gradients w.r.t. $\theta'$: $d\theta \leftarrow d\theta + \nabla\\_{\theta'} \log \pi\\_{\theta'}(a\\_i \vert s\\_i)(R - V\\_{w'}(s\\_i))$;
+    Accumulate gradients w.r.t. w': $dw \leftarrow dw + 2 (R - V\\_{w'}(s\\_i)) \nabla\\_{w'} (R - V\\_{w'}(s\\_i))$. 7. Update asynchronously $\theta$ using $\mathrm{d}\theta$, and $w$ using $\mathrm{d}w$.
 
 A3C enables the parallelism in multiple agent training. The gradient accumulation step (6.2) can be considered as a parallelized reformation of minibatch-based stochastic gradient update: the values of $w$ or $\theta$ get corrected by a little bit in the direction of each training thread independently.
 
@@ -336,7 +336,7 @@ In order to do better exploration, an exploration policy $\mu'$ is constructed b
 
 $$\mu'(s) = \mu_\theta(s) + \mathcal{N}$$
 
-In addition, DDPG does soft updates ("conservative policy iteration") on the parameters of both actor and critic, with $\tau \ll 1$: $\theta' \\leftarrow \tau \theta + (1 - \tau) \theta'$. In this way, the target network values are constrained to change slowly, different from the design in DQN that the target network stays frozen for some period of time.
+In addition, DDPG does soft updates ("conservative policy iteration") on the parameters of both actor and critic, with $\tau \ll 1$: $\theta' \leftarrow \tau \theta + (1 - \tau) \theta'$. In this way, the target network values are constrained to change slowly, different from the design in DQN that the target network stays frozen for some period of time.
 
 One detail in the paper that is particularly useful in robotics is on how to normalize the different physical units of low dimensional features. For example, a model is designed to learn a policy with the robot's positions and velocities as input; these physical statistics are different by nature and even statistics of the same type may vary a lot across multiple robots. [Batch normalization](http://proceedings.mlr.press/v37/ioffe15.pdf) is applied to fix it by normalizing every dimension across samples in one minibatch.
 
@@ -518,7 +518,7 @@ Fig. 7. The mean normalized performance of PPG vs PPO on the [Procgen](https://a
 Recall how TD learning works for prediction:
 
 1.  Compute TD error: $\delta_t = R_t + \gamma \mathbb{E}_{a \sim \pi} Q(S_{t+1}, a) - Q(S_t, A_t)$; the term $r_t + \gamma \mathbb{E}_{a \sim \pi} Q(s_{t+1}, a) $ is known as "TD target". The expectation $\mathbb{E}_{a \sim \pi}$ is used because for the future step the best estimation we can make is what the return would be if we follow the current policy $\pi$.
-2.  Update the value by correcting the error to move toward the goal: $Q(S_t, A_t) \\leftarrow Q(S_t, A_t) + \alpha \delta_t$. In other words, the incremental update on Q is proportional to the TD error: $\Delta Q(S_t, A_t) = \alpha \delta_t$.
+2.  Update the value by correcting the error to move toward the goal: $Q(S_t, A_t) \leftarrow Q(S_t, A_t) + \alpha \delta_t$. In other words, the incremental update on Q is proportional to the TD error: $\Delta Q(S_t, A_t) = \alpha \delta_t$.
 
 When the rollout is off policy, we need to apply importance sampling on the Q update:
 

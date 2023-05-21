@@ -238,8 +238,8 @@ The measurement of intrinsic dimensions suggests that deep learning models are s
 
 The paper proposed two types of operations that can be applied to parameters of the $\ell$-th layer, $\ell = 1, \dots, L$, at time $t$, $\theta^{(\ell)}_t$ to test their impacts on model robustness:
 
-- **Re-initialization**: Reset the parameters to the initial values, $\theta^{(\ell)}_t \\leftarrow \theta^{(\ell)}_0$. The performance of a network in which layer $\ell$ was re-initialized is referred to as the _re-initialization robustness_ of layer $\ell$.
-- **Re-randomization**: Re-sampling the layer's parameters at random, $\theta^{(\ell)}_t \\leftarrow \tilde{\theta}^{(\ell)} \sim \mathcal{P}^{(\ell)}$. The corresponding network performance is called the _re-randomization robustness_ of layer $\ell$.
+- **Re-initialization**: Reset the parameters to the initial values, $\theta^{(\ell)}_t \leftarrow \theta^{(\ell)}_0$. The performance of a network in which layer $\ell$ was re-initialized is referred to as the _re-initialization robustness_ of layer $\ell$.
+- **Re-randomization**: Re-sampling the layer's parameters at random, $\theta^{(\ell)}_t \leftarrow \tilde{\theta}^{(\ell)} \sim \mathcal{P}^{(\ell)}$. The corresponding network performance is called the _re-randomization robustness_ of layer $\ell$.
 
 Layers can be categorized into two categories with the help of these two operations:
 
