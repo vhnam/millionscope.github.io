@@ -15,53 +15,19 @@ This is part 2 of what to do when facing a limited amount of labeled data for su
 
 ## Notations
 
-Symbol
-
-Meaning
-
-$K$
-
-Number of unique class labels.
-
-$(\mathbf{x}^l, y) \sim \mathcal{X}, y \in \{0, 1\}^K$
-
-Labeled dataset. $y$ is a one-hot representation of the true label.
-
-$\mathbf{u} \sim \mathcal{U}$
-
-Unlabeled dataset.
-
-$\mathcal{D} = \mathcal{X} \cup \mathcal{U}$
-
-The entire dataset, including both labeled and unlabeled examples.
-
-$\mathbf{x}$
-
-Any sample which can be either labeled or unlabeled.
-
-$\mathbf{x}_i$
-
-The $i$-th sample.
-
-$U(\mathbf{x})$
-
-Scoring function for active learning selection.
-
-$P_\theta(y \vert \mathbf{x})$
-
-A softmax classifier parameterized by $\theta$.
-
-$\hat{y} = \arg\max_{y \in \mathcal{Y}} P_\theta(y \vert \mathbf{x})$
-
-The most confident prediction by the classifier.
-
-$B$
-
-Labeling budget (the maximum number of samples to label).
-
-$b$
-
-Batch size.
+| Symbol                                                                | Meaning                                                             |
+| --------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| $K$                                                                   | Number of unique class labels.                                      |
+| $(\mathbf{x}^l, y) \sim \mathcal{X}, y \in \{0, 1\}^K$                | Labeled dataset. $y$ is a one-hot representation of the true label. |
+| $\mathbf{u} \sim \mathcal{U}$                                         | Unlabeled dataset.                                                  |
+| $\mathcal{D} = \mathcal{X} \cup \mathcal{U}$                          | The entire dataset, including both labeled and unlabeled examples.  |
+| $\mathbf{x}$                                                          | Any sample which can be either labeled or unlabeled.                |
+| $\mathbf{x}_i$                                                        | The $i$-th sample.                                                  |
+| $U(\mathbf{x})$                                                       | Scoring function for active learning selection.                     |
+| $P_\theta(y \vert \mathbf{x})$                                        | A softmax classifier parameterized by $\theta$.                     |
+| $\hat{y} = \arg\max_{y \in \mathcal{Y}} P_\theta(y \vert \mathbf{x})$ | The most confident prediction by the classifier.                    |
+| $B$                                                                   | Labeling budget (the maximum number of samples to label).           |
+| $b$                                                                   | Batch size.                                                         |
 
 ## What is Active Learning?
 
