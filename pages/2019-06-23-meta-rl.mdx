@@ -126,7 +126,7 @@ The [return](https://lilianweng.github.io/posts/2018-02-19-rl-overview/#value-fu
 $$
 \begin{aligned}
 G_\eta^{(n)}(\tau_t) &= R_{t+1} + \gamma R_{t+2} + \dots + \gamma^{n-1}R_{t+n} + \gamma^n v_\theta(s_{t+n}) & \scriptstyle{\text{; n-step return}} \\
-G_\eta^{\lambda}(\tau_t) &= (1-\lambda) \sum_{n=1}^\infty \lambda^{n-1} G_\eta^{(n)} & \scriptstyle{\text{; \lambda-return, mixture of n-step returns}}
+G_\eta^{\lambda}(\tau_t) &= (1-\lambda) \sum_{n=1}^\infty \lambda^{n-1} G_\eta^{(n)} & \scriptstyle{; \lambda\text{ -return, mixture of n-step returns}}
 \end{aligned}
 $$
 
