@@ -130,7 +130,9 @@ This method ([Baehrens, et al. 2010](http://www.jmlr.org/papers/volume11/baehren
 
 Let's say, we have a [Bayes Classifier](https://en.wikipedia.org/wiki/Bayes_classifier) which is trained on the data set $X$ and outputs probabilities over the class labels $Y$, $p(Y=y \vert X=x)$. And one class label $y$ is drawn from the class label pool, $\{1, 2, \dots, C\}$. This Bayes classifier is constructed as:
 
-$$f^{*}(x) = \arg \min_{c \in \{1, \dots, C\}} p(Y \neq c \vert X = x)$$
+$$
+f^{*}(x) = \arg \min_{c \in \{1, \dots, C\}} p(Y \neq c \vert X = x)
+$$
 
 The _local explanation vector_ is defined as the derivative of the probability prediction function at the test point $x = x_0$. A large entry in this vector highlights a feature with a big influence on the model decision; A positive sign indicates that increasing the feature would lower the probability of $x_0$ assigned to $f^{*}(x_0)$.
 
