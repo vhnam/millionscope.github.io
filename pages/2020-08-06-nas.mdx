@@ -443,115 +443,22 @@ Fig. 25. An illustration of evolutionary progress on projected binary CIFAR-10 w
 
 ## Appendix: Summary of NAS Papers
 
-| Model name | Search space | Search algorithms
-
-Child model evaluation
-
-[NEAT (2002)](http://nn.cs.utexas.edu/downloads/papers/stanley.ec02.pdf)
-
-\-
-
-Evolution (Genetic algorithm)
-
-\-
-
-[NAS (2017)](https://arxiv.org/abs/1611.01578)
-
-Sequential layer-wise ops
-
-RL (REINFORCE)
-
-Train from scratch until convergence
-
-[MetaQNN (2017)](https://arxiv.org/abs/1611.02167)
-
-Sequential layer-wise ops
-
-RL (Q-learning with $\epsilon$-greedy)
-
-Train for 20 epochs
-
-[HNAS (2017)](https://arxiv.org/abs/1711.00436)
-
-Hierarchical structure
-
-Evolution (Tournament selection)
-
-Train for a fixed number of iterations
-
-[NASNet (2018)](https://arxiv.org/abs/1707.07012)
-
-Cell-based
-
-RL (PPO)
-
-Train for 20 epochs
-
-[AmoebaNet (2018)](https://arxiv.org/abs/1802.01548)
-
-NASNet search space
-
-Evolution (Tournament selection with aging regularization)
-
-Train for 25 epochs
-
-[EAS (2018a)](https://arxiv.org/abs/1707.04873)
-
-Network transformation
-
-RL (REINFORCE)
-
-2-stage training
-
-[PNAS (2018)](https://arxiv.org/abs/1712.00559)
-
-Reduced version of NASNet search space
-
-SMBO; Progressive search for architectures of increasing complexity
-
-Train for 20 epochs
-
-[ENAS (2018)](https://arxiv.org/abs/1802.03268)
-
-Both sequential and cell-based search space
-
-RL (REINFORCE)
-
-Train one model with shared weights
-
-[SMASH (2017)](https://arxiv.org/abs/1708.05344)
-
-Memory-bank representation
-
-Random search
-
-HyperNet predicts weights of evaluated architectures.
-
-[One-Shot (2018)](http://proceedings.mlr.press/v80/bender18a.html)
-
-An over-parameterized one-shot model
-
-Random search (zero out some paths at random)
-
-Train the one-shot model
-
-[DARTS (2019)](https://arxiv.org/abs/1806.09055)
-
-NASNet search space
-
-Gradient descent (Softmax weights over operations)
-
-[ProxylessNAS (2019)](https://arxiv.org/abs/1812.00332)
-
-Tree structure architecture
-
-Gradient descent (BinaryConnect) or REINFORCE
-
-[SNAS (2019)](https://arxiv.org/abs/1812.09926)
-
-NASNet search space
-
-Gradient descent (concrete distribution)
+| Model name                                                               | Search space                                | Search algorithms                                                   | Child model evaluation                                |
+| ------------------------------------------------------------------------ | ------------------------------------------- | ------------------------------------------------------------------- | ----------------------------------------------------- |
+| [NEAT (2002)](http://nn.cs.utexas.edu/downloads/papers/stanley.ec02.pdf) | -                                           | Evolution (Genetic algorithm)                                       | -                                                     |
+| [NAS (2017)](https://arxiv.org/abs/1611.01578)                           | Sequential layer-wise ops                   | RL (REINFORCE)                                                      | Train from scratch until convergence                  |
+| [MetaQNN (2017)](https://arxiv.org/abs/1611.02167)                       | Sequential layer-wise ops                   | RL (Q-learning with $\epsilon$-greedy)                              | Train for 20 epochs                                   |
+| [HNAS (2017)](https://arxiv.org/abs/1711.00436)                          | Hierarchical structure                      | Evolution (Tournament selection)                                    | Train for a fixed number of iterations                |
+| [NASNet (2018)](https://arxiv.org/abs/1707.07012)                        | Cell-based                                  | RL (PPO)                                                            | Train for 20 epochs                                   |
+| [AmoebaNet (2018)](https://arxiv.org/abs/1802.01548)                     | NASNet search space                         | Evolution (Tournament selection with aging regularization)          | Train for 25 epochs                                   |
+| [EAS (2018a)](https://arxiv.org/abs/1707.04873)                          | Network transformation                      | RL (REINFORCE)                                                      | 2-stage training                                      |
+| [PNAS (2018)](https://arxiv.org/abs/1712.00559)                          | Reduced version of NASNet search space      | SMBO; Progressive search for architectures of increasing complexity | Train for 20 epochs                                   |
+| [ENAS (2018)](https://arxiv.org/abs/1802.03268)                          | Both sequential and cell-based search space | RL (REINFORCE)                                                      | Train one model with shared weights                   |
+| [SMASH (2017)](https://arxiv.org/abs/1708.05344)                         | Memory-bank representation                  | Random search                                                       | HyperNet predicts weights of evaluated architectures. |
+| [One-Shot (2018)](http://proceedings.mlr.press/v80/bender18a.html)       | An over-parameterized one-shot model        | Random search (zero out some paths at random)                       | Train the one-shot model                              |
+| [DARTS (2019)](https://arxiv.org/abs/1806.09055)                         | NASNet search space                         | Gradient descent (Softmax weights over operations)                  |                                                       |
+| [ProxylessNAS (2019)](https://arxiv.org/abs/1812.00332)                  | Tree structure architecture                 | Gradient descent (BinaryConnect) or REINFORCE                       |                                                       |
+| [SNAS (2019)](https://arxiv.org/abs/1812.09926)                          | NASNet search space                         | Gradient descent (concrete distribution)                            |                                                       |
 
 ## Citation
 
@@ -590,7 +497,7 @@ Or
 14. Hieu Pham, et al. ["Efficient neural architecture search via parameter sharing"](https://arxiv.org/abs/1802.03268) ICML 2018.
 15. Andrew Brock, et al. ["SMASH: One-shot model architecture search through hypernetworks."](https://arxiv.org/abs/1708.05344) ICLR 2018.
 16. Gabriel Bender, et al. ["Understanding and simplifying one-shot architecture search."](http://proceedings.mlr.press/v80/bender18a.html) ICML 2018.
-17. Hanxiao Liu, Karen Simonyan, Yiming Yang. ["DARTS: Differentiable Architecture Search"](https://arxiv.org/abs/1806.09055) ICLR 2019.
+17. Hanxiao Liu, Karen Simonyan, Yiming dix: Summary of NAS PapersYang. ["DARTS: Differentiable Architecture Search"](https://arxiv.org/abs/1806.09055) ICLR 2019.
 18. Sirui Xie, Hehui Zheng, Chunxiao Liu, Liang Lin. ["SNAS: Stochastic Neural Architecture Search"](https://arxiv.org/abs/1812.09926) ICLR 2019.
 19. Chenxi Liu et al. ["Are Labels Necessary for Neural Architecture Search?"](https://arxiv.org/abs/2003.12056) ECCV 2020.
 20. Esteban Real, et al. ["AutoML-Zero: Evolving Machine Learning Algorithms From Scratch"](https://arxiv.org/abs/2003.03384) ICML 2020.
