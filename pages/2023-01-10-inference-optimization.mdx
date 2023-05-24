@@ -328,7 +328,7 @@ Mixture-of-experts (MoE) models depend on a collection of "expert" networks and 
 With MoE architecture, only partial parameters are utilized at decoding time and therefore it saves inference cost. The capacity of each expert can be adjusted with a hyperparameter, capacity factor $C$, and the expert capacity is defined as:
 
 $$
-\text{Expert capacity} = \text{round}(C \cdot k \cdot \frac{\text{total ## tokens in one batch}}{\text{## experts}})
+\text{Expert capacity} = \text{round}(C \cdot k \cdot \frac{\text{total \# tokens in one batch}}{\text{\# experts}})
 $$
 
 where top-$k$ experts are selected per token. Larger $C$ leads to higher expert capacity and improved performance but more expensive computationally. When $C>1$, a slack capacity is added; otherwise, when $C<1$, the routing network needs to ignore some tokens.
