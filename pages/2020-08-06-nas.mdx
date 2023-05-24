@@ -319,12 +319,15 @@ The motivation here is that we want to find an architecture with a low validatio
 Fig. 20. An illustration of how DARTS applies continuous relaxation on edges in DAG supergraph and identifies the final model. (Image source: [Liu et al 2019](https://arxiv.org/abs/1806.09055))
 
 $$
-\begin{aligned} \text{Let }w'_k &= w_k - \xi \nabla_w \mathcal{L}_\text{train}(w_k, \alpha_{k-1}) & \\
+\begin{aligned}
+\text{Let }w'_k &= w_k - \xi \nabla_w \mathcal{L}_\text{train}(w_k, \alpha_{k-1}) & \\
 J_\alpha &= \mathcal{L}_\text{val}(w_k - \xi \nabla_w \mathcal{L}_\text{train}(w_k, \alpha_{k-1}), \alpha_{k-1}) = \mathcal{L}_\text{val}(w'_k, \alpha_{k-1}) & \\
-\nabla_\alpha J_\alpha &= \nabla_{\alpha_{k-1}} \mathcal{L}_\text{val}(w'_k, \alpha_{k-1}) \nabla_\alpha \alpha_{k-1} + \nabla_{w'_k} \mathcal{L}_\text{val}(w'_k, \alpha_{k-1})\nabla_\alpha w'_k & \\& \text{; multivariable chain rule}\\
+\nabla_\alpha J_\alpha 
+&= \nabla_{\alpha_{k-1}} \mathcal{L}_\text{val}(w'_k, \alpha_{k-1}) \nabla_\alpha \alpha_{k-1} + \nabla_{w'_k} \mathcal{L}_\text{val}(w'_k, \alpha_{k-1})\nabla_\alpha w'_k & \\& \text{; multivariable chain rule}\\
 &= \nabla_{\alpha_{k-1}} \mathcal{L}_\text{val}(w'_k, \alpha_{k-1}) + \nabla_{w'_k} \mathcal{L}_\text{val}(w'_k, \alpha_{k-1}) \big( - \xi \color{red}{\nabla^2_{\alpha, w} \mathcal{L}_\text{train}(w_k, \alpha_{k-1})} \big) & \\
 &\approx \nabla_{\alpha_{k-1}} \mathcal{L}_\text{val}(w'_k, \alpha_{k-1}) - \xi \nabla_{w'_k} \mathcal{L}_\text{val}(w'_k, \alpha_{k-1}) \color{red}{\frac{\nabla_\alpha \mathcal{L}_\text{train}(w_k^+, \alpha_{k-1}) - \nabla_\alpha \mathcal{L}_\text{train}(w_k^-, \alpha_{k-1}) }{2\epsilon}} & \\
-& \text{; apply numerical differentiation approximation} \end{aligned}
+& \text{; apply numerical differentiation approximation}
+\end{aligned}
 $$
 
 where the red part is using numerical differentiation approximation where $w_k^+ = w_k + \epsilon \nabla_{w'_k} \mathcal{L}_\text{val}(w'_k, \alpha_{k-1})$ and $w_k^- = w_k - \epsilon \nabla_{w'_k} \mathcal{L}_\text{val}(w'_k, \alpha_{k-1})$.
@@ -358,8 +361,6 @@ o_{\vert \mathcal{O} \vert}(x) & \text{with probability }p_{\vert \mathcal{O} \v
 \end{cases}
 \end{aligned}
 $$
-
-> sdfsdf 
 
 ![](assets/images/2020-08-06-nas/proxylessNAS-training.png)
 Fig. 22. ProxylessNAS has two training steps running alternatively. (Image source: [Cai et al., 2019](https://arxiv.org/abs/1812.00332))
