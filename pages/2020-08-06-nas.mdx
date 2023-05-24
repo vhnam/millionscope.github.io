@@ -343,14 +343,23 @@ Let's continue with the graph representation. In a DAG adjacency matrix $G$ wher
 In One-Shot, $m_\mathcal{O}(x)$ is the sum of all the operations. In DARTS, it is a weighted sum where weights are softmax over a real-valued architecture weighting vector $\alpha$ of length $\vert \mathcal{O} \vert$. ProxylessNAS transforms the softmax probabilities of $\alpha$ into a binary gate and uses the binary gate to keep only one operation active at a time.
 
 $$
-\begin{aligned} m^\text{one-shot}_\mathcal{O}(x) &= \sum_{i=1}^{\vert \mathcal{O} \vert} o_i(x) \\
+\begin{aligned}
+m^\text{one-shot}_\mathcal{O}(x) &= \sum_{i=1}^{\vert \mathcal{O} \vert} o_i(x) \\
 m^\text{DARTS}_\mathcal{O}(x) &= \sum_{i=1}^{\vert \mathcal{O} \vert} p_i o_i(x) = \sum_{i=1}^{\vert \mathcal{O} \vert} \frac{\exp(\alpha_i)}{\sum_j \exp(\alpha_j)} o_i(x) \\
-m^\text{binary}_\mathcal{O}(x) &= \sum_{i=1}^{\vert \mathcal{O} \vert} g_i o_i(x) = \begin{cases} o_1(x) & \text{with probability }p_1, \\
+m^\text{binary}_\mathcal{O}(x) &= \sum_{i=1}^{\vert \mathcal{O} \vert} g_i o_i(x) = \begin{cases}
+o_1(x) & \text{with probability }p_1, \\
 \dots &\\
-o_{\vert \mathcal{O} \vert}(x) & \text{with probability }p_{\vert \mathcal{O} \vert} \end{cases} \\
-text{ where } g &= \text{binarize}(p_1, \dots, p_N) = \begin{cases} [1, 0, \dots, 0. & \text{with probability }p_1, \\\dots & \\
-0, 0, \dots, 1. & \text{with probability }p_N. \\\end{cases} \end{aligned}
+o_{\vert \mathcal{O} \vert}(x) & \text{with probability }p_{\vert \mathcal{O} \vert}
+\end{cases} \\
+\text{ where } g &= \text{binarize}(p_1, \dots, p_N) = \begin{cases}
+[1, 0, \dots, 0] & \text{with probability }p_1, \\
+\dots & \\
+[0, 0, \dots, 1] & \text{with probability }p_N. \\
+\end{cases}
+\end{aligned}
 $$
+
+> sdfsdf 
 
 ![](assets/images/2020-08-06-nas/proxylessNAS-training.png)
 Fig. 22. ProxylessNAS has two training steps running alternatively. (Image source: [Cai et al., 2019](https://arxiv.org/abs/1812.00332))
